@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "qapplaapp"
+  },
+  "targets": {
+    "qapplaapp": {
+      "hosting": {
+        "streamers-dashboard": [
+          "qaplastreamerdashboard"
+        ]
+      }
+    }
+  }
+}

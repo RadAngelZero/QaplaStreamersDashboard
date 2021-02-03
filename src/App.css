@@ -1,0 +1,13 @@
+.Nav-Title {
+  flex-grow: 1;
+}
+
+.White-Color {
+  color: '#FFF';
+  text-decoration: none;
+  text-transform: none !important;
+}
+
+.Margin-Right {
+  margin-left: 1rem;
+}

@@ -22,7 +22,7 @@ import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent'
 
 const Router = () => {
     const [games, setGames] = useState({});
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
 
@@ -64,21 +64,25 @@ const Router = () => {
                 <Route exact path='/signin'>
                     <StreamersSignin user={user} />
                 </Route>
-                <Route exact path='/welcome'>
-                    <StreamerOnBoarding user={user} />
-                </Route>
-                <Route exact path='/create'>
-                    <NewStream user={user} games={games}/>
-                </Route>
-                <Route exact path='/edit/:eventId'>
-                    <EditStreamerEvent user={user} games={games}/>
-                </Route>
-                <Route exact path='/profile'>
-                    <StreamerProfile user={user} />
-                </Route>
-                <Route exact path='/success'>
-                    <EventSent user={user} />
-                </Route>
+                {user &&
+                    <>
+                        <Route exact path='/welcome'>
+                            <StreamerOnBoarding user={user} />
+                        </Route>
+                        <Route exact path='/create'>
+                            <NewStream user={user} games={games}/>
+                        </Route>
+                        <Route exact path='/edit/:eventId'>
+                            <EditStreamerEvent user={user} games={games}/>
+                        </Route>
+                        <Route exact path='/profile'>
+                            <StreamerProfile user={user} />
+                        </Route>
+                        <Route exact path='/success'>
+                            <EventSent user={user} />
+                        </Route>
+                    </>
+                }
             </Switch>
         </RouterPackage>
     );

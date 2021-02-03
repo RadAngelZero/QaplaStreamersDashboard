@@ -37,7 +37,6 @@ const Router = () => {
             handleUserAuthentication((user) => {
                 loadStreamerProfile(user.uid, (userData) => {
                     setUser({ ...userData, admin: false, streamer: true, uid: user.uid });
-                    // connectUserToSendBird(user.uid);
                 });
             }, () => {
                 setUser(undefined);

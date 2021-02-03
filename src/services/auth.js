@@ -35,7 +35,7 @@ export async function signInWithTwitch() {
  * Login the user with twitch and return their user code
  */
 function LoginWithTwitch() {
-    const redirectUri = 'http://localhost:3000';
+    const redirectUri = 'https://qaplastreamerdashboard.firebaseapp.com';
     const uri =
         `https://id.twitch.tv/oauth2/authorize?` +
         `client_id=${TWITCH_CLIENT_ID}&` +
@@ -77,7 +77,7 @@ async function createTwitchUser(code) {
             `client_secret=${TWITCH_SECRET_ID}&` +
             `code=${code}&` +
             `grant_type=authorization_code&` +
-            `redirect_uri=http://localhost:3000`, { method: 'POST' });
+            `redirect_uri=https://qaplastreamerdashboard.firebaseapp.com`, { method: 'POST' });
 
         const resultData = await result.json();
         let user = await getTwitchUserData(resultData.access_token);

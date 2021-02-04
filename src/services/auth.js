@@ -1,7 +1,7 @@
 import { auth } from './firebase';
 import { streamerProfileExists } from './database';
 import { createUserWithTwitch } from './functions';
-import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID } from '../utilities/Constants';
+import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, TWITCH_REDIRECT_URI } from '../utilities/Constants';
 
 /**
  * Listens for changes on the user authentication status
@@ -35,11 +35,10 @@ export async function signInWithTwitch() {
  * Login the user with twitch and return their user code
  */
 function LoginWithTwitch() {
-    const redirectUri = 'https://qaplastreamerdashboard.firebaseapp.com';
     const uri =
         `https://id.twitch.tv/oauth2/authorize?` +
         `client_id=${TWITCH_CLIENT_ID}&` +
-        `redirect_uri=${redirectUri}&` +
+        `redirect_uri=${TWITCH_REDIRECT_URI}&` +
         `response_type=code&` +
         `scope=user:read:email%20user:edit%20bits:read%20user:edit%20channel:read:subscriptions%20channel:manage:redemptions`;
     return new Promise((resolve, reject) => {
@@ -77,7 +76,7 @@ async function createTwitchUser(code) {
             `client_secret=${TWITCH_SECRET_ID}&` +
             `code=${code}&` +
             `grant_type=authorization_code&` +
-            `redirect_uri=https://qaplastreamerdashboard.firebaseapp.com`, { method: 'POST' });
+            `redirect_uri=${TWITCH_REDIRECT_URI}`, { method: 'POST' });
 
         const resultData = await result.json();
         let user = await getTwitchUserData(resultData.access_token);

@@ -21,8 +21,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#141833',
         borderRadius: '.5rem',
         color: '#FFF',
-        fontSize: '14px',
-        paddingRight: '.5rem'
+        fontSize: '14px'
     },
     icon: {
         color: 'transparent',

@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Grid, Button, Card, CardContent, Box, IconButton } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Avatar, Grid, Button, Card, Menu, MenuItem, CardContent, Box, IconButton } from '@material-ui/core';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
-import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
+import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
-import StreamerSelect from '../StreamerSelect/StreamerSelect';
+
+const StyledMenu = withStyles({
+    paper: {
+        backgroundColor: '#141833'
+    },
+})((props) => (
+    <Menu
+        {...props}
+    />
+));
 
 const useStyles = makeStyles({
     endIcon: {
@@ -63,12 +72,24 @@ const StreamerProfile = ({ user }) => {
                             <h1 className={styles.title}>My events</h1>
                         </Grid>
                         <Grid item xs={9} style={{ marginTop: '6rem' }}>
-                            <StreamerSelect
-                                Icon={ArrowIcon}>
-                                <option>Scheduled</option>
-                                <option>Pending Approval</option>
-                                <option>Past Streams</option>
-                            </StreamerSelect>
+                            <Button className={styles.filter}
+                                classes={{
+                                    endIcon: classes.endIcon
+                                }}
+                                endIcon={<Arrow />}
+                                onClick={handleClick}>
+                                Scheduled
+                            </Button>
+                            <StyledMenu
+                                anchorEl={anchorEl}
+                                keepMounted
+                                open={Boolean(anchorEl)}
+                                onClose={handleClose}
+                            >
+                                <MenuItem onClick={handleClose}>Algo</MenuItem>
+                                <MenuItem onClick={handleClose}>Algo1</MenuItem>
+                                <MenuItem onClick={handleClose}>Algo2</MenuItem>
+                            </StyledMenu>
                         </Grid>
                     </Grid>
                 </Grid>

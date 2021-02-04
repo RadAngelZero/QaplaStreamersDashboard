@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Avatar, Grid, Button, Card, CardContent, Box, IconButton } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
 
 import styles from './StreamerProfile.module.css';
@@ -12,26 +11,9 @@ import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg'
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
 
-const useStyles = makeStyles({
-    endIcon: {
-        position: 'absolute',
-        right: '1.5rem'
-    },
-});
-
 const StreamerProfile = ({ user }) => {
-    const [anchorEl, setAnchorEl] = useState(null);
 
-    const classes = useStyles();
     const history = useHistory();
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
     const createStream = () => history.push('/create');
 

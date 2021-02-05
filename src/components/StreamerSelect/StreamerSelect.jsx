@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 const StreamerSelect = ({ children, label, Icon, value, onChange }) => {
     const classes = useStyles();
 
-
     return (
         <>
             <InputLabel className={classes.label}>

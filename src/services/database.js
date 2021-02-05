@@ -84,3 +84,11 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         streamerPhoto: streamer.photoUrl
     });
 }
+
+/**
+ * Streams
+ */
+
+export async function loadStreamsByStatus(uid, status) {
+    return await streamersEventsDataRef.child(uid).orderByChild('status').equalTo(status).once('value');
+}

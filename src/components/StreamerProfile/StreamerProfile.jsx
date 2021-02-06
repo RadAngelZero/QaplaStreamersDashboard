@@ -18,7 +18,7 @@ const PAST_STREAMS_EVENT_TYPE = 'PAST_STREAMS';
 
 const StreamerProfile = ({ user }) => {
     const history = useHistory();
-    const [streamType, setStreamType] = useState('scheduled');
+    const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
 
     useEffect(() => {

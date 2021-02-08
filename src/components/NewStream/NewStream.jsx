@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel } from '@material-ui/core';
+import React, { useState, useReducer } from 'react';
+import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails, } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import DayJsUtils from '@date-io/dayjs';
@@ -8,6 +8,7 @@ import { createNewStreamRequest } from './../../services/database';
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
+import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
@@ -82,16 +83,90 @@ const useStyles = makeStyles((theme) => ({
         '& .MuiPickersClockNumber-clockNumberSelected': {
             color: '#000'
         }
-    }
+    },
+    accordionContainer: {
+        marginTop: '3%',
+    },
+    accordion: {
+        backgroundColor: '#0D1021',
+        width: '66%',
+    },
+    accordionGridRoot: {
+        flex: 1,
+        flexGrow: 2,
+    },
+    accordionGridItem: {
+        flex: 1,
+        flexGrow: 2,
+    },
 }));
 
 const NewStream = ({ user, games }) => {
+
+    const userLang = navigator.language || navigator.userLanguage;
+
     const classes = useStyles();
     const history = useHistory();
+
+    const optionalDataReducer = (state, action) => {
+        switch (action.target.id) {
+            case 'eventTitle':
+                if (userLang.toLowerCase().includes('es')){
+                    return ({
+                        ...state,
+                        title: {
+                            es: action.target.value
+                        }
+                    })
+                } else {
+                    return ({
+                        ...state,
+                        title: {
+                            en: action.target.value
+                        }
+                    })
+                }
+            case 'eventDescriptionTitle':
+                if (userLang.toLowerCase().includes('es')){
+                    return ({
+                        ...state,
+                        descriptionsTitle: {
+                            es: action.target.value
+                        }
+                    })
+                } else {
+                    return ({
+                        ...state,
+                        descriptionsTitle: {
+                            en: action.target.value
+                        }
+                    })
+                }
+            case 'eventDescription':
+                if (userLang.toLowerCase().includes('es')){
+                    return ({
+                        ...state,
+                        descriptions: {
+                            es: action.target.value
+                        }
+                    })
+                } else {
+                    return ({
+                        ...state,
+                        descriptions: {
+                            en: action.target.value
+                        }
+                    })
+                }
+            default:
+                break;
+        }
+    }
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedGame, setSelectedGame] = useState();
     const [selectedEvent, setSelectedEvent] = useState('exp');
+    const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {})
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
@@ -99,7 +174,7 @@ const NewStream = ({ user, games }) => {
     const handleGameChange = (game) => {
         setSelectedGame(game.target.value);
     };
-    const handleEventChange = (event) => {
+    const handleEventTypeChange = (event) => {
         setSelectedEvent(event.target.value);
     };
 
@@ -125,7 +200,7 @@ const NewStream = ({ user, games }) => {
             selectedDate.$d.getMinutes()
         );
 
-        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, timestamp.getTime());
+        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, timestamp.getTime(), optionalData);
         history.push('/success');
     }
 
@@ -142,9 +217,9 @@ const NewStream = ({ user, games }) => {
                         Icon={ArrowIcon}
                         label='Select your game'>
                         <option style={{
-                                backgroundColor: '#141833',
-                                fontSize: '14px'
-                            }} value={null}></option>
+                            backgroundColor: '#141833',
+                            fontSize: '14px'
+                        }} value={null}></option>
                         {games.allGames && Object.entries(games.allGames).map((game) => {
                             if (!game[1].name.toLowerCase().includes('twitch')) {
                                 return <option style={{
@@ -226,7 +301,7 @@ const NewStream = ({ user, games }) => {
                     <h1 className={styles.title}>
                         Stream type
                     </h1>
-                    <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => {handleEventChange(event)}}>
+                    <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
                         <Grid container>
                             <Grid item sm={2}>
                                 <FormControlLabel
@@ -254,6 +329,85 @@ const NewStream = ({ user, games }) => {
                             </Grid>
                         </Grid>
                     </RadioGroup>
+                    <Grid container className={classes.accordionContainer}>
+                        <Accordion
+                            className={classes.accordion}
+                        >
+                            <AccordionSummary
+                                expandIcon={<ArrowIcon />}
+                                id={"moreOptions"}
+                                aria-controls="panel1a-content"
+                            >
+                                <InputLabel
+                                    className={classes.label}
+                                >
+                                    Advanced (optional)
+                            </InputLabel>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Grid container direction={'column'} className={classes.accordionGridRoot}>
+                                    <InputLabel
+                                        className={classes.label}
+                                    >
+                                        Isn't necessary to fill every field of this part, you can left some of them empty and we will do our best to translate or fulfill the missing info
+                                    </InputLabel>
+                                    <Grid container>
+                                        <h2 className={styles.subtitle}>
+                                            Event Title
+                                        </h2>
+                                        <Grid container spacing={4}>
+                                            <Grid item className={classes.accordionGridItem}>
+                                                <StreamerTextInput
+                                                    id={'eventTitle'}
+                                                    multiline={true}
+                                                    rowsMax={3}
+                                                    fullWidth={true}
+                                                    value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
+                                                    onChange={(e) => optionalDataDispatcher({target: e.target})}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid>
+                                        <h2 className={styles.subtitle}>
+                                            Event Title Description
+                                        </h2>
+                                        <Grid container spacing={4}>
+                                            <Grid item className={classes.accordionGridItem}>
+                                                <StreamerTextInput
+                                                    id={'eventDescriptionTitle'}
+                                                    multiline={true}
+                                                    rows={2}
+                                                    rowsMax={3}
+                                                    fullWidth={true}
+                                                    value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
+                                                    onChange={(e) => optionalDataDispatcher({target: e.target})}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid>
+                                        <h2 className={styles.subtitle}>
+                                            Event Description
+                                        </h2>
+                                        <Grid container spacing={4}>
+                                            <Grid item className={classes.accordionGridItem}>
+                                                <StreamerTextInput
+                                                    id={'eventDescription'}
+                                                    multiline={true}
+                                                    rows={3}
+                                                    rowsMax={30}
+                                                    fullWidth={true}
+                                                    value={optionalData.descriptions ? userLang.toLowerCase().includes('es') ? optionalData.descriptions.es : optionalData.descriptions.en : ''}
+                                                    onChange={(e) => optionalDataDispatcher({target: e.target})}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </AccordionDetails>
+                        </Accordion>
+                    </Grid>
                     <Button
                         className={styles.button}
                         onClick={submitEvent}>

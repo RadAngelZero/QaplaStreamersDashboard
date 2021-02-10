@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { makeStyles, Card, CardContent, IconButton, Menu, MenuItem } from '@material-ui/core';
+import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton } from '@material-ui/core';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
@@ -56,6 +56,20 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
+const StyledMenu = withStyles({
+    paper: {
+        backgroundColor: '#141833',
+    },
+})((props) => (
+    <Menu {...props} />
+));
+
+const StyledMenuItem = withStyles((theme) => ({
+    root: {
+      color: '#FFF'
+    },
+  }))(MenuItem);
+
 const StreamCard = ({ user, streamId, game, title, participants, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
@@ -111,13 +125,13 @@ const StreamCard = ({ user, streamId, game, title, participants, date, onClick, 
                     <IconButton size='small' disabled={!enableOptionsIcon} onClick={onOptionsIconClick}>
                         <OptionsIcon />
                     </IconButton>
-                    <Menu
+                    <StyledMenu
                         anchorEl={anchorEl}
                         open={Boolean(anchorEl)}
                         keepMounted
                         onClose={closeMenu}>
-                        <MenuItem onClick={cancelStream}>Cancelar</MenuItem>
-                    </Menu>
+                        <StyledMenuItem onClick={cancelStream}>Cancelar</StyledMenuItem>
+                    </StyledMenu>
                 </div>
             </CardContent>
         </Card>

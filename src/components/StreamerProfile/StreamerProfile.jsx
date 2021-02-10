@@ -112,33 +112,16 @@ const StreamerProfile = ({ user, games }) => {
                         </Grid>
                         {streams && Object.keys(streams).map((streamId) => (
                             <Grid item md={3} key={streamId}>
-                                {streamType === SCEHDULED_EVENT_TYPE &&
-                                    <StreamCard
-                                        streamId={streamId}
-                                        game={streams[streamId].game}
-                                        title={games['allGames'][streams[streamId].game].name}
-                                        participants={streams[streamId].participants || 0}
-                                        date={formatDate(streams[streamId].date)}
-                                        onClick={goToStreamDetails} />
-                                }
-                                {streamType === PENDING_APPROVAL_EVENT_TYPE &&
-                                    <StreamCard
-                                        streamId={streamId}
-                                        user={user}
-                                        game={streams[streamId].game}
-                                        title={games['allGames'][streams[streamId].game].name}
-                                        date={formatDate(streams[streamId].date)}
-                                        enableOptionsIcon
-                                        onRemoveStream={onRemoveStream} />
-                                }
-                                {streamType === PAST_STREAMS_EVENT_TYPE &&
-                                    <StreamCard
-                                        streamId={streamId}
-                                        game={streams[streamId].game}
-                                        title={games['allGames'][streams[streamId].game].name}
-                                        participants={streams[streamId].participants || 0}
-                                        date={formatDate(streams[streamId].date)} />
-                                }
+                                <StreamCard
+                                    streamType={streamType}
+                                    streamId={streamId}
+                                    user={user}
+                                    game={streams[streamId].game}
+                                    title={games['allGames'][streams[streamId].game].name}
+                                    date={formatDate(streams[streamId].date)}
+                                    enableOptionsIcon={streamType === PENDING_APPROVAL_EVENT_TYPE}
+                                    onClick={goToStreamDetails}
+                                    onRemoveStream={onRemoveStream} />
                             </Grid>
                         ))}
                     </Grid>

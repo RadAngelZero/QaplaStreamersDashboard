@@ -5,6 +5,8 @@ const InvitationCodeRef = database.ref('/InvitationCode');
 const userStreamersRef = database.ref('/UserStreamer');
 const streamsApprovalRef = database.ref('/StreamsApproval');
 const streamersEventsDataRef = database.ref('/StreamersEventsData');
+const streamsRef = database.ref('/eventosEspeciales').child('eventsData');
+const streamersHistoryEventsDataRef = database.ref('/StreamersHistoryEventsData');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -106,4 +108,28 @@ export async function loadStreamsByStatus(uid, status) {
 export async function cancelStreamRequest(uid, streamId) {
     await streamersEventsDataRef.child(uid).child(streamId).remove();
     await streamsApprovalRef.child(streamId).remove();
+}
+
+/**
+ * Returns the value of the participantsNumber node of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamParticipantsNumber(streamId) {
+    return await streamsRef.child(streamId).child('participantsNumber').once('value');
+}
+
+/**
+ * Returns all the data of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function loadApprovedStreamData(streamId) {
+    return await streamsRef.child(streamId).once('value');
+}
+
+/**
+ * Returns the value of the participantsNumber node of the given past stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getPastStreamParticipantsNumber(streamId) {
+    return await streamersHistoryEventsDataRef.child(streamId).child('participantsNumber').once('value');
 }

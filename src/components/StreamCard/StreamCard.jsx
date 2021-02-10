@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton } from '@material-ui/core';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
-import { streamsPlaceholderImages } from '../../utilities/Constants';
-import { cancelStreamRequest } from '../../services/database';
+import { streamsPlaceholderImages, SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
+import { cancelStreamRequest, getStreamParticipantsNumber, getPastStreamParticipantsNumber } from '../../services/database';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -64,16 +64,32 @@ const StyledMenu = withStyles({
     <Menu {...props} />
 ));
 
-const StyledMenuItem = withStyles((theme) => ({
+const StyledMenuItem = withStyles(() => ({
     root: {
       color: '#FFF'
     },
   }))(MenuItem);
 
-const StreamCard = ({ user, streamId, game, title, participants, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
+const StreamCard = ({ user, streamId, streamType, game, title, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
     const [anchorEl, setAnchorEl] = useState(null);
+    const [participantsNumber, setParticipantsNumber] = useState(null);
     const classes = useStyles();
-    const hasParticipants = typeof participants === 'number';
+
+    useEffect(() => {
+        async function getParticipantsNumber() {
+            if (streamType === SCEHDULED_EVENT_TYPE) {
+                const participants = await getStreamParticipantsNumber(streamId);
+                let participantsNumber = participants.exists() ? participants.val() : 0;
+                setParticipantsNumber(participantsNumber);
+            } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
+                const participants = await getPastStreamParticipantsNumber(streamId);
+                let participantsNumber = participants.exists() ? participants.val() : 0;
+                setParticipantsNumber(participantsNumber);
+            }
+        }
+
+        getParticipantsNumber();
+    }, []);
 
     const onOptionsIconClick = (e) => {
         e.stopPropagation();
@@ -110,9 +126,9 @@ const StreamCard = ({ user, streamId, game, title, participants, date, onClick, 
                     {title}
                 </p>
                 <div className={classes.rowContainer}>
-                    <div className={classes.circle} style={{ backgroundColor: hasParticipants ? '#0049C6' : 'transparent' }} />
-                    <p className={classes.participantsNumber} style={{ color: hasParticipants ? '#808191' : 'transparent' }}>
-                        {participants} participants
+                    <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />
+                    <p className={classes.participantsNumber} style={{ color: participantsNumber !== null ? '#808191' : 'transparent' }}>
+                        {participantsNumber} participants
                     </p>
                 </div>
                 <div className={classes.dateContainer}>

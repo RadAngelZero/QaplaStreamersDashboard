@@ -69,13 +69,13 @@ const Router = () => {
                             <StreamerOnBoarding user={user} />
                         </Route>
                         <Route exact path='/create'>
-                            <NewStream user={user} games={games}/>
+                            <NewStream user={user} games={games} />
                         </Route>
                         <Route exact path='/edit/:eventId'>
-                            <EditStreamerEvent user={user} games={games}/>
+                            <EditStreamerEvent user={user} games={games} />
                         </Route>
                         <Route exact path='/profile'>
-                            <StreamerProfile user={user} />
+                            <StreamerProfile user={user} games={games} />
                         </Route>
                         <Route exact path='/success'>
                             <EventSent user={user} />

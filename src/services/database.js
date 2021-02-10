@@ -89,6 +89,21 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
  * Streams
  */
 
+/**
+ * Load all the strams of StreamersEventsData based on their value on the status flag
+ * @param {string} uid User identifier
+ * @param {number} status Value of the status to load
+ */
 export async function loadStreamsByStatus(uid, status) {
     return await streamersEventsDataRef.child(uid).orderByChild('status').equalTo(status).once('value');
+}
+
+/**
+ * Removes a stream request of the database
+ * @param {string} uid User identifier
+ * @param {string} streamId Identifier of the stream to remove
+ */
+export async function cancelStreamRequest(uid, streamId) {
+    await streamersEventsDataRef.child(uid).child(streamId).remove();
+    await streamsApprovalRef.child(streamId).remove();
 }

@@ -7,16 +7,16 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
-import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
-import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import { loadStreamsByStatus } from '../../services/database';
+import StreamCard from '../StreamCard/StreamCard';
+import {
+    SCEHDULED_EVENT_TYPE,
+    PENDING_APPROVAL_EVENT_TYPE,
+    PAST_STREAMS_EVENT_TYPE
+} from '../../utilities/Constants';
 
-const SCEHDULED_EVENT_TYPE = 'SCHEDULED';
-const PENDING_APPROVAL_EVENT_TYPE = 'PENDING_APPROVAL';
-const PAST_STREAMS_EVENT_TYPE = 'PAST_STREAMS';
-
-const StreamerProfile = ({ user }) => {
+const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
@@ -30,22 +30,7 @@ const StreamerProfile = ({ user }) => {
 
         async function loadStreams() {
             if (user) {
-                let status = 0;
-                switch (streamType) {
-                    case SCEHDULED_EVENT_TYPE:
-                        status = 2;
-                        break;
-                    case PENDING_APPROVAL_EVENT_TYPE:
-                        status = 1;
-                        break;
-                    case PAST_STREAMS_EVENT_TYPE:
-                        status = 3;
-                        break;
-                    default:
-                        break;
-                }
-
-                setStreamLoaded(await loadStreamsByStatus(user.uid, status));
+                setStreamLoaded(await loadStreamsByStatus(user.uid, streamType));
             }
         }
 
@@ -54,9 +39,27 @@ const StreamerProfile = ({ user }) => {
 
     const createStream = () => history.push('/create');
 
-    const streamDetails = () => history.push('/edit/Nio928nje');
+    const goToStreamDetails = () => history.push('/edit/Nio928nje');
 
-    const changestreamType = (e) => setStreamType(e.target.value);
+    const changestreamType = (e) => setStreamType(parseInt(e.target.value));
+
+    /**
+     * Format the date to show in the card
+     * @param {string} date date in format DD-MM-YYYY
+     * @example formatDate("12-02-2021") returns 12 Feb 2021
+     */
+    const formatDate = (date) => {
+        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sept', 'Oct', 'Nov', 'Dic'];
+        let [day, month, year] = date.split('-');
+        month = parseInt(month) - 1; // Months array count start on zero
+        return `${day} ${months[month]} ${year}`;
+    }
+
+    const onRemoveStream = (streamId) => {
+        const streamsCopy = {...streams};
+        delete streamsCopy[streamId];
+        setStreams(streamsCopy);
+    }
 
     return (
         <StreamerDashboardContainer user={user}>
@@ -108,41 +111,34 @@ const StreamerProfile = ({ user }) => {
                             </Card>
                         </Grid>
                         {streams && Object.keys(streams).map((streamId) => (
-                            <Grid item md={3}>
-                                <Card className={styles.eventCard} onClick={streamDetails}>
-                                    <div style={{ overflow: 'hidden' }}>
-                                        <img
-                                            alt='Rocket'
-                                            src='https://rocketleague.media.zestyio.com/rl_platform_keyart_2019.f1cb27a519bdb5b6ed34049a5b86e317.jpg'
-                                            height='160'
-                                            style={{
-                                                objectFit: 'cover',
-                                                backgroundSize: 'cover',
-                                                backgroundRepeat: 'no-repeat',
-                                                backgroundPosition: 'center'
-                                            }} />
-                                    </div>
-                                    <CardContent className={styles.eventCardContent}>
-                                        <p className={styles.eventCardTitle}>
-                                            {streams[streamId].game}
-                                        </p>
-                                        <div className={styles.rowContainer}>
-                                            <div className={styles.circle} />
-                                            <p className={styles.participantsNumber}>
-                                                {streams[streamId].participants || 0}
-                                            </p>
-                                        </div>
-                                        <div className={styles.dateContainer}>
-                                            <div className={styles.rowContainer}>
-                                                <CalendarIcon />
-                                                <p className={styles.date}>
-                                                    {streams[streamId].date}
-                                                </p>
-                                            </div>
-                                            <OptionsIcon />
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                            <Grid item md={3} key={streamId}>
+                                {streamType === SCEHDULED_EVENT_TYPE &&
+                                    <StreamCard
+                                        streamId={streamId}
+                                        game={streams[streamId].game}
+                                        title={games['allGames'][streams[streamId].game].name}
+                                        participants={streams[streamId].participants || 0}
+                                        date={formatDate(streams[streamId].date)}
+                                        onClick={goToStreamDetails} />
+                                }
+                                {streamType === PENDING_APPROVAL_EVENT_TYPE &&
+                                    <StreamCard
+                                        streamId={streamId}
+                                        user={user}
+                                        game={streams[streamId].game}
+                                        title={games['allGames'][streams[streamId].game].name}
+                                        date={formatDate(streams[streamId].date)}
+                                        enableOptionsIcon
+                                        onRemoveStream={onRemoveStream} />
+                                }
+                                {streamType === PAST_STREAMS_EVENT_TYPE &&
+                                    <StreamCard
+                                        streamId={streamId}
+                                        game={streams[streamId].game}
+                                        title={games['allGames'][streams[streamId].game].name}
+                                        participants={streams[streamId].participants || 0}
+                                        date={formatDate(streams[streamId].date)} />
+                                }
                             </Grid>
                         ))}
                     </Grid>

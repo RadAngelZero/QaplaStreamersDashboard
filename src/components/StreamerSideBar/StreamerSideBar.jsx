@@ -36,10 +36,10 @@ const StreamerSideBar = ({ user }) => {
                 <ListItem>
                     <ListItemIcon><EventsIcon height={32} width={32} /></ListItemIcon>
                 </ListItem>
-                <ListItem style={{ marginTop: '.5rem' }}>
+                <ListItem style={{ marginTop: '.5rem' }} disabled>
                     <ListItemIcon><CommunityIcon height={32} width={32} /></ListItemIcon>
                 </ListItem>
-                <ListItem style={{ marginTop: '.5rem' }}>
+                <ListItem style={{ marginTop: '.5rem' }} disabled>
                     <ListItemIcon><AnalyticsIcon height={32} width={32} /></ListItemIcon>
                 </ListItem>
             </List>

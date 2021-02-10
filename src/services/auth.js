@@ -117,3 +117,10 @@ async function getTwitchUserData(access_token) {
 
     return user;
 };
+
+/**
+ * Close the current session
+ */
+export function signOut() {
+    auth.signOut();
+}

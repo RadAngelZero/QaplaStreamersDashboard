@@ -71,7 +71,7 @@ const Router = () => {
                         <Route exact path='/create'>
                             <NewStream user={user} games={games} />
                         </Route>
-                        <Route exact path='/edit/:eventId'>
+                        <Route exact path='/edit/:streamId'>
                             <EditStreamerEvent user={user} games={games} />
                         </Route>
                         <Route exact path='/profile'>

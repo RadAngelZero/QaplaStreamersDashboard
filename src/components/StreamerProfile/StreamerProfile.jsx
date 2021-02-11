@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Grid, Button, Card, CardContent, Box, IconButton } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { useHistory, use } from 'react-router-dom';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -39,7 +39,7 @@ const StreamerProfile = ({ user, games }) => {
 
     const createStream = () => history.push('/create');
 
-    const goToStreamDetails = (streamId) => history.push(`/edit/${streamId}`);
+    const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType }});
 
     const changestreamType = (e) => setStreamType(parseInt(e.target.value));
 

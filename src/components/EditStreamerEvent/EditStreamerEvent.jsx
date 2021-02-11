@@ -12,7 +12,7 @@ import {
     Avatar
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-// import { useParams } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
@@ -102,7 +102,8 @@ const SectionHeader = ({ title, description }) => {
 };
 
 const EditStreamerEvent = ({ user }) => {
-    // const { eventId } = useParams(); <= Get event id from router
+    const { streamType } = useLocation().state;
+    const { streamId } = useParams();
     const classes = useStyles();
     const history = useHistory();
 

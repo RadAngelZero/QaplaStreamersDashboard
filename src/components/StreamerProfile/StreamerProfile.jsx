@@ -39,7 +39,7 @@ const StreamerProfile = ({ user, games }) => {
 
     const createStream = () => history.push('/create');
 
-    const goToStreamDetails = () => history.push('/edit/Nio928nje');
+    const goToStreamDetails = (streamId) => history.push(`/edit/${streamId}`);
 
     const changestreamType = (e) => setStreamType(parseInt(e.target.value));
 
@@ -120,7 +120,7 @@ const StreamerProfile = ({ user, games }) => {
                                     title={games['allGames'][streams[streamId].game].name}
                                     date={formatDate(streams[streamId].date)}
                                     enableOptionsIcon={streamType === PENDING_APPROVAL_EVENT_TYPE}
-                                    onClick={goToStreamDetails}
+                                    onClick={() => goToStreamDetails(streamId)}
                                     onRemoveStream={onRemoveStream} />
                             </Grid>
                         ))}

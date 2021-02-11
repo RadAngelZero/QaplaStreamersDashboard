@@ -3,7 +3,7 @@ import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton }
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
-import { streamsPlaceholderImages, SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
+import { streamsPlaceholderImages, SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE, PENDING_APPROVAL_EVENT_TYPE } from '../../utilities/Constants';
 import { cancelStreamRequest, getStreamParticipantsNumber, getPastStreamParticipantsNumber } from '../../services/database';
 
 const useStyles = makeStyles(() => ({
@@ -112,8 +112,14 @@ const StreamCard = ({ user, streamId, streamType, game, title, date, onClick, en
         }
     }
 
+    const onClickCard = () => {
+        if (streamType !== PENDING_APPROVAL_EVENT_TYPE) {
+            onClick();
+        }
+    }
+
     return (
-        <Card className={classes.eventCard} onClick={onClick}>
+        <Card className={classes.eventCard} onClick={onClickCard}>
             <div style={{ overflow: 'hidden' }}>
                 <img
                     alt='Game'

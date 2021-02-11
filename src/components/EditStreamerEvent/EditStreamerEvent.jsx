@@ -24,6 +24,7 @@ import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg'
 
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
+import { SCEHDULED_EVENT_TYPE } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -114,49 +115,55 @@ const EditStreamerEvent = ({ user }) => {
                     <BackButton label='Nombre del evento'
                         onClick={() => history.goBack()} />
                 </Grid>
-                <Grid xs={6}>
-                    <SectionHeader title='Edit'
-                        description='A notification will be sent to the participants of any changes. We recommend not changing the date or time often tho, a consistent schedule drives more traffic to your live streams.' />
-                    <Grid container>
-                        <Grid item md={6}>
-                            <StreamerTextInput label='Date'
-                                placeholder='30/12/2020'
-                                Icon={CalendarIcon} />
-                            <ContainedButton className={classes.button}>
-                                Save Changes
-                            </ContainedButton>
+                {streamType === SCEHDULED_EVENT_TYPE &&
+                    <>
+                        <Grid xs={6}>
+                            <SectionHeader title='Edit'
+                                description='A notification will be sent to the participants of any changes. We recommend not changing the date or time often tho, a consistent schedule drives more traffic to your live streams.' />
+                            <Grid container>
+                                <Grid item md={6}>
+                                    <StreamerTextInput label='Date'
+                                        placeholder='30/12/2020'
+                                        Icon={CalendarIcon} />
+                                    <ContainedButton className={classes.button}>
+                                        Save Changes
+                                    </ContainedButton>
+                                </Grid>
+                                <Grid item md={6}>
+                                    <StreamerTextInput label='Time'
+                                        placeholder='18:00 hrs'
+                                        Icon={TimeIcon} />
+                                </Grid>
+                            </Grid>
+                            <Grid item md={12}>
+                                <SectionHeader title='Notifications'
+                                    description='You can send participants two custom notifications to share any relevant information about your stream. Make them short and only send important notices. Spaming  can have a negative impact on your stream.' />
+                                <StreamerTextInput placeholder='140 character limit'
+                                    multiline
+                                    rows={3}
+                                    fullWidth
+                                    textInputClassName={classes.textArea}
+                                    containerClassName={classes.containerTextArea} />
+                                <br/>
+                                <ContainedButton className={classes.button}>
+                                    Send
+                                </ContainedButton>
+                            </Grid>
                         </Grid>
-                        <Grid item md={6}>
-                            <StreamerTextInput label='Time'
-                                placeholder='18:00 hrs'
-                                Icon={TimeIcon} />
-                        </Grid>
-                    </Grid>
-                    <Grid item md={12}>
-                        <SectionHeader title='Notifications'
-                            description='You can send participants two custom notifications to share any relevant information about your stream. Make them short and only send important notices. Spaming  can have a negative impact on your stream.' />
-                        <StreamerTextInput placeholder='140 character limit'
-                            multiline
-                            rows={3}
-                            fullWidth
-                            textInputClassName={classes.textArea}
-                            containerClassName={classes.containerTextArea} />
-                        <br/>
-                        <ContainedButton className={classes.button}>
-                            Send
-                        </ContainedButton>
-                    </Grid>
-                </Grid>
-                <Grid xs={6}>
-                    <SectionHeader title='Private Rooms'
-                        description='If you are hosting a private room and want to give access to the participants of the event, you can share the ID with them directly in the Qapla app. Participants will get a notification to see the ID.' />
-                    <StreamerTextInput label='ID'
-                        placeholder='ID' />
-                    <br/>
-                    <ContainedButton className={classes.button}>
-                        Send
-                    </ContainedButton>
-                </Grid>
+                        {/** To define how this section is going to work
+                            <Grid xs={6}>
+                                <SectionHeader title='Private Rooms'
+                                    description='If you are hosting a private room and want to give access to the participants of the event, you can share the ID with them directly in the Qapla app. Participants will get a notification to see the ID.' />
+                                <StreamerTextInput label='ID'
+                                    placeholder='ID' />
+                                <br/>
+                                <ContainedButton className={classes.button}>
+                                    Send
+                                </ContainedButton>
+                            </Grid>
+                        */}
+                 </>
+                }
                 <Grid xs={12}>
                     <SectionHeader title='Participants' />
                     <TableContainer>

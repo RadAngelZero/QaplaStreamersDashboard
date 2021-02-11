@@ -11,6 +11,7 @@ import {
     withStyles,
     Avatar
 } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 // import { useParams } from 'react-router';
 
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -22,6 +23,7 @@ import { ReactComponent as EyeIcon } from './../../assets/EyeIcon.svg';
 import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg';
 
 import ContainedButton from '../ContainedButton/ContainedButton';
+import BackButton from '../BackButton/BackButton';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -102,10 +104,16 @@ const SectionHeader = ({ title, description }) => {
 const EditStreamerEvent = ({ user }) => {
     // const { eventId } = useParams(); <= Get event id from router
     const classes = useStyles();
+    const history = useHistory();
 
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
+                <Grid xs={12}>
+                    <BackButton
+                        onClick={() => history.goBack()}
+                        label='Nombre del evento' />
+                </Grid>
                 <Grid xs={6}>
                     <SectionHeader title='Edit'
                         description='A notification will be sent to the participants of any changes. We recommend not changing the date or time often tho, a consistent schedule drives more traffic to your live streams.' />

@@ -134,7 +134,7 @@ const NewStream = ({ user, games }) => {
         <StreamerDashboardContainer user={user}>
             <Grid container>
                 <Grid item xs={12}>
-                    <BackButton label='Nombre del evento'
+                    <BackButton
                         onClick={() => history.goBack()} />
                 </Grid>
                 <Grid item sm={8}>

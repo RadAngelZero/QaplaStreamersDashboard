@@ -110,9 +110,8 @@ const EditStreamerEvent = ({ user }) => {
         <StreamerDashboardContainer user={user}>
             <Grid container>
                 <Grid xs={12}>
-                    <BackButton
-                        onClick={() => history.goBack()}
-                        label='Nombre del evento' />
+                    <BackButton label='Nombre del evento'
+                        onClick={() => history.goBack()} />
                 </Grid>
                 <Grid xs={6}>
                     <SectionHeader title='Edit'

@@ -13,6 +13,7 @@ import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
 import { ReactComponent as CheckedIcon } from './../../assets/CheckedIcon.svg';
 import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.svg';
+import BackButton from '../BackButton/BackButton';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -132,6 +133,10 @@ const NewStream = ({ user, games }) => {
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
+                <Grid item xs={12}>
+                    <BackButton label='Nombre del evento'
+                        onClick={() => history.goBack()} />
+                </Grid>
                 <Grid item sm={8}>
                     <h1 className={styles.title}>
                         What are you playing?

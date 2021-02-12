@@ -24,8 +24,8 @@ import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg'
 
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
-import { SCEHDULED_EVENT_TYPE } from '../../utilities/Constants';
-import { loadApprovedStreamTimeStamp, getStreamParticipantsList } from '../../services/database';
+import { SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
+import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle } from '../../services/database';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -109,6 +109,7 @@ const SectionHeader = ({ title, description }) => {
 const EditStreamerEvent = ({ user }) => {
     const { streamType } = useLocation().state;
     const { streamId } = useParams();
+    const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
     const [hour, setHour] = useState('');
     const [participantsList, setParticipantsList] = useState({});
@@ -116,7 +117,7 @@ const EditStreamerEvent = ({ user }) => {
     const history = useHistory();
 
     useEffect(() => {
-        async function setEventData() {
+        async function setStreamData() {
             if (streamType === SCEHDULED_EVENT_TYPE) {
                 const timeStamp = await loadApprovedStreamTimeStamp(streamId);
                 const referenceDate = new Date(timeStamp.val());
@@ -127,21 +128,33 @@ const EditStreamerEvent = ({ user }) => {
 
         async function setStreamParticipantsList() {
             const participantsList = await getStreamParticipantsList(streamId);
-            console.log(participantsList.val());
             if (participantsList.exists()) {
                 setParticipantsList(participantsList.val());
             }
         }
 
-        setEventData();
+        async function setStreamTitle() {
+            if (streamType === SCEHDULED_EVENT_TYPE) {
+                const title = await getStreamTitle(streamId);
+                setTitle(title.val());
+            } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
+                if (user.uid) {
+                    const title = await getPastStreamTitle(user.uid, streamId);
+                    setTitle(title.val());
+                }
+            }
+        }
+
+        setStreamData();
         setStreamParticipantsList();
-    }, [streamId, streamType]);
+        setStreamTitle();
+    }, [streamId, streamType, user]);
 
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
                 <Grid xs={12}>
-                    <BackButton label='Nombre del evento'
+                    <BackButton label={title}
                         onClick={() => history.goBack()} />
                 </Grid>
                 {streamType === SCEHDULED_EVENT_TYPE &&

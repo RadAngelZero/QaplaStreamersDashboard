@@ -1,5 +1,4 @@
 import { auth } from './firebase';
-import { streamerProfileExists } from './database';
 import { createUserWithTwitch } from './functions';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, TWITCH_REDIRECT_URI } from '../utilities/Constants';
 
@@ -11,12 +10,7 @@ import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, TWITCH_REDIRECT_URI } from '../util
 export function handleUserAuthentication(callbackForAuthenticatedUser, callbackForUserNotAuthenticated) {
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            if (await streamerProfileExists(user.uid)) {
-                await callbackForAuthenticatedUser(user);
-            } else {
-                /* auth.signOut();
-                alert('Usuario no autorizado, habla con el staff de Qapla para que autorizen tu cuenta'); */
-            }
+            await callbackForAuthenticatedUser(user);
         } else {
             await callbackForUserNotAuthenticated();
         }

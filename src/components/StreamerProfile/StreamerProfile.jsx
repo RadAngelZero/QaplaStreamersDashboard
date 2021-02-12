@@ -25,6 +25,8 @@ const StreamerProfile = ({ user, games }) => {
         function setStreamLoaded(streams) {
             if (streams.exists()) {
                 setStreams(streams.val());
+            } else {
+                setStreams({});
             }
         }
 
@@ -63,70 +65,74 @@ const StreamerProfile = ({ user, games }) => {
 
     return (
         <StreamerDashboardContainer user={user}>
-            <div className={styles.avatarContainer}>
-                <Avatar
-                    alt='User image'
-                    src={user.photoUrl} />
-                <span className={styles.streamerName}>{user.displayName}</span>
-            </div>
-            <Grid container>
-                <Grid item xs={12}>
-                    <Button variant='contained'
-                        className={styles.twitchButton}
-                        startIcon={<TwitchIcon />}>
-                        {user.displayName}
-                    </Button>
-                </Grid>
-                <Grid item xs={12}>
+            {user &&
+                <>
+                    <div className={styles.avatarContainer}>
+                        <Avatar
+                            alt='User image'
+                            src={user.photoUrl} />
+                        <span className={styles.streamerName}>{user.displayName}</span>
+                    </div>
                     <Grid container>
-                        <Grid item xs={3}>
-                            <h1 className={styles.title}>My events</h1>
+                        <Grid item xs={12}>
+                            <Button variant='contained'
+                                className={styles.twitchButton}
+                                startIcon={<TwitchIcon />}>
+                                {user.displayName}
+                            </Button>
                         </Grid>
-                        <Grid item xs={9} style={{ marginTop: '6rem' }}>
-                            <StreamerSelect
-                                value={streamType}
-                                onChange={changestreamType}
-                                Icon={ArrowIcon}>
-                                <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
-                                <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
-                                <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
-                            </StreamerSelect>
-                        </Grid>
-                    </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                    <Grid container spacing={4}>
-                        <Grid item md={3}>
-                            <Card className={styles.createEventCard} onClick={createStream}>
-                                <h1 className={styles.newStream}>
-                                    New <br /> Stream
-                                </h1>
-                                <CardContent>
-                                    <Box display='flex' justifyContent='center'>
-                                        <IconButton className={styles.createButton}>
-                                            <AddIcon />
-                                        </IconButton>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        {streams && Object.keys(streams).map((streamId) => (
-                            <Grid item md={3} key={streamId}>
-                                <StreamCard
-                                    streamType={streamType}
-                                    streamId={streamId}
-                                    user={user}
-                                    game={streams[streamId].game}
-                                    title={games['allGames'][streams[streamId].game].name}
-                                    date={formatDate(streams[streamId].date)}
-                                    enableOptionsIcon={streamType === PENDING_APPROVAL_EVENT_TYPE}
-                                    onClick={() => goToStreamDetails(streamId)}
-                                    onRemoveStream={onRemoveStream} />
+                        <Grid item xs={12}>
+                            <Grid container>
+                                <Grid item xs={3}>
+                                    <h1 className={styles.title}>My events</h1>
+                                </Grid>
+                                <Grid item xs={9} style={{ marginTop: '6rem' }}>
+                                    <StreamerSelect
+                                        value={streamType}
+                                        onChange={changestreamType}
+                                        Icon={ArrowIcon}>
+                                        <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
+                                        <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
+                                        <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
+                                    </StreamerSelect>
+                                </Grid>
                             </Grid>
-                        ))}
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Grid container spacing={4}>
+                                <Grid item md={3}>
+                                    <Card className={styles.createEventCard} onClick={createStream}>
+                                        <h1 className={styles.newStream}>
+                                            New <br /> Stream
+                                        </h1>
+                                        <CardContent>
+                                            <Box display='flex' justifyContent='center'>
+                                                <IconButton className={styles.createButton}>
+                                                    <AddIcon />
+                                                </IconButton>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                                {streams && Object.keys(streams).map((streamId) => (
+                                    <Grid item md={3} key={streamId}>
+                                        <StreamCard
+                                            streamType={streamType}
+                                            streamId={streamId}
+                                            user={user}
+                                            game={streams[streamId].game}
+                                            games={games}
+                                            date={formatDate(streams[streamId].date)}
+                                            enableOptionsIcon={streamType === PENDING_APPROVAL_EVENT_TYPE}
+                                            onClick={() => goToStreamDetails(streamId)}
+                                            onRemoveStream={onRemoveStream} />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Grid>
+                </>
+            }
         </StreamerDashboardContainer>
     );
 }

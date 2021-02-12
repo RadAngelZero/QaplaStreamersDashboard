@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     makeStyles,
     Grid,
@@ -25,6 +25,7 @@ import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg'
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
 import { SCEHDULED_EVENT_TYPE } from '../../utilities/Constants';
+import { loadApprovedStreamTimeStamp, getStreamParticipantsList } from '../../services/database';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -74,6 +75,9 @@ const useStyles = makeStyles((theme) => ({
         width: theme.spacing(3),
         height: theme.spacing(3),
         marginLeft: '.25rem'
+    },
+    tableContainer: {
+        marginBottom: 16
     }
 }));
 
@@ -105,8 +109,33 @@ const SectionHeader = ({ title, description }) => {
 const EditStreamerEvent = ({ user }) => {
     const { streamType } = useLocation().state;
     const { streamId } = useParams();
+    const [date, setDate] = useState('');
+    const [hour, setHour] = useState('');
+    const [participantsList, setParticipantsList] = useState({});
     const classes = useStyles();
     const history = useHistory();
+
+    useEffect(() => {
+        async function setEventData() {
+            if (streamType === SCEHDULED_EVENT_TYPE) {
+                const timeStamp = await loadApprovedStreamTimeStamp(streamId);
+                const referenceDate = new Date(timeStamp.val());
+                setDate(`${referenceDate.getDate() >= 10 ? referenceDate.getDate() : `0${referenceDate.getDate()}`}/${referenceDate.getMonth() + 1 >= 10 ? referenceDate.getMonth() + 1 : `0${referenceDate.getMonth() + 1}`}/${referenceDate.getFullYear()}`);
+                setHour(`${referenceDate.getHours() >= 10 ? referenceDate.getHours() : `0${referenceDate.getHours()}`}:${referenceDate.getMinutes() >= 10 ? referenceDate.getMinutes() : `0${referenceDate.getMinutes()}`}`);
+            }
+        }
+
+        async function setStreamParticipantsList() {
+            const participantsList = await getStreamParticipantsList(streamId);
+            console.log(participantsList.val());
+            if (participantsList.exists()) {
+                setParticipantsList(participantsList.val());
+            }
+        }
+
+        setEventData();
+        setStreamParticipantsList();
+    }, [streamId, streamType]);
 
     return (
         <StreamerDashboardContainer user={user}>
@@ -124,7 +153,9 @@ const EditStreamerEvent = ({ user }) => {
                                 <Grid item md={6}>
                                     <StreamerTextInput label='Date'
                                         placeholder='30/12/2020'
-                                        Icon={CalendarIcon} />
+                                        Icon={CalendarIcon}
+                                        value={date}
+                                        onChange={setDate} />
                                     <ContainedButton className={classes.button}>
                                         Save Changes
                                     </ContainedButton>
@@ -132,7 +163,9 @@ const EditStreamerEvent = ({ user }) => {
                                 <Grid item md={6}>
                                     <StreamerTextInput label='Time'
                                         placeholder='18:00 hrs'
-                                        Icon={TimeIcon} />
+                                        Icon={TimeIcon}
+                                        value={hour}
+                                        onChange={setHour} />
                                 </Grid>
                             </Grid>
                             <Grid item md={12}>
@@ -166,7 +199,7 @@ const EditStreamerEvent = ({ user }) => {
                 }
                 <Grid xs={12}>
                     <SectionHeader title='Participants' />
-                    <TableContainer>
+                    <TableContainer className={classes.tableContainer}>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -177,7 +210,7 @@ const EditStreamerEvent = ({ user }) => {
                                     <TableCellStyled className={classes.tableHead}>Game Username</TableCellStyled>
                                     <TableCellStyled className={classes.tableHead}>Qapla Username</TableCellStyled>
                                     <TableCellStyled className={classes.participantsColumn}>
-                                        <EyeIcon /> <p>5 Participants</p>
+                                        <EyeIcon /> <p>{Object.keys(participantsList).length}</p>
                                     </TableCellStyled>
                                     <TableCellStyled className={classes.tableHead}>
                                         <ContainedButton
@@ -188,48 +221,22 @@ const EditStreamerEvent = ({ user }) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                <TableRow className={classes.tableRow}>
-                                    <TableCellStyled align='center' className={classes.firstCell}>
-                                        <Avatar className={classes.avatar} />
-                                    </TableCellStyled>
-                                    <TableCellStyled>
-                                        DHVS
-                                    </TableCellStyled>
-                                    <TableCellStyled>
-                                        DHVS
-                                    </TableCellStyled>
-                                    <TableCellStyled className={classes.lastCell}>
-                                        DHVS
-                                    </TableCellStyled>
-                                </TableRow>
-                                <TableRow className={classes.tableRowOdd}>
-                                    <TableCellStyled align='center' className={classes.firstCell}>
-                                        <Avatar className={classes.avatar} />
-                                    </TableCellStyled>
-                                    <TableCellStyled>
-                                        DHVS
-                                    </TableCellStyled>
-                                    <TableCellStyled>
-                                        DHVS
-                                    </TableCellStyled>
-                                    <TableCellStyled className={classes.lastCell}>
-                                        DHVS
-                                    </TableCellStyled>
-                                </TableRow>
-                                <TableRow className={classes.tableRow}>
-                                    <TableCellStyled align='center' className={classes.firstCell}>
-                                        <Avatar className={classes.avatar} />
-                                    </TableCellStyled>
-                                    <TableCellStyled>
-                                        DHVS
-                                    </TableCellStyled>
-                                    <TableCellStyled>
-                                        DHVS
-                                    </TableCellStyled>
-                                    <TableCellStyled className={classes.lastCell}>
-                                        DHVS
-                                    </TableCellStyled>
-                                </TableRow>
+                                {Object.keys(participantsList).map((participantUid, index) => (
+                                    <TableRow className={index % 2 === 0 ? classes.tableRow : classes.tableRowOdd}>
+                                        <TableCellStyled align='center' className={classes.firstCell}>
+                                            <Avatar className={classes.avatar} />
+                                        </TableCellStyled>
+                                        <TableCellStyled>
+                                            {participantsList[participantUid].userName}
+                                        </TableCellStyled>
+                                        <TableCellStyled>
+                                            {participantsList[participantUid].userName}
+                                        </TableCellStyled>
+                                        <TableCellStyled className={classes.lastCell}>
+                                            {participantsList[participantUid].userName}
+                                        </TableCellStyled>
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>

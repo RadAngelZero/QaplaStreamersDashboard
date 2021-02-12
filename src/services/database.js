@@ -7,6 +7,7 @@ const streamsApprovalRef = database.ref('/StreamsApproval');
 const streamersEventsDataRef = database.ref('/StreamersEventsData');
 const streamsRef = database.ref('/eventosEspeciales').child('eventsData');
 const streamersHistoryEventsDataRef = database.ref('/StreamersHistoryEventsData');
+const streamParticipantsRef = database.ref('/EventParticipants');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -130,8 +131,8 @@ export async function getStreamTitle(streamId) {
  * Returns all the data of the given stream
  * @param {string} streamId Stream unique identifier
  */
-export async function loadApprovedStreamData(streamId) {
-    return await streamsRef.child(streamId).once('value');
+export async function loadApprovedStreamTimeStamp(streamId) {
+    return await streamsRef.child(streamId).child('timestamp').once('value');
 }
 
 /**
@@ -140,4 +141,8 @@ export async function loadApprovedStreamData(streamId) {
  */
 export async function getPastStreamParticipantsNumber(streamId) {
     return await streamersHistoryEventsDataRef.child(streamId).child('participantsNumber').once('value');
+}
+
+export async function getStreamParticipantsList(streamId) {
+    return await streamParticipantsRef.child(streamId).once('value');
 }

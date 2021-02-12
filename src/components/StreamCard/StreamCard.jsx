@@ -4,7 +4,7 @@ import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton }
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
 import { streamsPlaceholderImages, SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE, PENDING_APPROVAL_EVENT_TYPE } from '../../utilities/Constants';
-import { cancelStreamRequest, getStreamParticipantsNumber, getPastStreamParticipantsNumber } from '../../services/database';
+import { cancelStreamRequest, getStreamParticipantsNumber, getPastStreamParticipantsNumber, getStreamTitle } from '../../services/database';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -70,9 +70,10 @@ const StyledMenuItem = withStyles(() => ({
     },
   }))(MenuItem);
 
-const StreamCard = ({ user, streamId, streamType, game, title, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
+const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
+    const [title, setTitle] = useState('');
     const classes = useStyles();
 
     useEffect(() => {
@@ -81,10 +82,17 @@ const StreamCard = ({ user, streamId, streamType, game, title, date, onClick, en
                 const participants = await getStreamParticipantsNumber(streamId);
                 let participantsNumber = participants.exists() ? participants.val() : 0;
                 setParticipantsNumber(participantsNumber);
+
+                const title = await getStreamTitle(streamId);
+                setTitle(title.val());
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
                 const participants = await getPastStreamParticipantsNumber(streamId);
                 let participantsNumber = participants.exists() ? participants.val() : 0;
+
+                // Load title
                 setParticipantsNumber(participantsNumber);
+            } else if (streamType === PENDING_APPROVAL_EVENT_TYPE) {
+                setTitle(games['allGames'][game].name);
             }
         }
 

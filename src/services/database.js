@@ -119,6 +119,14 @@ export async function getStreamParticipantsNumber(streamId) {
 }
 
 /**
+ * Returns the value of the title node of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamTitle(streamId) {
+    return await streamsRef.child(streamId).child('title').child('en').once('value');
+}
+
+/**
  * Returns all the data of the given stream
  * @param {string} streamId Stream unique identifier
  */

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Grid, Button, Card, CardContent, Box, IconButton } from '@material-ui/core';
-import { useHistory, use } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';

@@ -3,8 +3,19 @@ import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton }
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
-import { streamsPlaceholderImages, SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE, PENDING_APPROVAL_EVENT_TYPE } from '../../utilities/Constants';
-import { cancelStreamRequest, getStreamParticipantsNumber, getPastStreamParticipantsNumber, getStreamTitle } from '../../services/database';
+import {
+    streamsPlaceholderImages,
+    SCEHDULED_EVENT_TYPE,
+    PAST_STREAMS_EVENT_TYPE,
+    PENDING_APPROVAL_EVENT_TYPE
+} from '../../utilities/Constants';
+import {
+    cancelStreamRequest,
+    getStreamParticipantsNumber,
+    getPastStreamParticipantsNumber,
+    getStreamTitle,
+    getPastStreamTitle
+} from '../../services/database';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -86,11 +97,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                 const title = await getStreamTitle(streamId);
                 setTitle(title.val());
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
-                const participants = await getPastStreamParticipantsNumber(streamId);
+                const participants = await getPastStreamParticipantsNumber(user.uid, streamId);
                 let participantsNumber = participants.exists() ? participants.val() : 0;
-
-                // Load title
                 setParticipantsNumber(participantsNumber);
+
+                const title = await getPastStreamTitle(user.uid, streamId);
+                setTitle(title.val());
             } else if (streamType === PENDING_APPROVAL_EVENT_TYPE) {
                 setTitle(games['allGames'][game].name);
             }

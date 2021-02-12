@@ -137,12 +137,26 @@ export async function loadApprovedStreamTimeStamp(streamId) {
 
 /**
  * Returns the value of the participantsNumber node of the given past stream
+ * @param {string} uid User identifier
  * @param {string} streamId Stream unique identifier
  */
-export async function getPastStreamParticipantsNumber(streamId) {
-    return await streamersHistoryEventsDataRef.child(streamId).child('participantsNumber').once('value');
+export async function getPastStreamParticipantsNumber(uid, streamId) {
+    return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('participantsNumber').once('value');
 }
 
+/**
+ * Returns the list of participants of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
 export async function getStreamParticipantsList(streamId) {
     return await streamParticipantsRef.child(streamId).once('value');
+}
+
+/**
+ * Returns the value of the participantsNumber node of the given past stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getPastStreamTitle(uid, streamId) {
+    return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('title').child('en').once('value');
 }

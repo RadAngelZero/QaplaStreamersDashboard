@@ -5,6 +5,9 @@ const InvitationCodeRef = database.ref('/InvitationCode');
 const userStreamersRef = database.ref('/UserStreamer');
 const streamsApprovalRef = database.ref('/StreamsApproval');
 const streamersEventsDataRef = database.ref('/StreamersEventsData');
+const streamsRef = database.ref('/eventosEspeciales').child('eventsData');
+const streamersHistoryEventsDataRef = database.ref('/StreamersHistoryEventsData');
+const streamParticipantsRef = database.ref('/EventParticipants');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -57,19 +60,21 @@ export async function createStreamerProfile(uid, userData, inviteCode) {
  * Create a stream request in the nodes StreamersEvents and StreamsApproval
  * @param {object} streamer User object
  * @param {string} game Selected game for the stream
- * @param {string} date Date in formar DD/MM/YYYY
+ * @param {string} date Date in format DD-MM-YYYY
  * @param {string} hour Hour in format hh:mm
  * @param {string} streamType One of 'exp' or 'tournament'
  * @param {timestamp} timestamp Timestamp based on the given date and hour
+ * @param {object} optionalData Customizable data for events
  */
-export async function createNewStreamRequest(streamer, game, date, hour, streamType, timestamp) {
+export async function createNewStreamRequest(streamer, game, date, hour, streamType, timestamp, optionalData) {
     const event = await streamersEventsDataRef.child(streamer.uid).push({
         date,
         hour,
         game,
         status: 1,
         streamType,
-        timestamp
+        timestamp,
+        optionalData
     });
 
     return await streamsApprovalRef.child(event.key).set({
@@ -81,6 +86,80 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         streamType,
         timestamp,
         streamerChannelLink: 'https://twitch.tv/' + streamer.login,
-        streamerPhoto: streamer.photoUrl
+        streamerPhoto: streamer.photoUrl,
+        optionalData
     });
+}
+
+/**
+ * Streams
+ */
+
+/**
+ * Load all the strams of StreamersEventsData based on their value on the status flag
+ * @param {string} uid User identifier
+ * @param {number} status Value of the status to load
+ */
+export async function loadStreamsByStatus(uid, status) {
+    return await streamersEventsDataRef.child(uid).orderByChild('status').equalTo(status).once('value');
+}
+
+/**
+ * Removes a stream request of the database
+ * @param {string} uid User identifier
+ * @param {string} streamId Identifier of the stream to remove
+ */
+export async function cancelStreamRequest(uid, streamId) {
+    await streamersEventsDataRef.child(uid).child(streamId).remove();
+    await streamsApprovalRef.child(streamId).remove();
+}
+
+/**
+ * Returns the value of the participantsNumber node of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamParticipantsNumber(streamId) {
+    return await streamsRef.child(streamId).child('participantsNumber').once('value');
+}
+
+/**
+ * Returns the value of the title node of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamTitle(streamId) {
+    return await streamsRef.child(streamId).child('title').child('en').once('value');
+}
+
+/**
+ * Returns all the data of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function loadApprovedStreamTimeStamp(streamId) {
+    return await streamsRef.child(streamId).child('timestamp').once('value');
+}
+
+/**
+ * Returns the value of the participantsNumber node of the given past stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getPastStreamParticipantsNumber(uid, streamId) {
+    return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('participantsNumber').once('value');
+}
+
+/**
+ * Returns the list of participants of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamParticipantsList(streamId) {
+    return await streamParticipantsRef.child(streamId).once('value');
+}
+
+/**
+ * Returns the value of the participantsNumber node of the given past stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getPastStreamTitle(uid, streamId) {
+    return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('title').child('en').once('value');
 }

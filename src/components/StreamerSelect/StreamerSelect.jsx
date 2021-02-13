@@ -21,7 +21,8 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#141833',
         borderRadius: '.5rem',
         color: '#FFF',
-        fontSize: '14px'
+        fontSize: '14px',
+        paddingRight: '.5rem'
     },
     icon: {
         color: 'transparent',
@@ -33,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerSelect = ({ children, label, Icon, value, onChange }) => {
     const classes = useStyles();
-
 
     return (
         <>

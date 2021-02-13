@@ -109,7 +109,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
         }
 
         getParticipantsNumber();
-    }, [game, games, streamId, streamType]);
+    }, [game, games, streamId, streamType, user]);
 
     const onOptionsIconClick = (e) => {
         e.stopPropagation();

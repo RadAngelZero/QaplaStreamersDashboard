@@ -1,7 +1,9 @@
-import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon } from '@material-ui/core';
+import React, { useState } from 'react';
+import { withStyles, Menu, MenuItem, Drawer, List, ListItem, ListItemIcon } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { useHistory } from 'react-router-dom';
 
+import { signOut } from './../../services/auth';
 import { ReactComponent as EventsIcon } from './../../assets/EventIcon.svg';
 import { ReactComponent as CommunityIcon } from './../../assets/CommunityIcon.svg';
 import { ReactComponent as AnalyticsIcon } from './../../assets/AnalyticsIcon.svg';
@@ -23,8 +25,29 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const StyledMenu = withStyles({
+    paper: {
+        backgroundColor: '#141833',
+    },
+})((props) => (
+    <Menu {...props} />
+));
+
+const StyledMenuItem = withStyles((theme) => ({
+    root: {
+      color: '#FFF'
+    },
+  }))(MenuItem);
+
 const StreamerSideBar = ({ user }) => {
+    const history = useHistory();
     const classes = useStyles();
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const closeSession = () => {
+        signOut();
+        history.push('/signin');
+    }
 
     return (
         <Drawer
@@ -36,18 +59,26 @@ const StreamerSideBar = ({ user }) => {
                 <ListItem>
                     <ListItemIcon><EventsIcon height={32} width={32} /></ListItemIcon>
                 </ListItem>
-                <ListItem style={{ marginTop: '.5rem' }}>
+                <ListItem style={{ marginTop: '.5rem' }} disabled>
                     <ListItemIcon><CommunityIcon height={32} width={32} /></ListItemIcon>
                 </ListItem>
-                <ListItem style={{ marginTop: '.5rem' }}>
+                <ListItem style={{ marginTop: '.5rem' }} disabled>
                     <ListItemIcon><AnalyticsIcon height={32} width={32} /></ListItemIcon>
                 </ListItem>
             </List>
             <div style={{ flexGrow: 1 }} />
             <List>
-                <ListItem style={{ marginTop: '.5rem' }}>
+                <ListItem style={{ marginTop: '.5rem' }} onClick={(e) => setAnchorEl(e.currentTarget)}>
                     <ListItemIcon><CogIcon height={32} width={32} /></ListItemIcon>
                 </ListItem>
+                <StyledMenu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    keepMounted
+                    onClose={() => setAnchorEl(null)}>
+                    <StyledMenuItem onClick={closeSession}>Cerrar sesión</StyledMenuItem>
+                    <StyledMenuItem onClick={() => window.open('https://www.google.com', '_blank')}>Ayuda</StyledMenuItem>
+                </StyledMenu>
                 <ListItem style={{ marginTop: '.5rem' }}>
                     <ListItemIcon><QaplaLogo height={32} width={32} /></ListItemIcon>
                 </ListItem>

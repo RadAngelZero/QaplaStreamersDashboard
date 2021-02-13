@@ -15,7 +15,6 @@ const useStyles = makeStyles({
 const ContainedButton = ({ children, onClick, className = {}, startIcon }) => {
     const classes = useStyles();
 
-    console.log(startIcon);
     return (
         <Button variant='contained'
             className={[classes.button, className]}

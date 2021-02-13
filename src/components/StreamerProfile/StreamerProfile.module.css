@@ -34,15 +34,6 @@
     margin-bottom: 4rem;
 }
 
-.filter {
-    background: #141833 !important;
-    border-radius: 1rem !important;
-    padding: .75rem 5rem .75rem 1.75rem !important;
-    color: rgba(255, 255, 2555, .25) !important;
-    font-weight: bold !important;
-    text-transform: none !important;
-}
-
 .createEventCard {
     background-color: #141833 !important;
     border-radius: 1.5rem !important;

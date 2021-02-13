@@ -60,19 +60,21 @@ export async function createStreamerProfile(uid, userData, inviteCode) {
  * Create a stream request in the nodes StreamersEvents and StreamsApproval
  * @param {object} streamer User object
  * @param {string} game Selected game for the stream
- * @param {string} date Date in formar DD/MM/YYYY
+ * @param {string} date Date in format DD-MM-YYYY
  * @param {string} hour Hour in format hh:mm
  * @param {string} streamType One of 'exp' or 'tournament'
  * @param {timestamp} timestamp Timestamp based on the given date and hour
+ * @param {object} optionalData Customizable data for events
  */
-export async function createNewStreamRequest(streamer, game, date, hour, streamType, timestamp) {
+export async function createNewStreamRequest(streamer, game, date, hour, streamType, timestamp, optionalData) {
     const event = await streamersEventsDataRef.child(streamer.uid).push({
         date,
         hour,
         game,
         status: 1,
         streamType,
-        timestamp
+        timestamp,
+        optionalData
     });
 
     return await streamsApprovalRef.child(event.key).set({
@@ -84,7 +86,8 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         streamType,
         timestamp,
         streamerChannelLink: 'https://twitch.tv/' + streamer.login,
-        streamerPhoto: streamer.photoUrl
+        streamerPhoto: streamer.photoUrl,
+        optionalData
     });
 }
 

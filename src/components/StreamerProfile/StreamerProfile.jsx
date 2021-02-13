@@ -77,6 +77,7 @@ const StreamerProfile = ({ user, games }) => {
                         <Grid item xs={12}>
                             <Button variant='contained'
                                 className={styles.twitchButton}
+                                onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
                                 startIcon={<TwitchIcon />}>
                                 {user.displayName}
                             </Button>

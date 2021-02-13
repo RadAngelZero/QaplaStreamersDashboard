@@ -76,8 +76,8 @@ const StreamerSideBar = ({ user }) => {
                     open={Boolean(anchorEl)}
                     keepMounted
                     onClose={() => setAnchorEl(null)}>
-                    <StyledMenuItem onClick={closeSession}>Cerrar sesión</StyledMenuItem>
-                    <StyledMenuItem onClick={() => window.open('https://www.google.com', '_blank')}>Ayuda</StyledMenuItem>
+                    <StyledMenuItem onClick={closeSession}>Close Session</StyledMenuItem>
+                    <StyledMenuItem onClick={() => window.open('https://discord.gg/zWNhd3QG', '_blank')}>Help</StyledMenuItem>
                 </StyledMenu>
                 <ListItem style={{ marginTop: '.5rem' }}>
                     <ListItemIcon><QaplaLogo height={32} width={32} /></ListItemIcon>

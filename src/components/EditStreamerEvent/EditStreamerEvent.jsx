@@ -9,7 +9,8 @@ import {
     TableCell,
     TableBody,
     withStyles,
-    Avatar
+    Avatar,
+    Hidden
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useParams, useLocation } from 'react-router';
@@ -153,10 +154,12 @@ const EditStreamerEvent = ({ user }) => {
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
-                <Grid xs={12}>
-                    <BackButton label={title}
-                        onClick={() => history.goBack()} />
-                </Grid>
+                <Hidden smDown>
+                    <Grid xs={12}>
+                        <BackButton label={title}
+                            onClick={() => history.goBack()} />
+                    </Grid>
+                </Hidden>
                 {streamType === SCEHDULED_EVENT_TYPE &&
                     <>
                         <Grid xs={6}>

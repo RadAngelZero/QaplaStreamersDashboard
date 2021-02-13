@@ -346,21 +346,18 @@ const NewStream = ({ user, games }) => {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Grid container direction={'column'} className={classes.accordionGridRoot}>
-                                    <InputLabel
-                                        className={classes.label}
-                                    >
+                                    <InputLabel className={classes.label}>
                                         Isn't necessary to fill every field of this part, you can left some of them empty and we will do our best to translate or fulfill the missing info
                                     </InputLabel>
                                     <Grid container>
-                                        <h2 className={styles.subtitle}>
-                                            Event Title
-                                        </h2>
+                                        <h1 className={styles.title}>
+                                            Stream title
+                                        </h1>
                                         <Grid container spacing={4}>
                                             <Grid item className={classes.accordionGridItem}>
                                                 <StreamerTextInput
-                                                    id={'eventTitle'}
-                                                    multiline={true}
-                                                    rowsMax={3}
+                                                    label='Stream Title'
+                                                    id='eventTitle'
                                                     fullWidth={true}
                                                     value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
                                                     onChange={(e) => optionalDataDispatcher({target: e.target})}
@@ -368,17 +365,15 @@ const NewStream = ({ user, games }) => {
                                             </Grid>
                                         </Grid>
                                     </Grid>
+                                    <h1 className={styles.title}>
+                                        Stream description
+                                    </h1>
                                     <Grid>
-                                        <h2 className={styles.subtitle}>
-                                            Event Title Description
-                                        </h2>
                                         <Grid container spacing={4}>
                                             <Grid item className={classes.accordionGridItem}>
                                                 <StreamerTextInput
+                                                    label='Stream Description Title'
                                                     id={'eventDescriptionTitle'}
-                                                    multiline={true}
-                                                    rows={2}
-                                                    rowsMax={3}
                                                     fullWidth={true}
                                                     value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
                                                     onChange={(e) => optionalDataDispatcher({target: e.target})}
@@ -387,13 +382,11 @@ const NewStream = ({ user, games }) => {
                                         </Grid>
                                     </Grid>
                                     <Grid>
-                                        <h2 className={styles.subtitle}>
-                                            Event Description
-                                        </h2>
                                         <Grid container spacing={4}>
-                                            <Grid item className={classes.accordionGridItem}>
+                                            <Grid item className={classes.accordionGridItem} style={{ marginTop: '1rem' }}>
                                                 <StreamerTextInput
                                                     id={'eventDescription'}
+                                                    label='Stream Description'
                                                     multiline={true}
                                                     rows={3}
                                                     rowsMax={30}

@@ -84,7 +84,7 @@ const StyledMenuItem = withStyles(() => ({
 const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState({ en: '', es: '' });
     const classes = useStyles();
 
     useEffect(() => {
@@ -150,7 +150,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
             </div>
             <CardContent className={classes.eventCardContent}>
                 <p className={classes.eventCardTitle}>
-                    {title}
+                    {title && title['en'] ? title['en'] : ''}
                 </p>
                 <div className={classes.rowContainer}>
                     <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />

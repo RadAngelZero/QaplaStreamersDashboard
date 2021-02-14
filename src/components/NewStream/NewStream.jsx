@@ -210,7 +210,7 @@ const NewStream = ({ user, games }) => {
             <Grid container>
                 <Hidden smDown>
                     <Grid item xs={12}>
-                        <BackButton onClick={() => history.goBack()} />
+                        <BackButton onClick={history.goBack} />
                     </Grid>
                 </Hidden>
                 <Grid item sm={8}>
@@ -219,7 +219,7 @@ const NewStream = ({ user, games }) => {
                     </h1>
                     <StreamerSelect
                         value={selectedGame}
-                        onChange={(game) => handleGameChange(game)}
+                        onChange={handleGameChange}
                         Icon={ArrowIcon}
                         label='Select your game'>
                         <option style={{

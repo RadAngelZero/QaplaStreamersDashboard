@@ -127,7 +127,7 @@ export async function getStreamParticipantsNumber(streamId) {
  * @param {string} streamId Stream unique identifier
  */
 export async function getStreamTitle(streamId) {
-    return await streamsRef.child(streamId).child('title').child('en').once('value');
+    return await streamsRef.child(streamId).child('title').once('value');
 }
 
 /**
@@ -161,5 +161,5 @@ export async function getStreamParticipantsList(streamId) {
  * @param {string} streamId Stream unique identifier
  */
 export async function getPastStreamTitle(uid, streamId) {
-    return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('title').child('en').once('value');
+    return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('title').once('value');
 }

@@ -144,6 +144,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                 <img
                     alt='Game'
                     src={streamsPlaceholderImages[game]}
+                    width='100%'
                     height='160'
                     className={classes.eventImage} />
             </div>

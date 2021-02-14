@@ -109,7 +109,7 @@ const StreamerProfile = ({ user, games }) => {
                         </Grid>
                         <Grid item xs={12}>
                             <Grid container spacing={4}>
-                                <Grid item xl={2} lg={2} md={3} sm={4} xs={10}>
+                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
                                     <Card className={styles.createEventCard} onClick={createStream}>
                                         <h1 className={styles.newStream}>
                                             New <br /> Stream
@@ -124,7 +124,7 @@ const StreamerProfile = ({ user, games }) => {
                                     </Card>
                                 </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (
-                                    <Grid item xl={2} lg={2} md={3} sm={4} xs={10} key={streamId}>
+                                    <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId}>
                                         <StreamCard
                                             streamType={streamType}
                                             streamId={streamId}

@@ -104,7 +104,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                 const title = await getPastStreamTitle(user.uid, streamId);
                 setTitle(title.val());
             } else if (streamType === PENDING_APPROVAL_EVENT_TYPE) {
-                setTitle(games['allGames'][game].name);
+                setTitle({ en: games['allGames'][game].name });
             }
         }
 
@@ -144,6 +144,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                 <img
                     alt='Game'
                     src={streamsPlaceholderImages[game]}
+                    width='100%'
                     height='160'
                     className={classes.eventImage} />
             </div>

@@ -85,7 +85,8 @@ async function createTwitchUser(code) {
                 displayName: user.display_name,
                 login: user.login,
                 photoUrl: user.profile_image_url,
-                email: user.email
+                email: user.email,
+                twitchAccessToken: resultData.access_token
             }
         };
 

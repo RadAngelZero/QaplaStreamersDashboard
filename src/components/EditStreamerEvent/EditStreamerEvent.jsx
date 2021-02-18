@@ -153,15 +153,24 @@ const EditStreamerEvent = ({ user }) => {
         setStreamTitle();
     }, [streamId, streamType, user]);
 
-    const sendNotification = () => {
+    const sendNotification = async () => {
         const bodys = {
             es: notificationBody,
             en: notificationBody
         };
 
-        sednPushNotificationToTopic(streamId, title, bodys);
-        alert('Notificación enviada');
-        setNotificationBody('');
+        const titles = {
+            es: title['en'],
+            en: title['en']
+        };
+
+        try {
+            sednPushNotificationToTopic(streamId, titles, bodys);
+            alert('Notification sent');
+            setNotificationBody('');
+        } catch (error) {
+            alert('Error sending notification. Try again later');
+        }
     }
 
     const onChangeNotificationBody = (e) => {

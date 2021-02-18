@@ -29,9 +29,5 @@ export async function createUserWithTwitch(uid, displayName, login, photoUrl, em
 export async function sednPushNotificationToTopic(topic, titles, bodys, extraData = {}, onlyData = false) {
     const notificateToTopic = functions.httpsCallable('notificateToTopic');
 
-    try {
-        return await notificateToTopic({ topic, titles, bodys, extraData, onlyData });
-    } catch (error) {
-        console.log(error);
-    }
+    return await notificateToTopic({ topic, titles, bodys, extraData, onlyData });
 }

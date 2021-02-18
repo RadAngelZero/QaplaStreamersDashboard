@@ -154,7 +154,14 @@ const EditStreamerEvent = ({ user }) => {
     }, [streamId, streamType, user]);
 
     const sendNotification = () => {
-        sednPushNotificationToTopic(streamId, title['en'], notificationBody);
+        const bodys = {
+            es: notificationBody,
+            en: notificationBody
+        };
+
+        sednPushNotificationToTopic(streamId, title, bodys);
+        alert('Notificación enviada');
+        setNotificationBody('');
     }
 
     const onChangeNotificationBody = (e) => {

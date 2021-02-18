@@ -1,5 +1,5 @@
 import React, { useState, useReducer } from 'react';
-import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails, } from '@material-ui/core';
+import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails, Hidden } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import DayJsUtils from '@date-io/dayjs';
@@ -208,16 +208,18 @@ const NewStream = ({ user, games }) => {
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
-                <Grid item xs={12}>
-                    <BackButton onClick={() => history.goBack()} />
-                </Grid>
+                <Hidden smDown>
+                    <Grid item xs={12}>
+                        <BackButton onClick={history.goBack} />
+                    </Grid>
+                </Hidden>
                 <Grid item sm={8}>
                     <h1 className={styles.title}>
                         What are you playing?
                     </h1>
                     <StreamerSelect
                         value={selectedGame}
-                        onChange={(game) => handleGameChange(game)}
+                        onChange={handleGameChange}
                         Icon={ArrowIcon}
                         label='Select your game'>
                         <option style={{

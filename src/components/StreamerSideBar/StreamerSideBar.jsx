@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { withStyles, Menu, MenuItem, Drawer, List, ListItem, ListItemIcon } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles, Menu, MenuItem, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
+import BurguerMenu from '@material-ui/icons/Menu';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { signOut } from './../../services/auth';
 import { ReactComponent as EventsIcon } from './../../assets/EventIcon.svg';
@@ -34,57 +35,98 @@ const StyledMenu = withStyles({
 ));
 
 const StyledMenuItem = withStyles((theme) => ({
-    root: {
-      color: '#FFF'
-    },
-  }))(MenuItem);
+  root: {
+    color: '#FFF'
+  },
+}))(MenuItem);
 
 const StreamerSideBar = ({ user }) => {
-    const history = useHistory();
-    const classes = useStyles();
-    const [anchorEl, setAnchorEl] = useState(null);
+  const history = useHistory();
+  const classes = useStyles();
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  
+  const closeSession = () => {
+    signOut();
+    history.push('/signin');
+  }
 
-    const closeSession = () => {
-        signOut();
-        history.push('/signin');
-    }
 
-    return (
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const drawer = (
+    <Box display={'flex'} style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap' }}>
+      <List style={{ marginTop: '1rem' }}>
+        <ListItem>
+          <ListItemIcon><EventsIcon height={32} width={32} /></ListItemIcon>
+        </ListItem>
+        <ListItem style={{ marginTop: '.5rem' }} disabled>
+          <ListItemIcon><CommunityIcon height={32} width={32} /></ListItemIcon>
+        </ListItem>
+        <ListItem style={{ marginTop: '.5rem' }} disabled>
+          <ListItemIcon><AnalyticsIcon height={32} width={32} /></ListItemIcon>
+        </ListItem>
+      </List>
+      <div style={{ flexGrow: 1 }} />
+      <List>
+        <ListItem style={{ marginTop: '.5rem' }} onClick={(e) => setAnchorEl(e.currentTarget)}>
+          <ListItemIcon><CogIcon height={32} width={32} /></ListItemIcon>
+        </ListItem>
+        <StyledMenu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          keepMounted
+          onClose={() => setAnchorEl(null)}>
+          <StyledMenuItem onClick={closeSession}>Close Session</StyledMenuItem>
+          <StyledMenuItem onClick={() => window.open('https://discord.gg/zWNhd3QG', '_blank')}>Help</StyledMenuItem>
+        </StyledMenu>
+        <ListItem style={{ marginTop: '.5rem' }}>
+          <ListItemIcon><QaplaLogo height={32} width={32} /></ListItemIcon>
+        </ListItem>
+      </List>
+    </Box>
+  )
+
+  return (
+    <Box display={'flex'}>
+      <Hidden smDown >
         <Drawer
-            className={[classes.drawer, classes.drawerClose]}
-            classes={{ paper: classes.drawerClose }}
-            variant='permanent'
-            anchor='left'>
-            <List style={{ marginTop: '1rem' }}>
-                <ListItem>
-                    <ListItemIcon><EventsIcon height={32} width={32} /></ListItemIcon>
-                </ListItem>
-                <ListItem style={{ marginTop: '.5rem' }} disabled>
-                    <ListItemIcon><CommunityIcon height={32} width={32} /></ListItemIcon>
-                </ListItem>
-                <ListItem style={{ marginTop: '.5rem' }} disabled>
-                    <ListItemIcon><AnalyticsIcon height={32} width={32} /></ListItemIcon>
-                </ListItem>
-            </List>
-            <div style={{ flexGrow: 1 }} />
-            <List>
-                <ListItem style={{ marginTop: '.5rem' }} onClick={(e) => setAnchorEl(e.currentTarget)}>
-                    <ListItemIcon><CogIcon height={32} width={32} /></ListItemIcon>
-                </ListItem>
-                <StyledMenu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    keepMounted
-                    onClose={() => setAnchorEl(null)}>
-                    <StyledMenuItem onClick={closeSession}>Close Session</StyledMenuItem>
-                    <StyledMenuItem onClick={() => window.open('https://discord.gg/zWNhd3QG', '_blank')}>Help</StyledMenuItem>
-                </StyledMenu>
-                <ListItem style={{ marginTop: '.5rem' }}>
-                    <ListItemIcon><QaplaLogo height={32} width={32} /></ListItemIcon>
-                </ListItem>
-            </List>
+          className={[classes.drawer, classes.drawerClose]}
+          classes={{ paper: classes.drawerClose }}
+          variant='permanent'
+          anchor='left'>
+          {drawer}
         </Drawer>
-    );
+      </Hidden>
+      <Box position="absolute">
+        <Hidden mdUp>
+          <IconButton
+            onClick={handleDrawerToggle}
+            style={{ marginTop: '40%', marginLeft: '30%' }}
+          >
+            <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
+          </IconButton>
+          <Drawer
+            variant="temporary"
+            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            classes={{
+              paper: classes.drawerClose,
+            }}
+            ModalProps={{
+              keepMounted: true,
+            }}
+          >
+            {drawer}
+          </Drawer>
+        </Hidden>
+      </Box>
+    </Box>
+  );
 }
 
 export default StreamerSideBar;

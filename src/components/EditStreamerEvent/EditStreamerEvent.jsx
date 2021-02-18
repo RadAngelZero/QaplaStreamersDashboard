@@ -9,7 +9,8 @@ import {
     TableCell,
     TableBody,
     withStyles,
-    Avatar
+    Avatar,
+    Hidden
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useParams, useLocation } from 'react-router';
@@ -26,6 +27,7 @@ import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
 import { SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
 import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle } from '../../services/database';
+import { sednPushNotificationToTopic } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -109,9 +111,10 @@ const SectionHeader = ({ title, description }) => {
 const EditStreamerEvent = ({ user }) => {
     const { streamType } = useLocation().state;
     const { streamId } = useParams();
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState({ en: '', es: '' });
     const [date, setDate] = useState('');
     const [hour, setHour] = useState('');
+    const [notificationBody, setNotificationBody] = useState('');
     const [participantsList, setParticipantsList] = useState({});
     const classes = useStyles();
     const history = useHistory();
@@ -150,13 +153,42 @@ const EditStreamerEvent = ({ user }) => {
         setStreamTitle();
     }, [streamId, streamType, user]);
 
+    const sendNotification = async () => {
+        const bodys = {
+            es: notificationBody,
+            en: notificationBody
+        };
+
+        const titles = {
+            es: title['en'],
+            en: title['en']
+        };
+
+        try {
+            sednPushNotificationToTopic(streamId, titles, bodys);
+            alert('Notification sent');
+            setNotificationBody('');
+        } catch (error) {
+            alert('Error sending notification. Try again later');
+        }
+    }
+
+    const onChangeNotificationBody = (e) => {
+        const body = e.target.value;
+        if (body.length <= 140) {
+            setNotificationBody(body);
+        }
+    }
+
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
-                <Grid xs={12}>
-                    <BackButton label={title}
-                        onClick={() => history.goBack()} />
-                </Grid>
+                <Hidden smDown>
+                    <Grid xs={12}>
+                        <BackButton label={title && title['en'] ? title['en'] : ''}
+                            onClick={history.goBack} />
+                    </Grid>
+                </Hidden>
                 {streamType === SCEHDULED_EVENT_TYPE &&
                     <>
                         <Grid xs={6}>
@@ -189,9 +221,12 @@ const EditStreamerEvent = ({ user }) => {
                                     rows={3}
                                     fullWidth
                                     textInputClassName={classes.textArea}
-                                    containerClassName={classes.containerTextArea} />
+                                    containerClassName={classes.containerTextArea}
+                                    value={notificationBody}
+                                    onChange={onChangeNotificationBody} />
                                 <br/>
-                                <ContainedButton className={classes.button}>
+                                <ContainedButton className={classes.button}
+                                    onClick={sendNotification}>
                                     Send
                                 </ContainedButton>
                             </Grid>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Grid, Button, Card, CardContent, Box, IconButton } from '@material-ui/core';
+import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 
 import styles from './StreamerProfile.module.css';
@@ -67,12 +67,20 @@ const StreamerProfile = ({ user, games }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <div className={styles.avatarContainer}>
-                        <Avatar
-                            alt='User image'
-                            src={user.photoUrl} />
-                        <span className={styles.streamerName}>{user.displayName}</span>
-                    </div>
+                    <Box display="flex" flexDirection="row" >
+                        <Hidden smUp>
+                            <div style={{ width: '10%' }}></div>
+                        </Hidden>
+                        <Hidden mdUp xsDown>
+                            <div style={{ width: '5%' }}></div>
+                        </Hidden>
+                        <div className={styles.avatarContainer}>
+                            <Avatar
+                                alt='User image'
+                                src={user.photoUrl} />
+                            <span className={styles.streamerName}>{user.displayName}</span>
+                        </div>
+                    </Box>
                     <Grid container>
                         <Grid item xs={12}>
                             <Button variant='contained'
@@ -101,7 +109,7 @@ const StreamerProfile = ({ user, games }) => {
                         </Grid>
                         <Grid item xs={12}>
                             <Grid container spacing={4}>
-                                <Grid item md={3}>
+                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
                                     <Card className={styles.createEventCard} onClick={createStream}>
                                         <h1 className={styles.newStream}>
                                             New <br /> Stream
@@ -116,7 +124,7 @@ const StreamerProfile = ({ user, games }) => {
                                     </Card>
                                 </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (
-                                    <Grid item md={3} key={streamId}>
+                                    <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId}>
                                         <StreamCard
                                             streamType={streamType}
                                             streamId={streamId}

@@ -139,6 +139,36 @@ export async function loadApprovedStreamTimeStamp(streamId) {
 }
 
 /**
+ * Update the date, hour and timestamps of the given stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Streamer identifier
+ * @param {string} dateUTC Date UTC in format DD-MM-YYYY
+ * @param {string} hourUTC Hour UTC in format HH:MM
+ * @param {string} date Local Date in format DD-MM-YYYY
+ * @param {string} hour Local hour in format HH:MM
+ * @param {number} timestamp Timestamp of the dates
+ */
+export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, hour, timestamp) {
+    streamsRef.child(streamId).update({
+        dateUTC,
+        hourUTC,
+        tiempoLimite: date,
+        hour,
+        timestamp
+    });
+
+    return streamersEventsDataRef.child(uid).child(streamId).update({
+        date: dateUTC,
+        hour: hourUTC,
+        timestamp
+    });
+}
+
+/**
+ * Stream Participants
+ */
+
+/**
  * Returns the value of the participantsNumber node of the given past stream
  * @param {string} uid User identifier
  * @param {string} streamId Stream unique identifier

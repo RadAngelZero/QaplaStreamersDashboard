@@ -25,7 +25,7 @@ const StreamersSignin = () => {
         if (!(await streamerProfileExists(user.firebaseAuthUser.user.uid))) {
             if (inviteCode) {
                 await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
-                history.push('/welcome');
+                history.push('/profile');
             } else {
                 const user = auth.currentUser;
                 await user.delete();

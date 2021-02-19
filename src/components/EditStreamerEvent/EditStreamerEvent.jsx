@@ -10,10 +10,14 @@ import {
     TableBody,
     withStyles,
     Avatar,
-    Hidden
+    Hidden,
+    InputLabel,
+    InputAdornment
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useParams, useLocation } from 'react-router';
+import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
+import DayJsUtils from '@date-io/dayjs';
 
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
@@ -26,7 +30,7 @@ import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg'
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
 import { SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
-import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle } from '../../services/database';
+import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate } from '../../services/database';
 import { sednPushNotificationToTopic } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
@@ -40,6 +44,64 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: '18px',
         paddingRight: '2rem',
         marginBottom: '2rem'
+    },
+    datePickerLabel: {
+        fontSize: '12px',
+        color: '#B2B3BD',
+        lineHeight: '16px'
+    },
+    dateInput: {
+        color: '#FFF',
+        marginTop: theme.spacing(1),
+        paddingLeft: theme.spacing(2),
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+        fontWeight: 'bold',
+        backgroundColor: '#141833',
+        borderRadius: '.5rem',
+        fontSize: '14px',
+    },
+    popover: {
+        backgroundColor: '#141833',
+        color: 'white',
+        padding: '15px',
+        '& .MuiPickersCalendarHeader-switchHeader': {
+            '& .MuiIconButton-root:hover': {
+                backgroundColor: '#707070'
+            }
+        },
+
+        '& .MuiButtonBase-root:hover:not(.MuiPickersDay-daySelected)': {
+            backgroundColor: '#3f51b5',
+        },
+        '& .MuiPickersDay-day': {
+            color: 'white'
+        },
+        '& .MuiPickersDay-daySelected': {
+            backgroundColor: '#00beff',
+            color: '#000'
+        },
+        '& .MuiPickersDay-dayDisabled': {
+            color: 'gray'
+        },
+        '& .MuiPickersCalendarHeader-dayLabel': {
+            color: 'white'
+        },
+        '& .MuiPickersClockNumber-clockNumber': {
+            color: 'white'
+        },
+        '& .MuiPickersClockPointer-pointer': {
+            backgroundColor: '#00beff',
+            '& .MuiPickersClockPointer-noPoint': {
+                borderColor: '#00beff',
+            },
+            '& .MuiPickersClockPointer-thumb': {
+                borderColor: '#00beff',
+            }
+        },
+        '& .MuiPickersClockNumber-clockNumberSelected': {
+            color: '#000'
+        }
     },
     button: {
         marginTop: '2.5rem'
@@ -112,8 +174,7 @@ const EditStreamerEvent = ({ user }) => {
     const { streamType } = useLocation().state;
     const { streamId } = useParams();
     const [title, setTitle] = useState({ en: '', es: '' });
-    const [date, setDate] = useState('');
-    const [hour, setHour] = useState('');
+    const [date, setDate] = useState(null);
     const [notificationBody, setNotificationBody] = useState('');
     const [participantsList, setParticipantsList] = useState({});
     const classes = useStyles();
@@ -123,9 +184,7 @@ const EditStreamerEvent = ({ user }) => {
         async function setStreamData() {
             if (streamType === SCEHDULED_EVENT_TYPE) {
                 const timeStamp = await loadApprovedStreamTimeStamp(streamId);
-                const referenceDate = new Date(timeStamp.val());
-                setDate(`${referenceDate.getDate() >= 10 ? referenceDate.getDate() : `0${referenceDate.getDate()}`}/${referenceDate.getMonth() + 1 >= 10 ? referenceDate.getMonth() + 1 : `0${referenceDate.getMonth() + 1}`}/${referenceDate.getFullYear()}`);
-                setHour(`${referenceDate.getHours() >= 10 ? referenceDate.getHours() : `0${referenceDate.getHours()}`}:${referenceDate.getMinutes() >= 10 ? referenceDate.getMinutes() : `0${referenceDate.getMinutes()}`}`);
+                setDate(new Date(timeStamp.val()));
             }
         }
 
@@ -180,6 +239,31 @@ const EditStreamerEvent = ({ user }) => {
         }
     }
 
+    const saveDate = () => {
+        if (date.$d) {
+            const dateRef = new Date(date.$d);
+            const UTCDay = dateRef.getUTCDate() < 10 ? `0${dateRef.getUTCDate()}` : dateRef.getUTCDate();
+            const UTCMonth = dateRef.getUTCMonth() + 1 < 10 ? `0${dateRef.getUTCMonth() + 1}` : dateRef.getUTCMonth() + 1;
+            let UTCDate = `${UTCDay}-${UTCMonth}-${dateRef.getUTCFullYear()}`;
+
+            const UTCHours = dateRef.getUTCHours() < 10 ? `0${dateRef.getUTCHours()}` : dateRef.getUTCHours();
+            const UTCMinutes = dateRef.getUTCMinutes() < 10 ? `0${dateRef.getUTCMinutes()}` : dateRef.getUTCMinutes();
+            let UTCHour = `${UTCHours}:${UTCMinutes}`;
+
+            const localDay = dateRef.getDate() < 10 ? `0${dateRef.getDate()}` : dateRef.getDate();
+            const localMonth = dateRef.getMonth() + 1 < 10 ? `0${dateRef.getMonth() + 1}` : dateRef.getMonth() + 1;
+            let localDate = `${localDay}-${localMonth}-${dateRef.getFullYear()}`;
+
+            const localHours = dateRef.getHours() < 10 ? `0${dateRef.getHours()}` : dateRef.getHours();
+            const localMinutes = dateRef.getMinutes() < 10 ? `0${dateRef.getMinutes()}` : dateRef.getMinutes();
+            let localHour = `${localHours}:${localMinutes}`;
+
+            updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
+        } else {
+            alert('Please verify that you have selected a different date and/or hour');
+        }
+    }
+
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
@@ -194,41 +278,94 @@ const EditStreamerEvent = ({ user }) => {
                         <Grid xs={6}>
                             <SectionHeader title='Edit'
                                 description='A notification will be sent to the participants of any changes. We recommend not changing the date or time often tho, a consistent schedule drives more traffic to your live streams.' />
-                            <Grid container>
-                                <Grid item md={6}>
-                                    <StreamerTextInput label='Date'
-                                        placeholder='30/12/2020'
-                                        Icon={CalendarIcon}
-                                        value={date}
-                                        onChange={setDate} />
-                                    <ContainedButton className={classes.button}>
+                            <Grid item sm={12}>
+                                <Grid container>
+                                    <MuiPickersUtilsProvider utils={DayJsUtils}>
+                                        <Grid container>
+                                            <Grid item sm={6} spacing={4}>
+                                                <InputLabel className={classes.datePickerLabel}>
+                                                    Date
+                                                </InputLabel>
+                                                <KeyboardDatePicker
+                                                    clearable
+                                                    disablePast
+                                                    disableToolbar
+                                                    autoOk
+                                                    value={date}
+                                                    placeholder='10-10-2021'
+                                                    onChange={setDate}
+                                                    minDate={new Date()}
+                                                    format='DD-MM-YY ddd'
+                                                    keyboardIcon={
+                                                        <InputAdornment position='end' >
+                                                            <CalendarIcon />
+                                                        </InputAdornment>
+                                                    }
+                                                    InputProps={{
+                                                        disableUnderline: true,
+                                                        className: classes.dateInput
+                                                    }}
+                                                    variant={'inline'}
+                                                    PopoverProps={{
+                                                        PaperProps: {
+                                                            className: classes.popover,
+                                                        }
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item sm={6}>
+                                                <InputLabel className={classes.datePickerLabel}>
+                                                    Time
+                                                </InputLabel>
+                                                <KeyboardTimePicker
+                                                    ampm={false}
+                                                    disableToolbar
+                                                    autoOk
+                                                    value={date}
+                                                    placeholder='08:00 AM'
+                                                    onChange={setDate}
+                                                    mask='__:__'
+                                                    keyboardIcon={
+                                                        <InputAdornment position='end' >
+                                                            <TimeIcon />
+                                                        </InputAdornment>
+                                                    }
+                                                    InputProps={{
+                                                        disableUnderline: true,
+                                                        className: classes.dateInput
+                                                    }}
+                                                    variant={'inline'}
+                                                    PopoverProps={{
+                                                        PaperProps: {
+                                                            className: classes.popover,
+                                                        }
+                                                    }}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </MuiPickersUtilsProvider>
+                                    <ContainedButton className={classes.button}
+                                        onClick={saveDate}>
                                         Save Changes
                                     </ContainedButton>
                                 </Grid>
-                                <Grid item md={6}>
-                                    <StreamerTextInput label='Time'
-                                        placeholder='18:00 hrs'
-                                        Icon={TimeIcon}
-                                        value={hour}
-                                        onChange={setHour} />
+                                <Grid item md={12}>
+                                    <SectionHeader title='Notifications'
+                                        description='You can send participants two custom notifications to share any relevant information about your stream. Make them short and only send important notices. Spaming  can have a negative impact on your stream.' />
+                                    <StreamerTextInput placeholder='140 character limit'
+                                        multiline
+                                        rows={3}
+                                        fullWidth
+                                        textInputClassName={classes.textArea}
+                                        containerClassName={classes.containerTextArea}
+                                        value={notificationBody}
+                                        onChange={onChangeNotificationBody} />
+                                    <br/>
+                                    <ContainedButton className={classes.button}
+                                        onClick={sendNotification}>
+                                        Send
+                                    </ContainedButton>
                                 </Grid>
-                            </Grid>
-                            <Grid item md={12}>
-                                <SectionHeader title='Notifications'
-                                    description='You can send participants two custom notifications to share any relevant information about your stream. Make them short and only send important notices. Spaming  can have a negative impact on your stream.' />
-                                <StreamerTextInput placeholder='140 character limit'
-                                    multiline
-                                    rows={3}
-                                    fullWidth
-                                    textInputClassName={classes.textArea}
-                                    containerClassName={classes.containerTextArea}
-                                    value={notificationBody}
-                                    onChange={onChangeNotificationBody} />
-                                <br/>
-                                <ContainedButton className={classes.button}
-                                    onClick={sendNotification}>
-                                    Send
-                                </ContainedButton>
                             </Grid>
                         </Grid>
                         {/** To define how this section is going to work
@@ -270,7 +407,8 @@ const EditStreamerEvent = ({ user }) => {
                             </TableHead>
                             <TableBody>
                                 {Object.keys(participantsList).map((participantUid, index) => (
-                                    <TableRow className={index % 2 === 0 ? classes.tableRow : classes.tableRowOdd}>
+                                    <TableRow className={index % 2 === 0 ? classes.tableRow : classes.tableRowOdd}
+                                        key={`Participant-${participantUid}`}>
                                         <TableCellStyled align='center' className={classes.firstCell}>
                                             <Avatar className={classes.avatar} />
                                         </TableCellStyled>

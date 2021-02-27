@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
     Grid,
-    Button,
-    Icon
+    Button
 } from '@material-ui/core';
 
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';

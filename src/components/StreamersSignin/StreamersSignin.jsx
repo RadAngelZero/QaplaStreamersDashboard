@@ -6,7 +6,8 @@ import {
     Icon
 } from '@material-ui/core';
 
-import twitchIcon from './../../assets/twitchIcon.svg';
+import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
+import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPage.svg';
 import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -14,7 +15,7 @@ import { signInWithTwitch } from '../../services/auth';
 import { streamerProfileExists, createStreamerProfile } from '../../services/database';
 import { auth } from '../../services/firebase';
 
-const StreamersSignin = () => {
+const StreamersSignin = ({ title }) => {
     const [isLoadingAuth, setIsLoadingAuth] = useState(false);
     const history = useHistory();
     const { inviteCode } = useParams();
@@ -37,32 +38,37 @@ const StreamersSignin = () => {
         setIsLoadingAuth(false);
     }
 
-    const TwitchIcon = (
-        <Icon>
-          <img alt='Twitch Icon' src={twitchIcon} height={22} width={22} />
-        </Icon>
-    );
-
     return (
         <StreamerDashboardContainer>
             <Grid item md='4' style={{
                     backgroundImage: `url(${RoomGame})`,
+                    backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
-                    height: '100vh'
+                    backgroundSize: 'cover',
+                    height: '100%',
                 }}>
+                <div style={{
+                        display: 'flex',
+                        flexGrow: 1,
+                        justifyContent: 'center',
+                        height: '100vh',
+                        alignItems: 'flex-end'
+                    }}>
+                <QaplaIcon style={{ marginBottom: 32 }} />
+                </div>
             </Grid>
             <Grid item md='1' />
             <Grid item md='4'>
                 <p className={styles.getStarted}>
-                    Create your account
+                    {title}
                 </p>
                 <div className={styles.formContainer}>
                     <Button variant='contained'
                         className={styles.continueButton}
-                        startIcon={TwitchIcon}
+                        startIcon={<TwitchIcon />}
                         onClick={SignIn}>
                         {!isLoadingAuth ?
-                            'Sign up with Twitch'
+                            'Sign in with Twitch'
                             :
                             'Loading...'
                         }

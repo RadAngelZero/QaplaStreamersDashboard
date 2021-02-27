@@ -58,10 +58,10 @@ const Router = () => {
                     <InviteCode user={user}/>
                 </Route>
                 <Route exact path='/signin/:inviteCode'>
-                    <StreamersSignin />
+                    <StreamersSignin title='Create your account' />
                 </Route>
                 <Route exact path='/signin'>
-                    <StreamersSignin user={user} />
+                    <StreamersSignin user={user} title='Welcome back!' />
                 </Route>
                 <Route exact path='/welcome'>
                     <StreamerOnBoarding user={user} />

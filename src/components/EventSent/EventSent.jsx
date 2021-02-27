@@ -82,10 +82,7 @@ const EventSent = () => {
                                     Your post has been sent :D
                                 </p>
                                 <p className={classes.cardBody}>
-                                    We got you! When your post gets approved it will be available on the
-                                    app. We’ll let you know when it happens ;). It can take up to 12 hrs to be
-                                    on the app, but usually it only takes a couple of hours.
-                                    We appreciate your patience.
+                                    We got you! When your post gets approved, it will be available on the Qapla app. We’ll let you know when it happens ;). It can take up to 12 hrs to get posted in the app. We appreciate your patience.
                                 </p>
                                 <Box display='flex'
                                     justifyContent='center'>

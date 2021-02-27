@@ -353,7 +353,7 @@ const NewStream = ({ user, games }) => {
                             <AccordionDetails>
                                 <Grid container direction={'column'} className={classes.accordionGridRoot}>
                                     <InputLabel className={classes.label}>
-                                        Isn't necessary to fill every field of this part, you can left some of them empty and we will do our best to translate or fulfill the missing info
+                                        Feeling creative? Give your stream a cool name. Write it in Spanish! It's OK.
                                     </InputLabel>
                                     <Grid container>
                                         <h1 className={styles.title}>
@@ -363,6 +363,7 @@ const NewStream = ({ user, games }) => {
                                             <Grid item className={classes.accordionGridItem}>
                                                 <StreamerTextInput
                                                     label='Stream Title'
+                                                    placeholder='i.e. Manqueando en Fall Guys'
                                                     id='eventTitle'
                                                     fullWidth={true}
                                                     value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
@@ -378,8 +379,9 @@ const NewStream = ({ user, games }) => {
                                         <Grid container spacing={4}>
                                             <Grid item className={classes.accordionGridItem}>
                                                 <StreamerTextInput
-                                                    label='Stream Description Title'
+                                                    label='Subtitle'
                                                     id={'eventDescriptionTitle'}
+                                                    placeholder='Subtitle'
                                                     fullWidth={true}
                                                     value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
                                                     onChange={(e) => optionalDataDispatcher({target: e.target})}
@@ -393,6 +395,7 @@ const NewStream = ({ user, games }) => {
                                                 <StreamerTextInput
                                                     id={'eventDescription'}
                                                     label='Stream Description'
+                                                    placeholder='Share what your stream is going to be about.'
                                                     multiline={true}
                                                     rows={3}
                                                     rowsMax={30}

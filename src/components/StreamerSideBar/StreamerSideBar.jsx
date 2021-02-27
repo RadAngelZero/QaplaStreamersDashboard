@@ -80,7 +80,7 @@ const StreamerSideBar = ({ user }) => {
           open={Boolean(anchorEl)}
           keepMounted
           onClose={() => setAnchorEl(null)}>
-          <StyledMenuItem onClick={closeSession}>Close Session</StyledMenuItem>
+          <StyledMenuItem onClick={closeSession}>Sign Out</StyledMenuItem>
           <StyledMenuItem onClick={() => window.open('https://discord.gg/zWNhd3QG', '_blank')}>Help</StyledMenuItem>
         </StyledMenu>
         <ListItem style={{ marginTop: '.5rem' }}>
@@ -101,7 +101,7 @@ const StreamerSideBar = ({ user }) => {
           {drawer}
         </Drawer>
       </Hidden>
-      <Box position="absolute">
+      <Box position='absolute'>
         <Hidden mdUp>
           <IconButton
             onClick={handleDrawerToggle}
@@ -110,7 +110,7 @@ const StreamerSideBar = ({ user }) => {
             <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
           </IconButton>
           <Drawer
-            variant="temporary"
+            variant='temporary'
             anchor={theme.direction === 'rtl' ? 'right' : 'left'}
             open={mobileOpen}
             onClose={handleDrawerToggle}

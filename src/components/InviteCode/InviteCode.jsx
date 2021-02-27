@@ -7,6 +7,7 @@ import {
     InputBase
 } from '@material-ui/core';
 
+import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPage.svg';
 import styles from './InviteCode.module.css';
 import RoomGame from './../../assets/room-game.png';
 import { invitationCodeExists } from '../../services/database';
@@ -45,18 +46,29 @@ const InviteCode = ({ user }) => {
         <StreamerDashboardContainer>
             <Grid item md='4' style={{
                     backgroundImage: `url(${RoomGame})`,
+                    backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
-                    height: '100vh'
+                    backgroundSize: 'cover',
+                    height: '100%',
                 }}>
+                <div style={{
+                        display: 'flex',
+                        flexGrow: 1,
+                        justifyContent: 'center',
+                        height: '100vh',
+                        alignItems: 'flex-end'
+                    }}>
+                <QaplaIcon style={{ marginBottom: 32 }} />
+                </div>
             </Grid>
             <Grid item md='1' />
             <Grid item md='4'>
                 <p className={styles.getStarted}>
-                    Get started, it’s free!
+                    Start growing your community.
                 </p>
                 <div className={styles.formContainer}>
                     <p className={styles.instruction}>
-                        Enter your invitation code to continue to sign up
+                        Enter your free trial invite code to sign up.
                     </p>
                     <form onSubmit={continueToSignUp}>
                         <InputBase

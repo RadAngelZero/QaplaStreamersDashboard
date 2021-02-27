@@ -93,7 +93,7 @@ const StreamerProfile = ({ user, games }) => {
                         <Grid item xs={12}>
                             <Grid container>
                                 <Grid item xs={3}>
-                                    <h1 className={styles.title}>My events</h1>
+                                    <h1 className={styles.title}>My Streams</h1>
                                 </Grid>
                                 <Grid item xs={9} style={{ marginTop: '6rem' }}>
                                     <StreamerSelect
@@ -112,7 +112,7 @@ const StreamerProfile = ({ user, games }) => {
                                 <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
                                     <Card className={styles.createEventCard} onClick={createStream}>
                                         <h1 className={styles.newStream}>
-                                            New <br /> Stream
+                                            Post a <br /> Stream
                                         </h1>
                                         <CardContent>
                                             <Box display='flex' justifyContent='center'>

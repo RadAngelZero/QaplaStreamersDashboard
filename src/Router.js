@@ -4,7 +4,6 @@ import {
     Switch,
     Route
 } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 
 import './App.css';
 import {
@@ -50,9 +49,6 @@ const Router = () => {
 
     return (
         <RouterPackage>
-            <Helmet>
-                <title>Streamer Dashboard</title>
-            </Helmet>
             <Switch>
                 <Route exact path='/'>
                     <InviteCode user={user}/>

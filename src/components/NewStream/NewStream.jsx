@@ -227,11 +227,11 @@ const NewStream = ({ user, games }) => {
                             fontSize: '14px'
                         }} value={null}></option>
                         {games.allGames && Object.entries(games.allGames).map((game) => {
-                            if (!game[1].name.toLowerCase().includes('twitch')) {
+                            if (!game[1].gameName.toLowerCase().includes('twitch')) {
                                 return <option style={{
                                     backgroundColor: '#141833',
                                     fontSize: '14px'
-                                }} value={game[0]}>{game[1].name}</option>
+                                }} value={game[0]}>{game[1].gameName}</option>
                             }
 
                             return null;
@@ -321,7 +321,7 @@ const NewStream = ({ user, games }) => {
                                     }
                                     label='Casual (XQ)' />
                             </Grid>
-                            <Grid item sm={2}>
+                            {/* <Grid item sm={2}>
                                 <FormControlLabel
                                     value={'tournament'}
                                     classes={{ label: classes.label }}
@@ -332,7 +332,7 @@ const NewStream = ({ user, games }) => {
                                             style={{ backgroundColor: 'transparent' }} />
                                     }
                                     label='Tournament' />
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                     </RadioGroup>
                     <Grid container className={classes.accordionContainer}>

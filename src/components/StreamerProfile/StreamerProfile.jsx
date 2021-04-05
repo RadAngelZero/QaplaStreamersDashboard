@@ -50,11 +50,10 @@ const StreamerProfile = ({ user, games }) => {
      * @param {string} date date in format DD-MM-YYYY
      * @example formatDate("12-02-2021") returns 12 Feb 2021
      */
-    const formatDate = (date) => {
+    const formatDate = (timestamp) => {
+        const date = new Date(timestamp);
         const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sept', 'Oct', 'Nov', 'Dic'];
-        let [day, month, year] = date.split('-');
-        month = parseInt(month) - 1; // Months array count start on zero
-        return `${day} ${months[month]} ${year}`;
+        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
     }
 
     const onRemoveStream = (streamId) => {
@@ -131,7 +130,7 @@ const StreamerProfile = ({ user, games }) => {
                                             user={user}
                                             game={streams[streamId].game}
                                             games={games}
-                                            date={formatDate(streams[streamId].date)}
+                                            date={formatDate(streams[streamId].timestamp)}
                                             enableOptionsIcon={streamType === PENDING_APPROVAL_EVENT_TYPE}
                                             onClick={() => goToStreamDetails(streamId)}
                                             onRemoveStream={onRemoveStream} />

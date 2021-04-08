@@ -95,7 +95,11 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                 setParticipantsNumber(participantsNumber);
 
                 const title = await getStreamTitle(streamId);
-                setTitle(title.val());
+                if (title.exists()) {
+                    setTitle(title.val());
+                } else if (games['allGames'] && games['allGames'][game] && games['allGames'][game].gameName) {
+                    setTitle({ en: games['allGames'][game].gameName });
+                }
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
                 const participants = await getPastStreamParticipantsNumber(user.uid, streamId);
                 let participantsNumber = participants.exists() ? participants.val() : 0;
@@ -104,7 +108,9 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                 const title = await getPastStreamTitle(user.uid, streamId);
                 setTitle(title.val());
             } else if (streamType === PENDING_APPROVAL_EVENT_TYPE) {
-                setTitle({ en: games['allGames'][game].name });
+                if (games['allGames'] && games['allGames'][game] && games['allGames'][game].gameName) {
+                    setTitle({ en: games['allGames'][game].gameName });
+                }
             }
         }
 

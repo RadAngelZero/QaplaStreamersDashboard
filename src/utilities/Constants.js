@@ -23,6 +23,12 @@ import SmashImage from './../assets/Smash.jpg';
 import TFTImage from './../assets/TFT.jpg';
 import ValorantImage from './../assets/Valorant.jpg';
 import WarzoneImage from './../assets/Warzone.jpg';
+import AvengersImage from './../assets/Avengers.jpg';
+import BetrayalImage from './../assets/Betrayal.jpg';
+import StumbleGuysImage from './../assets/StumbleGuys.jpg';
+import KukoroImage from './../assets/Kukoro.jpg';
+import MarblesImage from './../assets/Marbles.jpg';
+import GOWImage from './../assets/GOW.jpg';
 
 
 /**
@@ -68,5 +74,11 @@ export const streamsPlaceholderImages = {
     swSmash: SmashImage,
     tft: TFTImage,
     valorant: ValorantImage,
-    xHalo: HaloImage
+    xHalo: HaloImage,
+    AvengerSquare: AvengersImage,
+    Betrayal: BetrayalImage,
+    StumbleGuys: StumbleGuysImage,
+    Kukoro: KukoroImage,
+    Marbles: MarblesImage,
+    GearsofWar: GOWImage
 };

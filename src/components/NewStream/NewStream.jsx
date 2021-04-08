@@ -167,7 +167,8 @@ const NewStream = ({ user, games }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedGame, setSelectedGame] = useState();
     const [selectedEvent, setSelectedEvent] = useState('exp');
-    const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {})
+    const [stringDate, setStringDate] = useState('');
+    const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
@@ -178,6 +179,10 @@ const NewStream = ({ user, games }) => {
     const handleEventTypeChange = (event) => {
         setSelectedEvent(event.target.value);
     };
+
+    const handleStringDateChange = (event) => {
+        setStringDate(event.target.value);
+    }
 
     const submitEvent = () => {
         if (selectedDate.$d === undefined || !selectedGame) {
@@ -201,7 +206,7 @@ const NewStream = ({ user, games }) => {
             selectedDate.$d.getMinutes()
         );
 
-        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, timestamp.getTime(), optionalData);
+        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, timestamp.getTime(), optionalData, stringDate);
         history.push('/success');
     }
 
@@ -301,6 +306,15 @@ const NewStream = ({ user, games }) => {
                                         }
                                     }}
                                 />
+                            </Grid>
+                            <Grid item sm={8}>
+                            <InputLabel className={classes.datePickerLabel}>
+                                    Confirm your date
+                                </InputLabel>
+                                <StreamerTextInput placeholder='Example: 15 de abril 16:00 Hora de Ciudad de México'
+                                    fullWidth
+                                    value={stringDate}
+                                    onChange={handleStringDateChange} />
                             </Grid>
                         </Grid>
                     </MuiPickersUtilsProvider>

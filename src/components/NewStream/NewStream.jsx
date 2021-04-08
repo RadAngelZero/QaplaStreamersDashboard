@@ -164,14 +164,19 @@ const NewStream = ({ user, games }) => {
         }
     }
 
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    // Minimum valid date is 24 hours since the current date
+    const minDate = new Date((new Date()).getTime() + 86400000);
+
+    // The default date is the minDate + 15 minutes, to avoid show the error feedback when the streamer open the screen
+    const [selectedDate, setSelectedDate] = useState(new Date(minDate.getTime() + 900000));
     const [selectedGame, setSelectedGame] = useState();
     const [selectedEvent, setSelectedEvent] = useState('exp');
     const [stringDate, setStringDate] = useState('');
     const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
 
+
     const handleDateChange = (date) => {
-        setSelectedDate(date);
+        setSelectedDate(date.$d);
     };
     const handleGameChange = (game) => {
         setSelectedGame(game.target.value);
@@ -185,28 +190,24 @@ const NewStream = ({ user, games }) => {
     }
 
     const submitEvent = () => {
-        if (selectedDate.$d === undefined || !selectedGame) {
-            alert('Verifica que todos los campos hayan sido llenados correctamente');
+        if (selectedDate < minDate) {
+            alert('All requests must be sent at least 24 hours before the stream');
+            return;
+        }
+        if (!selectedGame) {
+            alert('Verify that all fields have been filled correctly');
             return;
         }
 
-        const UTCDay = selectedDate.$d.getUTCDate() < 10 ? `0${selectedDate.$d.getUTCDate()}` : selectedDate.$d.getUTCDate();
-        const UTCMonth = selectedDate.$d.getUTCMonth() + 1 < 10 ? `0${selectedDate.$d.getUTCMonth() + 1}` : selectedDate.$d.getUTCMonth() + 1;
-        let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.$d.getUTCFullYear()}`;
+        const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
+        const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
+        let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
 
-        const UTCHour = selectedDate.$d.getUTCHours() < 10 ? `0${selectedDate.$d.getUTCHours()}` : selectedDate.$d.getUTCHours();
-        const UTCMinutes = selectedDate.$d.getUTCMinutes() < 10 ? `0${selectedDate.$d.getUTCMinutes()}` : selectedDate.$d.getUTCMinutes();
+        const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
+        const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
         let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
-        let timestamp = new Date(
-            selectedDate.$d.getFullYear(),
-            selectedDate.$d.getMonth(),
-            selectedDate.$d.getDate(),
-            selectedDate.$d.getHours(),
-            selectedDate.$d.getMinutes()
-        );
-
-        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, timestamp.getTime(), optionalData, stringDate);
+        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
         history.push('/success');
     }
 
@@ -258,8 +259,10 @@ const NewStream = ({ user, games }) => {
                                     autoOk
                                     value={selectedDate}
                                     placeholder='10-10-2021'
-                                    onChange={(date) => handleDateChange(date)}
-                                    minDate={new Date()}
+                                    onChange={handleDateChange}
+                                    defaultValue={new Date()}
+                                    minDate={minDate}
+                                    minDateMessage='All requests must be sent at least 24 hours before the stream'
                                     format='DD-MM-YY ddd'
                                     keyboardIcon={
                                         <InputAdornment position='end' >
@@ -286,9 +289,12 @@ const NewStream = ({ user, games }) => {
                                     ampm={false}
                                     disableToolbar
                                     autoOk
+                                    error={selectedDate <= minDate}
+                                    helperText={selectedDate >= minDate ? '' : 'All requests must be sent at least 24 hours before the stream'}
                                     value={selectedDate}
                                     placeholder='08:00 AM'
-                                    onChange={(date) => setSelectedDate(date)}
+                                    onChange={handleDateChange}
+                                    min
                                     mask='__:__'
                                     keyboardIcon={
                                         <InputAdornment position='end' >

@@ -65,8 +65,10 @@ export async function createStreamerProfile(uid, userData, inviteCode) {
  * @param {string} streamType One of 'exp' or 'tournament'
  * @param {timestamp} timestamp Timestamp based on the given date and hour
  * @param {object} optionalData Customizable data for events
+ * @param {number} createdAt timestamp of when the request was created
+ * @param {string} stringDate Temporary field just to detect a bug
  */
-export async function createNewStreamRequest(streamer, game, date, hour, streamType, timestamp, optionalData) {
+export async function createNewStreamRequest(streamer, game, date, hour, streamType, timestamp, optionalData, createdAt, stringDate) {
     const event = await streamersEventsDataRef.child(streamer.uid).push({
         date,
         hour,
@@ -74,7 +76,9 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         status: 1,
         streamType,
         timestamp,
-        optionalData
+        optionalData,
+        createdAt,
+        stringDate
     });
 
     return await streamsApprovalRef.child(event.key).set({
@@ -87,7 +91,9 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         timestamp,
         streamerChannelLink: 'https://twitch.tv/' + streamer.login,
         streamerPhoto: streamer.photoUrl,
-        optionalData
+        optionalData,
+        createdAt,
+        stringDate
     });
 }
 

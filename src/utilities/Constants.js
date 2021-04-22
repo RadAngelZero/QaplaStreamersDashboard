@@ -29,6 +29,8 @@ import StumbleGuysImage from './../assets/StumbleGuys.jpg';
 import KukoroImage from './../assets/Kukoro.jpg';
 import MarblesImage from './../assets/Marbles.jpg';
 import GOWImage from './../assets/GOW.jpg';
+import ApexImage from './../assets/Apex.jpg';
+import AnimalCrossingImage from './../assets/AnimalCrossing.jpg';
 
 
 /**
@@ -80,5 +82,7 @@ export const streamsPlaceholderImages = {
     StumbleGuys: StumbleGuysImage,
     Kukoro: KukoroImage,
     Marbles: MarblesImage,
-    GearsofWar: GOWImage
+    GearsofWar: GOWImage,
+    Apex: ApexImage,
+    AnimalCrossing: AnimalCrossingImage
 };

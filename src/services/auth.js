@@ -34,7 +34,7 @@ function LoginWithTwitch() {
         `client_id=${TWITCH_CLIENT_ID}&` +
         `redirect_uri=${TWITCH_REDIRECT_URI}&` +
         `response_type=code&` +
-        `scope=user:read:email%20user:edit%20bits:read%20user:edit%20channel:read:subscriptions%20channel:manage:redemptions`;
+        `scope=user:read:email%20user:edit%20bits:read%20user:edit%20channel:read:subscriptions%20channel:manage:redemptions%20channel:read:redemptions`;
     return new Promise((resolve, reject) => {
       const authWindow = window.open(
             uri,
@@ -86,7 +86,9 @@ async function createTwitchUser(code) {
                 login: user.login,
                 photoUrl: user.profile_image_url,
                 email: user.email,
-                twitchAccessToken: resultData.access_token
+                twitchAccessToken: resultData.access_token,
+                refreshToken: resultData.refresh_token,
+                scope: resultData.scope
             }
         };
 

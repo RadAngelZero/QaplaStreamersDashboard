@@ -8,6 +8,8 @@ const streamersEventsDataRef = database.ref('/StreamersEventsData');
 const streamsRef = database.ref('/eventosEspeciales').child('eventsData');
 const streamersHistoryEventsDataRef = database.ref('/StreamersHistoryEventsData');
 const streamParticipantsRef = database.ref('/EventParticipants');
+const userRef = database.ref('/Users');
+const donationsLeaderBoardRef = database.ref('/DonationsLeaderBoard');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -54,6 +56,27 @@ export async function streamerProfileExists(uid) {
 export async function createStreamerProfile(uid, userData, inviteCode) {
     InvitationCodeRef.child(inviteCode).remove();
     return await userStreamersRef.child(uid).update(userData);
+}
+
+/**
+ * Update the streamer profile with the given data
+ * @param {string} uid User identifier
+ * @param {object} userData Data to update
+ */
+export async function updateStreamerProfile(uid, userData) {
+    userStreamersRef.child(uid).update(userData);
+}
+
+/**
+ * Save on the streamer profile a new custom reward created with the
+ * dashboard
+ * @param {string} uid User identifier
+ * @param {string} rewardId New custom reward identifier
+ * @param {string} title Title of the new reward
+ * @param {number} cost Cost (in bits) of the new reward
+ */
+export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost) {
+    userStreamersRef.child(uid).child('customRewards').child(rewardId).set({ title, cost });
 }
 
 /**
@@ -198,4 +221,22 @@ export async function getStreamParticipantsList(streamId) {
  */
 export async function getPastStreamTitle(uid, streamId) {
     return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('title').once('value');
+}
+
+export async function giveStreamExperienceForRewardRedeemed(userTwitchId, amountOfExperience) {
+    let userUpdate = {};
+    let user = await userRef.orderByChild('twitchId').equalTo(userTwitchId).once('value');
+
+    if (user.exists()) {
+        user = Object.keys(user.val()).map((uid) => user.val()[uid])[0];
+
+        let userExperience = user.qaplaLevel || 0;
+        const userLeaderboardExperience = (await donationsLeaderBoardRef.child(user.id).child('totalDonations').once('value')).val() || 0;
+
+        userUpdate[`/Users/${user.id}/qaplaLevel`] = amountOfExperience + userExperience;
+        userUpdate[`/DonationsLeaderBoard/${user.id}/totalDonations`] = userLeaderboardExperience + amountOfExperience;
+        userUpdate[`/DonationsLeaderBoard/${user.id}/userName`] = user.userName;
+
+        // database.ref('/').update(userUpdate);
+    }
 }

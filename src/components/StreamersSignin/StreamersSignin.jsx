@@ -11,7 +11,7 @@ import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { signInWithTwitch } from '../../services/auth';
-import { streamerProfileExists, createStreamerProfile } from '../../services/database';
+import { streamerProfileExists, createStreamerProfile, updateStreamerProfile } from '../../services/database';
 import { auth } from '../../services/firebase';
 
 const StreamersSignin = ({ title }) => {
@@ -22,6 +22,7 @@ const StreamersSignin = ({ title }) => {
     const SignIn = async () => {
         setIsLoadingAuth(true);
         const user = await signInWithTwitch();
+        localStorage.setItem('twitchPermission', 'channel:read:redemptions');
         if (!(await streamerProfileExists(user.firebaseAuthUser.user.uid))) {
             if (inviteCode) {
                 await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
@@ -32,6 +33,7 @@ const StreamersSignin = ({ title }) => {
                 alert('Requieres un codigo de invitación para acceder');
             }
         } else {
+            await updateStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
             history.push('/profile');
         }
         setIsLoadingAuth(false);

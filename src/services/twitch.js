@@ -1,6 +1,14 @@
-import { giveStreamExperienceForRewardRedeemed, updateStreamerProfile, saveStreamerTwitchCustomReward } from './database';
+import {
+    giveStreamExperienceForRewardRedeemed,
+    updateStreamerProfile,
+    saveStreamerTwitchCustomReward,
+    removeStreamerTwitchCustomReward,
+    saveCustomRewardRedemption,
+    updateCustomRewardRedemptionStatus,
+    getUserByTwitchId,
+    isUserRegisteredToStream
+} from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID } from '../utilities/Constants';
-import { signOut } from './auth';
 
 let webSocket;
 
@@ -8,8 +16,11 @@ let webSocket;
  * Establish a connection between the dashboard and the twitch using web sockets
  * @param {string} uid User identifier
  * @param {string} accessToken Twitch access token
+ * @param {array} topics Array of strings with the topics to listen
+ * @param {stirng} rewardId Id of the qapla custom reward
+ * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export function connect(uid, accessToken) {
+export function connect(streamId, uid, accessToken, topics, rewardId, onInvalidRefreshToken) {
     let pingInterval = 1000 * 60;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
@@ -19,6 +30,7 @@ export function connect(uid, accessToken) {
     webSocket.onopen = (error) => {
         ping();
         pingHandle = setInterval(ping, pingInterval);
+        listen(topics, accessToken, uid, onInvalidRefreshToken);
     };
 
     webSocket.onerror = (error) => {
@@ -27,31 +39,71 @@ export function connect(uid, accessToken) {
 
     webSocket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log(event);
         console.log(message);
-        if (message.type === 'RECONNECT') {
-            setTimeout(connect, reconnectInterval);
-        }
-
-        if (message.type === 'RESPONSE') {
-            if (message.error === 'ERR_BADAUTH') {
-                console.log('Refresh token');
-                // refreshTwitchToken(uid, accessToken);
+        if (message.data) {
+            const reward = JSON.parse(message.data.message);
+            if (reward.type === 'reward-redeemed') {
+                const redemptionData = reward.data.redemption;
+                handleCustomRewardRedemption(uid, accessToken, streamId, rewardId, redemptionData, onInvalidRefreshToken);
             }
-        }
 
-        if (message.type === 'reward-redeemed') {
-            console.log(message.data.redemption.user.id);
-            console.log(message.data.reward.id);
-            console.log(message.data.status);
-            // giveStreamExperienceForRewardRedeemed(message.data.redemption.user.id, 100);
+            if (message.type === 'RECONNECT') {
+                setTimeout(() => connect(streamId, uid, accessToken, topics, onInvalidRefreshToken), reconnectInterval);
+            }
         }
     };
 
     webSocket.onclose = () => {
         clearInterval(pingHandle);
-        setTimeout(connect, reconnectInterval);
     };
+}
+
+export function closeConnection() {
+    webSocket.close();
+}
+
+/**
+ * Fulfill any redemption of the Qapla custom reward redeemed by Qapla users who are subscribed
+ * to the given stream and cancel any redemption of the Qapla custom reward for no users or users
+ * not subscribed to the event. Ignore any other custom reward redemption
+ * @param {string} streamerUid Streamer user identifier
+ * @param {string} accessToken Twitch access token
+ * @param {string} streamId Streamer Twitch id
+ * @param {string} rewardId Qapla Custom Reward Id
+ * @param {object} redemptionData Redemption twitch object
+ * @param {function} onInvalidRefreshToken Callback for invalid tokens
+ */
+export async function handleCustomRewardRedemption(streamerUid, accessToken, streamId, rewardId, redemptionData, onInvalidRefreshToken) {
+    if (redemptionData.reward.id === rewardId) {
+        console.log('Qapla Custom reward redeemed');
+        const user = await getUserByTwitchId(redemptionData.user.id);
+        if (user) {
+            console.log('Redeemed by qapla user:', user.id);
+            const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
+            if (isUserParticipantOfStream) {
+                console.log(`User ${user.id} is subscribed to stream`);
+                saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                const status = await updateRedemptionStatus(streamerUid, redemptionData.id, redemptionData.channel_id, accessToken, redemptionData.reward.id, 'FULFILLED', onInvalidRefreshToken);
+                if (status === 'FULFILLED') {
+                    console.log('Correctly Fulfilled reward for user:', user.id);
+                    updateCustomRewardRedemptionStatus(streamId, redemptionData.id, status);
+                } else {
+                    console.log(`Error trying to fullfill reward for user: ${user.id} with status ${status}`);
+                    updateCustomRewardRedemptionStatus(streamId, redemptionData.id, 'ERROR');
+                }
+
+                return;
+            } else {
+                console.log(`User ${user.id} is NOT subscribed to stream`);
+            }
+        }
+
+        if (await updateRedemptionStatus(streamerUid, redemptionData.id, redemptionData.channel_id, accessToken, redemptionData.reward.id, 'CANCELED', onInvalidRefreshToken) === 'CANCELED') {
+            console.log(`Redemption cancelled`);
+        } else {
+            console.log(`Couldn´t cancelled redemption`);
+        }
+    }
 }
 
 /**
@@ -64,7 +116,8 @@ export function connect(uid, accessToken) {
 export async function listen(topics, accessToken, uid, onInvalidRefreshToken) {
     const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
     if (twitchAccessTokenStatus === 401) {
-        return await refreshTwitchToken(uid, accessToken, onInvalidRefreshToken);
+        await refreshTwitchToken(uid, accessToken, onInvalidRefreshToken);
+        return await listen(topics, accessToken, uid, onInvalidRefreshToken);
     }
 
     const message = {
@@ -76,7 +129,7 @@ export async function listen(topics, accessToken, uid, onInvalidRefreshToken) {
         }
     };
 
-    setTimeout(() => webSocket.send(JSON.stringify(message)), 5000);
+    setTimeout(() => webSocket.send(JSON.stringify(message)), 1250);
 }
 
 /**
@@ -117,7 +170,13 @@ function nonce(length) {
  */
 export async function createCustomReward(uid, twitchId, accessToken, title, cost, onInvalidRefreshToken) {
     try {
-        let algo = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}`, {
+        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
+        if (twitchAccessTokenStatus === 401) {
+            await refreshTwitchToken(uid, accessToken, onInvalidRefreshToken);
+            return createCustomReward(uid, twitchId, accessToken, title, cost, onInvalidRefreshToken);
+        }
+
+        let res = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}`, {
             method: 'POST',
             headers: {
                 'Client-Id': TWITCH_CLIENT_ID,
@@ -130,18 +189,90 @@ export async function createCustomReward(uid, twitchId, accessToken, title, cost
             })
         });
 
-        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-        if (twitchAccessTokenStatus === 401) {
-            return await refreshTwitchToken(uid, accessToken, onInvalidRefreshToken);
-        }
-
-        const response = await algo.json();
-        if (response.data[0]) {
+        const response = await res.json();
+        if (response.data && response.data[0]) {
             saveStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost);
+
+            return response.data[0];
         }
     } catch (e) {
         console.log('Error: ', e);
     }
+}
+
+/**
+ * Delete a custom reward in the user´s twitch
+ * @param {string} uid User identifier
+ * @param {string} twitchId Twitch identifier
+ * @param {string} accessToken Twitch access token
+ * @param {string} rewardId Id of the reward to delete
+ * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
+ */
+export async function deleteCustomReward(uid, twitchId, accessToken, rewardId, onInvalidRefreshToken) {
+    try {
+        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
+        if (twitchAccessTokenStatus === 401) {
+            await refreshTwitchToken(uid, accessToken, onInvalidRefreshToken);
+            return await deleteCustomReward(uid, twitchId, accessToken, rewardId, onInvalidRefreshToken);
+        }
+
+        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
+            method: 'DELETE',
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        });
+
+        if (response.status === 204 ) {
+            removeStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost);
+        }
+
+        return response.status;
+    } catch (e) {
+        console.log('Error: ', e);
+    }
+}
+
+/**
+ * Update the status of the given redemption
+ * @param {string} uid Streamer user identifier
+ * @param {string} redemptionId Redemption twitch identifier
+ * @param {strint} streamerId Streamer Twitch id
+ * @param {string} accessToken Twitch access token
+ * @param {string} rewardId Qapla custom reward identifier
+ * @param {string} status Status to assign (FULFILLED or CANCELED)
+ * @param {function} onInvalidRefreshToken Callback for invalid tokens
+ */
+export async function updateRedemptionStatus(uid, redemptionId, streamerId, accessToken, rewardId, status, onInvalidRefreshToken) {
+    const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
+    if (twitchAccessTokenStatus === 401) {
+        await refreshTwitchToken(uid, accessToken, onInvalidRefreshToken);
+        return await updateRedemptionStatus(uid, redemptionId, streamerId, accessToken, rewardId, status, onInvalidRefreshToken);
+    }
+
+    let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
+    `&broadcaster_id=${streamerId}` +
+    `&reward_id=${rewardId}` +
+    `&id=${redemptionId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json; charset=utf-8'
+            },
+            body: JSON.stringify({
+                status
+            })
+        }
+    });
+
+    response = await response.json();
+
+    return response.data[0].status;
 }
 
 /**
@@ -163,9 +294,9 @@ export async function refreshTwitchToken(uid, accessToken, onInvalidRefreshToken
 
     const result = (await algo.json());
     if (result.status === 400) {
-        onInvalidRefreshToken();
+        await onInvalidRefreshToken();
     } else {
-        updateStreamerProfile(uid, { twitchAccessToken: result.access_token, refreshToken: result.refresh_token });
+        await updateStreamerProfile(uid, { twitchAccessToken: result.access_token, refreshToken: result.refresh_token });
 
         return result;
     }

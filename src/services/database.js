@@ -10,6 +10,8 @@ const streamersHistoryEventsDataRef = database.ref('/StreamersHistoryEventsData'
 const streamParticipantsRef = database.ref('/EventParticipants');
 const userRef = database.ref('/Users');
 const donationsLeaderBoardRef = database.ref('/DonationsLeaderBoard');
+const redeemedCustomRewardsRef = database.ref('/RedeemedCustomRewards');
+const eventParticipantsRef = database.ref('/EventParticipants');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -77,6 +79,15 @@ export async function updateStreamerProfile(uid, userData) {
  */
 export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost) {
     userStreamersRef.child(uid).child('customRewards').child(rewardId).set({ title, cost });
+}
+
+/**
+ * Remove a custom reward created from the streamer profile
+ * @param {string} uid User identifier
+ * @param {string} rewardId New custom reward identifier
+ */
+export async function removeStreamerTwitchCustomReward(uid, rewardId) {
+    userStreamersRef.child(uid).child('customRewards').child(rewardId).remove();
 }
 
 /**
@@ -223,20 +234,67 @@ export async function getPastStreamTitle(uid, streamId) {
     return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('title').once('value');
 }
 
-export async function giveStreamExperienceForRewardRedeemed(userTwitchId, amountOfExperience) {
+export async function giveStreamExperienceForRewardRedeemed(uid, amountOfExperience) {
     let userUpdate = {};
-    let user = await userRef.orderByChild('twitchId').equalTo(userTwitchId).once('value');
+    let userExperience = user.qaplaLevel || 0;
+    const userLeaderboardExperience = (await donationsLeaderBoardRef.child(uid).child('totalDonations').once('value')).val() || 0;
 
-    if (user.exists()) {
-        user = Object.keys(user.val()).map((uid) => user.val()[uid])[0];
+    userUpdate[`/Users/${uid}/qaplaLevel`] = amountOfExperience + userExperience;
+    userUpdate[`/DonationsLeaderBoard/${uid}/totalDonations`] = userLeaderboardExperience + amountOfExperience;
+    userUpdate[`/DonationsLeaderBoard/${uid}/userName`] = user.userName;
 
-        let userExperience = user.qaplaLevel || 0;
-        const userLeaderboardExperience = (await donationsLeaderBoardRef.child(user.id).child('totalDonations').once('value')).val() || 0;
+    // database.ref('/').update(userUpdate);
+}
 
-        userUpdate[`/Users/${user.id}/qaplaLevel`] = amountOfExperience + userExperience;
-        userUpdate[`/DonationsLeaderBoard/${user.id}/totalDonations`] = userLeaderboardExperience + amountOfExperience;
-        userUpdate[`/DonationsLeaderBoard/${user.id}/userName`] = user.userName;
+/**
+ * Save on database the information about a redemption of a twitch custom reward
+ * @param {string} uid User identifier
+ * @param {string} photoUrl Photo of the user
+ * @param {string} twitchIdThatRedeemed Id of the user that redeemed the custom reward
+ * @param {string} displayName Twitch display name of the user
+ * @param {string} streamId Stream identifier in our database
+ * @param {string} redemptionId Id of the twitch redemption
+ * @param {string} rewardId Id of the reward
+ * @param {string} status Status of the redemption
+ */
+export async function saveCustomRewardRedemption(uid, photoUrl, twitchIdThatRedeemed, displayName, streamId, redemptionId, rewardId, status) {
+    await redeemedCustomRewardsRef.child(streamId).child(redemptionId).update({ uid, photoUrl, id: twitchIdThatRedeemed, displayName, rewardId, status });
+}
 
-        // database.ref('/').update(userUpdate);
-    }
+/**
+ * Update the status of the given custom redemption
+ * @param {string} streamId Stream identifier in our database
+ * @param {string} redemptionId Id of the twitch redemption
+ * @param {string} status Status of the redemption
+ */
+export async function updateCustomRewardRedemptionStatus(streamId, redemptionId, status) {
+    await redeemedCustomRewardsRef.child(streamId).child(redemptionId).update({ status });
+}
+
+/**
+ * Set a listener for the redeemedCustomRewardsRef/streamId node
+ * @param {string} streamId Stream identifier in our database
+ * @param {function} callback Handler of the returned data
+ */
+export async function listenCustomRewardRedemptions(streamId, callback) {
+    redeemedCustomRewardsRef.child(streamId).on('value', callback);
+}
+
+/**
+ * Return a user profile object (node Users in our database) based on their twitchId or null
+ * if it does not exist
+ * @param {string} twitchId Twitch id
+ */
+export async function getUserByTwitchId(twitchId) {
+    const users = await userRef.orderByChild('twitchId').equalTo(twitchId).once('value');
+    return users.exists() ? users.val()[Object.keys(users.val())[0]] : null;
+}
+
+/**
+ * Returns true if the user is registered to the given stream false if he is not
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream identifier in our database
+ */
+export async function isUserRegisteredToStream(uid, streamId) {
+    return (await eventParticipantsRef.child(streamId).child(uid).once('value')).exists();
 }

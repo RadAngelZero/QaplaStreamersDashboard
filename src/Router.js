@@ -83,7 +83,7 @@ const Router = () => {
                 <Route exact path='/success'>
                     <EventSent user={user} />
                 </Route>
-                <Route exact path='/test'>
+                <Route exact path='/test/:streamId'>
                     <PubSubTest user={user} />
                 </Route>
             </Switch>

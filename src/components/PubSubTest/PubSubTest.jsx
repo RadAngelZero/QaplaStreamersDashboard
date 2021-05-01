@@ -85,9 +85,13 @@ const PubSubTest = ({ user }) => {
     }, [streamId]);
 
     const listenForRewards = async () => {
-        await createReward();
-        connect(streamId, user.uid, user.twitchAccessToken, [`channel-points-channel-v1.${user.id}`], rewardId, handleTwitchSignIn);
-        setConnectedToTwitch(true);
+        const reward = await createReward();
+        if (reward) {
+            connect(streamId, user.uid, user.twitchAccessToken, [`channel-points-channel-v1.${user.id}`], reward.id, handleTwitchSignIn);
+            setConnectedToTwitch(true);
+        } else {
+            alert('Qapla Custom Reward couldn´t been created');
+        }
     }
 
     const createReward = async () => {
@@ -99,6 +103,8 @@ const PubSubTest = ({ user }) => {
         if (reward) {
             setRewardId(reward.id);
         }
+
+        return reward ? reward : null;
     }
 
     const deleteReward = async () => {

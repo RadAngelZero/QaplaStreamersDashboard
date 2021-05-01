@@ -87,6 +87,7 @@ export async function handleCustomRewardRedemption(streamerUid, accessToken, str
                 if (status === 'FULFILLED') {
                     console.log('Correctly Fulfilled reward for user:', user.id);
                     updateCustomRewardRedemptionStatus(streamId, redemptionData.id, status);
+                    giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 25);
                 } else {
                     console.log(`Error trying to fullfill reward for user: ${user.id} with status ${status}`);
                     updateCustomRewardRedemptionStatus(streamId, redemptionData.id, 'ERROR');

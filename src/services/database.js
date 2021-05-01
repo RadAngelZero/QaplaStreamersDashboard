@@ -234,16 +234,16 @@ export async function getPastStreamTitle(uid, streamId) {
     return await streamersHistoryEventsDataRef.child(uid).child(streamId).child('title').once('value');
 }
 
-export async function giveStreamExperienceForRewardRedeemed(uid, amountOfExperience) {
+export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, userName, amountOfExperience) {
     let userUpdate = {};
-    let userExperience = user.qaplaLevel || 0;
+    let userExperience = qaplaLevel || 0;
     const userLeaderboardExperience = (await donationsLeaderBoardRef.child(uid).child('totalDonations').once('value')).val() || 0;
 
     userUpdate[`/Users/${uid}/qaplaLevel`] = amountOfExperience + userExperience;
     userUpdate[`/DonationsLeaderBoard/${uid}/totalDonations`] = userLeaderboardExperience + amountOfExperience;
-    userUpdate[`/DonationsLeaderBoard/${uid}/userName`] = user.userName;
+    userUpdate[`/DonationsLeaderBoard/${uid}/userName`] = userName;
 
-    // database.ref('/').update(userUpdate);
+    database.ref('/').update(userUpdate);
 }
 
 /**

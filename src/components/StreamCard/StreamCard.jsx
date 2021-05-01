@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
@@ -82,6 +83,7 @@ const StyledMenuItem = withStyles(() => ({
   }))(MenuItem);
 
 const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
+    const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
     const [title, setTitle] = useState({ en: '', es: '' });
@@ -138,8 +140,13 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
         }
     }
 
+    const connectToStream = (e, streamId) => {
+        e.preventDefault();
+        history.push(`/stream/${streamId}`);
+    }
+
     const onClickCard = () => {
-        if (streamType !== PENDING_APPROVAL_EVENT_TYPE) {
+        if (streamType !== PENDING_APPROVAL_EVENT_TYPE && !Boolean(anchorEl)) {
             onClick();
         }
     }
@@ -179,7 +186,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                         open={Boolean(anchorEl)}
                         keepMounted
                         onClose={closeMenu}>
-                        <StyledMenuItem onClick={cancelStream}>Cancelar</StyledMenuItem>
+                        {streamType === SCEHDULED_EVENT_TYPE &&
+                            <StyledMenuItem onClick={(e) => connectToStream(e, streamId)}>Iniciar stream</StyledMenuItem>
+                        }
+                        {streamType === PENDING_APPROVAL_EVENT_TYPE &&
+                            <StyledMenuItem onClick={cancelStream}>Cancelar</StyledMenuItem>
+                        }
                     </StyledMenu>
                 </div>
             </CardContent>

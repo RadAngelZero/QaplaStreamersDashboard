@@ -96,7 +96,7 @@ const PubSubTest = ({ user }) => {
 
     const createReward = async () => {
         console.log('Create reward');
-        const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, 'Recompensa Qapla', 150, handleTwitchSignIn);
+        const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, 'Qapla', 500, handleTwitchSignIn);
 
         console.log(reward);
 

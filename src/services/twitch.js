@@ -99,11 +99,11 @@ export async function handleCustomRewardRedemption(streamerUid, accessToken, str
             }
         }
 
-        if (await updateRedemptionStatus(streamerUid, redemptionData.id, redemptionData.channel_id, accessToken, redemptionData.reward.id, 'CANCELED', onInvalidRefreshToken) === 'CANCELED') {
+        /*if (await updateRedemptionStatus(streamerUid, redemptionData.id, redemptionData.channel_id, accessToken, redemptionData.reward.id, 'CANCELED', onInvalidRefreshToken) === 'CANCELED') {
             console.log(`Redemption cancelled`);
         } else {
             console.log(`Couldn´t cancelled redemption`);
-        }
+        }*/
     }
 }
 
@@ -186,7 +186,11 @@ export async function createCustomReward(uid, twitchId, accessToken, title, cost
             },
             body: JSON.stringify({
                 title,
-                cost
+                cost,
+                is_max_per_user_per_stream_enabled: true,
+                max_per_user_per_stream: 2,
+                is_max_per_stream_enabled: false,
+                is_enabled: true
             })
         });
 

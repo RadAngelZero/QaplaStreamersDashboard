@@ -128,7 +128,7 @@ const PubSubTest = ({ user }) => {
     }
 
     const unlistenForRewards = async () => {
-        await deleteReward();
+        //await deleteReward();
         closeConnection();
         setConnectedToTwitch(false);
     }

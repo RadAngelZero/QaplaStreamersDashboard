@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
+    withStyles,
     Grid,
-    Button
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
 } from '@material-ui/core';
 
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
@@ -10,19 +16,30 @@ import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPa
 import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
+import ContainedButton from '../ContainedButton/ContainedButton';
 import { signInWithTwitch } from '../../services/auth';
 import { streamerProfileExists, createStreamerProfile, updateStreamerProfile } from '../../services/database';
 import { auth } from '../../services/firebase';
 
+const CustomDialog = withStyles((theme) => ({
+    paper: {
+        backgroundColor: '#0D1021',
+        color: '#FFF'
+    }
+}))(Dialog);
+
 const StreamersSignin = ({ title }) => {
     const [isLoadingAuth, setIsLoadingAuth] = useState(false);
+    const [openTermsAndConditionsDialog, setOpenTermsAndConditionsDialog] = useState(false);
     const history = useHistory();
     const { inviteCode } = useParams();
 
-    const SignIn = async () => {
+    const signIn = async () => {
+        closeTermsAndConditionsModal();
         setIsLoadingAuth(true);
         const user = await signInWithTwitch();
         localStorage.setItem('twitchPermission', 'channel:read:redemptions');
+        localStorage.setItem('termsAndConditions', 'true');
         if (!(await streamerProfileExists(user.firebaseAuthUser.user.uid))) {
             if (inviteCode) {
                 await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
@@ -38,6 +55,18 @@ const StreamersSignin = ({ title }) => {
         }
         setIsLoadingAuth(false);
     }
+
+    const handleSignInClick = () => {
+        const userHasAcceptedTerms = localStorage.getItem('termsAndConditions');
+
+        if (userHasAcceptedTerms) {
+            signIn();
+        } else {
+            setOpenTermsAndConditionsDialog(true);
+        }
+    }
+
+    const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
 
     return (
         <StreamerDashboardContainer>
@@ -67,7 +96,7 @@ const StreamersSignin = ({ title }) => {
                     <Button variant='contained'
                         className={styles.continueButton}
                         startIcon={<TwitchIcon />}
-                        onClick={SignIn}>
+                        onClick={handleSignInClick}>
                         {!isLoadingAuth ?
                             'Sign in with Twitch'
                             :
@@ -77,6 +106,31 @@ const StreamersSignin = ({ title }) => {
                 </div>
             </Grid>
             <Grid item md='3' />
+            <CustomDialog
+                open={openTermsAndConditionsDialog}
+                onClose={closeTermsAndConditionsModal}>
+                <DialogTitle>AVISO PARA MEJORAR LA EXPERIENCIA DENTRO DE QAPLA (BETA)</DialogTitle>
+                <DialogContent>
+                <DialogContentText style={{ color: '#FFF' }}>
+                    CAMBIOS Y PERMISOS
+                    <br/>
+                    <br/>
+                    Informamos por este medio a toda nuestra Comunidad Streamer que a partir de hoy y en los próximos días, con la finalidad de ofrecer una mejor experiencia dentro de Qapla, se realizarán algunas pruebas y cambios en las herramientas que se utilizan, lo cual puede conllevar a la adecuación en la configuración de la cuentas de TWITCH de los STREMEARS  por parte de QAPLA.
+                    <br/>
+                    <br/>
+                    <br/>
+                    Lo anterior, únicamente para mejorar el rendimiento del uso de QAPLA por parte de la comunidad STREAMER teniendo como consecuencia beneficios y mejoras.
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <ContainedButton variant='outlined' onClick={closeTermsAndConditionsModal} color="primary">
+                    Cancelar
+                </ContainedButton>
+                <ContainedButton variant='outlined' onClick={signIn} color="primary" autoFocus>
+                    Aceptar
+                </ContainedButton>
+                </DialogActions>
+            </CustomDialog>
         </StreamerDashboardContainer>
     );
 }

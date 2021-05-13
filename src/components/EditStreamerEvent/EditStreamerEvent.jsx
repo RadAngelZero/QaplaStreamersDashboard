@@ -244,27 +244,29 @@ const EditStreamerEvent = ({ user }) => {
     }
 
     const saveDate = () => {
-        if (date.$d) {
-            const dateRef = new Date(date.$d);
-            const UTCDay = dateRef.getUTCDate() < 10 ? `0${dateRef.getUTCDate()}` : dateRef.getUTCDate();
-            const UTCMonth = dateRef.getUTCMonth() + 1 < 10 ? `0${dateRef.getUTCMonth() + 1}` : dateRef.getUTCMonth() + 1;
-            let UTCDate = `${UTCDay}-${UTCMonth}-${dateRef.getUTCFullYear()}`;
+        if (maxTimeToAcceptUpdates !== 0 && new Date().getTime() < maxTimeToAcceptUpdates) {
+            if (date.$d) {
+                const dateRef = new Date(date.$d);
+                const UTCDay = dateRef.getUTCDate() < 10 ? `0${dateRef.getUTCDate()}` : dateRef.getUTCDate();
+                const UTCMonth = dateRef.getUTCMonth() + 1 < 10 ? `0${dateRef.getUTCMonth() + 1}` : dateRef.getUTCMonth() + 1;
+                let UTCDate = `${UTCDay}-${UTCMonth}-${dateRef.getUTCFullYear()}`;
 
-            const UTCHours = dateRef.getUTCHours() < 10 ? `0${dateRef.getUTCHours()}` : dateRef.getUTCHours();
-            const UTCMinutes = dateRef.getUTCMinutes() < 10 ? `0${dateRef.getUTCMinutes()}` : dateRef.getUTCMinutes();
-            let UTCHour = `${UTCHours}:${UTCMinutes}`;
+                const UTCHours = dateRef.getUTCHours() < 10 ? `0${dateRef.getUTCHours()}` : dateRef.getUTCHours();
+                const UTCMinutes = dateRef.getUTCMinutes() < 10 ? `0${dateRef.getUTCMinutes()}` : dateRef.getUTCMinutes();
+                let UTCHour = `${UTCHours}:${UTCMinutes}`;
 
-            const localDay = dateRef.getDate() < 10 ? `0${dateRef.getDate()}` : dateRef.getDate();
-            const localMonth = dateRef.getMonth() + 1 < 10 ? `0${dateRef.getMonth() + 1}` : dateRef.getMonth() + 1;
-            let localDate = `${localDay}-${localMonth}-${dateRef.getFullYear()}`;
+                const localDay = dateRef.getDate() < 10 ? `0${dateRef.getDate()}` : dateRef.getDate();
+                const localMonth = dateRef.getMonth() + 1 < 10 ? `0${dateRef.getMonth() + 1}` : dateRef.getMonth() + 1;
+                let localDate = `${localDay}-${localMonth}-${dateRef.getFullYear()}`;
 
-            const localHours = dateRef.getHours() < 10 ? `0${dateRef.getHours()}` : dateRef.getHours();
-            const localMinutes = dateRef.getMinutes() < 10 ? `0${dateRef.getMinutes()}` : dateRef.getMinutes();
-            let localHour = `${localHours}:${localMinutes}`;
+                const localHours = dateRef.getHours() < 10 ? `0${dateRef.getHours()}` : dateRef.getHours();
+                const localMinutes = dateRef.getMinutes() < 10 ? `0${dateRef.getMinutes()}` : dateRef.getMinutes();
+                let localHour = `${localHours}:${localMinutes}`;
 
-            updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
-        } else {
-            alert('Please verify that you have selected a different date and/or hour');
+                updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
+            } else {
+                alert('Please verify that you have selected a different date and/or hour');
+            }
         }
     }
 

@@ -92,9 +92,9 @@ export async function handleCustomRewardRedemption(streamId, rewardId, redemptio
                     const redemptionsSaved = await getCustomRewardRedemptions(streamId, user.id);
 
                     const numberOfRedemptionsSaved = Object.keys(redemptionsSaved.val()).length;
-                    if (numberOfRedemptionsSaved == 1) {
+                    if (numberOfRedemptionsSaved === 1) {
                         giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 15);
-                    } else if (numberOfRedemptionsSaved == 2) {
+                    } else if (numberOfRedemptionsSaved === 2) {
                         addQoinsToUser(user.id, 10);
                     }
                     return;

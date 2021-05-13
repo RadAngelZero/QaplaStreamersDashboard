@@ -317,6 +317,17 @@ export async function isUserRegisteredToStream(uid, streamId) {
 }
 
 /**
+ * Add the specified field on the EventParticipant node of the given stream and user
+ * @param {string} streamId Stream identifier in our database
+ * @param {string} uid User identifier
+ * @param {string} fieldName Name of the field to create
+ * @param {any} value Value to save
+ */
+export async function addInfoToEventParticipants(streamId, uid, fieldName, value) {
+    eventParticipantsRef.child(streamId).child(uid).update({ [fieldName]: value });
+}
+
+/**
  * Add the specific amount of Qoins to the given user
  * @param {string} uid user identifier
  * @param {number} qoinsToAdd Qoins to add

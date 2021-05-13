@@ -94,8 +94,10 @@ export async function handleCustomRewardRedemption(streamId, rewardId, redemptio
                     const numberOfRedemptionsSaved = Object.keys(redemptionsSaved.val()).length;
                     if (numberOfRedemptionsSaved === 1) {
                         giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 15);
+                        addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', 15);
                     } else if (numberOfRedemptionsSaved === 2) {
                         addQoinsToUser(user.id, 10);
+                        addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', 10);
                     }
                     return;
                 } else {

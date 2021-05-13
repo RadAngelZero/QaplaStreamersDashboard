@@ -10,7 +10,7 @@ import {
     loadStreamerProfile,
     loadQaplaGames
 } from './services/database';
-import { handleUserAuthentication } from './services/auth';
+import { handleUserAuthentication, signOut } from './services/auth';
 import InviteCode from './components/InviteCode/InviteCode';
 import StreamersSignin from './components/StreamersSignin/StreamersSignin';
 import StreamerOnBoarding from './components/StreamerOnBoarding/StreamerOnBoarding';
@@ -18,6 +18,7 @@ import StreamerProfile from './components/StreamerProfile/StreamerProfile';
 import NewStream from './components/NewStream/NewStream';
 import EventSent from './components/EventSent/EventSent';
 import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent';
+import PubSubTest from './components/PubSubTest/PubSubTest';
 
 const Router = () => {
     const [games, setGames] = useState({});
@@ -42,9 +43,18 @@ const Router = () => {
             });
         }
 
-        loadGamesResources();
-        checkIfUserIsAuthenticated();
-    }, []);
+        const permissions = localStorage.getItem('twitchPermission');
+        const termsAndConditions = localStorage.getItem('termsAndConditions');
+
+        if (user && (permissions !== 'channel:read:redemptions' || termsAndConditions !== 'true' )) {
+            signOut();
+        }
+
+        if (!user) {
+            loadGamesResources();
+            checkIfUserIsAuthenticated();
+        }
+    }, [user]);
 
 
     return (
@@ -73,6 +83,9 @@ const Router = () => {
                 </Route>
                 <Route exact path='/success'>
                     <EventSent user={user} />
+                </Route>
+                <Route exact path='/stream/:streamId'>
+                    <PubSubTest user={user} />
                 </Route>
             </Switch>
         </RouterPackage>

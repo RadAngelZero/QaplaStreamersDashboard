@@ -33,6 +33,8 @@ const StreamerProfile = ({ user, games }) => {
         async function loadStreams() {
             if (user) {
                 setStreamLoaded(await loadStreamsByStatus(user.uid, streamType));
+            } else {
+                history.push('/');
             }
         }
 
@@ -131,7 +133,7 @@ const StreamerProfile = ({ user, games }) => {
                                             game={streams[streamId].game}
                                             games={games}
                                             date={formatDate(streams[streamId].timestamp)}
-                                            enableOptionsIcon={streamType === PENDING_APPROVAL_EVENT_TYPE}
+                                            enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
                                             onClick={() => goToStreamDetails(streamId)}
                                             onRemoveStream={onRemoveStream} />
                                     </Grid>

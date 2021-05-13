@@ -171,6 +171,14 @@ export async function getStreamTitle(streamId) {
 }
 
 /**
+ * Returns the value of the timestamp node of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamTimestamp(streamId) {
+    return await streamsRef.child(streamId).child('timestamp').once('value');
+}
+
+/**
  * Returns all the data of the given stream
  * @param {string} streamId Stream unique identifier
  */

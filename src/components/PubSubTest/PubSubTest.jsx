@@ -18,7 +18,7 @@ import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
 import { connect, createCustomReward, deleteCustomReward, closeConnection } from '../../services/twitch';
 import { signInWithTwitch } from '../../services/auth';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { updateStreamerProfile, listenCustomRewardRedemptions } from '../../services/database';
+import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,9 +64,19 @@ const PubSubTest = ({ user }) => {
     const classes = useStyles();
     const [connectedToTwitch, setConnectedToTwitch] = useState(false);
     const [rewardId, setRewardId] = useState('');
+    const [streamTimestamp, setStreamTimestamp] = useState(0);
     const [userThatRedeemed, setUserThatRedeemed] = useState({});
 
     useEffect(() => {
+        async function getTimestamp() {
+            if (streamId) {
+                const timestamp = await getStreamTimestamp(streamId);
+                if (timestamp.exists()) {
+                    setStreamTimestamp(timestamp.val());
+                }
+            }
+        }
+
         listenCustomRewardRedemptions(streamId, (users) => {
             if (users.exists()) {
                 let usersToSave = {};
@@ -82,6 +92,8 @@ const PubSubTest = ({ user }) => {
                 setUserThatRedeemed(usersToSave);
             }
         });
+
+        getTimestamp();
     }, [streamId]);
 
     const listenForRewards = async () => {
@@ -95,16 +107,18 @@ const PubSubTest = ({ user }) => {
     }
 
     const createReward = async () => {
-        console.log('Create reward');
-        const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, 'Qapla', 500, handleTwitchSignIn);
+        let date = new Date();
+        if (date.getTime() >= streamTimestamp - 900000) {
+            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, 'Qapla', 500, handleTwitchSignIn);
 
-        console.log(reward);
+            if (reward) {
+                setRewardId(reward.id);
+            }
 
-        if (reward) {
-            setRewardId(reward.id);
+            return reward ? reward : null;
         }
 
-        return reward ? reward : null;
+        return null;
     }
 
     const deleteReward = async () => {
@@ -134,7 +148,7 @@ const PubSubTest = ({ user }) => {
     }
 
     return (
-        <StreamerDashboardContainer user={user}>
+        <StreamerDashboardContainer user={{ id: 'algo' }}>
             <Grid container>
                 <Grid xs={3}>
                     <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}>

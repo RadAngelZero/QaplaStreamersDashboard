@@ -7,7 +7,8 @@ import {
     getCustomRewardRedemptions,
     getUserByTwitchId,
     isUserRegisteredToStream,
-    addQoinsToUser
+    addQoinsToUser,
+    addInfoToEventParticipants
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID } from '../utilities/Constants';
 

@@ -31,6 +31,8 @@ import MarblesImage from './../assets/Marbles.jpg';
 import GOWImage from './../assets/GOW.jpg';
 import ApexImage from './../assets/Apex.jpg';
 import AnimalCrossingImage from './../assets/AnimalCrossing.jpg';
+import SWBattlefrontIIImage from './../assets/SWBattlefrontII.jpg';
+import ProjectZomboidImage from './../assets/ProjectZomboid.jpg';
 
 
 /**
@@ -84,5 +86,7 @@ export const streamsPlaceholderImages = {
     Marbles: MarblesImage,
     GearsofWar: GOWImage,
     Apex: ApexImage,
-    AnimalCrossing: AnimalCrossingImage
+    AnimalCrossing: AnimalCrossingImage,
+    SWBattlefrontII: SWBattlefrontIIImage,
+    ProjectZomboid: ProjectZomboidImage
 };

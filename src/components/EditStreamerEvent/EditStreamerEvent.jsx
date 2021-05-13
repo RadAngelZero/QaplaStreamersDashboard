@@ -175,6 +175,7 @@ const EditStreamerEvent = ({ user }) => {
     const { streamId } = useParams();
     const [title, setTitle] = useState({ en: '', es: '' });
     const [date, setDate] = useState(null);
+    const [maxTimeToAcceptUpdates, setMaxTimeToAcceptUpdates] = useState(0);
     const [notificationBody, setNotificationBody] = useState('');
     const [participantsList, setParticipantsList] = useState({});
     const classes = useStyles();
@@ -184,7 +185,10 @@ const EditStreamerEvent = ({ user }) => {
         async function setStreamData() {
             if (streamType === SCEHDULED_EVENT_TYPE) {
                 const timeStamp = await loadApprovedStreamTimeStamp(streamId);
-                setDate(new Date(timeStamp.val()));
+                if (timeStamp.exists()) {
+                    setDate(new Date(timeStamp.val()));
+                    setMaxTimeToAcceptUpdates(timeStamp.val() - 600000);
+                }
             }
         }
 
@@ -287,6 +291,7 @@ const EditStreamerEvent = ({ user }) => {
                                                     Date
                                                 </InputLabel>
                                                 <KeyboardDatePicker
+                                                    disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates}
                                                     clearable
                                                     disablePast
                                                     disableToolbar
@@ -318,6 +323,7 @@ const EditStreamerEvent = ({ user }) => {
                                                     Time
                                                 </InputLabel>
                                                 <KeyboardTimePicker
+                                                    disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates}
                                                     ampm={false}
                                                     disableToolbar
                                                     autoOk
@@ -345,7 +351,8 @@ const EditStreamerEvent = ({ user }) => {
                                         </Grid>
                                     </MuiPickersUtilsProvider>
                                     <ContainedButton className={classes.button}
-                                        onClick={saveDate}>
+                                        onClick={saveDate}
+                                        disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates}>
                                         Save Changes
                                     </ContainedButton>
                                 </Grid>

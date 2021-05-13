@@ -270,6 +270,15 @@ export async function saveCustomRewardRedemption(uid, photoUrl, twitchIdThatRede
 }
 
 /**
+ * Return all the custom rewards redeemed by the given user in the given stream
+ * @param {string} streamId Stream identifier on the database
+ * @param {String} uid User identifier
+ */
+export async function getCustomRewardRedemptions(streamId, uid) {
+    return await redeemedCustomRewardsRef.child(streamId).orderByChild('uid').equalTo(uid).once('value');
+}
+
+/**
  * Update the status of the given custom redemption
  * @param {string} streamId Stream identifier in our database
  * @param {string} redemptionId Id of the twitch redemption
@@ -305,4 +314,25 @@ export async function getUserByTwitchId(twitchId) {
  */
 export async function isUserRegisteredToStream(uid, streamId) {
     return (await eventParticipantsRef.child(streamId).child(uid).once('value')).exists();
+}
+
+/**
+ * Add the specific amount of Qoins to the given user
+ * @param {string} uid user identifier
+ * @param {number} qoinsToAdd Qoins to add
+ */
+export function addQoinsToUser(uid, qoinsToAdd) {
+    try {
+        userRef.child(uid).child('credits').transaction((credits) => {
+            if (typeof credits === 'number') {
+                return credits + qoinsToAdd;
+            }
+
+            return credits;
+        }, (error) => {
+            console.log(error);
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }

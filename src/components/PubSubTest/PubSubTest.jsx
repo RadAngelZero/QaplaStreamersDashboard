@@ -18,7 +18,7 @@ import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
 import { connect, createCustomReward, deleteCustomReward, closeConnection } from '../../services/twitch';
 import { signInWithTwitch } from '../../services/auth';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp } from '../../services/database';
+import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp, getCustomRewardRedemptions } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 
 const useStyles = makeStyles((theme) => ({

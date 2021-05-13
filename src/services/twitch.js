@@ -4,9 +4,10 @@ import {
     saveStreamerTwitchCustomReward,
     removeStreamerTwitchCustomReward,
     saveCustomRewardRedemption,
-    updateCustomRewardRedemptionStatus,
+    getCustomRewardRedemptions,
     getUserByTwitchId,
-    isUserRegisteredToStream
+    isUserRegisteredToStream,
+    addQoinsToUser
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID } from '../utilities/Constants';
 
@@ -88,10 +89,14 @@ export async function handleCustomRewardRedemption(streamId, rewardId, redemptio
                 if (isUserParticipantOfStream) {
                     console.log(`User ${user.id} is subscribed to stream`);
                     await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
-                    console.log('Giving experience to user:', user.id);
-                    // updateCustomRewardRedemptionStatus(streamId, redemptionData.id, status);
-                    giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 25);
+                    const redemptionsSaved = await getCustomRewardRedemptions(streamId, user.id);
 
+                    const numberOfRedemptionsSaved = Object.keys(redemptionsSaved.val()).length;
+                    if (numberOfRedemptionsSaved == 1) {
+                        giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 15);
+                    } else if (numberOfRedemptionsSaved == 2) {
+                        addQoinsToUser(user.id, 10);
+                    }
                     return;
                 } else {
                     console.log(`User ${user.id} is NOT subscribed to stream`);
@@ -181,8 +186,8 @@ export async function createCustomReward(uid, twitchId, accessToken, title, cost
             body: JSON.stringify({
                 title,
                 cost,
-                is_max_per_user_per_stream_enabled: false,
-                // max_per_user_per_stream: 2,
+                is_max_per_user_per_stream_enabled: true,
+                max_per_user_per_stream: 2,
                 is_max_per_stream_enabled: false,
                 is_enabled: true
             })

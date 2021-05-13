@@ -99,7 +99,7 @@ const PubSubTest = ({ user }) => {
     const listenForRewards = async () => {
         const reward = await createReward();
         if (reward) {
-            connect(streamId, user.uid, user.twitchAccessToken, [`channel-points-channel-v1.${user.id}`], reward.id, handleTwitchSignIn);
+            connect(streamId, user.uid, user.twitchAccessToken, [`channel-points-channel-v1.${user.id}`], reward.id, streamTimestamp, handleTwitchSignIn);
             setConnectedToTwitch(true);
         } else {
             alert('Qapla Custom Reward couldn´t been created');

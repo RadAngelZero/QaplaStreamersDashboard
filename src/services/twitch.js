@@ -18,9 +18,10 @@ let webSocket;
  * @param {string} accessToken Twitch access token
  * @param {array} topics Array of strings with the topics to listen
  * @param {stirng} rewardId Id of the qapla custom reward
+ * @param {number} timestamp Timestamp of the start hour of the stream
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export function connect(streamId, uid, accessToken, topics, rewardId, onInvalidRefreshToken) {
+export function connect(streamId, uid, accessToken, topics, rewardId, timestamp, onInvalidRefreshToken) {
     let pingInterval = 1000 * 60;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
@@ -44,7 +45,7 @@ export function connect(streamId, uid, accessToken, topics, rewardId, onInvalidR
             const reward = JSON.parse(message.data.message);
             if (reward.type === 'reward-redeemed') {
                 const redemptionData = reward.data.redemption;
-                handleCustomRewardRedemption(streamId, rewardId, redemptionData);
+                handleCustomRewardRedemption(streamId, rewardId, redemptionData, timestamp);
             }
 
             if (message.type === 'RECONNECT') {
@@ -69,25 +70,32 @@ export function closeConnection() {
  * @param {string} streamId Streamer Twitch id
  * @param {string} rewardId Qapla Custom Reward Id
  * @param {object} redemptionData Redemption twitch object
+ * @param {number} timestamp Timestamp of the start hour of the stream
  */
-export async function handleCustomRewardRedemption(streamId, rewardId, redemptionData) {
+export async function handleCustomRewardRedemption(streamId, rewardId, redemptionData, timestamp) {
     console.log(redemptionData);
-    if (redemptionData.reward.id === rewardId) {
-        console.log('Qapla Custom reward redeemed', redemptionData.user.id);
-        const user = await getUserByTwitchId(redemptionData.user.id);
-        if (user) {
-            console.log('Redeemed by qapla user:', user.id);
-            const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
-            if (isUserParticipantOfStream) {
-                console.log(`User ${user.id} is subscribed to stream`);
-                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
-                console.log('Giving experience to user:', user.id);
-                // updateCustomRewardRedemptionStatus(streamId, redemptionData.id, status);
-                giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 25);
+    const date = new Date();
+    /**
+     * Allow only redemptions during the first 3 and a half hours of a stream
+     */
+    if (date.getTime() < timestamp + 12600000) {
+        if (redemptionData.reward.id === rewardId) {
+            console.log('Qapla Custom reward redeemed', redemptionData.user.id);
+            const user = await getUserByTwitchId(redemptionData.user.id);
+            if (user) {
+                console.log('Redeemed by qapla user:', user.id);
+                const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
+                if (isUserParticipantOfStream) {
+                    console.log(`User ${user.id} is subscribed to stream`);
+                    await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                    console.log('Giving experience to user:', user.id);
+                    // updateCustomRewardRedemptionStatus(streamId, redemptionData.id, status);
+                    giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 25);
 
-                return;
-            } else {
-                console.log(`User ${user.id} is NOT subscribed to stream`);
+                    return;
+                } else {
+                    console.log(`User ${user.id} is NOT subscribed to stream`);
+                }
             }
         }
     }

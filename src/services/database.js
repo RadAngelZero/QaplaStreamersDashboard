@@ -12,6 +12,7 @@ const userRef = database.ref('/Users');
 const donationsLeaderBoardRef = database.ref('/DonationsLeaderBoard');
 const redeemedCustomRewardsRef = database.ref('/RedeemedCustomRewards');
 const eventParticipantsRef = database.ref('/EventParticipants');
+const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -346,4 +347,17 @@ export function addQoinsToUser(uid, qoinsToAdd) {
     } catch (error) {
         console.error(error);
     }
+}
+
+/**
+ * Saves a reward information on the UserStreamsRewards node on the database
+ * @param {string} uid User identifier
+ * @param {string} type Type of reward (One of qoins or xq)
+ * @param {string} streamerName Name of the streamer
+ * @param {string} streamId Stream identifier
+ * @param {number} amount Numeric value of the reward
+ */
+export async function saveUserStreamReward(uid, type, streamerName, streamId, amount) {
+    const date = new Date();
+    return await userStreamsRewardsRef.child(uid).push({ type, streamerName, streamId, amount, timestamp: date.getTime() });
 }

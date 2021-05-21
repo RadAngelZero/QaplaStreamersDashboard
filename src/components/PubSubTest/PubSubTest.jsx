@@ -18,8 +18,9 @@ import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
 import { connect, createCustomReward, deleteCustomReward, closeConnection } from '../../services/twitch';
 import { signInWithTwitch } from '../../services/auth';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp } from '../../services/database';
+import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp, saveUserStreamReward } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
+import { XQ, QOINS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     tableHead: {
@@ -138,9 +139,10 @@ const PubSubTest = ({ user }) => {
         }
     }
 
-    const handleTwitchSignIn = async () => {
+    const handleTwitchSignIn = async (callback) => {
         const user = await signInWithTwitch();
         await updateStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
+        callback(user.userData.twitchAccessToken);
     }
 
     const unlistenForRewards = async () => {

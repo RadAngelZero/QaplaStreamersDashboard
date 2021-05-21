@@ -53,6 +53,12 @@ export const PENDING_APPROVAL_EVENT_TYPE = 1;
 export const SCEHDULED_EVENT_TYPE = 2;
 export const PAST_STREAMS_EVENT_TYPE = 3;
 
+/**
+ * Type of UserStreamsRewards
+ */
+export const XQ = 'xq';
+export const QOINS = 'qoins';
+
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

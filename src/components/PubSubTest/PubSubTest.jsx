@@ -18,9 +18,8 @@ import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
 import { connect, createCustomReward, deleteCustomReward, closeConnection } from '../../services/twitch';
 import { signInWithTwitch } from '../../services/auth';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp, saveUserStreamReward } from '../../services/database';
+import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import { XQ, QOINS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     tableHead: {
@@ -65,6 +64,7 @@ const PubSubTest = ({ user }) => {
     const classes = useStyles();
     const [connectedToTwitch, setConnectedToTwitch] = useState(false);
     const [rewardId, setRewardId] = useState('');
+    const [oldUser, setOldUser] = useState({ twitchAccessToken: '' });
     const [streamTimestamp, setStreamTimestamp] = useState(0);
     const [userThatRedeemed, setUserThatRedeemed] = useState({});
 
@@ -94,13 +94,19 @@ const PubSubTest = ({ user }) => {
             }
         });
 
+        if (rewardId && user.twitchAccessToken !== oldUser.twitchAccessToken) {
+            connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardId, streamTimestamp, handleTwitchSignIn);
+            setOldUser(user);
+        }
+
         getTimestamp();
-    }, [streamId]);
+    }, [streamId, user, rewardId, oldUser, streamTimestamp]);
 
     const listenForRewards = async () => {
         const reward = await createReward();
         if (reward) {
-            connect(streamId, user.uid, user.twitchAccessToken, [`channel-points-channel-v1.${user.id}`], reward.id, streamTimestamp, handleTwitchSignIn);
+            connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], reward.id, streamTimestamp, handleTwitchSignIn);
+            setOldUser(user);
             setConnectedToTwitch(true);
         } else {
             alert('Qapla Custom Reward couldn´t been created');
@@ -110,9 +116,11 @@ const PubSubTest = ({ user }) => {
     const createReward = async () => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
-            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, 'Qapla', 500, handleTwitchSignIn);
+            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qapla', 500, handleTwitchSignIn);
 
+            setRewardId('Test connection');
             if (reward) {
+                alert('La recompensa fue creada, manten esta ventana abierta');
                 setRewardId(reward.id);
             }
 
@@ -139,10 +147,13 @@ const PubSubTest = ({ user }) => {
         }
     }
 
-    const handleTwitchSignIn = async (callback) => {
-        const user = await signInWithTwitch();
+    const handleTwitchSignIn = async () => {
+        let user = await signInWithTwitch();
         await updateStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
-        callback(user.userData.twitchAccessToken);
+
+        user.access_token = user.userData.twitchAccessToken;
+        user.refresh_token = user.userData.refreshToken;
+        return user;
     }
 
     const unlistenForRewards = async () => {

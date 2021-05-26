@@ -15,11 +15,22 @@ import {
 
 import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
 
-import { connect, createCustomReward, deleteCustomReward, closeConnection } from '../../services/twitch';
+import { connect, createCustomReward, deleteCustomReward, closeConnection, getAllRewardRedemptions } from '../../services/twitch';
 import { signInWithTwitch } from '../../services/auth';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { updateStreamerProfile, listenCustomRewardRedemptions, getStreamTimestamp } from '../../services/database';
+import {
+    updateStreamerProfile,
+    listenCustomRewardRedemptions,
+    getStreamTimestamp,
+    getUserByTwitchId,
+    addQoinsToUser,
+    addInfoToEventParticipants,
+    saveUserStreamReward,
+    giveStreamExperienceForRewardRedeemed,
+    saveCustomRewardRedemption
+} from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
+import { XQ, QOINS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     tableHead: {
@@ -66,7 +77,7 @@ const PubSubTest = ({ user }) => {
     const [rewardId, setRewardId] = useState('');
     const [oldUser, setOldUser] = useState({ twitchAccessToken: '' });
     const [streamTimestamp, setStreamTimestamp] = useState(0);
-    const [userThatRedeemed, setUserThatRedeemed] = useState({});
+    const [usersThatRedeemed, setUsersThatRedeemed] = useState({});
 
     useEffect(() => {
         async function getTimestamp() {
@@ -90,7 +101,7 @@ const PubSubTest = ({ user }) => {
                     }
                 });
 
-                setUserThatRedeemed(usersToSave);
+                setUsersThatRedeemed(usersToSave);
             }
         });
 
@@ -118,7 +129,6 @@ const PubSubTest = ({ user }) => {
         if (date.getTime() >= streamTimestamp - 900000) {
             const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qapla', 500, handleTwitchSignIn);
 
-            setRewardId('Test connection');
             if (reward) {
                 alert('La recompensa fue creada, manten esta ventana abierta');
                 setRewardId(reward.id);
@@ -159,18 +169,55 @@ const PubSubTest = ({ user }) => {
     const unlistenForRewards = async () => {
         //await deleteReward();
         closeConnection();
+        await handleFailedRewardRedemptions();
         setConnectedToTwitch(false);
     }
 
+    const handleFailedRewardRedemptions = async () => {
+        const redemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardId, handleTwitchSignIn);
+        const usersPrizes = {};
+        for (let i = 0; i < redemptions.length; i++) {
+            const redemption = redemptions[i];
+            if (!usersThatRedeemed[redemption.user_id]) {
+                if (usersPrizes[redemption.user_id] && usersPrizes[redemption.user_id].redemptions) {
+                    usersPrizes[redemption.user_id].redemptions = 2;
+                } else {
+                    usersPrizes[redemption.user_id] = { redemptions: 1, userName: redemption.user_name, redemptionId: redemption.id, rewardId: redemption.reward.id, status: redemption.status } ;
+                }
+            }
+        }
+
+        const usersPrizeArray = Object.keys(usersPrizes).map((twitchId) => ({ ...usersPrizes[twitchId], twitchId }));
+
+        for (let i = 0; i < usersPrizeArray.length; i++) {
+            const twitchUser = usersPrizeArray[i];
+            const qaplaUser = await getUserByTwitchId(twitchUser.twitchId);
+            if (qaplaUser) {
+                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
+                giveStreamExperienceForRewardRedeemed(qaplaUser.id, qaplaUser.qaplaLevel, qaplaUser.userName, 15);
+                addInfoToEventParticipants(streamId, qaplaUser.id, 'xqRedeemed', 15);
+                saveUserStreamReward(qaplaUser.id, XQ, user.displayName, streamId, 15);
+
+                if (user.redemptions === 2) {
+                    addQoinsToUser(qaplaUser.id, 10);
+                    addInfoToEventParticipants(streamId, qaplaUser.id, 'qoinsRedeemed', 10);
+                    saveUserStreamReward(qaplaUser.id, QOINS, user.displayName, streamId, 10);
+                }
+            } else {
+                console.log(qaplaUser, user.twitchId + ' No Qapla user');
+            }
+        }
+    }
+
     return (
-        <StreamerDashboardContainer user={{ id: 'algo' }}>
+        <StreamerDashboardContainer user={user}>
             <Grid container>
                 <Grid xs={3}>
                     <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}>
                         {!connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'}
                     </ContainedButton>
                 </Grid>
-                {Object.keys(userThatRedeemed).length > 0 &&
+                {Object.keys(usersThatRedeemed).length > 0 &&
                     <Grid xs={4}>
                         <TableContainer className={classes.tableContainer}>
                             <Table>
@@ -184,19 +231,19 @@ const PubSubTest = ({ user }) => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {Object.keys(userThatRedeemed).map((uid, index) => (
+                                    {Object.keys(usersThatRedeemed).map((uid, index) => (
                                         <TableRow className={index % 2 === 0 ? classes.tableRow : classes.tableRowOdd}
                                             key={`Participant-${uid}`}>
                                             <TableCellStyled align='center' className={classes.firstCell}>
                                                 <Avatar
                                                     className={classes.avatar}
-                                                    src={userThatRedeemed[uid].photoUrl} />
+                                                    src={usersThatRedeemed[uid].photoUrl} />
                                             </TableCellStyled>
                                             <TableCellStyled>
-                                                {userThatRedeemed[uid].displayName}
+                                                {usersThatRedeemed[uid].displayName}
                                             </TableCellStyled>
                                             <TableCellStyled className={classes.lastCell}>
-                                                {userThatRedeemed[uid].numberOfRedemptions}
+                                                {usersThatRedeemed[uid].numberOfRedemptions}
                                             </TableCellStyled>
                                         </TableRow>
                                     ))}

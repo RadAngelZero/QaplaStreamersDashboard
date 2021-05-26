@@ -15,6 +15,7 @@ const eventParticipantsRef = database.ref('/EventParticipants');
 const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 
+
 /**
  * Load all the games ordered by platform from GamesResources
  * database node
@@ -78,9 +79,10 @@ export async function updateStreamerProfile(uid, userData) {
  * @param {string} rewardId New custom reward identifier
  * @param {string} title Title of the new reward
  * @param {number} cost Cost (in bits) of the new reward
+ * @param {string} streamId Id of the stream event
  */
-export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost) {
-    userStreamersRef.child(uid).child('customRewards').child(rewardId).set({ title, cost });
+export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
+    userStreamersRef.child(uid).child('customRewards').child(rewardId).set({ title, cost, streamId });
 }
 
 /**
@@ -254,6 +256,21 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
     userUpdate[`/DonationsLeaderBoard/${uid}/userName`] = userName;
 
     database.ref('/').update(userUpdate);
+}
+
+
+export function getCustomRewardId(streamerId ,streamId) {
+
+     userStreamersRef.child(streamerId).child('customRewards').orderByChild('streamId').equalTo(streamId).once('value', (streamerData) => {
+        if (streamerData.exists()) {
+            return streamerData.key   
+        }
+    })
+    
+}
+
+export async function isRewardAlreadyActive(streamerId ,streamId) {
+    return (await userStreamersRef.child(streamerId).child('customRewards').orderByChild('streamId').equalTo(streamId).once('value')).exists();
 }
 
 /**

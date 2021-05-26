@@ -172,14 +172,15 @@ function nonce(length) {
  * @param {string} title Title of the reward
  * @param {number} cost Cost for redeem the reward
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
+ * @param {string} streamId Id of the stream event
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, onInvalidRefreshToken) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, onInvalidRefreshToken, streamId) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
             const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
             if (newCredentials) {
-                return createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, onInvalidRefreshToken);
+                return createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, onInvalidRefreshToken, streamId);
             }
         }
 
@@ -203,7 +204,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
         const response = await res.json();
         console.log(response);
         if (response.data && response.data[0]) {
-            saveStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost);
+            saveStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost, streamId);
 
             return response.data[0];
         }

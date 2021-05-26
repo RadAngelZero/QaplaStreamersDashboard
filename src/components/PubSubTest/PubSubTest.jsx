@@ -107,6 +107,7 @@ const PubSubTest = ({ user }) => {
     const listenForRewards = async () => {
 
         const existReward = await isRewardAlreadyActive(user.uid, streamId);
+        
         if(existReward){
             const customRewardId = getCustomRewardId(user.uid, streamId);
 
@@ -116,7 +117,7 @@ const PubSubTest = ({ user }) => {
             alert('Reconectado con exito');
         }else {
              const reward = await createReward();
-             
+
             if (reward) {
                 connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], reward.id, streamTimestamp, handleTwitchSignIn);
                 setOldUser(user);
@@ -133,7 +134,7 @@ const PubSubTest = ({ user }) => {
     const createReward = async () => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
-            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Prueba1', 500, handleTwitchSignIn, streamId);
+            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qapla', 500, handleTwitchSignIn, streamId);
 
             setRewardId('Test connection');
             if (reward) {

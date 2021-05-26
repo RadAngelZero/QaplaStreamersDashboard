@@ -260,10 +260,10 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
 
 
 export function getCustomRewardId(streamerId ,streamId) {
-     userStreamersRef.child(streamerId).child('customRewards').orderByChild('streamId').equalTo(streamId)('value', (streamerData) => {
+
+     userStreamersRef.child(streamerId).child('customRewards').orderByChild('streamId').equalTo(streamId).once('value', (streamerData) => {
         if (streamerData.exists()) {
-            return streamerData.key()
-            
+            return streamerData.key   
         }
     })
     

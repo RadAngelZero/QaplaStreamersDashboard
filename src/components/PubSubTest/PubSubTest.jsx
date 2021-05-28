@@ -195,7 +195,7 @@ const PubSubTest = ({ user }) => {
     }
 
     const handleFailedRewardRedemptions = async () => {
-        const usersThatRedeemedCopy = [...usersThatRedeemed];
+        const usersThatRedeemedCopy = {...usersThatRedeemed};
         const redemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardId, handleTwitchSignIn);
         const usersPrizes = {};
         for (let i = 0; i < redemptions.length; i++) {
@@ -221,14 +221,14 @@ const PubSubTest = ({ user }) => {
                 addInfoToEventParticipants(streamId, qaplaUser.id, 'xqRedeemed', 15);
                 saveUserStreamReward(qaplaUser.id, XQ, user.displayName, streamId, 15);
 
-                if (user.redemptions === 2) {
+                if (qaplaUser.redemptions === 2) {
                     await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionsIds[1], twitchUser.rewardId, twitchUser.status);
                     addQoinsToUser(qaplaUser.id, 10);
                     addInfoToEventParticipants(streamId, qaplaUser.id, 'qoinsRedeemed', 10);
                     saveUserStreamReward(qaplaUser.id, QOINS, user.displayName, streamId, 10);
                 }
             } else {
-                console.log(qaplaUser, user.twitchId + ' No Qapla user');
+                console.log(qaplaUser, twitchUser.twitchId + ' No Qapla user');
             }
         }
     }

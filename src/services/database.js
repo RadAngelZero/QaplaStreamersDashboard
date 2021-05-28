@@ -13,6 +13,8 @@ const donationsLeaderBoardRef = database.ref('/DonationsLeaderBoard');
 const redeemedCustomRewardsRef = database.ref('/RedeemedCustomRewards');
 const eventParticipantsRef = database.ref('/EventParticipants');
 const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
+const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
+
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -77,6 +79,7 @@ export async function updateStreamerProfile(uid, userData) {
  * @param {string} rewardId New custom reward identifier
  * @param {string} title Title of the new reward
  * @param {number} cost Cost (in bits) of the new reward
+ * @param {string} streamId Id of the stream event
  */
 
 export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
@@ -372,4 +375,19 @@ export function addQoinsToUser(uid, qoinsToAdd) {
 export async function saveUserStreamReward(uid, type, streamerName, streamId, amount) {
     const date = new Date();
     return await userStreamsRewardsRef.child(uid).push({ type, streamerName, streamId, amount, timestamp: date.getTime() });
+}
+
+/**
+ * Save redemption of user that are not registered to the stream
+ * @param {string} uid User identifier
+ * @param {string} photoUrl Photo of the user
+ * @param {string} twitchIdThatRedeemed Id of the user that redeemed the custom reward
+ * @param {string} displayName Twitch display name of the user
+ * @param {string} streamId Stream identifier
+ * @param {string} redemptionId Id of the twitch redemption
+ * @param {string} rewardId Id of the reward
+ * @param {string} status Status of the redemption
+ */
+export async function saveCustomRewardNonRedemption(uid, photoUrl, twitchIdThatRedeemed, displayName, streamId, redemptionId, rewardId, status) {
+    await nonRedeemedCustomRewardsRef.child(streamId).child(redemptionId).update({ uid, photoUrl, id: twitchIdThatRedeemed, displayName, rewardId, status });
 }

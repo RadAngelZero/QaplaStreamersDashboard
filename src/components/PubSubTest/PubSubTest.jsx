@@ -121,8 +121,9 @@ const PubSubTest = ({ user }) => {
 
         const existReward = await isRewardAlreadyActive(user.uid, streamId);
         
-        if(existReward){
-            const customRewardId = getCustomRewardId(user.uid, streamId);
+        if(existReward.exists()){
+            const customRewardId = await getCustomRewardId(user.uid, streamId);
+            setRewardId(customRewardId);
 
             connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], customRewardId, streamTimestamp, handleTwitchSignIn);
             setOldUser(user);
@@ -194,15 +195,17 @@ const PubSubTest = ({ user }) => {
     }
 
     const handleFailedRewardRedemptions = async () => {
+        const usersThatRedeemedCopy = [...usersThatRedeemed];
         const redemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardId, handleTwitchSignIn);
         const usersPrizes = {};
         for (let i = 0; i < redemptions.length; i++) {
             const redemption = redemptions[i];
-            if (!usersThatRedeemed[redemption.user_id]) {
+            if (!usersThatRedeemedCopy[redemption.user_id]) {
                 if (usersPrizes[redemption.user_id] && usersPrizes[redemption.user_id].redemptions) {
                     usersPrizes[redemption.user_id].redemptions = 2;
+                    usersPrizes[redemption.user_id].redemptionsIds.push(redemption.id);
                 } else {
-                    usersPrizes[redemption.user_id] = { redemptions: 1, userName: redemption.user_name, redemptionId: redemption.id, rewardId: redemption.reward.id, status: redemption.status } ;
+                    usersPrizes[redemption.user_id] = { redemptions: 1, userName: redemption.user_name, redemptionsIds: [redemption.id], rewardId: redemption.reward.id, status: redemption.status } ;
                 }
             }
         }
@@ -213,12 +216,13 @@ const PubSubTest = ({ user }) => {
             const twitchUser = usersPrizeArray[i];
             const qaplaUser = await getUserByTwitchId(twitchUser.twitchId);
             if (qaplaUser) {
-                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
+                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionsIds[0], twitchUser.rewardId, twitchUser.status);
                 giveStreamExperienceForRewardRedeemed(qaplaUser.id, qaplaUser.qaplaLevel, qaplaUser.userName, 15);
                 addInfoToEventParticipants(streamId, qaplaUser.id, 'xqRedeemed', 15);
                 saveUserStreamReward(qaplaUser.id, XQ, user.displayName, streamId, 15);
 
                 if (user.redemptions === 2) {
+                    await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionsIds[1], twitchUser.rewardId, twitchUser.status);
                     addQoinsToUser(qaplaUser.id, 10);
                     addInfoToEventParticipants(streamId, qaplaUser.id, 'qoinsRedeemed', 10);
                     saveUserStreamReward(qaplaUser.id, QOINS, user.displayName, streamId, 10);

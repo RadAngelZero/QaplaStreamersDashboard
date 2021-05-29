@@ -78,6 +78,7 @@ const PubSubTest = ({ user }) => {
     const { streamId } = useParams();
     const classes = useStyles();
     const [connectedToTwitch, setConnectedToTwitch] = useState(false);
+    const [verifyngRedemptions, setVerifyngRedemptions] = useState(false);
     const [rewardId, setRewardId] = useState('');
     const [oldUser, setOldUser] = useState({ twitchAccessToken: '' });
     const [streamTimestamp, setStreamTimestamp] = useState(0);
@@ -120,8 +121,8 @@ const PubSubTest = ({ user }) => {
     const listenForRewards = async () => {
 
         const existReward = await isRewardAlreadyActive(user.uid, streamId);
-        
-        if(existReward.exists()){
+
+        if (existReward.exists()){
             const customRewardId = await getCustomRewardId(user.uid, streamId);
             setRewardId(customRewardId);
 
@@ -129,8 +130,8 @@ const PubSubTest = ({ user }) => {
             setOldUser(user);
             setConnectedToTwitch(true);
             alert('Reconectado con exito');
-        }else {
-             const reward = await createReward();
+        } else {
+            const reward = await createReward();
 
             if (reward) {
                 connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], reward.id, streamTimestamp, handleTwitchSignIn);
@@ -140,9 +141,6 @@ const PubSubTest = ({ user }) => {
                 alert('Qapla Custom Reward couldn´t been created');
             }
         }
-
-
-       
     }
 
     const createReward = async () => {
@@ -190,7 +188,9 @@ const PubSubTest = ({ user }) => {
     const unlistenForRewards = async () => {
         //await deleteReward();
         closeConnection();
+        setVerifyngRedemptions(true);
         await handleFailedRewardRedemptions();
+        setVerifyngRedemptions(false);
         setConnectedToTwitch(false);
     }
 
@@ -221,14 +221,14 @@ const PubSubTest = ({ user }) => {
                 addInfoToEventParticipants(streamId, qaplaUser.id, 'xqRedeemed', 15);
                 saveUserStreamReward(qaplaUser.id, XQ, user.displayName, streamId, 15);
 
-                if (qaplaUser.redemptions === 2) {
+                if (twitchUser.redemptions === 2) {
                     await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionsIds[1], twitchUser.rewardId, twitchUser.status);
                     addQoinsToUser(qaplaUser.id, 10);
                     addInfoToEventParticipants(streamId, qaplaUser.id, 'qoinsRedeemed', 10);
                     saveUserStreamReward(qaplaUser.id, QOINS, user.displayName, streamId, 10);
                 }
             } else {
-                console.log(qaplaUser, twitchUser.twitchId + ' No Qapla user');
+                console.log(twitchUser.userName + ' No Qapla user');
             }
         }
     }
@@ -237,8 +237,13 @@ const PubSubTest = ({ user }) => {
         <StreamerDashboardContainer user={user}>
             <Grid container>
                 <Grid xs={3}>
-                    <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}>
-                        {!connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'}
+                    <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}
+                        disabled={verifyngRedemptions}>
+                        {verifyngRedemptions ?
+                            'Desconectando, espere porfavor...'
+                        :
+                            !connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'
+                        }
                     </ContainedButton>
                 </Grid>
                 {Object.keys(usersThatRedeemed).length > 0 &&

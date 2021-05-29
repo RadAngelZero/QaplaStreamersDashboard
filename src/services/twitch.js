@@ -36,7 +36,6 @@ export function connect(streamId, streamerName, uid, accessToken, refreshToken, 
     webSocket.onopen = (error) => {
         ping();
         pingHandle = setInterval(ping, pingInterval);
-        console.log("LLega al handle")
         listen(topics, accessToken, refreshToken, uid, onInvalidRefreshToken);
     };
 
@@ -120,7 +119,6 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
  */
 export async function listen(topics, accessToken, refreshToken, uid, onInvalidRefreshToken) {
     const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-    console.log("LLega al listen")
     if (twitchAccessTokenStatus === 401) {
         const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
         if (newCredentials) {

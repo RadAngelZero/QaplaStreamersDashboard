@@ -112,7 +112,7 @@ const NewStream = ({ user, games }) => {
     const optionalDataReducer = (state, action) => {
         switch (action.target.id) {
             case 'eventTitle':
-                if (userLang.toLowerCase().includes('es')){
+                if (userLang.toLowerCase().includes('es')) {
                     return ({
                         ...state,
                         title: {
@@ -128,7 +128,7 @@ const NewStream = ({ user, games }) => {
                     })
                 }
             case 'eventDescriptionTitle':
-                if (userLang.toLowerCase().includes('es')){
+                if (userLang.toLowerCase().includes('es')) {
                     return ({
                         ...state,
                         descriptionsTitle: {
@@ -144,7 +144,7 @@ const NewStream = ({ user, games }) => {
                     })
                 }
             case 'eventDescription':
-                if (userLang.toLowerCase().includes('es')){
+                if (userLang.toLowerCase().includes('es')) {
                     return ({
                         ...state,
                         descriptions: {
@@ -214,11 +214,9 @@ const NewStream = ({ user, games }) => {
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
-                <Hidden smDown>
-                    <Grid item xs={12}>
-                        <BackButton onClick={history.goBack} />
-                    </Grid>
-                </Hidden>
+                <Grid item xs={12}>
+                    <BackButton onClick={history.goBack} />
+                </Grid>
                 <Grid item sm={8}>
                     <h1 className={styles.title}>
                         What are you playing?
@@ -314,7 +312,7 @@ const NewStream = ({ user, games }) => {
                                 />
                             </Grid>
                             <Grid item sm={8}>
-                            <InputLabel className={classes.datePickerLabel}>
+                                <InputLabel className={classes.datePickerLabel}>
                                     Confirm your date
                                 </InputLabel>
                                 <StreamerTextInput placeholder='Example: 15 de abril 16:00 Hora de Ciudad de México'
@@ -387,7 +385,7 @@ const NewStream = ({ user, games }) => {
                                                     id='eventTitle'
                                                     fullWidth={true}
                                                     value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
-                                                    onChange={(e) => optionalDataDispatcher({target: e.target})}
+                                                    onChange={(e) => optionalDataDispatcher({ target: e.target })}
                                                 />
                                             </Grid>
                                         </Grid>
@@ -404,7 +402,7 @@ const NewStream = ({ user, games }) => {
                                                     placeholder='Subtitle'
                                                     fullWidth={true}
                                                     value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
-                                                    onChange={(e) => optionalDataDispatcher({target: e.target})}
+                                                    onChange={(e) => optionalDataDispatcher({ target: e.target })}
                                                 />
                                             </Grid>
                                         </Grid>
@@ -421,7 +419,7 @@ const NewStream = ({ user, games }) => {
                                                     rowsMax={30}
                                                     fullWidth={true}
                                                     value={optionalData.descriptions ? userLang.toLowerCase().includes('es') ? optionalData.descriptions.es : optionalData.descriptions.en : ''}
-                                                    onChange={(e) => optionalDataDispatcher({target: e.target})}
+                                                    onChange={(e) => optionalDataDispatcher({ target: e.target })}
                                                 />
                                             </Grid>
                                         </Grid>

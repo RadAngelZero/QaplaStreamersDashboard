@@ -14,7 +14,7 @@ import {
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, XQ, QOINS } from '../utilities/Constants';
 
-let webSocket;
+let webSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
 
 /**
  * Establish a connection between the dashboard and the twitch using web sockets
@@ -33,7 +33,6 @@ export function connect(streamId, streamerName, uid, accessToken, refreshToken, 
     let pingHandle;
 
     webSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
-
     webSocket.onopen = (error) => {
         ping();
         pingHandle = setInterval(ping, pingInterval);
@@ -121,7 +120,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
 export async function listen(topics, accessToken, refreshToken, uid, onInvalidRefreshToken) {
     const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
     if (twitchAccessTokenStatus === 401) {
-        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken, (newAccessToken) => listen(topics, newAccessToken, uid, onInvalidRefreshToken));
+        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
         if (newCredentials) {
             return await listen(topics, newCredentials.access_token, newCredentials.refresh_token, uid, onInvalidRefreshToken);
         }
@@ -180,7 +179,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
-            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken, (newAccessToken) => createCustomReward(uid, twitchId, newAccessToken, title, cost, onInvalidRefreshToken));
+            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
             if (newCredentials) {
                 return createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, onInvalidRefreshToken, streamId);
             }
@@ -191,7 +190,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
             headers: {
                 'Client-Id': TWITCH_CLIENT_ID,
                 Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json; charset=utf-8'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 title,
@@ -204,6 +203,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
         });
 
         const response = await res.json();
+        console.log(response);
         if (response.data && response.data[0]) {
             saveStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost, streamId);
 
@@ -226,7 +226,7 @@ export async function deleteCustomReward(uid, twitchId, accessToken, refreshToke
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
-            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken, (newAccessToken) => deleteCustomReward(uid, twitchId, newAccessToken, rewardId, onInvalidRefreshToken));
+            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
             if (newCredentials) {
                 return await deleteCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
             }
@@ -265,7 +265,7 @@ export async function updateRedemptionStatus(uid, redemptionId, streamerId, acce
     console.log('Fulfill Redemption:', status, redemptionId);
     const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
     if (twitchAccessTokenStatus === 401) {
-        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken, (newAccessToken) => updateRedemptionStatus(uid, redemptionId, streamerId, newAccessToken, rewardId, status, onInvalidRefreshToken));
+        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
         if (newCredentials) {
             return await updateRedemptionStatus(uid, redemptionId, streamerId, newCredentials.access_token, newCredentials.refresh_token, rewardId, status, onInvalidRefreshToken);
         }
@@ -298,13 +298,79 @@ export async function updateRedemptionStatus(uid, redemptionId, streamerId, acce
     return response.data[0].status;
 }
 
+export async function getAllRewardRedemptions(uid, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
+    const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
+    if (twitchAccessTokenStatus === 401) {
+        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
+        if (newCredentials) {
+            return await getAllRewardRedemptions(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
+        }
+    }
+
+    let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
+    `broadcaster_id=${twitchId}` +
+    `&reward_id=${rewardId}` +
+    '&status=UNFULFILLED' +
+    '&first=2', {
+        method: 'GET',
+        headers: {
+            'Client-Id': TWITCH_CLIENT_ID,
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+
+    const redemptions = [];
+
+    response = await response.json();
+    if (response.data) {
+        response.data.forEach(redemption => {
+            redemptions.push(redemption);
+        });
+        while (response.pagination && response.pagination.cursor && response.pagination.cursor !== 'IA') {
+            response = await getRewardRedemptionsWithCursor(uid, response.pagination.cursor, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken)
+            if (response.data) {
+                response.data.forEach(redemption => {
+                    redemptions.push(redemption);
+                });
+            }
+        }
+    }
+
+    return redemptions;
+}
+
+async function getRewardRedemptionsWithCursor(uid, cursor, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
+    const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
+    if (twitchAccessTokenStatus === 401) {
+        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
+        if (newCredentials) {
+            return await getRewardRedemptionsWithCursor(uid, cursor, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
+        }
+    }
+
+    let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
+    `&broadcaster_id=${twitchId}` +
+    `&reward_id=${rewardId}` +
+    '&status=UNFULFILLED' +
+    `&after=${cursor}` +
+    '&first=2', {
+        method: 'GET',
+        headers: {
+            'Client-Id': TWITCH_CLIENT_ID,
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+
+    return await response.json();
+}
+
 /**
  * Try to refresh the token if it can´t then call the onInvalidRefreshToken callback
  * @param {string} uid User identifier
  * @param {string} refreshToken Twitch refresh token
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export async function refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken, callWithNewToken) {
+export async function refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken) {
     let algo = await fetch('https://id.twitch.tv/oauth2/token?grant_type=refresh_token' +
     `&refresh_token=${refreshToken}` +
     `&client_id=${TWITCH_CLIENT_ID}` +

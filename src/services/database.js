@@ -81,8 +81,9 @@ export async function updateStreamerProfile(uid, userData) {
  * @param {number} cost Cost (in bits) of the new reward
  * @param {string} streamId Id of the stream event
  */
+
 export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
-    userStreamersRef.child(uid).child('customRewards').child(rewardId).set({ title, cost, streamId });
+    userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId });
 }
 
 /**
@@ -259,19 +260,15 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
 }
 
 
-export function getCustomRewardId(streamerId ,streamId) {
 
-     userStreamersRef.child(streamerId).child('customRewards').orderByChild('streamId').equalTo(streamId).once('value', (streamerData) => {
-        if (streamerData.exists()) {
-            return streamerData.key   
-        }
-    })
-    
+export async function getCustomRewardId(streamerId ,streamId) {
+    return await (await userStreamersRef.child(streamerId).child('customRewards').child(streamId).child('rewardId').once('value')).val();
 }
 
 export async function isRewardAlreadyActive(streamerId ,streamId) {
-    return (await userStreamersRef.child(streamerId).child('customRewards').orderByChild('streamId').equalTo(streamId).once('value')).exists();
+    return (await userStreamersRef.child(streamerId).child('customRewards').child(streamId).once('value'));
 }
+
 
 /**
  * Save on database the information about a redemption of a twitch custom reward

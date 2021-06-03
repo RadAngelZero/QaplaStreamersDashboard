@@ -186,12 +186,14 @@ const PubSubTest = ({ user }) => {
     }
 
     const unlistenForRewards = async () => {
-        //await deleteReward();
-        closeConnection();
-        setVerifyngRedemptions(true);
-        await handleFailedRewardRedemptions();
-        setVerifyngRedemptions(false);
-        setConnectedToTwitch(false);
+        if (window.confirm('¿Estas seguro de que deseas desconectar tu stream?')) {
+            //await deleteReward();
+            closeConnection();
+            setVerifyngRedemptions(true);
+            await handleFailedRewardRedemptions();
+            setVerifyngRedemptions(false);
+            setConnectedToTwitch(false);
+        }
     }
 
     const handleFailedRewardRedemptions = async () => {

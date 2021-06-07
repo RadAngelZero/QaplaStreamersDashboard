@@ -81,9 +81,17 @@ export async function updateStreamerProfile(uid, userData) {
  * @param {number} cost Cost (in bits) of the new reward
  * @param {string} streamId Id of the stream event
  */
-
 export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
     userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId });
+}
+
+/**
+ * Mark as closed the custom reward created for the event
+ * @param {string} uid User identifier
+ * @param {string} streamId Id of the stream event
+ */
+export async function markAsClosedStreamerTwitchCustomReward(uid, streamId) {
+    userStreamersRef.child(uid).child('customRewards').child(streamId).update({ closedStream: true });
 }
 
 /**
@@ -260,13 +268,22 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
 }
 
 
-
+/**
+ * @deprecated
+ * @param {string} streamerId Id of the streamer
+ * @param {string} streamId Stream identifier in our database
+ */
 export async function getCustomRewardId(streamerId ,streamId) {
     return await (await userStreamersRef.child(streamerId).child('customRewards').child(streamId).child('rewardId').once('value')).val();
 }
 
-export async function isRewardAlreadyActive(streamerId ,streamId) {
-    return (await userStreamersRef.child(streamerId).child('customRewards').child(streamId).once('value'));
+/**
+ * Returns the snapshor of the custom reward for the given event
+ * @param {string} streamerId Id of the streamer
+ * @param {string} streamId Stream identifier in our database
+ */
+export async function getStreamCustomReward(streamerId ,streamId) {
+    return await userStreamersRef.child(streamerId).child('customRewards').child(streamId).once('value');
 }
 
 

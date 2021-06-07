@@ -23,14 +23,15 @@ import {
     updateStreamerProfile,
     listenCustomRewardRedemptions,
     getStreamTimestamp,
-    isRewardAlreadyActive,
+    getStreamCustomReward,
     getCustomRewardId,
     getUserByTwitchId,
     addQoinsToUser,
     addInfoToEventParticipants,
     saveUserStreamReward,
     giveStreamExperienceForRewardRedeemed,
-    saveCustomRewardRedemption
+    saveCustomRewardRedemption,
+    markAsClosedStreamerTwitchCustomReward
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS } from '../../utilities/Constants';
@@ -121,16 +122,20 @@ const PubSubTest = ({ user }) => {
 
     const listenForRewards = async () => {
 
-        const existReward = await isRewardAlreadyActive(user.uid, streamId);
+        const rewardOnDatabase = await getStreamCustomReward(user.uid, streamId);
 
-        if (existReward.exists()){
-            const customRewardId = await getCustomRewardId(user.uid, streamId);
-            setRewardId(customRewardId);
+        if (rewardOnDatabase.exists()){
+            if (!rewardOnDatabase.val().closedStream) {
+                const customRewardId = rewardOnDatabase.val().rewardId;
+                setRewardId(customRewardId);
 
-            connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], customRewardId, streamTimestamp, handleTwitchSignIn);
-            setOldUser(user);
-            setConnectedToTwitch(true);
-            alert('Reconectado con exito');
+                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], customRewardId, streamTimestamp, handleTwitchSignIn);
+                setOldUser(user);
+                setConnectedToTwitch(true);
+                alert('Reconectado con exito');
+            } else {
+                alert('Este evento ya fue cerrado, si es necesario reabrirlo contacta con soporte tecnico');
+            }
         } else {
             const reward = await createReward();
 
@@ -192,6 +197,7 @@ const PubSubTest = ({ user }) => {
             closeConnection();
             setVerifyngRedemptions(true);
             await handleFailedRewardRedemptions();
+            await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
             setVerifyngRedemptions(false);
             setConnectedToTwitch(false);
         }

@@ -14,7 +14,7 @@ const redeemedCustomRewardsRef = database.ref('/RedeemedCustomRewards');
 const eventParticipantsRef = database.ref('/EventParticipants');
 const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
-
+const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -83,6 +83,7 @@ export async function updateStreamerProfile(uid, userData) {
  */
 export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
     userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId });
+    activeCustomRewardsRef.child(streamId).set({ streamerUid: uid, title, cost, rewardId, timestamp: (new Date()).getTime() });
 }
 
 /**

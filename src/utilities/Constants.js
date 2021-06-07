@@ -33,7 +33,12 @@ import ApexImage from './../assets/Apex.jpg';
 import AnimalCrossingImage from './../assets/AnimalCrossing.jpg';
 import SWBattlefrontIIImage from './../assets/SWBattlefrontII.jpg';
 import ProjectZomboidImage from './../assets/ProjectZomboid.jpg';
-
+import WoWImage from './../assets/WoW.jpg';
+import KTaneImage from './../assets/KTANE.jpg';
+import GolfItImage from './../assets/GolfIt.jpg';
+import LittleNightmaresImage from './../assets/LittleNightmares.jpg';
+import StreamRaidersImage from './../assets/StreamRaiders.jpg';
+import SeaOfThievesImage from './../assets/SeaOfThieves.jpg';
 
 /**
  * Twitch API keys
@@ -94,5 +99,11 @@ export const streamsPlaceholderImages = {
     Apex: ApexImage,
     AnimalCrossing: AnimalCrossingImage,
     SWBattlefrontII: SWBattlefrontIIImage,
-    ProjectZomboid: ProjectZomboidImage
+    ProjectZomboid: ProjectZomboidImage,
+    WoW: WoWImage,
+    KTane: KTaneImage,
+    GolfIt: GolfItImage,
+    LittleNightmares: LittleNightmaresImage,
+    StreamRaiders: StreamRaidersImage,
+    SOT: SeaOfThievesImage
 };

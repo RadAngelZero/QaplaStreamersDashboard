@@ -38,6 +38,7 @@ import KTaneImage from './../assets/KTANE.jpg';
 import GolfItImage from './../assets/GolfIt.jpg';
 import LittleNightmaresImage from './../assets/LittleNightmares.jpg';
 import StreamRaidersImage from './../assets/StreamRaiders.jpg';
+import SeaOfThievesImage from './../assets/SeaOfThieves.jpg';
 
 /**
  * Twitch API keys
@@ -103,5 +104,6 @@ export const streamsPlaceholderImages = {
     KTane: KTaneImage,
     GolfIt: GolfItImage,
     LittleNightmares: LittleNightmaresImage,
-    StreamRaiders: StreamRaidersImage
+    StreamRaiders: StreamRaidersImage,
+    SOT: SeaOfThievesImage
 };

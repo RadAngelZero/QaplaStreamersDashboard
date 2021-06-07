@@ -10,7 +10,8 @@ import {
     TableHead,
     TableRow,
     TableBody,
-    Avatar
+    Avatar,
+    CircularProgress
 } from '@material-ui/core';
 
 import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
@@ -238,15 +239,18 @@ const PubSubTest = ({ user }) => {
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
-                <Grid xs={3}>
-                    <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}
-                        disabled={verifyngRedemptions}>
-                        {verifyngRedemptions ?
-                            'Desconectando, espere porfavor...'
-                        :
-                            !connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'
-                        }
-                    </ContainedButton>
+                <Grid xs={4} container>
+                    <Grid xs={6}>
+                        <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}
+                            disabled={verifyngRedemptions}
+                            endIcon={verifyngRedemptions ? <CircularProgress style={{ color: '#FFF' }} /> : null}>
+                            {verifyngRedemptions ?
+                                'Desconectando, espere porfavor...'
+                            :
+                                !connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'
+                            }
+                        </ContainedButton>
+                    </Grid>
                 </Grid>
                 {Object.keys(usersThatRedeemed).length > 0 &&
                     <Grid xs={4}>

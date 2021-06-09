@@ -152,7 +152,7 @@ const PubSubTest = ({ user }) => {
     const createReward = async () => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
-            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qapla', 500, handleTwitchSignIn, streamId);
+            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qapla', 500, handleTwitchSignIn, streamId, handleDuplicatedCustomReward);
 
             if (reward) {
                 alert('La recompensa fue creada, manten esta ventana abierta');
@@ -165,6 +165,12 @@ const PubSubTest = ({ user }) => {
         }
 
         return null;
+    }
+
+    const handleDuplicatedCustomReward = async () => {
+        alert('Existe una recompensa activa, se eliminara y se creara una nueva para continuar');
+        await finishStream();
+        return createReward();
     }
 
     const deleteReward = async () => {
@@ -194,22 +200,26 @@ const PubSubTest = ({ user }) => {
     const unlistenForRewards = async () => {
         if (window.confirm('¿Estas seguro de que deseas desconectar tu stream?')) {
             closeConnection();
-            setVerifyngRedemptions(true);
-
-            // Give rewards to Qapla users that were not registered to the event
-            await handleFailedRewardRedemptions();
-
             // Mark as closed the stream on the database
             await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
 
-            // Remove the custom reward from the ActiveCustomReward node on the database
-            await removeActiveCustomRewardFromList(streamId);
-
-            // Just then remove the reward. This line can not never be before the handleFailedRewardRedemptions
-            await deleteReward();
-            setVerifyngRedemptions(false);
-            setConnectedToTwitch(false);
+            finishStream();
         }
+    }
+
+    const finishStream = async () => {
+        setVerifyngRedemptions(true);
+
+        // Give rewards to Qapla users that were not registered to the event
+        await handleFailedRewardRedemptions();
+
+        // Remove the custom reward from the ActiveCustomReward node on the database
+        await removeActiveCustomRewardFromList(streamId);
+
+        // Just then remove the reward. This line can not never be before the handleFailedRewardRedemptions
+        await deleteReward();
+        setVerifyngRedemptions(false);
+        setConnectedToTwitch(false);
     }
 
     const handleFailedRewardRedemptions = async () => {

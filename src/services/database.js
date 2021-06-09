@@ -82,7 +82,7 @@ export async function updateStreamerProfile(uid, userData) {
  * @param {string} streamId Id of the stream event
  */
 export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
-    userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId });
+    userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId, closedStream: false });
     activeCustomRewardsRef.child(streamId).set({ streamerUid: uid, title, cost, rewardId, timestamp: (new Date()).getTime() });
 }
 

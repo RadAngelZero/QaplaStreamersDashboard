@@ -311,7 +311,7 @@ export async function getAllRewardRedemptions(uid, twitchId, accessToken, refres
     `broadcaster_id=${twitchId}` +
     `&reward_id=${rewardId}` +
     '&status=UNFULFILLED' +
-    '&first=2', {
+    '&first=50', {
         method: 'GET',
         headers: {
             'Client-Id': TWITCH_CLIENT_ID,

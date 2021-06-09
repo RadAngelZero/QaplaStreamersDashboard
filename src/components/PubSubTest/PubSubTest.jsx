@@ -24,14 +24,14 @@ import {
     listenCustomRewardRedemptions,
     getStreamTimestamp,
     getStreamCustomReward,
-    getCustomRewardId,
     getUserByTwitchId,
     addQoinsToUser,
     addInfoToEventParticipants,
     saveUserStreamReward,
     giveStreamExperienceForRewardRedeemed,
     saveCustomRewardRedemption,
-    markAsClosedStreamerTwitchCustomReward
+    markAsClosedStreamerTwitchCustomReward,
+    removeActiveCustomRewardFromList
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS } from '../../utilities/Constants';
@@ -193,11 +193,20 @@ const PubSubTest = ({ user }) => {
 
     const unlistenForRewards = async () => {
         if (window.confirm('¿Estas seguro de que deseas desconectar tu stream?')) {
-            //await deleteReward();
             closeConnection();
             setVerifyngRedemptions(true);
+
+            // Give rewards to Qapla users that were not registered to the event
             await handleFailedRewardRedemptions();
+
+            // Mark as closed the stream on the database
             await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
+
+            // Remove the custom reward from the ActiveCustomReward node on the database
+            await removeActiveCustomRewardFromList(streamId);
+
+            // Just then remove the reward. This line can not never be before the handleFailedRewardRedemptions
+            await deleteReward();
             setVerifyngRedemptions(false);
             setConnectedToTwitch(false);
         }

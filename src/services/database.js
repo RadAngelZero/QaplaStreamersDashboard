@@ -287,7 +287,6 @@ export async function getStreamCustomReward(streamerId ,streamId) {
     return await userStreamersRef.child(streamerId).child('customRewards').child(streamId).once('value');
 }
 
-
 /**
  * Save on database the information about a redemption of a twitch custom reward
  * @param {string} uid User identifier
@@ -408,4 +407,8 @@ export async function saveUserStreamReward(uid, type, streamerName, streamId, am
  */
 export async function saveCustomRewardNonRedemption(uid, photoUrl, twitchIdThatRedeemed, displayName, streamId, redemptionId, rewardId, status) {
     await nonRedeemedCustomRewardsRef.child(streamId).child(redemptionId).update({ uid, photoUrl, id: twitchIdThatRedeemed, displayName, rewardId, status });
+}
+
+export async function removeActiveCustomRewardFromList(streamId) {
+    activeCustomRewardsRef.child(streamId).remove();
 }

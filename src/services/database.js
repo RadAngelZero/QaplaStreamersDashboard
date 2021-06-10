@@ -96,6 +96,14 @@ export async function markAsClosedStreamerTwitchCustomReward(uid, streamId) {
 }
 
 /**
+ * Find all the "open" stream rewards (rewards with their closedStream flag marked as false)
+ * @param {string} uid User identifier
+ */
+export async function getOpenCustomRewards(uid) {
+    return await userStreamersRef.child(uid).child('customRewards').orderByChild('closedStream').equalTo(false).once('value');
+}
+
+/**
  * Remove a custom reward created from the streamer profile
  * @param {string} uid User identifier
  * @param {string} rewardId New custom reward identifier

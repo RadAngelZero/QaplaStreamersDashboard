@@ -31,7 +31,8 @@ import {
     giveStreamExperienceForRewardRedeemed,
     saveCustomRewardRedemption,
     markAsClosedStreamerTwitchCustomReward,
-    removeActiveCustomRewardFromList
+    removeActiveCustomRewardFromList,
+    getOpenCustomRewards
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS } from '../../utilities/Constants';
@@ -169,18 +170,28 @@ const PubSubTest = ({ user }) => {
 
     const handleDuplicatedCustomReward = async () => {
         alert('Existe una recompensa activa, se eliminara y se creara una nueva para continuar');
-        await finishStream();
+        const activeRewards = await getOpenCustomRewards(user.uid);
+        let rewardIdToDelete;
+        let streamIdToClose;
+        activeRewards.forEach((activeReward) => {
+            rewardIdToDelete = activeReward.val().rewardId;
+            streamIdToClose = activeReward.key;
+        });
+
+        await markAsClosedStreamerTwitchCustomReward(user.uid, streamIdToClose);
+
+        await finishStream(streamIdToClose, rewardIdToDelete);
         return createReward();
     }
 
-    const deleteReward = async () => {
+    const deleteReward = async (rewardIdToDelete) => {
         console.log('Delete reward');
-        const result = await deleteCustomReward(user.uid, user.id, user.twitchAccessToken, rewardId, handleTwitchSignIn);
+        const result = await deleteCustomReward(user.uid, user.id, user.twitchAccessToken, rewardIdToDelete, handleTwitchSignIn);
 
         console.log(result);
 
         if (result === 204) {
-            alert('Elemento eliminado correctamente');
+            alert('Recompensa eliminada correctamente');
         } else if (result === 404 || result === 403) {
             alert(`No se encontro la recompensa a eliminar, status: ${result}`);
         } else if (result === 500) {
@@ -203,21 +214,21 @@ const PubSubTest = ({ user }) => {
             // Mark as closed the stream on the database
             await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
 
-            finishStream();
+            finishStream(streamId, rewardId);
         }
     }
 
-    const finishStream = async () => {
+    const finishStream = async (streamIdToClose, rewardIdToDelete) => {
         setVerifyngRedemptions(true);
 
         // Give rewards to Qapla users that were not registered to the event
         await handleFailedRewardRedemptions();
 
         // Remove the custom reward from the ActiveCustomReward node on the database
-        await removeActiveCustomRewardFromList(streamId);
+        await removeActiveCustomRewardFromList(streamIdToClose);
 
         // Just then remove the reward. This line can not never be before the handleFailedRewardRedemptions
-        await deleteReward();
+        await deleteReward(rewardIdToDelete);
         setVerifyngRedemptions(false);
         setConnectedToTwitch(false);
     }

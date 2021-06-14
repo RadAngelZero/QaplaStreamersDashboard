@@ -219,7 +219,7 @@ export async function loadApprovedStreamTimeStamp(streamId) {
  * @param {number} timestamp Timestamp of the dates
  */
 export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, hour, timestamp) {
-    streamsRef.child(streamId).update({
+    await streamsRef.child(streamId).update({
         dateUTC,
         hourUTC,
         tiempoLimite: date,
@@ -227,7 +227,7 @@ export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, ho
         timestamp
     });
 
-    return streamersEventsDataRef.child(uid).child(streamId).update({
+    return await streamersEventsDataRef.child(uid).child(streamId).update({
         date: dateUTC,
         hour: hourUTC,
         timestamp

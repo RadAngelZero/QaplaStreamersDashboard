@@ -32,6 +32,7 @@ import BackButton from '../BackButton/BackButton';
 import { SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
 import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate } from '../../services/database';
 import { sednPushNotificationToTopic } from '../../services/functions';
+import { notifyUpdateToQaplaAdmins } from '../../services/discord';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -243,7 +244,7 @@ const EditStreamerEvent = ({ user }) => {
         }
     }
 
-    const saveDate = () => {
+    const saveDate = async () => {
         if (maxTimeToAcceptUpdates !== 0 && new Date().getTime() < maxTimeToAcceptUpdates) {
             if (date.$d) {
                 const dateRef = new Date(date.$d);
@@ -263,7 +264,8 @@ const EditStreamerEvent = ({ user }) => {
                 const localMinutes = dateRef.getMinutes() < 10 ? `0${dateRef.getMinutes()}` : dateRef.getMinutes();
                 let localHour = `${localHours}:${localMinutes}`;
 
-                updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
+                await updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
+                notifyUpdateToQaplaAdmins(streamId, user.displayName, dateRef);
             } else {
                 alert('Please verify that you have selected a different date and/or hour');
             }
@@ -355,6 +357,7 @@ const EditStreamerEvent = ({ user }) => {
                                     <ContainedButton className={classes.button}
                                         onClick={saveDate}
                                         disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates}>
+                                        >
                                         Save Changes
                                     </ContainedButton>
                                 </Grid>

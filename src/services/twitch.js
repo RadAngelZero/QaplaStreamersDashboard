@@ -175,7 +175,7 @@ function nonce(length) {
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  * @param {string} streamId Id of the stream event
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, onInvalidRefreshToken, streamId) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, onInvalidRefreshToken, streamId, handleDuplicatedCustomReward) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
@@ -203,11 +203,14 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
         });
 
         const response = await res.json();
-        console.log(response);
         if (response.data && response.data[0]) {
             saveStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost, streamId);
 
             return response.data[0];
+        } else if (response.error) {
+            if (res.status === 400) {
+                return handleDuplicatedCustomReward();
+            }
         }
     } catch (e) {
         console.log('Error: ', e);

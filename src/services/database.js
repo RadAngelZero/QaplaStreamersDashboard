@@ -14,7 +14,7 @@ const redeemedCustomRewardsRef = database.ref('/RedeemedCustomRewards');
 const eventParticipantsRef = database.ref('/EventParticipants');
 const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
-
+const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -81,9 +81,26 @@ export async function updateStreamerProfile(uid, userData) {
  * @param {number} cost Cost (in bits) of the new reward
  * @param {string} streamId Id of the stream event
  */
-
 export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
-    userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId });
+    userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId, closedStream: false });
+    activeCustomRewardsRef.child(streamId).set({ streamerUid: uid, title, cost, rewardId, timestamp: (new Date()).getTime() });
+}
+
+/**
+ * Mark as closed the custom reward created for the event
+ * @param {string} uid User identifier
+ * @param {string} streamId Id of the stream event
+ */
+export async function markAsClosedStreamerTwitchCustomReward(uid, streamId) {
+    userStreamersRef.child(uid).child('customRewards').child(streamId).update({ closedStream: true });
+}
+
+/**
+ * Find all the "open" stream rewards (rewards with their closedStream flag marked as false)
+ * @param {string} uid User identifier
+ */
+export async function getOpenCustomRewards(uid) {
+    return await userStreamersRef.child(uid).child('customRewards').orderByChild('closedStream').equalTo(false).once('value');
 }
 
 /**
@@ -260,15 +277,23 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
 }
 
 
-
+/**
+ * @deprecated
+ * @param {string} streamerId Id of the streamer
+ * @param {string} streamId Stream identifier in our database
+ */
 export async function getCustomRewardId(streamerId ,streamId) {
     return await (await userStreamersRef.child(streamerId).child('customRewards').child(streamId).child('rewardId').once('value')).val();
 }
 
-export async function isRewardAlreadyActive(streamerId ,streamId) {
-    return (await userStreamersRef.child(streamerId).child('customRewards').child(streamId).once('value'));
+/**
+ * Returns the snapshor of the custom reward for the given event
+ * @param {string} streamerId Id of the streamer
+ * @param {string} streamId Stream identifier in our database
+ */
+export async function getStreamCustomReward(streamerId ,streamId) {
+    return await userStreamersRef.child(streamerId).child('customRewards').child(streamId).once('value');
 }
-
 
 /**
  * Save on database the information about a redemption of a twitch custom reward
@@ -390,4 +415,8 @@ export async function saveUserStreamReward(uid, type, streamerName, streamId, am
  */
 export async function saveCustomRewardNonRedemption(uid, photoUrl, twitchIdThatRedeemed, displayName, streamId, redemptionId, rewardId, status) {
     await nonRedeemedCustomRewardsRef.child(streamId).child(redemptionId).update({ uid, photoUrl, id: twitchIdThatRedeemed, displayName, rewardId, status });
+}
+
+export async function removeActiveCustomRewardFromList(streamId) {
+    activeCustomRewardsRef.child(streamId).remove();
 }

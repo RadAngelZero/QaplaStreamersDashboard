@@ -10,7 +10,8 @@ import {
     TableHead,
     TableRow,
     TableBody,
-    Avatar
+    Avatar,
+    CircularProgress
 } from '@material-ui/core';
 
 import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
@@ -22,14 +23,16 @@ import {
     updateStreamerProfile,
     listenCustomRewardRedemptions,
     getStreamTimestamp,
-    isRewardAlreadyActive,
-    getCustomRewardId,
+    getStreamCustomReward,
     getUserByTwitchId,
     addQoinsToUser,
     addInfoToEventParticipants,
     saveUserStreamReward,
     giveStreamExperienceForRewardRedeemed,
-    saveCustomRewardRedemption
+    saveCustomRewardRedemption,
+    markAsClosedStreamerTwitchCustomReward,
+    removeActiveCustomRewardFromList,
+    getOpenCustomRewards
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS } from '../../utilities/Constants';
@@ -120,16 +123,20 @@ const PubSubTest = ({ user }) => {
 
     const listenForRewards = async () => {
 
-        const existReward = await isRewardAlreadyActive(user.uid, streamId);
+        const rewardOnDatabase = await getStreamCustomReward(user.uid, streamId);
 
-        if (existReward.exists()){
-            const customRewardId = await getCustomRewardId(user.uid, streamId);
-            setRewardId(customRewardId);
+        if (rewardOnDatabase.exists()){
+            if (!rewardOnDatabase.val().closedStream) {
+                const customRewardId = rewardOnDatabase.val().rewardId;
+                setRewardId(customRewardId);
 
-            connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], customRewardId, streamTimestamp, handleTwitchSignIn);
-            setOldUser(user);
-            setConnectedToTwitch(true);
-            alert('Reconectado con exito');
+                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], customRewardId, streamTimestamp, handleTwitchSignIn);
+                setOldUser(user);
+                setConnectedToTwitch(true);
+                alert('Reconectado con exito');
+            } else {
+                alert('Este evento ya fue cerrado, si es necesario reabrirlo contacta con soporte tecnico');
+            }
         } else {
             const reward = await createReward();
 
@@ -146,7 +153,7 @@ const PubSubTest = ({ user }) => {
     const createReward = async () => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
-            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qapla', 500, handleTwitchSignIn, streamId);
+            const reward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qapla', 500, handleTwitchSignIn, streamId, handleDuplicatedCustomReward);
 
             if (reward) {
                 alert('La recompensa fue creada, manten esta ventana abierta');
@@ -161,14 +168,30 @@ const PubSubTest = ({ user }) => {
         return null;
     }
 
-    const deleteReward = async () => {
+    const handleDuplicatedCustomReward = async () => {
+        alert('Existe una recompensa activa, se eliminara y se creara una nueva para continuar');
+        const activeRewards = await getOpenCustomRewards(user.uid);
+        let rewardIdToDelete;
+        let streamIdToClose;
+        activeRewards.forEach((activeReward) => {
+            rewardIdToDelete = activeReward.val().rewardId;
+            streamIdToClose = activeReward.key;
+        });
+
+        await markAsClosedStreamerTwitchCustomReward(user.uid, streamIdToClose);
+
+        await finishStream(streamIdToClose, rewardIdToDelete);
+        return createReward();
+    }
+
+    const deleteReward = async (rewardIdToDelete) => {
         console.log('Delete reward');
-        const result = await deleteCustomReward(user.uid, user.id, user.twitchAccessToken, rewardId, handleTwitchSignIn);
+        const result = await deleteCustomReward(user.uid, user.id, user.twitchAccessToken, rewardIdToDelete, handleTwitchSignIn);
 
         console.log(result);
 
         if (result === 204) {
-            alert('Elemento eliminado correctamente');
+            alert('Recompensa eliminada correctamente');
         } else if (result === 404 || result === 403) {
             alert(`No se encontro la recompensa a eliminar, status: ${result}`);
         } else if (result === 500) {
@@ -186,10 +209,26 @@ const PubSubTest = ({ user }) => {
     }
 
     const unlistenForRewards = async () => {
-        //await deleteReward();
-        closeConnection();
+        if (window.confirm('¿Estas seguro de que deseas desconectar tu stream?')) {
+            closeConnection();
+            // Mark as closed the stream on the database
+            await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
+
+            finishStream(streamId, rewardId);
+        }
+    }
+
+    const finishStream = async (streamIdToClose, rewardIdToDelete) => {
         setVerifyngRedemptions(true);
+
+        // Give rewards to Qapla users that were not registered to the event
         await handleFailedRewardRedemptions();
+
+        // Remove the custom reward from the ActiveCustomReward node on the database
+        await removeActiveCustomRewardFromList(streamIdToClose);
+
+        // Just then remove the reward. This line can not never be before the handleFailedRewardRedemptions
+        await deleteReward(rewardIdToDelete);
         setVerifyngRedemptions(false);
         setConnectedToTwitch(false);
     }
@@ -236,15 +275,18 @@ const PubSubTest = ({ user }) => {
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
-                <Grid xs={3}>
-                    <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}
-                        disabled={verifyngRedemptions}>
-                        {verifyngRedemptions ?
-                            'Desconectando, espere porfavor...'
-                        :
-                            !connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'
-                        }
-                    </ContainedButton>
+                <Grid xs={4} container>
+                    <Grid xs={6}>
+                        <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}
+                            disabled={verifyngRedemptions}
+                            endIcon={verifyngRedemptions ? <CircularProgress style={{ color: '#FFF' }} /> : null}>
+                            {verifyngRedemptions ?
+                                'Desconectando, espere porfavor...'
+                            :
+                                !connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'
+                            }
+                        </ContainedButton>
+                    </Grid>
                 </Grid>
                 {Object.keys(usersThatRedeemed).length > 0 &&
                     <Grid xs={4}>

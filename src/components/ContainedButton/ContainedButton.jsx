@@ -12,7 +12,7 @@ const useStyles = makeStyles({
     }
 });
 
-const ContainedButton = ({ children, onClick, className = {}, startIcon, disabled = false }) => {
+const ContainedButton = ({ children, onClick, className = {}, startIcon, endIcon, disabled = false }) => {
     const classes = useStyles();
 
     return (
@@ -21,6 +21,10 @@ const ContainedButton = ({ children, onClick, className = {}, startIcon, disable
             className={[classes.button, className]}
             startIcon={startIcon ?
                 startIcon
+                :
+                null}
+            endIcon={endIcon ?
+                endIcon
                 :
                 null}
             onClick={onClick}>

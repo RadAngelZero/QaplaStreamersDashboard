@@ -15,6 +15,7 @@ import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
 import { ReactComponent as CheckedIcon } from './../../assets/CheckedIcon.svg';
 import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.svg';
 import BackButton from '../BackButton/BackButton';
+import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -108,6 +109,7 @@ const NewStream = ({ user, games }) => {
 
     const classes = useStyles();
     const history = useHistory();
+    const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
     const optionalDataReducer = (state, action) => {
         switch (action.target.id) {
@@ -188,6 +190,8 @@ const NewStream = ({ user, games }) => {
     const handleStringDateChange = (event) => {
         setStringDate(event.target.value);
     }
+
+    const openConfirmationDialog = () => setOpenDetailsDialog(true);
 
     const submitEvent = () => {
         if (selectedDate < minDate) {
@@ -432,11 +436,19 @@ const NewStream = ({ user, games }) => {
                     </Grid>
                     <Button
                         className={styles.button}
-                        onClick={submitEvent}>
+                        onClick={openConfirmationDialog}>
                         Submit
                     </Button>
                 </Grid>
             </Grid>
+            <NewStreamDetailsDialog
+                open={openDetailsDialog}
+                onClose={() => setOpenDetailsDialog(false)}
+                submitEvent={submitEvent}
+                game={selectedGame}
+                date={`${selectedDate.toLocaleDateString()} ${selectedDate.toLocaleTimeString()}`}
+                userName={user ? user.displayName : ''}
+                {...optionalData} />
         </StreamerDashboardContainer>
     );
 }

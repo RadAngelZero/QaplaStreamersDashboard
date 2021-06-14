@@ -9,7 +9,7 @@ export async function notifyUpdateToQaplaAdmins(streamId, streamerName, newDateO
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				content: `Evento de ${streamerName} ha cambiado de fecha\nNueva fecha: ${newDateObject.toLocaleString('es-mx')}\nID del evento: ${streamId}`,
+				content: `Evento de ${streamerName} ha cambiado de fecha\nNueva fecha: ${newDateObject.toLocaleString('es-mx')}\nID del evento: ${streamId}\n<@586019077546442752>`,
             	username: "Qapla Match Announcer",
 				tts: false
 			})

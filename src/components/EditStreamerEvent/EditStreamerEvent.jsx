@@ -357,7 +357,6 @@ const EditStreamerEvent = ({ user }) => {
                                     <ContainedButton className={classes.button}
                                         onClick={saveDate}
                                         disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates}>
-                                        >
                                         Save Changes
                                     </ContainedButton>
                                 </Grid>

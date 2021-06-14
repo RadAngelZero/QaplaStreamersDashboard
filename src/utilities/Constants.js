@@ -39,6 +39,9 @@ import GolfItImage from './../assets/GolfIt.jpg';
 import LittleNightmaresImage from './../assets/LittleNightmares.jpg';
 import StreamRaidersImage from './../assets/StreamRaiders.jpg';
 import SeaOfThievesImage from './../assets/SeaOfThieves.jpg';
+import MarioKartImage from './../assets/MarioKart.jpg';
+import AgarIoImage from './../assets/Agario.jpg';
+import TetrIoImage from './../assets/Tetrio.jpg';
 
 /**
  * Twitch API keys
@@ -105,5 +108,8 @@ export const streamsPlaceholderImages = {
     GolfIt: GolfItImage,
     LittleNightmares: LittleNightmaresImage,
     StreamRaiders: StreamRaidersImage,
-    SOT: SeaOfThievesImage
+    SOT: SeaOfThievesImage,
+    MarioKart: MarioKartImage,
+    AgarIo: AgarIoImage,
+    TetrIo: TetrIoImage
 };

@@ -39,7 +39,7 @@ const StreamerProfile = ({ user, games }) => {
         }
 
         loadStreams();
-    }, [streamType, user]);
+    }, [streamType, user, history]);
 
     const createStream = () => history.push('/create');
 

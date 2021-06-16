@@ -73,17 +73,18 @@ export async function updateStreamerProfile(uid, userData) {
 }
 
 /**
- * Save on the streamer profile a new custom reward created with the
+ * Save on the streamer profile and in the active custom rewards node a new custom reward created with the
  * dashboard
  * @param {string} uid User identifier
+ * @param {string} rewardName String name to identify on the database
  * @param {string} rewardId New custom reward identifier
  * @param {string} title Title of the new reward
  * @param {number} cost Cost (in bits) of the new reward
  * @param {string} streamId Id of the stream event
  */
-export async function saveStreamerTwitchCustomReward(uid, rewardId, title, cost, streamId) {
-    userStreamersRef.child(uid).child('customRewards').child(streamId).set({ title, cost, rewardId, closedStream: false });
-    activeCustomRewardsRef.child(streamId).set({ streamerUid: uid, title, cost, rewardId, timestamp: (new Date()).getTime() });
+export async function saveStreamerTwitchCustomReward(uid, rewardName, rewardId, title, cost, streamId) {
+    userStreamersRef.child(uid).child('customRewards').child(streamId).set({ closedStream: false, [rewardName]: { title, cost, rewardId } });
+    activeCustomRewardsRef.child(streamId).update({ streamerUid: uid, [rewardName]: { title, cost, rewardId, timestamp: (new Date()).getTime() } });
 }
 
 /**

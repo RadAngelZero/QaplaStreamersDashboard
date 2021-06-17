@@ -255,7 +255,7 @@ const PubSubTest = ({ user }) => {
             }
         }
 
-        const usersPrizeArray = Object.keys(usersPrizes).map((twitchId) => ({ ...usersPrizes[twitchId], twitchId }));
+        let usersPrizeArray = Object.keys(usersPrizes).map((twitchId) => ({ ...usersPrizes[twitchId], twitchId }));
 
         for (let i = 0; i < usersPrizeArray.length; i++) {
             const twitchUser = usersPrizeArray[i];

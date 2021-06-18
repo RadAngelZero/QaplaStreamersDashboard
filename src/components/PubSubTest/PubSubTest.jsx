@@ -32,7 +32,8 @@ import {
     saveCustomRewardRedemption,
     markAsClosedStreamerTwitchCustomReward,
     removeActiveCustomRewardFromList,
-    getOpenCustomRewards
+    getOpenCustomRewards,
+    getCustomRewardRedemptions
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS } from '../../utilities/Constants';
@@ -289,7 +290,16 @@ const PubSubTest = ({ user }) => {
             if (qaplaUser) {
                 await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionsIds[1], twitchUser.rewardId, twitchUser.status);
 
-                const qoinsToGive = 10;
+                const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
+
+                let qoinsToGive = 5;
+
+                // If the user has already redeemed the exp reward and now the qoins reward
+                if (userHasRedeemedExperience.exists() && Object.keys(userHasRedeemedExperience.val()).length === 2) {
+                    // Give him 10 qoins instead of 5
+                    qoinsToGive = 10;
+                }
+
                 addQoinsToUser(qaplaUser.id, qoinsToGive);
                 addInfoToEventParticipants(streamId, qaplaUser.id, 'qoinsRedeemed', qoinsToGive);
                 saveUserStreamReward(qaplaUser.id, QOINS, user.displayName, streamId, qoinsToGive);

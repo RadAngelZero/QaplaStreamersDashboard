@@ -193,9 +193,8 @@ function nonce(length) {
  * @param {boolean} enabled true if the reward must be enable when created
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  * @param {string} streamId Id of the stream event
- * @param {function} handleDuplicatedCustomReward Handler for when there is already a reward equal to the one we are trying to create
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, rewardName, title, cost, enabled, onInvalidRefreshToken, streamId, handleDuplicatedCustomReward) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, rewardName, title, cost, enabled, onInvalidRefreshToken, streamId) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
@@ -229,7 +228,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
             return response.data[0];
         } else if (response.error) {
             if (res.status === 400) {
-                return handleDuplicatedCustomReward();
+                return null;
             }
         }
     } catch (e) {

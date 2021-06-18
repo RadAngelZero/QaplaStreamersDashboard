@@ -156,8 +156,12 @@ const PubSubTest = ({ user }) => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
             let rewardsIdsObject = {};
-            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'Exp Qapla', 500, true, handleTwitchSignIn, streamId, handleDuplicatedCustomReward);
-            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qapla Qoins', 500, false, handleTwitchSignIn, streamId, handleDuplicatedCustomReward);
+            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'Exp Qapla', 1, true, handleTwitchSignIn, streamId);
+            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qapla Qoins', 1, false, handleTwitchSignIn, streamId);
+
+            if (!expReward || !qoinsReward) {
+                return await handleDuplicatedCustomReward();
+            }
 
             rewardsIdsObject = { expReward: expReward.id, qoinsReward: qoinsReward.id };
 
@@ -175,7 +179,7 @@ const PubSubTest = ({ user }) => {
     }
 
     const handleDuplicatedCustomReward = async () => {
-        alert('Existe una recompensa activa, se eliminara y se creara una nueva para continuar');
+        alert('Existen recompensas activas, se eliminaran y se crearan nuevas para continuar');
         const activeRewards = await getOpenCustomRewards(user.uid);
         let rewardsIdsToDelete = {};
         let streamIdToClose;
@@ -188,7 +192,7 @@ const PubSubTest = ({ user }) => {
         await markAsClosedStreamerTwitchCustomReward(user.uid, streamIdToClose);
 
         await finishStream(streamIdToClose, rewardsIdsToDelete);
-        return createReward();
+        return await createReward();
     }
 
     const deleteReward = async (rewardIdToDelete) => {
@@ -229,7 +233,7 @@ const PubSubTest = ({ user }) => {
         setVerifyngRedemptions(true);
 
         // Give rewards to Qapla users that were not registered to the event
-        await handleFailedRewardRedemptions();
+        await handleFailedRewardRedemptions(streamIdToClose, rewardsIdsToDelete);
 
         // Remove the custom reward from the ActiveCustomReward node on the database
         await removeActiveCustomRewardFromList(streamIdToClose);
@@ -245,10 +249,10 @@ const PubSubTest = ({ user }) => {
         setConnectedToTwitch(false);
     }
 
-    const handleFailedRewardRedemptions = async () => {
+    const handleFailedRewardRedemptions = async (streamIdToAssignRewards, rewardsIdsToDelete) => {
         const usersThatRedeemedCopy = {...usersThatRedeemed};
-        const expRedemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardsIds.expReward, handleTwitchSignIn);
-        const usersPrizes = {};
+        const expRedemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardsIdsToDelete.expReward, handleTwitchSignIn);
+        let usersPrizes = {};
         for (let i = 0; i < expRedemptions.length; i++) {
             const redemption = expRedemptions[i];
             if (!usersThatRedeemedCopy[redemption.user_id]) {
@@ -262,18 +266,18 @@ const PubSubTest = ({ user }) => {
             const twitchUser = usersPrizeArray[i];
             const qaplaUser = await getUserByTwitchId(twitchUser.twitchId);
             if (qaplaUser) {
-                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionsIds[0], twitchUser.rewardId, twitchUser.status);
+                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, XQ, twitchUser.redemptionsIds[0], twitchUser.rewardId, twitchUser.status);
 
                 const expToGive = 15;
                 giveStreamExperienceForRewardRedeemed(qaplaUser.id, qaplaUser.qaplaLevel, qaplaUser.userName, expToGive);
-                addInfoToEventParticipants(streamId, qaplaUser.id, 'xqRedeemed', expToGive);
-                saveUserStreamReward(qaplaUser.id, XQ, user.displayName, streamId, expToGive);
+                addInfoToEventParticipants(streamIdToAssignRewards, qaplaUser.id, 'xqRedeemed', expToGive);
+                saveUserStreamReward(qaplaUser.id, XQ, user.displayName, streamIdToAssignRewards, expToGive);
             } else {
                 console.log(twitchUser.userName + ' No Qapla user');
             }
         }
 
-        const qoinsRedemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardsIds.qoinsReward, handleTwitchSignIn);
+        const qoinsRedemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardsIdsToDelete.qoinsReward, handleTwitchSignIn);
         usersPrizes = {};
         for (let i = 0; i < qoinsRedemptions.length; i++) {
             const redemption = qoinsRedemptions[i];
@@ -288,9 +292,12 @@ const PubSubTest = ({ user }) => {
             const twitchUser = usersPrizeArray[i];
             const qaplaUser = await getUserByTwitchId(twitchUser.twitchId);
             if (qaplaUser) {
-                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamId, twitchUser.redemptionsIds[1], twitchUser.rewardId, twitchUser.status);
+                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, QOINS, twitchUser.redemptionsIds[0], twitchUser.rewardId, twitchUser.status);
 
-                const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
+                const userHasRedeemedExperience = await getCustomRewardRedemptions(streamIdToAssignRewards, qaplaUser.id);
+
+                console.log(userHasRedeemedExperience.val());
+                console.log(Object.keys(userHasRedeemedExperience.val()).length);
 
                 let qoinsToGive = 5;
 
@@ -301,8 +308,8 @@ const PubSubTest = ({ user }) => {
                 }
 
                 addQoinsToUser(qaplaUser.id, qoinsToGive);
-                addInfoToEventParticipants(streamId, qaplaUser.id, 'qoinsRedeemed', qoinsToGive);
-                saveUserStreamReward(qaplaUser.id, QOINS, user.displayName, streamId, qoinsToGive);
+                addInfoToEventParticipants(streamIdToAssignRewards, qaplaUser.id, 'qoinsRedeemed', qoinsToGive);
+                saveUserStreamReward(qaplaUser.id, QOINS, user.displayName, streamIdToAssignRewards, qoinsToGive);
             } else {
                 console.log(twitchUser.userName + ' No Qapla user');
             }

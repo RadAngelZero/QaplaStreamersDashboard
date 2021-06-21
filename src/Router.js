@@ -35,8 +35,8 @@ const Router = () => {
 
         function checkIfUserIsAuthenticated() {
             handleUserAuthentication((user) => {
-                loadStreamerProfile('213807528-mr_yuboto', (userData) => {
-                    setUser({ ...userData, admin: false, streamer: true, uid: '213807528-mr_yuboto' });
+                loadStreamerProfile(user.uid, (userData) => {
+                    setUser({ ...userData, admin: false, streamer: true, uid: user.uid });
                 });
             }, () => {
                 setUser(undefined);

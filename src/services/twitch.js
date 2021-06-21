@@ -193,8 +193,10 @@ function nonce(length) {
  * @param {boolean} enabled true if the reward must be enable when created
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  * @param {string} streamId Id of the stream event
+ * @param {boolean} isMaxPerStreamEnabled Whether a maximum per stream is enabled
+ * @param {number} maxPerStream The maximum number per stream if enabled
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, rewardName, title, cost, enabled, onInvalidRefreshToken, streamId) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, rewardName, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled = false, maxPerStream) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
@@ -216,7 +218,8 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
                 cost,
                 is_max_per_user_per_stream_enabled: true,
                 max_per_user_per_stream: 1,
-                is_max_per_stream_enabled: false,
+                is_max_per_stream_enabled: isMaxPerStreamEnabled,
+                max_per_stream: maxPerStream,
                 is_enabled: enabled
             })
         });

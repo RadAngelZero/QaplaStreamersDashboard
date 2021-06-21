@@ -156,8 +156,8 @@ const PubSubTest = ({ user }) => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
             let rewardsIdsObject = {};
-            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'Exp Qapla', 1, true, handleTwitchSignIn, streamId);
-            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qapla Qoins', 1, false, handleTwitchSignIn, streamId);
+            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'XQ Qapla', 500, true, handleTwitchSignIn, streamId);
+            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qoins Qapla', 500, false, handleTwitchSignIn, streamId, true, 75);
 
             if (!expReward || !qoinsReward) {
                 return await handleDuplicatedCustomReward();

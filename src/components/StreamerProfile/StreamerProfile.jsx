@@ -15,6 +15,9 @@ import {
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE
 } from '../../utilities/Constants';
+import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
+import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
+import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
 
 const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
@@ -84,28 +87,70 @@ const StreamerProfile = ({ user, games }) => {
                     </Box>
                     <Grid container>
                         <Grid item xs={12}>
-                            <Button variant='contained'
-                                className={styles.twitchButton}
-                                onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
-                                startIcon={<TwitchIcon />}>
-                                {user.displayName}
-                            </Button>
-                        </Grid>
-                        <Grid item xs={12}>
                             <Grid container>
-                                <Grid item xs={3}>
-                                    <h1 className={styles.title}>My Streams</h1>
+                                <Grid xs={8}>
+                                    <Grid item xs={12}>
+                                        <Button variant='contained'
+                                            className={styles.twitchButton}
+                                            onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
+                                            startIcon={<TwitchIcon />}>
+                                            {user.displayName}
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Grid container>
+                                            <Grid item xs={3}>
+                                                <h1 className={styles.title}>My Streams</h1>
+                                            </Grid>
+                                            <Grid item xs={9} style={{ marginTop: '6rem' }}>
+                                                <StreamerSelect
+                                                    value={streamType}
+                                                    onChange={changestreamType}
+                                                    Icon={ArrowIcon}>
+                                                    <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
+                                                    <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
+                                                    <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
+                                                </StreamerSelect>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={9} style={{ marginTop: '6rem' }}>
-                                    <StreamerSelect
-                                        value={streamType}
-                                        onChange={changestreamType}
-                                        Icon={ArrowIcon}>
-                                        <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
-                                        <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
-                                        <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
-                                    </StreamerSelect>
+                                <Grid xs={3} className={styles.displayFlex} alignItems='center'>
+                                    <div className={styles.balanceInfoContainer}>
+                                        <div className={styles.cheersTitleContainer}>
+                                            <p className={styles.cheersText}>
+                                                Current Cheers Balance
+                                            </p>
+                                        </div>
+                                        <Grid container className={styles.balanceContainer}>
+                                            <Grid xs={12}>
+                                                <div className={styles.balanceCurrencyContainer}>
+                                                    <p className={styles.balanceCurrencyValue}>
+                                                        {user.bitsBalance || 0}
+                                                    </p>
+                                                    <BitsIcon />
+                                                </div>
+                                            </Grid>
+                                            <Grid xs={12}>
+                                                <div className={styles.balanceCurrencyContainer}>
+                                                    <p className={styles.balanceCurrencyValue}>
+                                                        {user.qoinsBalance || 0}
+                                                    </p>
+                                                    <QoinsIcon />
+                                                </div>
+                                            </Grid>
+                                        </Grid>
+                                        <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
+                                            <IconButton size='small'>
+                                                <InfoSquare />
+                                            </IconButton>
+                                            <p className={styles.learnMoreText}>
+                                                Learn More
+                                            </p>
+                                        </div>
+                                    </div>
                                 </Grid>
+                                <Grid xs={1} />
                             </Grid>
                         </Grid>
                         <Grid item xs={12}>

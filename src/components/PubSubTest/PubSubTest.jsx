@@ -291,7 +291,7 @@ const PubSubTest = ({ user }) => {
             }
         }
 
-        addListToStreamRedemptionList(streamId, 'XQReward', qoinsRedemptions);
+        addListToStreamRedemptionList(streamId, 'QoinsReward', qoinsRedemptions);
 
         usersPrizeArray = Object.keys(usersPrizes).map((twitchId) => ({ ...usersPrizes[twitchId], twitchId }));
 

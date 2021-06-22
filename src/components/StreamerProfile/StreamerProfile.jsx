@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden } from '@material-ui/core';
+import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip, withStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 
 import styles from './StreamerProfile.module.css';
@@ -19,9 +19,28 @@ import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
 import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
 
+const BalanceInfoTooltip = withStyles(() => ({
+    tooltip: {
+        fontSize: 16,
+        color: '#FFF',
+        backgroundColor: '#3B4BF9',
+        fontWeight: 500,
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingRight: 24,
+        paddingLeft: 24,
+        borderRadius: 16,
+        maxWidth: 200
+    },
+    arrow: {
+        color: '#3B4BF9'
+    }
+}))(Tooltip);
+
 const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
+    const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
     const [streams, setStreams] = useState({});
 
     useEffect(() => {
@@ -141,9 +160,17 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                         </Grid>
                                         <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
-                                            <IconButton size='small'>
-                                                <InfoSquare />
-                                            </IconButton>
+                                            <BalanceInfoTooltip arrow
+                                                onClose={() => setOpenBalanceTooltip(false)}
+                                                open={openBalanceTooltip}
+                                                disableFocusListener
+                                                disableHoverListener
+                                                disableTouchListener
+                                                title={<div><p>{'Keep track of your Qoins<>Bits balance.'}</p> <p> Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period. </p></div>}>
+                                                <IconButton onClick={() => setOpenBalanceTooltip(!openBalanceTooltip)} size='small'>
+                                                    <InfoSquare />
+                                                </IconButton>
+                                            </BalanceInfoTooltip>
                                             <p className={styles.learnMoreText}>
                                                 Learn More
                                             </p>

@@ -33,7 +33,9 @@ import {
     markAsClosedStreamerTwitchCustomReward,
     removeActiveCustomRewardFromList,
     getOpenCustomRewards,
-    getCustomRewardRedemptions
+    getCustomRewardRedemptions,
+    setStreamInRedemptionsLists,
+    addListToStreamRedemptionList
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS } from '../../utilities/Constants';
@@ -250,15 +252,18 @@ const PubSubTest = ({ user }) => {
     }
 
     const handleFailedRewardRedemptions = async (streamIdToAssignRewards, rewardsIdsToDelete) => {
+        setStreamInRedemptionsLists(streamId);
         const usersThatRedeemedCopy = {...usersThatRedeemed};
         const expRedemptions = await getAllRewardRedemptions(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardsIdsToDelete.expReward, handleTwitchSignIn);
         let usersPrizes = {};
         for (let i = 0; i < expRedemptions.length; i++) {
             const redemption = expRedemptions[i];
             if (!usersThatRedeemedCopy[redemption.user_id]) {
-                usersPrizes[redemption.user_id] = { redemptions: 1, userName: redemption.user_name, redemptionsIds: [redemption.id], rewardId: redemption.reward.id, status: redemption.status };
+                usersPrizes[redemption.user_id] = { userName: redemption.user_name, redemptionId: redemption.id, rewardId: redemption.reward.id, status: redemption.status, timestamp: redemption.redeemed_at };
             }
         }
+
+        addListToStreamRedemptionList(streamId, 'XQReward', usersPrizes);
 
         let usersPrizeArray = Object.keys(usersPrizes).map((twitchId) => ({ ...usersPrizes[twitchId], twitchId }));
 
@@ -266,7 +271,7 @@ const PubSubTest = ({ user }) => {
             const twitchUser = usersPrizeArray[i];
             const qaplaUser = await getUserByTwitchId(twitchUser.twitchId);
             if (qaplaUser) {
-                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, XQ, twitchUser.redemptionsIds[0], twitchUser.rewardId, twitchUser.status);
+                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, XQ, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
 
                 const expToGive = 15;
                 giveStreamExperienceForRewardRedeemed(qaplaUser.id, qaplaUser.qaplaLevel, qaplaUser.userName, expToGive);
@@ -282,9 +287,11 @@ const PubSubTest = ({ user }) => {
         for (let i = 0; i < qoinsRedemptions.length; i++) {
             const redemption = qoinsRedemptions[i];
             if (!usersThatRedeemedCopy[redemption.user_id]) {
-                usersPrizes[redemption.user_id] = { redemptions: 1, userName: redemption.user_name, redemptionsIds: [redemption.id], rewardId: redemption.reward.id, status: redemption.status };
+                usersPrizes[redemption.user_id] = { userName: redemption.user_name, redemptionId: redemption.id, rewardId: redemption.reward.id, status: redemption.status, timestamp: redemption.redeemed_at };
             }
         }
+
+        addListToStreamRedemptionList(streamId, 'QoinsReward', usersPrizes);
 
         usersPrizeArray = Object.keys(usersPrizes).map((twitchId) => ({ ...usersPrizes[twitchId], twitchId }));
 
@@ -292,7 +299,7 @@ const PubSubTest = ({ user }) => {
             const twitchUser = usersPrizeArray[i];
             const qaplaUser = await getUserByTwitchId(twitchUser.twitchId);
             if (qaplaUser) {
-                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, QOINS, twitchUser.redemptionsIds[0], twitchUser.rewardId, twitchUser.status);
+                await saveCustomRewardRedemption(qaplaUser.id, qaplaUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, QOINS, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
 
                 const userHasRedeemedExperience = await getCustomRewardRedemptions(streamIdToAssignRewards, qaplaUser.id);
 

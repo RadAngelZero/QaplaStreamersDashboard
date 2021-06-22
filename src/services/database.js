@@ -15,6 +15,7 @@ const eventParticipantsRef = database.ref('/EventParticipants');
 const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
+const redemptionsListsRef = database.ref('/RedemptionsLists');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -421,4 +422,13 @@ export async function saveCustomRewardNonRedemption(uid, photoUrl, twitchIdThatR
 
 export async function removeActiveCustomRewardFromList(streamId) {
     activeCustomRewardsRef.child(streamId).remove();
+}
+
+export async function setStreamInRedemptionsLists(streamId) {
+    const date = new Date();
+    await redemptionsListsRef.child(streamId).set({ timestamp: date.getTime() });
+}
+
+export async function addListToStreamRedemptionList(streamId, type, list) {
+    await redemptionsListsRef.child(streamId).update({ [type]: list });
 }

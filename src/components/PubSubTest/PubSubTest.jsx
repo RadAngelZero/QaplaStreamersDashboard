@@ -90,6 +90,8 @@ const PubSubTest = ({ user }) => {
     const [oldUser, setOldUser] = useState({ twitchAccessToken: '' });
     const [streamTimestamp, setStreamTimestamp] = useState(0);
     const [usersThatRedeemed, setUsersThatRedeemed] = useState({});
+    const [buttonFirstText, setButtonFirstText] = useState('Conectar a Twitch');
+    const [eventIsAlreadyClosed, setEventIsAlreadyClosed] = useState(false);
 
     useEffect(() => {
         async function getTimestamp() {
@@ -97,6 +99,19 @@ const PubSubTest = ({ user }) => {
                 const timestamp = await getStreamTimestamp(streamId);
                 if (timestamp.exists()) {
                     setStreamTimestamp(timestamp.val());
+                }
+            }
+        }
+
+        async function checkIfStreamIsAlreadyOpen() {
+            if (user && user.uid) {
+                const rewardOnDatabase = await getStreamCustomReward(user.uid, streamId);
+                if (rewardOnDatabase.exists()){
+                    if (rewardOnDatabase.val().closedStream) {
+                        setEventIsAlreadyClosed(true);
+                    } else {
+                        setButtonFirstText('Reconectar a Twitch');
+                    }
                 }
             }
         }
@@ -122,6 +137,7 @@ const PubSubTest = ({ user }) => {
             setOldUser(user);
         }
 
+        checkIfStreamIsAlreadyOpen();
         getTimestamp();
     }, [streamId, user, rewardsIds, oldUser, streamTimestamp]);
 
@@ -337,12 +353,12 @@ const PubSubTest = ({ user }) => {
                 <Grid xs={4} container>
                     <Grid xs={6}>
                         <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}
-                            disabled={verifyngRedemptions}
+                            disabled={verifyngRedemptions || eventIsAlreadyClosed}
                             endIcon={verifyngRedemptions ? <CircularProgress style={{ color: '#FFF' }} /> : null}>
                             {verifyngRedemptions ?
                                 'Desconectando, espere porfavor...'
                             :
-                                !connectedToTwitch ? 'Conectar a Twitch' : 'Cerrar Stream'
+                                !connectedToTwitch ? eventIsAlreadyClosed ? 'Este evento ya fue cerrado' : buttonFirstText : 'Cerrar Stream'
                             }
                         </ContainedButton>
                         {(connectedToTwitch && !isQoinsRewardEnabled) &&

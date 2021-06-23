@@ -93,6 +93,15 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                 giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
                 addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
                 saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+
+                const userHasRedeemedQoins = await getCustomRewardRedemptions(streamId, user.id);
+
+                if (userHasRedeemedQoins.exists() && Object.keys(userHasRedeemedQoins.val()).length === 2) {
+                    let qoinsToGive = 5;
+                    addQoinsToUser(user.id, qoinsToGive);
+                    addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive * 2);
+                    saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                }
             } else {
                 console.log(`User ${user.id} is NOT subscribed to stream`);
                 await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);

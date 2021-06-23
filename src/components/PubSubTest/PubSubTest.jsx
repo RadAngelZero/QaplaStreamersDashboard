@@ -222,7 +222,7 @@ const PubSubTest = ({ user }) => {
     }
 
     const unlistenForRewards = async () => {
-        if (window.confirm('¿Estas seguro de que deseas desconectar tu stream?')) {
+        if (window.confirm('¿Estas seguro que deseas cerrar este evento? Si lo cierras, ya no podras volver a abrirlo.')) {
             closeConnection();
             // Mark as closed the stream on the database
             await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
@@ -342,7 +342,7 @@ const PubSubTest = ({ user }) => {
                             {verifyngRedemptions ?
                                 'Desconectando, espere porfavor...'
                             :
-                                !connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'
+                                !connectedToTwitch ? 'Conectar a Twitch' : 'Cerrar Stream'
                             }
                         </ContainedButton>
                         {(connectedToTwitch && !isQoinsRewardEnabled) &&

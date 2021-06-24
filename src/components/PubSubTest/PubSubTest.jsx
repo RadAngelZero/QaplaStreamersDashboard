@@ -86,7 +86,7 @@ const PubSubTest = ({ user }) => {
     const [connectedToTwitch, setConnectedToTwitch] = useState(false);
     const [verifyngRedemptions, setVerifyngRedemptions] = useState(false);
     const [rewardsIds, setRewardsIds] = useState({});
-    const [isXQRewardEnabled, setIsQoinsRewardEnabled] = useState(false);
+    const [isXQRewardEnabled, setIsXQRewardEnabled] = useState(false);
     const [oldUser, setOldUser] = useState({ twitchAccessToken: '' });
     const [streamTimestamp, setStreamTimestamp] = useState(0);
     const [usersThatRedeemed, setUsersThatRedeemed] = useState({});

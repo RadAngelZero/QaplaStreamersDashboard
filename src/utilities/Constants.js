@@ -42,6 +42,7 @@ import SeaOfThievesImage from './../assets/SeaOfThieves.jpg';
 import MarioKartImage from './../assets/MarioKart.jpg';
 import AgarIoImage from './../assets/Agario.jpg';
 import TetrIoImage from './../assets/Tetrio.jpg';
+import OverwatchImage from './../assets/Overwatch.jpg';
 
 /**
  * Twitch API keys
@@ -111,5 +112,6 @@ export const streamsPlaceholderImages = {
     SOT: SeaOfThievesImage,
     MarioKart: MarioKartImage,
     AgarIo: AgarIoImage,
-    TetrIo: TetrIoImage
+    TetrIo: TetrIoImage,
+    Overwatch: OverwatchImage
 };

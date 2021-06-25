@@ -67,6 +67,11 @@ const useStyles = makeStyles((theme) => ({
     },
     tableContainer: {
         marginTop: 16
+    },
+    secondaryButton: {
+        backgroundColor: '#00FFDD !important',
+        marginTop: 16,
+        color: '#000'
     }
 }));
 
@@ -362,7 +367,7 @@ const PubSubTest = ({ user }) => {
                             }
                         </ContainedButton>
                         {(connectedToTwitch && !isXQRewardEnabled) &&
-                            <ContainedButton onClick={enableXQReward}>
+                            <ContainedButton className={classes.secondaryButton} onClick={enableXQReward}>
                                 Habilitar recompensa de Experiencia
                             </ContainedButton>
                         }

@@ -268,6 +268,8 @@ const PubSubTest = ({ user }) => {
             await deleteReward(rewardsIdToDeleteArray[i]);
         }
 
+        setRewardsIds({});
+
         setVerifyngRedemptions(false);
         setConnectedToTwitch(false);
     }

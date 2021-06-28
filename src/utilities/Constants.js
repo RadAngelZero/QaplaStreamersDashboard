@@ -43,6 +43,8 @@ import MarioKartImage from './../assets/MarioKart.jpg';
 import AgarIoImage from './../assets/Agario.jpg';
 import TetrIoImage from './../assets/Tetrio.jpg';
 import OverwatchImage from './../assets/Overwatch.jpg';
+import OvercookedImage from './../assets/Overcooked.jpg';
+import DeadCellsImage from './../assets/DeadCells.jpg';
 
 /**
  * Twitch API keys
@@ -113,5 +115,7 @@ export const streamsPlaceholderImages = {
     MarioKart: MarioKartImage,
     AgarIo: AgarIoImage,
     TetrIo: TetrIoImage,
-    Overwatch: OverwatchImage
+    Overwatch: OverwatchImage,
+    Overcooked: OvercookedImage,
+    DeadCells: DeadCellsImage
 };

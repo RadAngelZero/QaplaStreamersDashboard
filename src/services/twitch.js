@@ -242,6 +242,9 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
             if (res.status === 400) {
                 return null;
             }
+        } else {
+            console.log(res);
+            console.log(res.status);
         }
     } catch (e) {
         console.log('Error: ', e);

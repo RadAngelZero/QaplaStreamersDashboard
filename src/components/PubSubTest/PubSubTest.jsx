@@ -109,7 +109,7 @@ const PubSubTest = ({ user }) => {
         }
 
         async function checkIfStreamIsAlreadyOpen() {
-            if (user && user.uid) {
+            if (user && user.uid && Object.keys(rewardsIds).length < 2) {
                 const rewardOnDatabase = await getStreamCustomReward(user.uid, streamId);
                 if (rewardOnDatabase.exists()){
                     if (rewardOnDatabase.val().closedStream) {
@@ -369,7 +369,7 @@ const PubSubTest = ({ user }) => {
                             }
                         </ContainedButton>
                         {(connectedToTwitch && !isQoinsRewardEnabled) &&
-                            <ContainedButton onClick={enableQoinsReward}>
+                            <ContainedButton onClick={enableQoinsReward} className={classes.secondaryButton}>
                                 Habilitar recompensa de Qoins
                             </ContainedButton>
                         }

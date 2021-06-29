@@ -91,7 +91,7 @@ const PubSubTest = ({ user }) => {
     const [connectedToTwitch, setConnectedToTwitch] = useState(false);
     const [verifyngRedemptions, setVerifyngRedemptions] = useState(false);
     const [rewardsIds, setRewardsIds] = useState({});
-    const [isXQRewardEnabled, setIsXQRewardEnabled] = useState(false);
+    const [isQoinsRewardEnabled, setIsQoinsRewardEnabled] = useState(false);
     const [oldUser, setOldUser] = useState({ twitchAccessToken: '' });
     const [streamTimestamp, setStreamTimestamp] = useState(0);
     const [usersThatRedeemed, setUsersThatRedeemed] = useState({});
@@ -179,8 +179,8 @@ const PubSubTest = ({ user }) => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
             let rewardsIdsObject = {};
-            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'XQ Qapla', 500, false, handleTwitchSignIn, streamId);
-            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qoins Qapla', 500, true, handleTwitchSignIn, streamId, true, 75);
+            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'XQ Qapla', 500, true, handleTwitchSignIn, streamId);
+            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qoins Qapla', 500, false, handleTwitchSignIn, streamId, true, 75);
 
             if (!expReward || !qoinsReward) {
                 return await handleDuplicatedCustomReward();
@@ -346,9 +346,9 @@ const PubSubTest = ({ user }) => {
         }
     }
 
-    const enableXQReward = async () => {
-        if (await enableCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardsIds.expReward, handleTwitchSignIn) === 200) {
-            setIsXQRewardEnabled(true);
+    const enableQoinsReward = async () => {
+        if (await enableCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, rewardsIds.qoinsReward, handleTwitchSignIn) === 200) {
+            setIsQoinsRewardEnabled(true);
         }
     }
 
@@ -368,9 +368,9 @@ const PubSubTest = ({ user }) => {
                                 !connectedToTwitch ? eventIsAlreadyClosed ? 'Este evento ya fue cerrado' : buttonFirstText : 'Cerrar Stream'
                             }
                         </ContainedButton>
-                        {(connectedToTwitch && !isXQRewardEnabled) &&
-                            <ContainedButton className={classes.secondaryButton} onClick={enableXQReward}>
-                                Habilitar recompensa de Experiencia
+                        {(connectedToTwitch && !isQoinsRewardEnabled) &&
+                            <ContainedButton onClick={enableQoinsReward}>
+                                Habilitar recompensa de Qoins
                             </ContainedButton>
                         }
                     </Grid>

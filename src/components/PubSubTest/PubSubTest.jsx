@@ -67,6 +67,11 @@ const useStyles = makeStyles((theme) => ({
     },
     tableContainer: {
         marginTop: 16
+    },
+    secondaryButton: {
+        backgroundColor: '#00FFDD !important',
+        marginTop: 16,
+        color: '#000'
     }
 }));
 
@@ -90,6 +95,8 @@ const PubSubTest = ({ user }) => {
     const [oldUser, setOldUser] = useState({ twitchAccessToken: '' });
     const [streamTimestamp, setStreamTimestamp] = useState(0);
     const [usersThatRedeemed, setUsersThatRedeemed] = useState({});
+    const [buttonFirstText, setButtonFirstText] = useState('Conectar a Twitch');
+    const [eventIsAlreadyClosed, setEventIsAlreadyClosed] = useState(false);
 
     useEffect(() => {
         async function getTimestamp() {
@@ -97,6 +104,19 @@ const PubSubTest = ({ user }) => {
                 const timestamp = await getStreamTimestamp(streamId);
                 if (timestamp.exists()) {
                     setStreamTimestamp(timestamp.val());
+                }
+            }
+        }
+
+        async function checkIfStreamIsAlreadyOpen() {
+            if (user && user.uid && Object.keys(rewardsIds).length < 2) {
+                const rewardOnDatabase = await getStreamCustomReward(user.uid, streamId);
+                if (rewardOnDatabase.exists()){
+                    if (rewardOnDatabase.val().closedStream) {
+                        setEventIsAlreadyClosed(true);
+                    } else {
+                        setButtonFirstText('Reconectar a Twitch');
+                    }
                 }
             }
         }
@@ -122,6 +142,7 @@ const PubSubTest = ({ user }) => {
             setOldUser(user);
         }
 
+        checkIfStreamIsAlreadyOpen();
         getTimestamp();
     }, [streamId, user, rewardsIds, oldUser, streamTimestamp]);
 
@@ -222,7 +243,7 @@ const PubSubTest = ({ user }) => {
     }
 
     const unlistenForRewards = async () => {
-        if (window.confirm('¿Estas seguro de que deseas desconectar tu stream?')) {
+        if (window.confirm('¿Estas seguro que deseas cerrar este evento? Si lo cierras, ya no podras volver a abrirlo.')) {
             closeConnection();
             // Mark as closed the stream on the database
             await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
@@ -246,6 +267,8 @@ const PubSubTest = ({ user }) => {
         for (let i = 0; i < rewardsIdToDeleteArray.length; i++) {
             await deleteReward(rewardsIdToDeleteArray[i]);
         }
+
+        setRewardsIds({});
 
         setVerifyngRedemptions(false);
         setConnectedToTwitch(false);
@@ -337,16 +360,16 @@ const PubSubTest = ({ user }) => {
                 <Grid xs={4} container>
                     <Grid xs={6}>
                         <ContainedButton onClick={!connectedToTwitch ? listenForRewards : unlistenForRewards}
-                            disabled={verifyngRedemptions}
+                            disabled={verifyngRedemptions || eventIsAlreadyClosed}
                             endIcon={verifyngRedemptions ? <CircularProgress style={{ color: '#FFF' }} /> : null}>
                             {verifyngRedemptions ?
                                 'Desconectando, espere porfavor...'
                             :
-                                !connectedToTwitch ? 'Conectar a Twitch' : 'Desconectar de twitch'
+                                !connectedToTwitch ? eventIsAlreadyClosed ? 'Este evento ya fue cerrado' : buttonFirstText : 'Cerrar Stream'
                             }
                         </ContainedButton>
                         {(connectedToTwitch && !isQoinsRewardEnabled) &&
-                            <ContainedButton onClick={enableQoinsReward}>
+                            <ContainedButton onClick={enableQoinsReward} className={classes.secondaryButton}>
                                 Habilitar recompensa de Qoins
                             </ContainedButton>
                         }

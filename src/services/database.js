@@ -227,6 +227,11 @@ export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, ho
         timestamp
     });
 
+    const lastTimestamp = await userStreamersRef.child(uid).child('lastStreamTs').once('value');
+    if (!lastTimestamp.exists() || (lastTimestamp.exists() && lastTimestamp.val() < timestamp)) {
+        userStreamersRef.child(uid).update({ lastStreamTs: timestamp });
+    }
+
     return await streamersEventsDataRef.child(uid).child(streamId).update({
         date: dateUTC,
         hour: hourUTC,

@@ -16,6 +16,7 @@ const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
+const streamersDonationsRef = database.ref('/StreamersDonations');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -71,6 +72,20 @@ export async function createStreamerProfile(uid, userData, inviteCode) {
  */
 export async function updateStreamerProfile(uid, userData) {
     userStreamersRef.child(uid).update(userData);
+}
+
+/**
+ * Gets the uid of the streamer using theit twitchId
+ * @param {string} twitchId Twitch id of the streamer
+ */
+export async function getStreamerUidWithTwitchId(twitchId) {
+    const streamerSnapshot = await userStreamersRef.orderByChild('id').equalTo(twitchId).once('value');
+    let uid = '';
+    streamerSnapshot.forEach((streamer) => {
+        uid = streamer.key;
+    });
+
+    return uid;
 }
 
 /**
@@ -431,4 +446,31 @@ export async function setStreamInRedemptionsLists(streamId) {
 
 export async function addListToStreamRedemptionList(streamId, type, list) {
     await redemptionsListsRef.child(streamId).update({ [type]: list });
+}
+
+/**
+ * Listener to check if the streamer is online
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Handler of the results
+ */
+export function listenToUserStreamingStatus(streamerUid, callback) {
+    userStreamersRef.child(streamerUid).child('isStreaming').on('value', callback);
+}
+
+/**
+ * Listener to get every unread streamer cheer added to the StreamersDonations
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Handler of the results
+ */
+export function listenForUnreadStreamerCheers(streamerUid, callback) {
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback);
+}
+
+/**
+ * Mark as read the given donation
+ * @param {string} streamerUid Uid of the streamer who receive the donation
+ * @param {string} donationId Id of the donation
+ */
+export async function markDonationAsRead(streamerUid, donationId) {
+    return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
 }

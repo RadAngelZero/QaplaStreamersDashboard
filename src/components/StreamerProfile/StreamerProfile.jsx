@@ -58,6 +58,14 @@ const StreamerProfile = ({ user, games }) => {
         return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
     }
 
+    const formatHour = (timestamp) => {
+        const date = new Date(timestamp);
+        const hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+
+        return `${hour}:${minutes}`;
+    }
+
     const onRemoveStream = (streamId) => {
         const streamsCopy = {...streams};
         delete streamsCopy[streamId];
@@ -133,6 +141,7 @@ const StreamerProfile = ({ user, games }) => {
                                             game={streams[streamId].game}
                                             games={games}
                                             date={formatDate(streams[streamId].timestamp)}
+                                            hour={formatHour(streams[streamId].timestamp)}
                                             enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
                                             onClick={() => goToStreamDetails(streamId)}
                                             onRemoveStream={onRemoveStream} />

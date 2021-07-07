@@ -1,7 +1,6 @@
 import {
     giveStreamExperienceForRewardRedeemed,
     updateStreamerProfile,
-    saveStreamerTwitchCustomReward,
     saveCustomRewardRedemption,
     getUserByTwitchId,
     isUserRegisteredToStream,
@@ -196,7 +195,6 @@ function nonce(length) {
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
  * @param {string} refreshToken Twitch refresh token
- * @param {string} rewardName String name to identify on the database
  * @param {string} title Title of the reward
  * @param {number} cost Cost for redeem the reward
  * @param {boolean} enabled true if the reward must be enable when created
@@ -205,7 +203,7 @@ function nonce(length) {
  * @param {boolean} isMaxPerStreamEnabled Whether a maximum per stream is enabled
  * @param {number} maxPerStream The maximum number per stream if enabled
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, rewardName, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled = false, maxPerStream) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled = false, maxPerStream) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
@@ -235,7 +233,6 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
 
         const response = await res.json();
         if (response.data && response.data[0]) {
-            saveStreamerTwitchCustomReward(uid, rewardName, response.data[0].id, response.data[0].title, response.data[0].cost, streamId);
 
             return response.data[0];
         } else if (response.error) {

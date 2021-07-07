@@ -35,7 +35,8 @@ import {
     getOpenCustomRewards,
     getCustomRewardRedemptions,
     setStreamInRedemptionsLists,
-    addListToStreamRedemptionList
+    addListToStreamRedemptionList,
+    saveStreamerTwitchCustomReward
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS } from '../../utilities/Constants';
@@ -86,7 +87,7 @@ const TableCellStyled = withStyles(() => ({
 }))(TableCell);
 
 const PubSubTest = ({ user }) => {
-    const { streamId } = useParams();
+    const { streamId, status } = useParams();
     const classes = useStyles();
     const [connectedToTwitch, setConnectedToTwitch] = useState(false);
     const [verifyngRedemptions, setVerifyngRedemptions] = useState(false);
@@ -142,6 +143,11 @@ const PubSubTest = ({ user }) => {
             setOldUser(user);
         }
 
+        if (!rewardsAreCreated() && !connectedToTwitch && user && streamId && (status === 'start' || status === 'resume')) {
+            // listenForRewards is able to identify if we need to reconect or we are trying to start
+            listenForRewards();
+        }
+
         checkIfStreamIsAlreadyOpen();
         getTimestamp();
     }, [streamId, user, rewardsIds, oldUser, streamTimestamp]);
@@ -163,6 +169,7 @@ const PubSubTest = ({ user }) => {
                 alert('Este evento ya fue cerrado, si es necesario reabrirlo contacta con soporte tecnico');
             }
         } else {
+            alert('Conectando');
             const reward = await createReward();
 
             if (reward) {
@@ -179,8 +186,8 @@ const PubSubTest = ({ user }) => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
             let rewardsIdsObject = {};
-            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'XQ Qapla', 500, true, handleTwitchSignIn, streamId);
-            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qoins Qapla', 500, false, handleTwitchSignIn, streamId, true, 75);
+            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'XQ Qapla', 500, true, handleTwitchSignIn, streamId);
+            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'Qoins Qapla', 500, false, handleTwitchSignIn, streamId, true, 75);
 
             if (!expReward || !qoinsReward) {
                 return await handleDuplicatedCustomReward();
@@ -189,8 +196,10 @@ const PubSubTest = ({ user }) => {
             rewardsIdsObject = { expReward: expReward.id, qoinsReward: qoinsReward.id };
 
             if (Object.keys(rewardsIdsObject).length === 2) {
-                alert('Recompensas creadas, manten esta ventana abierta');
                 setRewardsIds({ expReward: expReward.id, qoinsReward: qoinsReward.id });
+                await saveStreamerTwitchCustomReward(user.uid, 'expReward', expReward.id, expReward.title, expReward.cost, streamId);
+                await saveStreamerTwitchCustomReward(user.uid, 'qoinsReward', qoinsReward.id, qoinsReward.title, qoinsReward.cost, streamId);
+                alert('Recompensas creadas, manten esta ventana abierta');
             }
 
             return (Object.keys(rewardsIdsObject).length === 2) ? { expReward, qoinsReward } : {};

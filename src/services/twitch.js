@@ -76,17 +76,12 @@ export function closeConnection() {
  * @param {object} redemptionData Redemption twitch object
  */
 export async function handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData) {
-    console.log(redemptionData);
     if (redemptionData.reward.id === rewardsIds.expReward) {
-        console.log('Exp Qapla Custom reward redeemed', redemptionData.user.id);
         const user = await getUserByTwitchId(redemptionData.user.id);
         if (user) {
-            console.log('Redeemed by qapla user:', user.id);
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                console.log(`User ${user.id} is subscribed to stream`);
                 await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
-                console.log('Exp Qapla Custom reward redeemed', redemptionData.user.id);
 
                 const expToGive = 15;
                 giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
@@ -102,19 +97,15 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                     saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
                 }
             } else {
-                console.log(`User ${user.id} is NOT subscribed to stream`);
                 await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
             }
         }
     } else if (redemptionData.reward.id === rewardsIds.qoinsReward) {
         const user = await getUserByTwitchId(redemptionData.user.id);
         if (user) {
-            console.log('Redeemed by qapla user:', user.id);
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                console.log(`User ${user.id} is subscribed to stream`);
                 await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
-                console.log('Qapla Qoins Custom reward redeemed', redemptionData.user.id);
 
                 const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
 

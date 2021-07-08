@@ -179,6 +179,11 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
         history.push(`/stream/${streamId}/resume`);
     }
 
+    const closeStream = (e) => {
+        e.stopPropagation();
+        history.push(`/stream/${streamId}/close`);
+    }
+
     return (
         <Card className={classes.eventCard} onClick={onClickCard}>
             <div style={{ position: 'relative' }}>
@@ -221,9 +226,14 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                             </Button>
                             :
                             closedStream === false &&
-                            <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
-                                Reanudar
-                            </Button>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
+                                    Reanudar
+                                </Button>
+                                <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={closeStream}>
+                                    Cerrar
+                                </Button>
+                            </div>
                         }
                         </>
                         :

@@ -181,7 +181,9 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
 
     const closeStream = (e) => {
         e.stopPropagation();
-        history.push(`/stream/${streamId}/close`);
+        if (window.confirm('¿Estas seguro que deseas cerrar este evento? Si lo cierras, ya no podras volver a abrirlo.')) {
+            history.push(`/stream/${streamId}/close`);
+        }
     }
 
     return (

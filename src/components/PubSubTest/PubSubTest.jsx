@@ -132,7 +132,7 @@ const PubSubTest = ({ user }) => {
                 // Then when rewards are created (one render after the rewards are loaded) we close the event
                 if (rewardsAreCreated() && connectedToTwitch && !verifyngRedemptions) {
                     setVerifyngRedemptions(true);
-                    unlistenForRewards();
+                    closeStream();
                 }
             }
         }
@@ -271,12 +271,16 @@ const PubSubTest = ({ user }) => {
 
     const unlistenForRewards = async () => {
         if (window.confirm('¿Estas seguro que deseas cerrar este evento? Si lo cierras, ya no podras volver a abrirlo.')) {
-            closeConnection();
-            // Mark as closed the stream on the database
-            await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
-
-            finishStream(streamId, rewardsIds);
+            await closeStream();
         }
+    }
+
+    const closeStream = async () => {
+        closeConnection();
+        // Mark as closed the stream on the database
+        await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
+
+        finishStream(streamId, rewardsIds);
     }
 
     const finishStream = async (streamIdToClose, rewardsIdsToDelete) => {

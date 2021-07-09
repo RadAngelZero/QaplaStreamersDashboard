@@ -467,6 +467,14 @@ export function listenForUnreadStreamerCheers(streamerUid, callback) {
 }
 
 /**
+ * Remove listener from the Streamers Donation node
+ * @param {string} streamerUid Uid of the streamer
+ */
+export function removeListenerForUnreadStreamerCheers(streamerUid) {
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('child_added');
+}
+
+/**
  * Mark as read the given donation
  * @param {string} streamerUid Uid of the streamer who receive the donation
  * @param {string} donationId Id of the donation

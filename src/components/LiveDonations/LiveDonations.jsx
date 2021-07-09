@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers } from '../../services/database';
 import { ReactComponent as QaplaLogo } from './../../assets/QaplaLogo.svg';
 
 const LiveDonations = () => {
@@ -43,6 +43,8 @@ const LiveDonations = () => {
                     setTimeout(() => {
                         loadDonations();
                     }, 1000);
+                } else {
+                    removeListenerForUnreadStreamerCheers(streamerUid);
                 }
             });
         }

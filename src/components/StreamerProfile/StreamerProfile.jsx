@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip, withStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -42,6 +43,7 @@ const StreamerProfile = ({ user, games }) => {
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
     const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
     const [streams, setStreams] = useState({});
+    const { t } = useTranslation();
 
     useEffect(() => {
         function setStreamLoaded(streams) {
@@ -119,7 +121,9 @@ const StreamerProfile = ({ user, games }) => {
                                     <Grid item xs={12}>
                                         <Grid container>
                                             <Grid item xs={3}>
-                                                <h1 className={styles.title}>My Streams</h1>
+                                                <h1 className={styles.title}>
+                                                    {t('profile.myStreams')}
+                                                </h1>
                                             </Grid>
                                             <Grid item xs={9} style={{ marginTop: '6rem' }}>
                                                 <StreamerSelect

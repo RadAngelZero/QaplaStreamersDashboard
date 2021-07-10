@@ -56,7 +56,6 @@ const Router = () => {
         }
     }, [user]);
 
-
     return (
         <RouterPackage>
             <Switch>

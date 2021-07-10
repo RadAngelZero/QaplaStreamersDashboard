@@ -2,15 +2,14 @@ import {
     giveStreamExperienceForRewardRedeemed,
     updateStreamerProfile,
     saveStreamerTwitchCustomReward,
-    removeStreamerTwitchCustomReward,
     saveCustomRewardRedemption,
-    getCustomRewardRedemptions,
     getUserByTwitchId,
     isUserRegisteredToStream,
     addQoinsToUser,
     addInfoToEventParticipants,
     saveUserStreamReward,
-    saveCustomRewardNonRedemption
+    saveCustomRewardNonRedemption,
+    getCustomRewardRedemptions
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, XQ, QOINS } from '../utilities/Constants';
 
@@ -23,11 +22,11 @@ let webSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
  * @param {string} uid User identifier
  * @param {string} accessToken Twitch access token
  * @param {array} topics Array of strings with the topics to listen
- * @param {stirng} rewardId Id of the qapla custom reward
+ * @param {object} rewardsIds Ids of the qapla custom rewards { expReward: 'expId', qoinsReward: 'qoinsId' }
  * @param {number} timestamp Timestamp of the start hour of the stream
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardId, timestamp, onInvalidRefreshToken) {
+export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, timestamp, onInvalidRefreshToken) {
     let pingInterval = 1000 * 60;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
@@ -50,7 +49,7 @@ export function connect(streamId, streamerName, uid, accessToken, refreshToken, 
             const reward = JSON.parse(message.data.message);
             if (reward.type === 'reward-redeemed') {
                 const redemptionData = reward.data.redemption;
-                handleCustomRewardRedemption(streamId, streamerName, rewardId, redemptionData, timestamp);
+                handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, timestamp);
             }
 
             if (message.type === 'RECONNECT') {
@@ -74,37 +73,63 @@ export function closeConnection() {
  * not subscribed to the event. Ignore any other custom reward redemption
  * @param {string} streamId Streamer Twitch id
  * @param {string} streamerName Name of the streamer
- * @param {string} rewardId Qapla Custom Reward Id
+ * @param {object} rewardsIds Ids of the qapla custom rewards { expReward: 'expId', qoinsReward: 'qoinsId' }
  * @param {object} redemptionData Redemption twitch object
- * @param {number} timestamp Timestamp of the start hour of the stream
  */
-export async function handleCustomRewardRedemption(streamId, streamerName, rewardId, redemptionData, timestamp) {
+export async function handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData) {
     console.log(redemptionData);
-    if (redemptionData.reward.id === rewardId) {
-        console.log('Qapla Custom reward redeemed', redemptionData.user.id);
+    if (redemptionData.reward.id === rewardsIds.expReward) {
+        console.log('Exp Qapla Custom reward redeemed', redemptionData.user.id);
         const user = await getUserByTwitchId(redemptionData.user.id);
         if (user) {
             console.log('Redeemed by qapla user:', user.id);
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
                 console.log(`User ${user.id} is subscribed to stream`);
-                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
-                const redemptionsSaved = await getCustomRewardRedemptions(streamId, user.id);
+                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                console.log('Exp Qapla Custom reward redeemed', redemptionData.user.id);
 
-                const numberOfRedemptionsSaved = Object.keys(redemptionsSaved.val()).length;
-                if (numberOfRedemptionsSaved === 1) {
-                    giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, 15);
-                    addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', 15);
-                    saveUserStreamReward(user.id, XQ, streamerName, streamId, 15);
-                } else if (numberOfRedemptionsSaved === 2) {
-                    addQoinsToUser(user.id, 10);
-                    addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', 10);
-                    saveUserStreamReward(user.id, QOINS, streamerName, streamId, 10);
+                const expToGive = 15;
+                giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
+                addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
+                saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+
+                const userHasRedeemedQoins = await getCustomRewardRedemptions(streamId, user.id);
+
+                if (userHasRedeemedQoins.exists() && Object.keys(userHasRedeemedQoins.val()).length === 2) {
+                    let qoinsToGive = 5;
+                    addQoinsToUser(user.id, qoinsToGive);
+                    addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive * 2);
+                    saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
                 }
-                return;
             } else {
                 console.log(`User ${user.id} is NOT subscribed to stream`);
                 await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+            }
+        }
+    } else if (redemptionData.reward.id === rewardsIds.qoinsReward) {
+        const user = await getUserByTwitchId(redemptionData.user.id);
+        if (user) {
+            console.log('Redeemed by qapla user:', user.id);
+            const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
+            if (isUserParticipantOfStream) {
+                console.log(`User ${user.id} is subscribed to stream`);
+                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                console.log('Qapla Qoins Custom reward redeemed', redemptionData.user.id);
+
+                const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
+
+                let qoinsToGive = 5;
+
+                // If the user has already redeemed the exp reward and now the qoins reward
+                if (userHasRedeemedExperience.exists() && Object.keys(userHasRedeemedExperience.val()).length === 2) {
+                    // Give him 10 qoins instead of 5
+                    qoinsToGive = 10;
+                }
+
+                addQoinsToUser(user.id, qoinsToGive);
+                addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
+                saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
             }
         }
     }
@@ -170,12 +195,17 @@ function nonce(length) {
  * @param {string} uid User identifier
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
+ * @param {string} refreshToken Twitch refresh token
+ * @param {string} rewardName String name to identify on the database
  * @param {string} title Title of the reward
  * @param {number} cost Cost for redeem the reward
+ * @param {boolean} enabled true if the reward must be enable when created
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  * @param {string} streamId Id of the stream event
+ * @param {boolean} isMaxPerStreamEnabled Whether a maximum per stream is enabled
+ * @param {number} maxPerStream The maximum number per stream if enabled
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, onInvalidRefreshToken, streamId, handleDuplicatedCustomReward) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, rewardName, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled = false, maxPerStream) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
@@ -196,22 +226,63 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
                 title,
                 cost,
                 is_max_per_user_per_stream_enabled: true,
-                max_per_user_per_stream: 2,
-                is_max_per_stream_enabled: false,
-                is_enabled: true
+                max_per_user_per_stream: 1,
+                is_max_per_stream_enabled: isMaxPerStreamEnabled,
+                max_per_stream: maxPerStream,
+                is_enabled: enabled
             })
         });
 
         const response = await res.json();
         if (response.data && response.data[0]) {
-            saveStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost, streamId);
+            saveStreamerTwitchCustomReward(uid, rewardName, response.data[0].id, response.data[0].title, response.data[0].cost, streamId);
 
             return response.data[0];
         } else if (response.error) {
             if (res.status === 400) {
-                return handleDuplicatedCustomReward();
+                return null;
+            }
+        } else {
+            console.log(res);
+            console.log(res.status);
+        }
+    } catch (e) {
+        console.log('Error: ', e);
+    }
+}
+
+/**
+ * Update a custom reward in the user´s twitch
+ * @param {string} uid User identifier
+ * @param {string} twitchId Twitch identifier
+ * @param {string} accessToken Twitch access token
+ * @param {string} refreshToken Twitch refresh token
+ * @param {string} rewardId Id of the reward to delete
+ * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
+ */
+export async function enableCustomReward(uid, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
+    try {
+        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
+        if (twitchAccessTokenStatus === 401) {
+            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
+            if (newCredentials) {
+                return await enableCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
             }
         }
+
+        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
+            method: 'PATCH',
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                is_enabled: true
+            })
+        });
+
+        return response.status;
     } catch (e) {
         console.log('Error: ', e);
     }
@@ -222,6 +293,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
  * @param {string} uid User identifier
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
+ * @param {string} refreshToken Twitch refresh token
  * @param {string} rewardId Id of the reward to delete
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
@@ -244,10 +316,6 @@ export async function deleteCustomReward(uid, twitchId, accessToken, refreshToke
             }
         });
 
-        if (response.status === 204 ) {
-            removeStreamerTwitchCustomReward(uid, response.data[0].id, response.data[0].title, response.data[0].cost);
-        }
-
         return response.status;
     } catch (e) {
         console.log('Error: ', e);
@@ -260,6 +328,7 @@ export async function deleteCustomReward(uid, twitchId, accessToken, refreshToke
  * @param {string} redemptionId Redemption twitch identifier
  * @param {strint} streamerId Streamer Twitch id
  * @param {string} accessToken Twitch access token
+ * @param {string} refreshToken Twitch refresh token
  * @param {string} rewardId Qapla custom reward identifier
  * @param {string} status Status to assign (FULFILLED or CANCELED)
  * @param {function} onInvalidRefreshToken Callback for invalid tokens

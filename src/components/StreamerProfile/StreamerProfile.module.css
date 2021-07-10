@@ -50,12 +50,46 @@
     padding-bottom: 8px;
 }
 
+.getPremiumBannerContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -1.75rem;
+    margin-left: -6rem;
+    height: 3.5rem;
+    width: 12;
+    background: linear-gradient(90deg, #FFB906 0%, #FFE600 100%), #6C5DD3;
+    z-index: 9999;
+    border-radius: 16px;
+    padding-right: .75rem;
+    padding-left: .75rem;
+    cursor: pointer;
+}
+
+.getPremiumBannerText {
+    font-weight: bold;
+    font-size: 14;
+    color: #0D1021;
+}
+
 .balanceContainer {
+    position: relative;
     margin-top: .5rem;
     width: 100%;
     border-radius: 20px;
     background-color: #141735;
     padding-right: 1rem;
+}
+
+.blur {
+    -webkit-filter: blur(2.5px);
+    -moz-filter: blur(2.5px);
+    -o-filter: blur(2.5px);
+    -ms-filter: blur(2.5px);
+    filter: blur(2.5px);
 }
 
 .balanceCurrencyContainer {

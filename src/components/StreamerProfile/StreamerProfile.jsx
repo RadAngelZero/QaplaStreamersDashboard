@@ -142,20 +142,31 @@ const StreamerProfile = ({ user, games }) => {
                                             </p>
                                         </div>
                                         <Grid container className={styles.balanceContainer}>
-                                            <Grid xs={12}>
-                                                <div className={styles.balanceCurrencyContainer}>
-                                                    <p className={styles.balanceCurrencyValue}>
-                                                        {user.bitsBalance || 0}
+                                            {!user.premium &&
+                                                <div className={styles.getPremiumBannerContainer}>
+                                                    <p className={styles.getPremiumBannerText}>
+                                                        Get Bits & Subs for free
                                                     </p>
-                                                    <BitsIcon />
+                                                </div>
+                                            }
+                                            <Grid xs={12}>
+                                                <div className={user.premium ? '' : styles.blur}>
+                                                    <div className={styles.balanceCurrencyContainer}>
+                                                        <p className={styles.balanceCurrencyValue}>
+                                                            {user.bitsBalance || 0}
+                                                        </p>
+                                                        <BitsIcon />
+                                                    </div>
                                                 </div>
                                             </Grid>
                                             <Grid xs={12}>
-                                                <div className={styles.balanceCurrencyContainer}>
-                                                    <p className={styles.balanceCurrencyValue}>
-                                                        {user.qoinsBalance || 0}
-                                                    </p>
-                                                    <QoinsIcon />
+                                                <div className={user.premium ? '' : styles.blur}>
+                                                    <div className={styles.balanceCurrencyContainer}>
+                                                        <p className={styles.balanceCurrencyValue}>
+                                                            {user.qoinsBalance || 0}
+                                                        </p>
+                                                        <QoinsIcon />
+                                                    </div>
                                                 </div>
                                             </Grid>
                                         </Grid>

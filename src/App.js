@@ -5,7 +5,9 @@ import Router from './Router';
 
 function App() {
     return (
-        <Router />
+        <React.Suspense fallback=''>
+            <Router />
+        </React.Suspense>
     );
 }
 

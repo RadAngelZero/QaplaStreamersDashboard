@@ -123,7 +123,7 @@ const PubSubTest = ({ user }) => {
         }
 
         async function checkIfEventMustBeClosed() {
-            if (status === 'close' && user && streamId) {
+            if (status === 'close' && streamId && user && user.customRewards && user.customRewards[streamId] && !user.customRewards[streamId].closedStream) {
                 // First we need to connect to the event
                 if (!rewardsAreCreated() && !connectedToTwitch) {
                     listenForRewards();

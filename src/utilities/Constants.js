@@ -45,6 +45,7 @@ import TetrIoImage from './../assets/Tetrio.jpg';
 import OverwatchImage from './../assets/Overwatch.jpg';
 import OvercookedImage from './../assets/Overcooked.jpg';
 import DeadCellsImage from './../assets/DeadCells.jpg';
+import GenshinImpactImage from './../assets/GenshinImpact.jpg';
 
 /**
  * Twitch API keys
@@ -117,5 +118,6 @@ export const streamsPlaceholderImages = {
     TetrIo: TetrIoImage,
     Overwatch: OverwatchImage,
     Overcooked: OvercookedImage,
-    DeadCells: DeadCellsImage
+    DeadCells: DeadCellsImage,
+    GenshinImpact: GenshinImpactImage
 };

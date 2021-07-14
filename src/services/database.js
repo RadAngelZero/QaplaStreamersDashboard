@@ -426,6 +426,15 @@ export async function saveUserStreamReward(uid, type, streamerName, streamId, am
 }
 
 /**
+ * Returns all the redemptions made by the user in a given stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream identifier
+ */
+export async function getStreamUserRedemptions(uid, streamId) {
+    return await userStreamsRewardsRef.child(uid).orderByChild('streamId').equalTo(streamId).once('value');
+}
+
+/**
  * Save redemption of user that are not registered to the stream
  * @param {string} uid User identifier
  * @param {string} photoUrl Photo of the user

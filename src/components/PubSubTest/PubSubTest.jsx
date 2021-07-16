@@ -33,7 +33,6 @@ import {
     markAsClosedStreamerTwitchCustomReward,
     removeActiveCustomRewardFromList,
     getOpenCustomRewards,
-    getCustomRewardRedemptions,
     setStreamInRedemptionsLists,
     addListToStreamRedemptionList,
     getStreamUserRedemptions
@@ -180,8 +179,8 @@ const PubSubTest = ({ user }) => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
             let rewardsIdsObject = {};
-            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'XQ Qapla', 500, true, handleTwitchSignIn, streamId);
-            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qoins Qapla', 500, false, handleTwitchSignIn, streamId, true, 75);
+            const expReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'expReward', 'XQ Qapla', 1, true, handleTwitchSignIn, streamId);
+            const qoinsReward = await createCustomReward(user.uid, user.id, user.twitchAccessToken, user.refreshToken, 'qoinsReward', 'Qoins Qapla', 1, false, handleTwitchSignIn, streamId);
 
             if (!expReward || !qoinsReward) {
                 return await handleDuplicatedCustomReward();
@@ -287,7 +286,9 @@ const PubSubTest = ({ user }) => {
             const redemption = expRedemptions[i];
             const qaplaUser = await getUserByTwitchId(redemption.user_id);
             if (qaplaUser) {
+                console.log(qaplaUser.id);
                 const userRedemptionsOnDatabase = await getStreamUserRedemptions(qaplaUser.id, streamIdToAssignRewards);
+                console.log(userRedemptionsOnDatabase.val());
                 usersPrizes[redemption.user_id] = {
                     twitchUserName: redemption.user_name,
                     redemptionId: redemption.id,
@@ -324,6 +325,16 @@ const PubSubTest = ({ user }) => {
                 giveStreamExperienceForRewardRedeemed(twitchUser.uid, twitchUser.qaplaLevel, twitchUser.userName, expToGive);
                 addInfoToEventParticipants(streamIdToAssignRewards, twitchUser.uid, 'xqRedeemed', expToGive);
                 saveUserStreamReward(twitchUser.uid, XQ, user.displayName, streamIdToAssignRewards, expToGive);
+
+                const userHasRedeemedQoins = twitchUser.redemptions ? Object.keys(twitchUser.redemptions).some((redemptionId) => twitchUser.redemptions[redemptionId].type === QOINS) : false;
+
+                if (userHasRedeemedQoins) {
+                    let qoinsToGive = 5;
+
+                    addQoinsToUser(twitchUser.uid, qoinsToGive);
+                    addInfoToEventParticipants(streamIdToAssignRewards, twitchUser.uid, 'qoinsRedeemed', qoinsToGive * 2);
+                    saveUserStreamReward(twitchUser.uid, QOINS, user.displayName, streamIdToAssignRewards, qoinsToGive);
+                }
             }
         }
 
@@ -333,7 +344,9 @@ const PubSubTest = ({ user }) => {
             const redemption = qoinsRedemptions[i];
             const qaplaUser = await getUserByTwitchId(redemption.user_id);
             if (qaplaUser) {
+                console.log(qaplaUser.id);
                 const userRedemptionsOnDatabase = await getStreamUserRedemptions(qaplaUser.id, streamIdToAssignRewards);
+                console.log(userRedemptionsOnDatabase.val());
                 usersPrizes[redemption.user_id] = {
                     twitchUserName: redemption.user_name,
                     redemptionId: redemption.id,
@@ -368,9 +381,10 @@ const PubSubTest = ({ user }) => {
 
                 let qoinsToGive = 5;
 
-                const userHasRedeemedExperience = Object.keys(twitchUser.redemptions).some((redemptionId) => twitchUser.redemptions[redemptionId].type === XQ);;
+                const userHasRedeemedExperience = twitchUser.redemptions ? Object.keys(twitchUser.redemptions).some((redemptionId) => twitchUser.redemptions[redemptionId].type === XQ) : false;
+
                 // If the user has redeemed both XQ and Qoins rewards
-                if (userHasRedeemedExperience.exists() && Object.keys(userHasRedeemedExperience.val()).length === 2) {
+                if (userHasRedeemedExperience) {
                     // Give him 10 qoins instead of 5
                     qoinsToGive = 10;
                 }

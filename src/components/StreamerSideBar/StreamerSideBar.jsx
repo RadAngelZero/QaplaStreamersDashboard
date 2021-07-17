@@ -27,11 +27,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StyledMenu = withStyles({
-    paper: {
-        backgroundColor: '#141833',
-    },
+  paper: {
+    backgroundColor: '#141833',
+  },
 })((props) => (
-    <Menu {...props} />
+  <Menu {...props} />
 ));
 
 const StyledMenuItem = withStyles((theme) => ({
@@ -46,7 +46,7 @@ const StreamerSideBar = ({ user }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  
+
   const closeSession = () => {
     signOut();
     history.push('/signin');
@@ -56,6 +56,8 @@ const StreamerSideBar = ({ user }) => {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  console.log(history)
 
   const drawer = (
     <Box display={'flex'} style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap' }}>
@@ -102,28 +104,32 @@ const StreamerSideBar = ({ user }) => {
         </Drawer>
       </Hidden>
       <Box position='absolute'>
-        <Hidden mdUp>
-          <IconButton
-            onClick={handleDrawerToggle}
-            style={{ marginTop: '40%', marginLeft: '30%' }}
-          >
-            <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
-          </IconButton>
-          <Drawer
-            variant='temporary'
-            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            classes={{
-              paper: classes.drawerClose,
-            }}
-            ModalProps={{
-              keepMounted: true,
-            }}
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
+        {history.location.pathname === '/create' ?
+          <></>
+          :
+          <Hidden mdUp>
+            <IconButton
+              onClick={handleDrawerToggle}
+              style={{ marginTop: '40%', marginLeft: '30%' }}
+            >
+              <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
+            </IconButton>
+            <Drawer
+              variant='temporary'
+              anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              classes={{
+                paper: classes.drawerClose,
+              }}
+              ModalProps={{
+                keepMounted: true,
+              }}
+            >
+              {drawer}
+            </Drawer>
+          </Hidden>
+        }
       </Box>
     </Box>
   );

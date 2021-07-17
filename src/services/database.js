@@ -16,6 +16,7 @@ const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
+const streamersDonationsRef = database.ref('/StreamersDonations');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -71,6 +72,20 @@ export async function createStreamerProfile(uid, userData, inviteCode) {
  */
 export async function updateStreamerProfile(uid, userData) {
     userStreamersRef.child(uid).update(userData);
+}
+
+/**
+ * Gets the uid of the streamer using theit twitchId
+ * @param {string} twitchId Twitch id of the streamer
+ */
+export async function getStreamerUidWithTwitchId(twitchId) {
+    const streamerSnapshot = await userStreamersRef.orderByChild('id').equalTo(twitchId).once('value');
+    let uid = '';
+    streamerSnapshot.forEach((streamer) => {
+        uid = streamer.key;
+    });
+
+    return uid;
 }
 
 /**
@@ -236,6 +251,11 @@ export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, ho
         hour,
         timestamp
     });
+
+    const lastTimestamp = await userStreamersRef.child(uid).child('lastStreamTs').once('value');
+    if (!lastTimestamp.exists() || (lastTimestamp.exists() && lastTimestamp.val() < timestamp)) {
+        userStreamersRef.child(uid).update({ lastStreamTs: timestamp });
+    }
 
     return await streamersEventsDataRef.child(uid).child(streamId).update({
         date: dateUTC,
@@ -414,6 +434,15 @@ export async function saveUserStreamReward(uid, type, streamerName, streamId, am
 }
 
 /**
+ * Returns all the redemptions made by the user in a given stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream identifier
+ */
+export async function getStreamUserRedemptions(uid, streamId) {
+    return await userStreamsRewardsRef.child(uid).orderByChild('streamId').equalTo(streamId).once('value');
+}
+
+/**
  * Save redemption of user that are not registered to the stream
  * @param {string} uid User identifier
  * @param {string} photoUrl Photo of the user
@@ -439,4 +468,39 @@ export async function setStreamInRedemptionsLists(streamId) {
 
 export async function addListToStreamRedemptionList(streamId, type, list) {
     await redemptionsListsRef.child(streamId).update({ [type]: list });
+}
+
+/**
+ * Listener to check if the streamer is online
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Handler of the results
+ */
+export function listenToUserStreamingStatus(streamerUid, callback) {
+    userStreamersRef.child(streamerUid).child('isStreaming').on('value', callback);
+}
+
+/**
+ * Listener to get every unread streamer cheer added to the StreamersDonations
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Handler of the results
+ */
+export function listenForUnreadStreamerCheers(streamerUid, callback) {
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback);
+}
+
+/**
+ * Remove listener from the Streamers Donation node
+ * @param {string} streamerUid Uid of the streamer
+ */
+export function removeListenerForUnreadStreamerCheers(streamerUid) {
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('child_added');
+}
+
+/**
+ * Mark as read the given donation
+ * @param {string} streamerUid Uid of the streamer who receive the donation
+ * @param {string} donationId Id of the donation
+ */
+export async function markDonationAsRead(streamerUid, donationId) {
+    return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
 }

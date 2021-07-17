@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden } from '@material-ui/core';
+import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip, withStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 
 import styles from './StreamerProfile.module.css';
@@ -15,10 +15,32 @@ import {
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE
 } from '../../utilities/Constants';
+import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
+import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
+import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
+
+const BalanceInfoTooltip = withStyles(() => ({
+    tooltip: {
+        fontSize: 16,
+        color: '#FFF',
+        backgroundColor: '#3B4BF9',
+        fontWeight: 500,
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingRight: 24,
+        paddingLeft: 24,
+        borderRadius: 16,
+        maxWidth: 200
+    },
+    arrow: {
+        color: '#3B4BF9'
+    }
+}))(Tooltip);
 
 const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
+    const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
     const [streams, setStreams] = useState({});
 
     useEffect(() => {
@@ -92,28 +114,89 @@ const StreamerProfile = ({ user, games }) => {
                     </Box>
                     <Grid container>
                         <Grid item xs={12}>
-                            <Button variant='contained'
-                                className={styles.twitchButton}
-                                onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
-                                startIcon={<TwitchIcon />}>
-                                {user.displayName}
-                            </Button>
-                        </Grid>
-                        <Grid item xs={12}>
                             <Grid container>
-                                <Grid item xs={3}>
-                                    <h1 className={styles.title}>My Streams</h1>
+                                <Grid xs={8}>
+                                    <Grid item xs={12}>
+                                        <Button variant='contained'
+                                            className={styles.twitchButton}
+                                            onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
+                                            startIcon={<TwitchIcon />}>
+                                            {user.displayName}
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Grid container>
+                                            <Grid item xs={3}>
+                                                <h1 className={styles.title}>My Streams</h1>
+                                            </Grid>
+                                            <Grid item xs={9} style={{ marginTop: '6rem' }}>
+                                                <StreamerSelect
+                                                    value={streamType}
+                                                    onChange={changestreamType}
+                                                    Icon={ArrowIcon}>
+                                                    <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
+                                                    <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
+                                                    <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
+                                                </StreamerSelect>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={9} style={{ marginTop: '6rem' }}>
-                                    <StreamerSelect
-                                        value={streamType}
-                                        onChange={changestreamType}
-                                        Icon={ArrowIcon}>
-                                        <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
-                                        <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
-                                        <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
-                                    </StreamerSelect>
+                                <Grid xs={3} className={styles.displayFlex} alignItems='center'>
+                                    <div className={styles.balanceInfoContainer}>
+                                        <div className={styles.cheersTitleContainer}>
+                                            <p className={styles.cheersText}>
+                                                Current Cheers Balance
+                                            </p>
+                                        </div>
+                                        <Grid container className={styles.balanceContainer}>
+                                            {!user.premium &&
+                                                <div className={styles.getPremiumBannerContainer}>
+                                                    <p className={styles.getPremiumBannerText}>
+                                                        Get Bits & Subs for free
+                                                    </p>
+                                                </div>
+                                            }
+                                            <Grid xs={12}>
+                                                <div className={user.premium ? '' : styles.blur}>
+                                                    <div className={styles.balanceCurrencyContainer}>
+                                                        <p className={styles.balanceCurrencyValue}>
+                                                            {user.bitsBalance || 0}
+                                                        </p>
+                                                        <BitsIcon />
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid xs={12}>
+                                                <div className={user.premium ? '' : styles.blur}>
+                                                    <div className={styles.balanceCurrencyContainer}>
+                                                        <p className={styles.balanceCurrencyValue}>
+                                                            {user.qoinsBalance || 0}
+                                                        </p>
+                                                        <QoinsIcon />
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                        </Grid>
+                                        <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
+                                            <BalanceInfoTooltip arrow
+                                                onClose={() => setOpenBalanceTooltip(false)}
+                                                open={openBalanceTooltip}
+                                                disableFocusListener
+                                                disableHoverListener
+                                                disableTouchListener
+                                                title={<div><p>{'Keep track of your Qoins<>Bits balance.'}</p> <p> Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period. </p></div>}>
+                                                <IconButton onClick={() => setOpenBalanceTooltip(!openBalanceTooltip)} size='small'>
+                                                    <InfoSquare />
+                                                </IconButton>
+                                            </BalanceInfoTooltip>
+                                            <p className={styles.learnMoreText}>
+                                                Learn More
+                                            </p>
+                                        </div>
+                                    </div>
                                 </Grid>
+                                <Grid xs={1} />
                             </Grid>
                         </Grid>
                         <Grid item xs={12}>

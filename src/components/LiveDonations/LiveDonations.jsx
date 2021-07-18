@@ -45,6 +45,7 @@ const LiveDonations = () => {
                     }, 1000);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
+                    setDonationQueue([]);
                 }
             });
         }
@@ -81,10 +82,7 @@ const LiveDonations = () => {
 
 const DonationHandler = (donationToShow) => {
     const donation = donationToShow.donationToShow;
-    useEffect(() => {
-        console.log(donation)
-        console.log(donation.userName)
-    })
+
     return (
         <div style={{ flex: 1, fontFamily: 'Montserrat' }}>
             <div style={{
@@ -103,7 +101,7 @@ const DonationHandler = (donationToShow) => {
             </div>
             <div style={{ flex: 1, marginTop: '110px', backgroundColor: '#0D1021', borderRadius: 40, height: '80px' }}>
                 <p style={{ color: '#fff', textAlign: 'center', fontSize: 20, paddingTop: '5px' }}>
-                    <b style={{ color: '#3DF9DF' }}>{donation.userName}</b><br />ha donado<br /><b style={{ color: '#3DF9DF' }}>{donation.amountQoins}</b> Qoins
+                    <b style={{ color: '#3DF9DF' }}>{donation.twitchUserName}</b><br />ha donado<br /><b style={{ color: '#3DF9DF' }}>{donation.amountQoins}</b> Qoins
                 </p>
                 {donation.message !== '' &&
                     <div style={{ flex: 1 }}>

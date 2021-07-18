@@ -113,7 +113,7 @@ const DonationHandler = (donationToShow) => {
                             </p>
                         </div>
                         <div style={{ flex: 1, marginTop: '10px', backgroundColor: '#0D1021', borderRadius: 40, width: '300px', height: 'auto', paddingTop: '1px', paddingBottom: '1px', marginLeft: '50px' }}>
-                            <p style={{ color: '#fff', textAlign: 'center', fontSize: 18 }}>
+                            <p style={{ color: '#fff', textAlign: 'center', fontSize: 18, maxWidth: '300px' }}>
                                 {donation.message}
                             </p>
                         </div>

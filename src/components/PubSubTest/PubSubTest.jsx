@@ -122,21 +122,6 @@ const PubSubTest = ({ user }) => {
             }
         }
 
-        async function checkIfEventMustBeClosed() {
-            if (status === 'close' && streamId && user && user.customRewards && user.customRewards[streamId] && !user.customRewards[streamId].closedStream) {
-                // First we need to connect to the event
-                if (!rewardsAreCreated() && !connectedToTwitch) {
-                    listenForRewards();
-                }
-
-                // Then when rewards are created (one render after the rewards are loaded) we close the event
-                if (rewardsAreCreated() && connectedToTwitch && !verifyngRedemptions) {
-                    setVerifyngRedemptions(true);
-                    closeStream();
-                }
-            }
-        }
-
         listenCustomRewardRedemptions(streamId, (users) => {
             if (users.exists()) {
                 let usersToSave = {};
@@ -158,14 +143,8 @@ const PubSubTest = ({ user }) => {
             setOldUser(user);
         }
 
-        if (!rewardsAreCreated() && !connectedToTwitch && user && streamId && (status === 'start' || status === 'resume')) {
-            // listenForRewards is able to identify if we need to reconect or we are trying to start
-            listenForRewards();
-        }
-
         checkIfStreamIsAlreadyOpen();
         getTimestamp();
-        checkIfEventMustBeClosed();
     }, [streamId, connectedToTwitch, user, rewardsIds, oldUser, streamTimestamp]);
 
     const listenForRewards = async () => {

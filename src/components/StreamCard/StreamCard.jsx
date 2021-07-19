@@ -169,21 +169,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
 
     const startStream = (e) => {
         e.stopPropagation();
-        if (window.confirm('¿Estas seguro que deseas iniciar el stream?')) {
-            history.push(`/stream/${streamId}/start`);
-        }
+        history.push(`/stream/${streamId}`);
     }
 
     const resumeStream = (e) => {
         e.stopPropagation();
-        history.push(`/stream/${streamId}/resume`);
-    }
-
-    const closeStream = (e) => {
-        e.stopPropagation();
-        if (window.confirm('¿Estas seguro que deseas cerrar este evento? Si lo cierras, ya no podras volver a abrirlo.')) {
-            history.push(`/stream/${streamId}/close`);
-        }
+        history.push(`/stream/${streamId}`);
     }
 
     return (
@@ -228,14 +219,9 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                             </Button>
                             :
                             closedStream === false &&
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
-                                    Reanudar
-                                </Button>
-                                <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={closeStream}>
-                                    Cerrar
-                                </Button>
-                            </div>
+                            <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
+                                Reanudar
+                            </Button>
                         }
                         </>
                         :

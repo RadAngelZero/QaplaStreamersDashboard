@@ -87,7 +87,7 @@ const TableCellStyled = withStyles(() => ({
 }))(TableCell);
 
 const PubSubTest = ({ user }) => {
-    const { streamId, status } = useParams();
+    const { streamId } = useParams();
     const classes = useStyles();
     const [connectedToTwitch, setConnectedToTwitch] = useState(false);
     const [verifyngRedemptions, setVerifyngRedemptions] = useState(false);
@@ -159,9 +159,7 @@ const PubSubTest = ({ user }) => {
                 connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, streamTimestamp, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
-                if (status !== 'close') {
-                    alert('Reconectado con exito');
-                }
+                alert('Reconectado con exito');
             } else {
                 alert('Este evento ya fue cerrado, si es necesario reabrirlo contacta con soporte tecnico');
             }

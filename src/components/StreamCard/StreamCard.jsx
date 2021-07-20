@@ -26,6 +26,25 @@ const useStyles = makeStyles(() => ({
         boxShadow: '0 6px 15px 0 rgba(0,0,0,0.31)',
         height: '100%'
     },
+    relativeContainer: {
+        position: 'relative'
+    },
+    hourContainer: {
+        position: 'absolute',
+        zIndex: 9999,
+        right: '1rem',
+        top: '1rem',
+        background: 'rgba(27, 29, 33, .7)',
+        borderRadius: '.5rem'
+    },
+    hourText: {
+        color: '#FFF',
+        marginTop: '.25rem',
+        marginBottom: '.25rem',
+        marginLeft: '.5rem',
+        marginRight: '.5rem',
+        fontWeight: '700'
+    },
     eventImage: {
         objectFit: 'cover',
         backgroundSize: 'cover',
@@ -179,9 +198,9 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
 
     return (
         <Card className={classes.eventCard} onClick={onClickCard}>
-            <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', zIndex: 9999, right: 16, top: 16, background: 'rgba(27, 29, 33, .7)', borderRadius: 6 }}>
-                    <p style={{ color: '#FFF', marginTop: 4, marginBottom: 4, marginLeft: 9, marginRight: 9, fontWeight: '700' }}>
+            <div className={classes.relativeContainer}>
+                <div className={classes.hourContainer}>
+                    <p className={classes.hourText}>
                         {hour}
                     </p>
                 </div>

@@ -1,7 +1,6 @@
 import {
     giveStreamExperienceForRewardRedeemed,
     updateStreamerProfile,
-    saveStreamerTwitchCustomReward,
     saveCustomRewardRedemption,
     getUserByTwitchId,
     isUserRegisteredToStream,
@@ -77,17 +76,12 @@ export function closeConnection() {
  * @param {object} redemptionData Redemption twitch object
  */
 export async function handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData) {
-    console.log(redemptionData);
     if (redemptionData.reward.id === rewardsIds.expReward) {
-        console.log('Exp Qapla Custom reward redeemed', redemptionData.user.id);
         const user = await getUserByTwitchId(redemptionData.user.id);
         if (user) {
-            console.log('Redeemed by qapla user:', user.id);
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                console.log(`User ${user.id} is subscribed to stream`);
                 await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
-                console.log('Exp Qapla Custom reward redeemed', redemptionData.user.id);
 
                 const expToGive = 15;
                 giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
@@ -103,19 +97,15 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                     saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
                 }
             } else {
-                console.log(`User ${user.id} is NOT subscribed to stream`);
                 await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
             }
         }
     } else if (redemptionData.reward.id === rewardsIds.qoinsReward) {
         const user = await getUserByTwitchId(redemptionData.user.id);
         if (user) {
-            console.log('Redeemed by qapla user:', user.id);
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                console.log(`User ${user.id} is subscribed to stream`);
                 await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
-                console.log('Qapla Qoins Custom reward redeemed', redemptionData.user.id);
 
                 const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
 
@@ -196,7 +186,6 @@ function nonce(length) {
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
  * @param {string} refreshToken Twitch refresh token
- * @param {string} rewardName String name to identify on the database
  * @param {string} title Title of the reward
  * @param {number} cost Cost for redeem the reward
  * @param {boolean} enabled true if the reward must be enable when created
@@ -205,7 +194,7 @@ function nonce(length) {
  * @param {boolean} isMaxPerStreamEnabled Whether a maximum per stream is enabled
  * @param {number} maxPerStream The maximum number per stream if enabled
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, rewardName, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled = false, maxPerStream) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled = false, maxPerStream) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
@@ -235,7 +224,6 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
 
         const response = await res.json();
         if (response.data && response.data[0]) {
-            saveStreamerTwitchCustomReward(uid, rewardName, response.data[0].id, response.data[0].title, response.data[0].cost, streamId);
 
             return response.data[0];
         } else if (response.error) {

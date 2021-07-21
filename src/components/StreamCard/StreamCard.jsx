@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton } from '@material-ui/core';
+import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton, Button } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
@@ -15,7 +15,8 @@ import {
     getStreamParticipantsNumber,
     getPastStreamParticipantsNumber,
     getStreamTitle,
-    getPastStreamTitle
+    getPastStreamTitle,
+    getClosedStream
 } from '../../services/database';
 
 const useStyles = makeStyles(() => ({
@@ -25,6 +26,25 @@ const useStyles = makeStyles(() => ({
         boxShadow: '0 6px 15px 0 rgba(0,0,0,0.31)',
         height: '100%'
     },
+    relativeContainer: {
+        position: 'relative'
+    },
+    hourContainer: {
+        position: 'absolute',
+        zIndex: 9999,
+        right: '1rem',
+        top: '1rem',
+        background: 'rgba(27, 29, 33, .7)',
+        borderRadius: '.5rem'
+    },
+    hourText: {
+        color: '#FFF',
+        marginTop: '.25rem',
+        marginBottom: '.25rem',
+        marginLeft: '.5rem',
+        marginRight: '.5rem',
+        fontWeight: '700'
+    },
     eventImage: {
         objectFit: 'cover',
         backgroundSize: 'cover',
@@ -32,8 +52,8 @@ const useStyles = makeStyles(() => ({
         backgroundPosition: 'center'
     },
     eventCardContent: {
-        padding: '1.5rem',
-        paddingTop: '.5rem',
+        paddingLeft: '.7rem',
+        paddingRight: '.7rem',
         justifyContent: 'space-between'
     },
     eventCardTitle: {
@@ -65,6 +85,10 @@ const useStyles = makeStyles(() => ({
         fontSize: '13px',
         lineHeight: '20px',
         marginLeft: '.625rem'
+    },
+    streamButton: {
+        backgroundColor: '#6C5DD3 !important',
+        color: '#FFF'
     }
 }));
 
@@ -82,11 +106,12 @@ const StyledMenuItem = withStyles(() => ({
     },
   }))(MenuItem);
 
-const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
+const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
     const [title, setTitle] = useState({ en: '', es: '' });
+    const [closedStream, setClosedStream] = useState(null);
     const classes = useStyles();
 
     useEffect(() => {
@@ -116,8 +141,18 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
             }
         }
 
+        async function getStreamClosedStatus() {
+            const closedStream = await getClosedStream(user.uid, streamId);
+            if (closedStream.exists()) {
+                setClosedStream(closedStream.val());
+            } else {
+                setClosedStream(null);
+            }
+        }
+
         getParticipantsNumber();
-    }, [game, games, streamId, streamType, user]);
+        getStreamClosedStatus();
+    }, [game, games, streamId, streamType, user, closedStream]);
 
     const onOptionsIconClick = (e) => {
         e.stopPropagation();
@@ -151,9 +186,24 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
         }
     }
 
+    const startStream = (e) => {
+        e.stopPropagation();
+        history.push(`/stream/${streamId}`);
+    }
+
+    const resumeStream = (e) => {
+        e.stopPropagation();
+        history.push(`/stream/${streamId}`);
+    }
+
     return (
         <Card className={classes.eventCard} onClick={onClickCard}>
-            <div style={{ overflow: 'hidden' }}>
+            <div className={classes.relativeContainer}>
+                <div className={classes.hourContainer}>
+                    <p className={classes.hourText}>
+                        {hour}
+                    </p>
+                </div>
                 <img
                     alt='Game'
                     src={streamsPlaceholderImages[game]}
@@ -161,15 +211,17 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                     height='160'
                     className={classes.eventImage} />
             </div>
-            <CardContent className={classes.eventCardContent}>
-                <p className={classes.eventCardTitle}>
-                    {title && title['en'] ? title['en'] : ''}
-                </p>
-                <div className={classes.rowContainer}>
-                    <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />
-                    <p className={classes.participantsNumber} style={{ color: participantsNumber !== null ? '#808191' : 'transparent' }}>
-                        {participantsNumber} participants
+            <CardContent>
+                <div className={classes.eventCardContent}>
+                    <p className={classes.eventCardTitle}>
+                        {title && title['en'] ? title['en'] : ''}
                     </p>
+                    <div className={classes.rowContainer}>
+                        <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />
+                        <p className={classes.participantsNumber} style={{ color: participantsNumber !== null ? '#808191' : 'transparent' }}>
+                            {participantsNumber} participants
+                        </p>
+                    </div>
                 </div>
                 <div className={classes.dateContainer}>
                     <div className={classes.rowContainer}>
@@ -178,9 +230,24 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, onClick, en
                             {date}
                         </p>
                     </div>
-                    <IconButton size='small' disabled={!enableOptionsIcon} onClick={onOptionsIconClick}>
-                        <OptionsIcon />
-                    </IconButton>
+                    {streamType === SCEHDULED_EVENT_TYPE ?
+                        <>
+                            {closedStream === null ?
+                            <Button size='medium' className={classes.streamButton} onClick={startStream}>
+                                Iniciar
+                            </Button>
+                            :
+                            closedStream === false &&
+                            <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
+                                Reanudar
+                            </Button>
+                        }
+                        </>
+                        :
+                        <IconButton size='small' disabled={!enableOptionsIcon} onClick={onOptionsIconClick}>
+                            <OptionsIcon />
+                        </IconButton>
+                    }
                     <StyledMenu
                         anchorEl={anchorEl}
                         open={Boolean(anchorEl)}

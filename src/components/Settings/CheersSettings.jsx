@@ -6,36 +6,60 @@ import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import Rocket from './../../assets/RocketLeague.jpg';
 
 const useStyles = makeStyles(() =>({
+    instructionsMargin: {
+        marginTop: 50
+    },
+    instructionTitle: {
+        fontWeight: '600',
+        fontSize: 18,
+        color: '#FFF'
+    },
+    instructionDescription: {
+        marginTop: 24,
+        fontSize: 16,
+        color: '#FFF'
+    },
     link: {
         color: '#6C5DD3',
         fontWeight: '500',
         fontSize: 18
+    },
+    container: {
+        marginTop: 60,
+        marginRight: 24
+    },
+    cursorPointer: {
+        cursor: 'pointer'
     }
 }));
 
-const InstructionSection = ({ title, description, mediaContainerComponent = 'img', src }) => (
-    <div style={{ marginTop: 50 }}>
-        <p style={{ fontWeight: '600', fontSize: 18, color: '#FFF' }}>
-            {title}
-        </p>
-        <p style={{ marginTop: 24, fontSize: 16, color: '#FFF' }}>
-            {description}
-        </p>
-        <Grid container style={{ marginTop: 55 }}>
-            <Grid xs={12} sm={8} md={6}>
-                <Card>
-                    <CardMedia component={mediaContainerComponent}
-                        width='480'
-                        height='270'
-                        src={src}
-                        frameborder='0'
-                        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                        allowfullscreen />
-                </Card>
+const InstructionSection = ({ title, description, mediaContainerComponent = 'img', src }) => {
+    const classes = useStyles();
+
+    return (
+        <div className={classes.instructionsMargin}>
+            <p className={classes.instructionTitle}>
+                {title}
+            </p>
+            <p className={classes.instructionDescription}>
+                {description}
+            </p>
+            <Grid container className={classes.instructionsMargin}>
+                <Grid xs={12} sm={8} md={6}>
+                    <Card>
+                        <CardMedia component={mediaContainerComponent}
+                            width='480'
+                            height='270'
+                            src={src}
+                            frameborder='0'
+                            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                            allowfullscreen />
+                    </Card>
+                </Grid>
             </Grid>
-        </Grid>
-    </div>
-);
+        </div>
+    );
+};
 
 const CheersSettings = ({ twitchId }) => {
     const classes = useStyles();
@@ -51,19 +75,19 @@ const CheersSettings = ({ twitchId }) => {
     }
 
     return (
-        <div style={{ marginTop: 60, marginRight: 24 }}>
-            <p style={{ fontWeight: '500', fontSize: 18, color: '#FFF' }}>
+        <div className={classes.container}>
+            <p className={classes.instructionTitle}>
                 Recibe los mensajes de tu comunidad
             </p>
-            <p style={{ marginTop: 24, fontSize: 16, color: '#FFF' }}>
+            <p className={classes.instructionDescription}>
                 Muestra los mensajes de los cheers que te envía tu comunidad en tu transmisiones agregando este link a tu OBS.
             </p>
-            <Grid container style={{ marginTop: 50 }}>
+            <Grid container className={classes.instructionsMargin}>
                 <Grid sm={6} xs={12}>
                     <StreamerTextInput
                         Icon={
                             <Tooltip placement='top' open={openTooltip} title='Copiado'>
-                                <CopyIcon style={{ cursor: 'pointer' }} onClick={copyCheersURL} />
+                                <CopyIcon className={classes.cursorPointer} onClick={copyCheersURL} />
                             </Tooltip>
                         }
                         textInputClassName={classes.link}
@@ -81,7 +105,7 @@ const CheersSettings = ({ twitchId }) => {
             <InstructionSection title='2. Abre tu setup en tu OBS'
                 description='Ve a tu OBS (StreamLabs, OBS, Stream Elements, etc.) y abre el setup con el que normalmente transmites.'
                 src={Rocket} />
-            <div style={{ marginBottom: 50 }} />
+            <div className={classes.instructionsMargin} />
         </div>
     );
 }

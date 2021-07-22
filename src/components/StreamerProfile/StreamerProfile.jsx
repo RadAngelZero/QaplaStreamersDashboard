@@ -63,7 +63,11 @@ const StreamerProfile = ({ user, games }) => {
         loadStreams();
     }, [streamType, user, history]);
 
-    const createStream = () => history.push('/create');
+    const createStream = () => {
+        if (user.premium) {
+            history.push('/create');
+        }
+    }
 
     const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType }});
 

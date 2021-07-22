@@ -1,5 +1,5 @@
-import React, { useState, useReducer } from 'react';
-import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails, Hidden } from '@material-ui/core';
+import React, { useState, useReducer, useEffect } from 'react';
+import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import DayJsUtils from '@date-io/dayjs';
@@ -104,6 +104,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const NewStream = ({ user, games }) => {
+    useEffect(() => {
+        if (user && !user.premium) {
+            history.push('/profile');
+        }
+    }, [user]);
 
     const userLang = navigator.language || navigator.userLanguage;
 

@@ -121,6 +121,14 @@ export async function getOpenCustomRewards(uid) {
 }
 
 /**
+ * Find all the "open" stream rewards (rewards with their closedStream flag marked as false)
+ * @param {string} uid User identifier
+ */
+export async function getClosedStream(uid, streamId) {
+    return await userStreamersRef.child(uid).child('customRewards').child(streamId).child('closedStream').once('value');
+}
+
+/**
  * Remove a custom reward created from the streamer profile
  * @param {string} uid User identifier
  * @param {string} rewardId New custom reward identifier
@@ -423,6 +431,15 @@ export function addQoinsToUser(uid, qoinsToAdd) {
 export async function saveUserStreamReward(uid, type, streamerName, streamId, amount) {
     const date = new Date();
     return await userStreamsRewardsRef.child(uid).push({ type, streamerName, streamId, amount, timestamp: date.getTime() });
+}
+
+/**
+ * Returns all the redemptions made by the user in a given stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream identifier
+ */
+export async function getStreamUserRedemptions(uid, streamId) {
+    return await userStreamsRewardsRef.child(uid).orderByChild('streamId').equalTo(streamId).once('value');
 }
 
 /**

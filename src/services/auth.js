@@ -1,6 +1,7 @@
 import { auth } from './firebase';
 import { createUserWithTwitch } from './functions';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, TWITCH_REDIRECT_URI } from '../utilities/Constants';
+import { getStreamerUidWithTwitchId } from './database';
 
 /**
  * Listens for changes on the user authentication status
@@ -75,7 +76,17 @@ async function createTwitchUser(code) {
         const resultData = await result.json();
         let user = await getTwitchUserData(resultData.access_token);
         const twitchId = user.id;
-        user.id = `${user.id}-${user.display_name}`;
+
+        const streamerUid = await getStreamerUidWithTwitchId(twitchId);
+
+        // If a registered user has the given twitchId then we save on the object this uid
+        if (streamerUid) {
+            user.id = streamerUid;
+        } else {
+            // Otherwise we create a new uid for the new user
+            user.id = `${user.id}-${user.display_name}`;
+        }
+
         const userToken = (await createUserWithTwitch(user.id, user.display_name, user.login, user.profile_image_url, user.email)).data;
         const userResult = {
             firebaseAuthUser: await auth.signInWithCustomToken(userToken),

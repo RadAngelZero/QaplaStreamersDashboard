@@ -40,8 +40,8 @@ const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = fa
                 multiline={multiline}
                 type={type}
                 endAdornment={Icon ?
-                    <InputAdornment position='end' style={{ marginRight: 16 }}>
-                        <Icon />
+                    <InputAdornment position='end'>
+                        {Icon}
                     </InputAdornment>
                     :
                     null

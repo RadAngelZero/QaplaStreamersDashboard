@@ -20,6 +20,7 @@ import EventSent from './components/EventSent/EventSent';
 import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent';
 import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
+import Settings from './components/Settings/Settings';
 
 const Router = () => {
     const [games, setGames] = useState({});
@@ -89,6 +90,9 @@ const Router = () => {
                 </Route>
                 <Route exact path='/liveDonations/:streamerId'>
                     <LiveDonations user={user} />
+                </Route>
+                <Route exact path='/settings'>
+                    <Settings user={user} />
                 </Route>
             </Switch>
         </RouterPackage>

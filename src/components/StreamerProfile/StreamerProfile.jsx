@@ -65,7 +65,11 @@ const StreamerProfile = ({ user, games }) => {
         loadStreams();
     }, [streamType, user, history]);
 
-    const createStream = () => history.push('/create');
+    const createStream = () => {
+        if (user.premium) {
+            history.push('/create');
+        }
+    }
 
     const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType }});
 
@@ -80,6 +84,14 @@ const StreamerProfile = ({ user, games }) => {
         const date = new Date(timestamp);
         const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sept', 'Oct', 'Nov', 'Dic'];
         return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    }
+
+    const formatHour = (timestamp) => {
+        const date = new Date(timestamp);
+        const hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+
+        return `${hour}:${minutes}`;
     }
 
     const onRemoveStream = (streamId) => {
@@ -119,13 +131,13 @@ const StreamerProfile = ({ user, games }) => {
                                         </Button>
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <Grid container>
-                                            <Grid item xs={3}>
+                                        <Grid container style={{ marginTop: '6rem' }}>
+                                            <Grid item xs={12} sm={3}>
                                                 <h1 className={styles.title}>
                                                     {t('profile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={9} style={{ marginTop: '6rem' }}>
+                                            <Grid item xs={12} sm={9}>
                                                 <StreamerSelect
                                                     value={streamType}
                                                     onChange={changestreamType}
@@ -138,7 +150,7 @@ const StreamerProfile = ({ user, games }) => {
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                                <Grid xs={3} className={styles.displayFlex} alignItems='center'>
+                                <Grid xs={12} sm={4} className={styles.displayFlex} alignItems='center'>
                                     <div className={styles.balanceInfoContainer}>
                                         <div className={styles.cheersTitleContainer}>
                                             <p className={styles.cheersText}>
@@ -220,6 +232,7 @@ const StreamerProfile = ({ user, games }) => {
                                             game={streams[streamId].game}
                                             games={games}
                                             date={formatDate(streams[streamId].timestamp)}
+                                            hour={formatHour(streams[streamId].timestamp)}
                                             enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
                                             onClick={() => goToStreamDetails(streamId)}
                                             onRemoveStream={onRemoveStream} />

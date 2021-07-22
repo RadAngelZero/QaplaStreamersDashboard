@@ -125,11 +125,11 @@ const StreamerProfile = ({ user, games }) => {
                                         </Button>
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <Grid container>
-                                            <Grid item xs={3}>
+                                        <Grid container style={{ marginTop: '6rem' }}>
+                                            <Grid item xs={12} sm={3}>
                                                 <h1 className={styles.title}>My Streams</h1>
                                             </Grid>
-                                            <Grid item xs={9} style={{ marginTop: '6rem' }}>
+                                            <Grid item xs={12} sm={9}>
                                                 <StreamerSelect
                                                     value={streamType}
                                                     onChange={changestreamType}
@@ -142,7 +142,7 @@ const StreamerProfile = ({ user, games }) => {
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                                <Grid xs={3} className={styles.displayFlex} alignItems='center'>
+                                <Grid xs={12} sm={4} className={styles.displayFlex} alignItems='center'>
                                     <div className={styles.balanceInfoContainer}>
                                         <div className={styles.cheersTitleContainer}>
                                             <p className={styles.cheersText}>

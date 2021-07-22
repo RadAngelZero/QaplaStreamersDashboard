@@ -222,7 +222,6 @@ const PubSubTest = ({ user }) => {
         if (rewardsIdsToDelete.expReward && rewardsIdsToDelete.qoinsReward && streamIdToClose) {
             await markAsClosedStreamerTwitchCustomReward(user.uid, streamIdToClose);
 
-            await finishStream(streamIdToClose, rewardsIdsToDelete);
             return await createReward();
         } else {
             alert('Las recompensas existentes no han podido ser eliminadas, contacta con soporte técnico.');
@@ -261,8 +260,6 @@ const PubSubTest = ({ user }) => {
 
     const closeStream = async () => {
         closeConnection();
-        // Mark as closed the stream on the database
-        await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
 
         finishStream(streamId, rewardsIds);
     }
@@ -282,6 +279,9 @@ const PubSubTest = ({ user }) => {
         for (let i = 0; i < rewardsIdToDeleteArray.length; i++) {
             await deleteReward(rewardsIdToDeleteArray[i]);
         }
+
+        // Mark as closed the stream on the database
+        await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
 
         setRewardsIds({});
 

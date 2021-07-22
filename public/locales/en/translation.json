@@ -1,5 +1,16 @@
-
 {
+    "handleStream": {
+        "connect": "Establish connection with Twitch",
+        "reconnect": "Reconnect to Twitch",
+        "rewardsCreated": "Channel rewards have been created successfully. Keep this window open during your stream to avoid connection failures.",
+        "streamerHasAnOpenStream": "We noticed you have an open stream with active rewards. The stream will be terminated and new channel rewards will be created for the new stream.",
+        "endStream": "End stream",
+        "enableQoinsReward": "Enable Qoins channel rewards",
+        "closeStreamConfirmation": "Are you sure you want to end the stream? If you do, the stream will be no longer available. The remaining Qapla rewards will get distributed to your audience immediately.",
+        "sendingRewards": "Sending rewards, please wait…",
+        "rewardsSent": "Rewards sent! We’ve sent the remaining rewards to your audience successfully, and the channel rewards have been deleted :)",
+        "streamClosed": "This stream has ended, it’s no longer available."
+    },
     "sideBar": {
         "languages": {
             "es": "Spanish",

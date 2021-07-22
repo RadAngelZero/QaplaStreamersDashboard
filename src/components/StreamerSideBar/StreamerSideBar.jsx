@@ -1,8 +1,7 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText } from '@material-ui/core';
+import { makeStyles, useTheme, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import BurguerMenu from '@material-ui/icons/Menu';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { signOut } from './../../services/auth';
 import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';

@@ -1,0 +1,23 @@
+{
+    "handleStream": {
+        "connect": "Conectar a Twitch",
+        "reconnect": "Reconectar a Twitch",
+        "rewardsCreated": "Se han creado las recompensas del canal. Mantén esta ventana abierta durante tu stream para evitar desconexiones.",
+        "streamerHasAnOpenStream": "Aún tienes un stream abierto con recompensas activas. Terminaremos el stream y se crearán nuevas recompensas del canal para continuar.",
+        "endStream": "Terminar stream",
+        "enableQoinsReward": "Habilitar recompensa de Qoins",
+        "closeStreamConfirmation": "¿Estás seguro que deseas cerrar el stream? Si lo cierras, ya no podrás volver a abrirlo. Las recompensas Qapla se repartirán inmediatamente.",
+        "sendingRewards": "Repartiendo recompensas, espera por favor…",
+        "rewardsSent": "¡Se han repartido las recompensas con éxito! Hemos eliminado las recompensas de tu canal correctamente :)",
+        "streamClosed": "Este stream ya fue cerrado."
+    },
+    "sideBar": {
+        "languages": {
+            "es": "Español",
+            "en": "Ingles"
+        }
+    },
+    "profile": {
+        "myStreams": "Mis Streams"
+    }
+}

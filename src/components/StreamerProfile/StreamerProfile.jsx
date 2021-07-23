@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip, withStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -42,6 +43,7 @@ const StreamerProfile = ({ user, games }) => {
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
     const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
     const [streams, setStreams] = useState({});
+    const { t } = useTranslation();
 
     useEffect(() => {
         function setStreamLoaded(streams) {
@@ -63,7 +65,11 @@ const StreamerProfile = ({ user, games }) => {
         loadStreams();
     }, [streamType, user, history]);
 
-    const createStream = () => history.push('/create');
+    const createStream = () => {
+        if (user.premium) {
+            history.push('/create');
+        }
+    }
 
     const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType }});
 
@@ -125,11 +131,13 @@ const StreamerProfile = ({ user, games }) => {
                                         </Button>
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <Grid container>
-                                            <Grid item xs={3}>
-                                                <h1 className={styles.title}>My Streams</h1>
+                                        <Grid container style={{ marginTop: '6rem' }}>
+                                            <Grid item xs={12} sm={3}>
+                                                <h1 className={styles.title}>
+                                                    {t('profile.myStreams')}
+                                                </h1>
                                             </Grid>
-                                            <Grid item xs={9} style={{ marginTop: '6rem' }}>
+                                            <Grid item xs={12} sm={9}>
                                                 <StreamerSelect
                                                     value={streamType}
                                                     onChange={changestreamType}
@@ -142,7 +150,7 @@ const StreamerProfile = ({ user, games }) => {
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                                <Grid xs={3} className={styles.displayFlex} alignItems='center'>
+                                <Grid xs={12} sm={4} className={styles.displayFlex} alignItems='center'>
                                     <div className={styles.balanceInfoContainer}>
                                         <div className={styles.cheersTitleContainer}>
                                             <p className={styles.cheersText}>

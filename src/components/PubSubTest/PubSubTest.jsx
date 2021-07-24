@@ -220,7 +220,7 @@ const PubSubTest = ({ user }) => {
         });
 
         if (rewardsIdsToDelete.expReward && rewardsIdsToDelete.qoinsReward && streamIdToClose) {
-            await markAsClosedStreamerTwitchCustomReward(user.uid, streamIdToClose);
+            await finishStream(streamIdToClose, rewardsIdsToDelete);
 
             return await createReward();
         } else {
@@ -281,7 +281,7 @@ const PubSubTest = ({ user }) => {
         }
 
         // Mark as closed the stream on the database
-        await markAsClosedStreamerTwitchCustomReward(user.uid, streamId);
+        await markAsClosedStreamerTwitchCustomReward(user.uid, streamIdToClose);
 
         setRewardsIds({});
 

@@ -11,7 +11,7 @@
         "rewardsSent": "Rewards sent! We’ve sent the remaining rewards to your audience successfully, and the channel rewards have been deleted :)",
         "streamClosed": "This stream has ended, it’s no longer available."
     },
-    "sideBar": {
+    "LanguageHandler": {
         "languages": {
             "es": "Spanish",
             "en": "English"

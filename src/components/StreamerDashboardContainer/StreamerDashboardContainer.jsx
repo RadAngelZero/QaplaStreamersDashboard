@@ -11,6 +11,7 @@ import { useHistory } from 'react-router-dom';
 
 import styles from './StreamerDashboardContainer.module.css';
 import StreamerSideBar from '../StreamerSideBar/StreamerSideBar';
+import LanguageHandler from '../LanguageHandler/LanguageHandler';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -59,6 +60,7 @@ const StreamerDashboardContainer = ({ children, user }) => {
                     }
                     <div className={classes.content}>
                         {children}
+                        <LanguageHandler />
                     </div>
                 </>
             }

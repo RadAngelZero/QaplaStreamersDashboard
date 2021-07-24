@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerSelect = ({ children, label, Icon, value, onChange }) => {
+const StreamerSelect = ({ children, style, label, Icon, value, onChange }) => {
     const classes = useStyles();
 
     return (
@@ -45,6 +45,7 @@ const StreamerSelect = ({ children, label, Icon, value, onChange }) => {
                 value={value}
                 IconComponent={Icon}
                 classes={{ icon: classes.icon }}
+                style={style}
                 input={<InputBase className={classes.input} />}>
                 {children}
             </NativeSelect>

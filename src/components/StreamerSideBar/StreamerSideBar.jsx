@@ -1,12 +1,11 @@
 import React from 'react';
 import { makeStyles, useTheme, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import BurguerMenu from '@material-ui/icons/Menu';
 
 import { signOut } from './../../services/auth';
 import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';
-import { changeLanguage } from '../../utilities/i18n';
+import LanguageSelect from '../LanguageSelect/LanguageSelect';
 
 const drawerWidth = 240;
 
@@ -44,7 +43,6 @@ const StreamerSideBar = ({ user }) => {
     const classes = useStyles();
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
-	const { t } = useTranslation();
 
     const closeSession = () => {
         if (window.confirm('Are you sure you want to signout?')) {
@@ -56,10 +54,6 @@ const StreamerSideBar = ({ user }) => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-
-	const selectNewLanguage = (language) => {
-		changeLanguage(language);
-	}
 
 	const goToSettings = () => {
         localStorage.setItem('HasVisitedSettings', 'true');
@@ -97,6 +91,11 @@ const StreamerSideBar = ({ user }) => {
             </List>
             <div style={{ flexGrow: 1 }} />
             <List>
+                <Hidden smUp>
+                    <ListItem style={{ marginTop: '.5rem' }}>
+                        <LanguageSelect />
+                    </ListItem>
+                </Hidden>
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={closeSession}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <LogoutIcon height={32} width={32} />

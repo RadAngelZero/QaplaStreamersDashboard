@@ -11,7 +11,7 @@
         "rewardsSent": "¡Se han repartido las recompensas con éxito! Hemos eliminado las recompensas de tu canal correctamente :)",
         "streamClosed": "Este stream ya fue cerrado."
     },
-    "sideBar": {
+    "LanguageHandler": {
         "languages": {
             "es": "Español",
             "en": "Ingles"

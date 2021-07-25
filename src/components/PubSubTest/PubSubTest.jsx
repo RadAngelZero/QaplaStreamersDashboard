@@ -168,10 +168,10 @@ const PubSubTest = ({ user }) => {
             }
         } else {
             alert('Conectando');
-            const reward = await createReward();
+            const rewards = await createReward();
 
-            if (reward) {
-                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], reward.id, streamTimestamp, handleTwitchSignIn);
+            if (rewards) {
+                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, streamTimestamp, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
             } else {

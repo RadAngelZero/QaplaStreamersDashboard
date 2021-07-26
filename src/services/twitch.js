@@ -80,7 +80,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
         if (user) {
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                const userRedemptions = await getStreamUserRedemptions(qaplaUser.id, streamIdToAssignRewards);
+                const userRedemptions = await getStreamUserRedemptions(user.id, streamId);
 
                 /**
                  * In some cases the users are able to redeem a reward twice for example if the streamer close and then reopen
@@ -122,7 +122,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
         if (user) {
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                const userRedemptions = await getStreamUserRedemptions(qaplaUser.id, streamIdToAssignRewards);
+                const userRedemptions = await getStreamUserRedemptions(user.id, streamId);
 
                 /**
                  * In some cases the users are able to redeem a reward twice for example if the streamer close and then reopen

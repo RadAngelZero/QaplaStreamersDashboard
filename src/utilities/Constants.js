@@ -46,6 +46,7 @@ import OverwatchImage from './../assets/Overwatch.jpg';
 import OvercookedImage from './../assets/Overcooked.jpg';
 import DeadCellsImage from './../assets/DeadCells.jpg';
 import GenshinImpactImage from './../assets/GenshinImpact.jpg';
+import AxieInfinityImage from './../assets/AxieInfinity.jpg';
 
 /**
  * Twitch API keys
@@ -119,5 +120,6 @@ export const streamsPlaceholderImages = {
     Overwatch: OverwatchImage,
     Overcooked: OvercookedImage,
     DeadCells: DeadCellsImage,
-    GenshinImpact: GenshinImpactImage
+    GenshinImpact: GenshinImpactImage,
+    AxieInfinity: AxieInfinityImage
 };

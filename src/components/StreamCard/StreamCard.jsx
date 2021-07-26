@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton, Button } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
@@ -113,6 +114,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
     const [title, setTitle] = useState({ en: '', es: '' });
     const [closedStream, setClosedStream] = useState(null);
     const classes = useStyles();
+    const { t } = useTranslation();
 
     useEffect(() => {
         async function getParticipantsNumber() {
@@ -169,15 +171,10 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
 
     const cancelStream = (e) => {
         e.stopPropagation();
-        if (window.confirm('¿Estas seguro que deseas eliminar este stream?')) {
+        if (window.confirm(t('StreamCard.deleteConfirmation'))) {
             cancelStreamRequest(user.uid, streamId);
             onRemoveStream(streamId);
         }
-    }
-
-    const connectToStream = (e, streamId) => {
-        e.preventDefault();
-        history.push(`/stream/${streamId}`);
     }
 
     const onClickCard = () => {
@@ -219,7 +216,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                     <div className={classes.rowContainer}>
                         <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />
                         <p className={classes.participantsNumber} style={{ color: participantsNumber !== null ? '#808191' : 'transparent' }}>
-                            {participantsNumber} participants
+                            {participantsNumber} {t('StreamCard.participants')}
                         </p>
                     </div>
                 </div>
@@ -234,12 +231,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                         <>
                             {closedStream === null ?
                             <Button size='medium' className={classes.streamButton} onClick={startStream}>
-                                Iniciar
+                                {t('StreamCard.start')}
                             </Button>
                             :
                             closedStream === false &&
                             <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
-                                Reanudar
+                                {t('StreamCard.resume')}
                             </Button>
                         }
                         </>
@@ -253,11 +250,10 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                         open={Boolean(anchorEl)}
                         keepMounted
                         onClose={closeMenu}>
-                        {streamType === SCEHDULED_EVENT_TYPE &&
-                            <StyledMenuItem onClick={(e) => connectToStream(e, streamId)}>Iniciar stream</StyledMenuItem>
-                        }
                         {streamType === PENDING_APPROVAL_EVENT_TYPE &&
-                            <StyledMenuItem onClick={cancelStream}>Cancelar</StyledMenuItem>
+                            <StyledMenuItem onClick={cancelStream}>
+                                {t('StreamCard.cancelStreamRequest')}
+                            </StyledMenuItem>
                         }
                     </StyledMenu>
                 </div>

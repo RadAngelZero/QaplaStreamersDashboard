@@ -11,13 +11,63 @@
         "rewardsSent": "¡Se han repartido las recompensas con éxito! Hemos eliminado las recompensas de tu canal correctamente :)",
         "streamClosed": "Este stream ya fue cerrado."
     },
+    "SideBar": {
+        "dashboard": "Dashboard",
+        "settings": "Ajustes",
+        "new": "Nuevo",
+        "signOut": "Cerrar sesión"
+    },
     "LanguageHandler": {
         "languages": {
             "es": "Español",
             "en": "Ingles"
         }
     },
-    "profile": {
-        "myStreams": "Mis Streams"
+    "StreamerProfile": {
+        "myStreams": "Mis Streams",
+        "scheduled": "Programados",
+        "pendingApproval": "Pendientes de aprobación",
+        "pastStreams": "Streams Anteriores",
+        "cheersBalance": "Balance actual de Cheers",
+        "premiumBenefits": "Obten Bits y Subs gratis",
+        "cheersBalanceTooltip": {
+            "title": "Realiza seguimiento de tu balance de Qoins<>Bits.",
+            "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
+        },
+        "learnMore": "Saber Más",
+        "postStream": "Publicar un\nStream"
+    },
+    "StreamCard": {
+        "deleteConfirmation": "¿Estas seguro que deseas eliminar este stream?",
+        "participants": "participantes",
+        "start": "Iniciar",
+        "resume": "Reanudar",
+        "cancelStreamRequest": "Cancelar"
+    },
+    "CheersSettings": {
+        "title": "Recibe mensajes de parte de tu comunidad",
+        "description": "Muestra los mensajes de los cheers que tu comunidad te envia en tus streams agregando este link en tu OBS.",
+        "instruction0": {
+            "title": "¿Como agrego las alertas de cheers de Qapla a mi OBS?",
+            "description": "¡Es muy sencillo! Funciona como las alertas que ya conoces y que tanto te gusta mostrar en tus streams :).",
+            "descriptionBold": "Sigue las sencillas instrucciones a continuación para agregarlas."
+        },
+        "instruction1": {
+            "title": "1. Abre tu setup en OBS",
+            "description": "Ve a tu OBS (StreamLabs, OBS, Stream Elements, etc.) y abre el setup que usas regularmente para tus streams."
+        },
+        "instruction2": {
+            "title": "2. Agrega un elemento fuente a tu pantalla en tu OBS"
+        },
+        "instruction3": {
+            "title": "3. Selecciona Navegador en el menu de fuentes"
+        },
+        "instruction4": {
+            "title": "4. Nombra tu fuente (por ejemplo: Qapla Cheers)"
+        },
+        "instruction5": {
+            "title": "5. Pega tu URL personalizado de Qapla",
+            "description": "Define tanto la altura como el ancho de la ventana en 400 y desmarca todas las opciones"
+        }
     }
 }

@@ -134,7 +134,7 @@ const StreamerProfile = ({ user, games }) => {
                                         <Grid container style={{ marginTop: '6rem' }}>
                                             <Grid item xs={12} sm={3}>
                                                 <h1 className={styles.title}>
-                                                    {t('profile.myStreams')}
+                                                    {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
                                             <Grid item xs={12} sm={9}>
@@ -142,9 +142,15 @@ const StreamerProfile = ({ user, games }) => {
                                                     value={streamType}
                                                     onChange={changestreamType}
                                                     Icon={ArrowIcon}>
-                                                    <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
-                                                    <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
-                                                    <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
+                                                    <option value={SCEHDULED_EVENT_TYPE}>
+                                                        {t('StreamerProfile.scheduled')}
+                                                    </option>
+                                                    <option value={PENDING_APPROVAL_EVENT_TYPE}>
+                                                        {t('StreamerProfile.pendingApproval')}
+                                                    </option>
+                                                    <option value={PAST_STREAMS_EVENT_TYPE}>
+                                                        {t('StreamerProfile.pastStreams')}
+                                                    </option>
                                                 </StreamerSelect>
                                             </Grid>
                                         </Grid>
@@ -154,14 +160,14 @@ const StreamerProfile = ({ user, games }) => {
                                     <div className={styles.balanceInfoContainer}>
                                         <div className={styles.cheersTitleContainer}>
                                             <p className={styles.cheersText}>
-                                                Current Cheers Balance
+                                                {t('StreamerProfile.cheersBalance')}
                                             </p>
                                         </div>
                                         <Grid container className={styles.balanceContainer}>
                                             {!user.premium &&
                                                 <div className={styles.getPremiumBannerContainer}>
                                                     <p className={styles.getPremiumBannerText}>
-                                                        Get Bits & Subs for free
+                                                        {t('StreamerProfile.premiumBenefits')}
                                                     </p>
                                                 </div>
                                             }
@@ -193,13 +199,13 @@ const StreamerProfile = ({ user, games }) => {
                                                 disableFocusListener
                                                 disableHoverListener
                                                 disableTouchListener
-                                                title={<div><p>{'Keep track of your Qoins<>Bits balance.'}</p> <p> Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period. </p></div>}>
+                                                title={<div><p>{t('StreamerProfile.cheersBalanceTooltip.title')}</p> <p> {t('StreamerProfile.cheersBalanceTooltip.description')} </p></div>}>
                                                 <IconButton onClick={() => setOpenBalanceTooltip(!openBalanceTooltip)} size='small'>
                                                     <InfoSquare />
                                                 </IconButton>
                                             </BalanceInfoTooltip>
                                             <p className={styles.learnMoreText}>
-                                                Learn More
+                                                {t('StreamerProfile.learnMore')}
                                             </p>
                                         </div>
                                     </div>
@@ -211,8 +217,8 @@ const StreamerProfile = ({ user, games }) => {
                             <Grid container spacing={4}>
                                 <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
                                     <Card className={styles.createEventCard} onClick={createStream}>
-                                        <h1 className={styles.newStream}>
-                                            Post a <br /> Stream
+                                        <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
+                                            {t('StreamerProfile.postStream')}
                                         </h1>
                                         <CardContent>
                                             <Box display='flex' justifyContent='center'>

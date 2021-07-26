@@ -2,6 +2,7 @@ import React from 'react';
 import { makeStyles, useTheme, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import BurguerMenu from '@material-ui/icons/Menu';
+import { useTranslation } from 'react-i18next';
 
 import { signOut } from './../../services/auth';
 import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';
@@ -43,6 +44,7 @@ const StreamerSideBar = ({ user }) => {
     const classes = useStyles();
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
+    const { t } = useTranslation();
 
     const closeSession = () => {
         if (window.confirm('Are you sure you want to signout?')) {
@@ -72,7 +74,7 @@ const StreamerSideBar = ({ user }) => {
                         <DashboardIcon active={currentScreen === 'profile' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Dashboard
+                        {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={goToSettings}>
@@ -80,11 +82,13 @@ const StreamerSideBar = ({ user }) => {
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Settings
+                        {t('SideBar.settings')}
                     </ListItemText>
                     {showNewLabelOnSettings &&
                         <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)' }}>
-                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24 }}>Nuevo</p>
+                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24 }}>
+                                {t('SideBar.new')}
+                            </p>
                         </div>
                     }
                 </ListItem>
@@ -101,7 +105,7 @@ const StreamerSideBar = ({ user }) => {
                         <LogoutIcon height={32} width={32} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Sign out
+                        {t('SideBar.signOut')}
                     </ListItemText>
                 </ListItem>
             </List>

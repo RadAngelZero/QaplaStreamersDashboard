@@ -11,13 +11,63 @@
         "rewardsSent": "Rewards sent! We’ve sent the remaining rewards to your audience successfully, and the channel rewards have been deleted :)",
         "streamClosed": "This stream has ended, it’s no longer available."
     },
+    "SideBar": {
+        "dashboard": "Dashboard",
+        "settings": "Settings",
+        "new": "New",
+        "signOut": "Sign out"
+    },
     "LanguageHandler": {
         "languages": {
             "es": "Spanish",
             "en": "English"
         }
     },
-    "profile": {
-        "myStreams": "My Streams"
+    "StreamerProfile": {
+        "myStreams": "My Streams",
+        "scheduled": "Scheduled",
+        "pendingApproval": "Pending Approval",
+        "pastStreams": "Past Streams",
+        "cheersBalance": "Current Cheers Balance",
+        "premiumBenefits": "Get Bits & Subs for free",
+        "cheersBalanceTooltip": {
+            "title": "Keep track of your Qoins<>Bits balance.",
+            "description": "Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period."
+        },
+        "learnMore": "Learn More",
+        "postStream": "Post a\nStream"
+    },
+    "StreamCard": {
+        "deleteConfirmation": "Are you sure you want to delete this stream?",
+        "participants": "participants",
+        "start": "Start",
+        "resume": "Resume",
+        "cancelStreamRequest": "Cancel"
+    },
+    "CheersSettings": {
+        "title": "Receive messages from your community",
+        "description": "Show the messages of the cheers that your community sends you in your streams by adding this link into your OBS.",
+        "instruction0": {
+            "title": "How do I add Qapla cheer alerts to my OBS?",
+            "description": "It is too easy! It works just like the alerts you already know and you like to show so much in your streams :).",
+            "descriptionBold": "Follow the simple instructions below to add them."
+        },
+        "instruction1": {
+            "title": "1. Open your OBS setup",
+            "description": "Go to your OBS (StreamLabs, OBS, Stream Elements, etc.) and open the setup that you use regularly to stream."
+        },
+        "instruction2": {
+            "title": "2. Add a source to your screen in your OBS"
+        },
+        "instruction3": {
+            "title": "3. Select Browser Source from the sources menu"
+        },
+        "instruction4": {
+            "title": "4. Name your source (i.e Qapla Cheers)"
+        },
+        "instruction5": {
+            "title": "5. Copy paste your custom Qapla URL.",
+            "description": "Set both width and height to 400, and uncheck all the other options."
+        }
     }
 }

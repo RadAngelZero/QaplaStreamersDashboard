@@ -22,10 +22,9 @@ let webSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
  * @param {string} accessToken Twitch access token
  * @param {array} topics Array of strings with the topics to listen
  * @param {object} rewardsIds Ids of the qapla custom rewards { expReward: 'expId', qoinsReward: 'qoinsId' }
- * @param {number} timestamp Timestamp of the start hour of the stream
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, timestamp, onInvalidRefreshToken) {
+export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onInvalidRefreshToken) {
     let pingInterval = 1000 * 60;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
@@ -43,12 +42,11 @@ export function connect(streamId, streamerName, uid, accessToken, refreshToken, 
 
     webSocket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log(message);
         if (message.data) {
             const reward = JSON.parse(message.data.message);
             if (reward.type === 'reward-redeemed') {
                 const redemptionData = reward.data.redemption;
-                handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, timestamp);
+                handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData);
             }
 
             if (message.type === 'RECONNECT') {

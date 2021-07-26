@@ -171,7 +171,7 @@ const PubSubTest = ({ user }) => {
             const rewards = await createReward();
 
             if (rewards) {
-                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, streamTimestamp, handleTwitchSignIn);
+                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
             } else {
@@ -200,7 +200,7 @@ const PubSubTest = ({ user }) => {
                 alert(t('handleStream.rewardsCreated'));
             }
 
-            return (Object.keys(rewardsIdsObject).length === 2) ? { expReward, qoinsReward } : {};
+            return rewardsIdsObject;
         } else {
             alert('La conexion solo puede realizarse cuando mucho 15 minutos antes de la hora en que esta programado el evento');
         }

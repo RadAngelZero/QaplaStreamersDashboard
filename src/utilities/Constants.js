@@ -72,6 +72,13 @@ export const PAST_STREAMS_EVENT_TYPE = 3;
 export const XQ = 'xq';
 export const QOINS = 'qoins';
 
+/**
+ * Twitch PubSub connections status
+ */
+export const TWITCH_PUBSUB_UNCONNECTED = 0;
+export const TWITCH_PUBSUB_CONNECTED = 1;
+export const TWITCH_PUBSUB_CONNECTION_LOST = -1;
+
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

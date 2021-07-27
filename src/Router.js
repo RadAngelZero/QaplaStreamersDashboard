@@ -22,6 +22,13 @@ import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
 
+window.onbeforeunload = function() {
+    return true;
+};
+
+// Remove navigation prompt
+window.onbeforeunload = null;
+
 const Router = () => {
     const [games, setGames] = useState({});
     const [user, setUser] = useState(null);

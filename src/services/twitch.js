@@ -23,10 +23,11 @@ let webSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
  * @param {string} accessToken Twitch access token
  * @param {array} topics Array of strings with the topics to listen
  * @param {object} rewardsIds Ids of the qapla custom rewards { expReward: 'expId', qoinsReward: 'qoinsId' }
+ * @param {function} onPong Function called every time Twitch answers our ping request
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onInvalidRefreshToken) {
-    let pingInterval = 1000 * 60;
+export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, onInvalidRefreshToken) {
+    let pingInterval = 1000 * 10;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
 
@@ -43,16 +44,16 @@ export function connect(streamId, streamerName, uid, accessToken, refreshToken, 
 
     webSocket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        if (message.data) {
+        if (message.type === 'PONG') {
+            onPong();
+        } else if (message.data) {
             const reward = JSON.parse(message.data.message);
             if (reward.type === 'reward-redeemed') {
                 const redemptionData = reward.data.redemption;
                 handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData);
             }
-
-            if (message.type === 'RECONNECT') {
-                setTimeout(() => connect(streamId, streamerName, uid, accessToken, topics, onInvalidRefreshToken), reconnectInterval);
-            }
+        } else if (message.type === 'RECONNECT') {
+            setTimeout(() => connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, onInvalidRefreshToken), reconnectInterval);
         }
     };
 

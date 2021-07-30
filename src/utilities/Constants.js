@@ -79,6 +79,19 @@ export const TWITCH_PUBSUB_UNCONNECTED = 0;
 export const TWITCH_PUBSUB_CONNECTED = 1;
 export const TWITCH_PUBSUB_CONNECTION_LOST = -1;
 
+/**
+ * Twitch webhooks info
+ */
+ export const webhookStreamOnline = {
+    type: 'stream.online',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOnline'
+};
+
+export const webhookStreamOffline = {
+    type: 'stream.offline',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOffline'
+};
+
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

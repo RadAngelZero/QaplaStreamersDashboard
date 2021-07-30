@@ -1,12 +1,12 @@
 import React from 'react';
 import { makeStyles, useTheme, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import BurguerMenu from '@material-ui/icons/Menu';
+import { useTranslation } from 'react-i18next';
 
 import { signOut } from './../../services/auth';
 import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';
-import { changeLanguage } from '../../utilities/i18n';
+import LanguageSelect from '../LanguageSelect/LanguageSelect';
 
 const drawerWidth = 240;
 
@@ -44,7 +44,7 @@ const StreamerSideBar = ({ user }) => {
     const classes = useStyles();
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
-	const { t } = useTranslation();
+    const { t } = useTranslation();
 
     const closeSession = () => {
         if (window.confirm('Are you sure you want to signout?')) {
@@ -56,10 +56,6 @@ const StreamerSideBar = ({ user }) => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-
-	const selectNewLanguage = (language) => {
-		changeLanguage(language);
-	}
 
 	const goToSettings = () => {
         localStorage.setItem('HasVisitedSettings', 'true');
@@ -78,7 +74,7 @@ const StreamerSideBar = ({ user }) => {
                         <DashboardIcon active={currentScreen === 'profile' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Dashboard
+                        {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={goToSettings}>
@@ -86,23 +82,30 @@ const StreamerSideBar = ({ user }) => {
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Settings
+                        {t('SideBar.settings')}
                     </ListItemText>
                     {showNewLabelOnSettings &&
                         <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)' }}>
-                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24 }}>Nuevo</p>
+                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24 }}>
+                                {t('SideBar.new')}
+                            </p>
                         </div>
                     }
                 </ListItem>
             </List>
             <div style={{ flexGrow: 1 }} />
             <List>
+                <Hidden smUp>
+                    <ListItem style={{ marginTop: '.5rem' }}>
+                        <LanguageSelect />
+                    </ListItem>
+                </Hidden>
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={closeSession}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <LogoutIcon height={32} width={32} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Sign out
+                        {t('SideBar.signOut')}
                     </ListItemText>
                 </ListItem>
             </List>

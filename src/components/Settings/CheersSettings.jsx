@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles, Grid, Card, CardMedia, Tooltip } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
@@ -75,6 +76,7 @@ const CheersSettings = ({ twitchId }) => {
     const classes = useStyles();
     const cheersURL = `https://dashboard.qapla.gg/liveDonations/${twitchId}`;
     const [openTooltip, setOpenTooltip] = useState(false);
+    const { t } = useTranslation();
 
     const copyCheersURL = () => {
         navigator.clipboard.writeText(cheersURL);
@@ -87,10 +89,10 @@ const CheersSettings = ({ twitchId }) => {
     return (
         <div className={classes.container}>
             <p className={classes.instructionTitle}>
-                Receive messages from your community
+                {t('CheersSettings.title')}
             </p>
             <p className={classes.instructionDescription}>
-                Show the messages of the cheers that your community sends you in your streams by adding this link into your OBS.
+                {t('CheersSettings.description')}
             </p>
             <Grid container className={classes.instructionsMargin}>
                 <Grid sm={6} xs={12}>
@@ -105,18 +107,18 @@ const CheersSettings = ({ twitchId }) => {
                         value={cheersURL} />
                 </Grid>
             </Grid>
-            <InstructionSection title='How do I add Qapla cheer alerts to my OBS?'
-                description={<>It is too easy! It works just like the alerts you already know and you like to show so much in your streams :). <b>Follow the simple instructions below to add them.</b></>} />
-            <InstructionSection title='1. Open your OBS setup'
-                description='Go to your OBS (StreamLabs, OBS, Stream Elements, etc.) and open the setup that you use regularly to stream.' />
-            <InstructionSection title='2. Add a source to your screen in your OBS'
+            <InstructionSection title={t('CheersSettings.instruction0.title')}
+                description={<>{t('CheersSettings.instruction0.description')} <b>{t('CheersSettings.instruction0.descriptionBold')}</b></>} />
+            <InstructionSection title={t('CheersSettings.instruction1.title')}
+                description={t('CheersSettings.instruction1.description')} />
+            <InstructionSection title={t('CheersSettings.instruction2.title')}
                 src={Step1} />
-            <InstructionSection title='3. Select Browser Source from the sources menu'
+            <InstructionSection title={t('CheersSettings.instruction3.title')}
                 src={Step2} />
-            <InstructionSection title='4. Name your source (i.e Qapla Cheers)'
+            <InstructionSection title={t('CheersSettings.instruction4.title')}
                 src={Step3} />
-            <InstructionSection title='5. Copy paste your custom Qapla URL.'
-                description='Set both width and height to 400, and uncheck all the other options.'
+            <InstructionSection title={t('CheersSettings.instruction5.title')}
+                description={t('CheersSettings.instruction5.description')}
                 src={Step4} />
             <div className={classes.instructionsMargin} />
         </div>

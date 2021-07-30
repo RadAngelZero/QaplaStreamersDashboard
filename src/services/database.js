@@ -17,6 +17,7 @@ const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
+const premiumEventsSubscriptionRef = database.ref('/PremiumEventsSubscription');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -160,6 +161,11 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         optionalData,
         createdAt,
         stringDate
+    });
+
+    await premiumEventsSubscriptionRef.child(streamer.uid).child(event.key).set({
+        approved: false,
+        timestamp
     });
 
     return await streamsApprovalRef.child(event.key).set({
@@ -503,4 +509,18 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  */
 export async function markDonationAsRead(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
+}
+
+/**
+ * Streamer Subscriptions
+ */
+
+/**
+ * Returns all the events of a user during the given range of dates
+ * @param {string} streamerUid User identifier of the streamer
+ * @param {number} startDate First valid timestamp of the range
+ * @param {string} endDate Last valid timestamp of the range
+ */
+export async function getStreamerEventsWithDateRange(streamerUid, startDate, endDate) {
+    return await premiumEventsSubscriptionRef.child(streamerUid).orderByChild('timestamp').startAt(startDate).endAt(endDate).once('value');
 }

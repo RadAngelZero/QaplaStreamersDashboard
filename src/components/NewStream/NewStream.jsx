@@ -3,7 +3,7 @@ import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdo
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import DayJsUtils from '@date-io/dayjs';
-import { createNewStreamRequest } from './../../services/database';
+import { createNewStreamRequest, getStreamerEventsWithDateRange } from './../../services/database';
 
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -16,6 +16,7 @@ import { ReactComponent as CheckedIcon } from './../../assets/CheckedIcon.svg';
 import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.svg';
 import BackButton from '../BackButton/BackButton';
 import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
+import { MONTH_IN_MILISECONDS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -198,7 +199,7 @@ const NewStream = ({ user, games }) => {
 
     const openConfirmationDialog = () => setOpenDetailsDialog(true);
 
-    const submitEvent = () => {
+    const submitEvent = async () => {
         if (selectedDate < minDate) {
             alert('All requests must be sent at least 24 hours before the stream');
             return;
@@ -208,16 +209,51 @@ const NewStream = ({ user, games }) => {
             return;
         }
 
-        const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
-        const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
-        let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
+        /**
+         * Check if the selected date is valid to create the event based on the end of a
+         * streamer subscription
+         */
+        if (selectedDate.getTime() <=  user.premiumUntil) {
+            let startDate = user.currentBillingPeriod.start;
+            let endDate = user.currentBillingPeriod.end;
 
-        const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
-        const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
-        let UTCTime = `${UTCHour}:${UTCMinutes}`;
+            // If the event will not be in the current period
+            if (selectedDate.getTime() > user.currentBillingPeriod.end) {
+                /**
+                 * We need to calculate the start and the end timestamps of the period for which the stream is
+                 * intended to be created
+                 */
+                 do {
+                    startDate = endDate;
+                    endDate = endDate + MONTH_IN_MILISECONDS;
+                } while (selectedDate.getTime() > endDate);
+            }
 
-        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
-        history.push('/success');
+            const streamsInSelectedPeriod = await getStreamerEventsWithDateRange(user.uid, startDate, endDate);
+            const numberOfStreamsInTheSelectedPeriod = Object.keys(streamsInSelectedPeriod.val()).length;
+
+            /**
+             * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
+             * is lower or equal to the user limit per month then we create the event
+             */
+            if (numberOfStreamsInTheSelectedPeriod + 1 <= user.eventsPerMonth) {
+                const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
+                const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
+                let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
+
+                const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
+                const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
+                let UTCTime = `${UTCHour}:${UTCMinutes}`;
+
+                await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+                history.push('/success');
+            } else {
+                // Hacer un modal chido para convencerlos de mejorar su plan o comprar eventos aparte
+                alert('You have reached the limit of events for this month acording to your subscription');
+            }
+        } else {
+            alert('The selected date is not valid as your plan will expire before it');
+        }
     }
 
     return (

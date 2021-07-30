@@ -72,6 +72,9 @@ export const PAST_STREAMS_EVENT_TYPE = 3;
 export const XQ = 'xq';
 export const QOINS = 'qoins';
 
+// 86400000 = Day in miliseconds
+export const MONTH_IN_MILISECONDS = 86400000 * 30;
+
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

@@ -235,7 +235,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
         if (twitchAccessTokenStatus === 401) {
             const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
             if (newCredentials) {
-                return createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, onInvalidRefreshToken, streamId);
+                return await createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled, maxPerStream);
             }
         }
 

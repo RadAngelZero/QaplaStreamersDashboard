@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams, Prompt } from 'react-router';
 import {
     makeStyles,
     withStyles,
@@ -16,6 +16,8 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
+import { ReactComponent as ConnectedIcon } from './../../assets/ganado.svg';
+import { ReactComponent as DisconnectedIcon } from './../../assets/perdido.svg';
 
 import { connect, createCustomReward, deleteCustomReward, closeConnection, getAllRewardRedemptions, enableCustomReward } from '../../services/twitch';
 import { signInWithTwitch } from '../../services/auth';
@@ -40,7 +42,7 @@ import {
     getStreamUserRedemptions
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import { XQ, QOINS } from '../../utilities/Constants';
+import { XQ, QOINS, TWITCH_PUBSUB_UNCONNECTED, TWITCH_PUBSUB_CONNECTED, TWITCH_PUBSUB_CONNECTION_LOST } from '../../utilities/Constants';
 
 
 
@@ -101,6 +103,8 @@ const PubSubTest = ({ user }) => {
     const [usersThatRedeemed, setUsersThatRedeemed] = useState({});
     const [buttonFirstText, setButtonFirstText] = useState(t('handleStream.connect'));
     const [eventIsAlreadyClosed, setEventIsAlreadyClosed] = useState(false);
+    const [connectionStatus, setConnectionStatus] = useState(TWITCH_PUBSUB_UNCONNECTED);
+    let pingTimeout;
 
     useEffect(() => {
         async function getTimestamp() {
@@ -142,12 +146,19 @@ const PubSubTest = ({ user }) => {
         });
 
         if (rewardsAreCreated() && user.twitchAccessToken !== oldUser.twitchAccessToken) {
-            connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardsIds, streamTimestamp, handleTwitchSignIn);
+            connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardsIds, onPong, handleTwitchSignIn);
             setOldUser(user);
         }
 
         checkIfStreamIsAlreadyOpen();
         getTimestamp();
+        if (connectedToTwitch) {
+            window.onbeforeunload = () => true;
+        }
+
+        return (() => {
+            window.onbeforeunload = null;
+        });
     }, [streamId, connectedToTwitch, user, rewardsIds, oldUser, streamTimestamp]);
 
     const listenForRewards = async () => {
@@ -159,7 +170,7 @@ const PubSubTest = ({ user }) => {
                 let rewards = { expReward: rewardOnDatabase.val().expReward.rewardId, qoinsReward: rewardOnDatabase.val().qoinsReward.rewardId }
                 setRewardsIds(rewards);
 
-                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, streamTimestamp, handleTwitchSignIn);
+                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
                 alert('Reconectado con exito');
@@ -168,16 +179,25 @@ const PubSubTest = ({ user }) => {
             }
         } else {
             alert('Conectando');
-            const reward = await createReward();
+            const rewards = await createReward();
 
-            if (reward) {
-                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], reward.id, streamTimestamp, handleTwitchSignIn);
+            if (rewards) {
+                connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
             } else {
                 alert('Qapla Custom Reward couldn´t been created');
             }
         }
+    }
+
+    const onPong = () => {
+        clearTimeout(pingTimeout);
+        setConnectionStatus(TWITCH_PUBSUB_CONNECTED);
+        pingTimeout = setTimeout(() => {
+            setConnectionStatus(TWITCH_PUBSUB_CONNECTION_LOST);
+            connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardsIds, onPong, handleTwitchSignIn);
+        }, 22000);
     }
 
     const createReward = async () => {
@@ -200,7 +220,7 @@ const PubSubTest = ({ user }) => {
                 alert(t('handleStream.rewardsCreated'));
             }
 
-            return (Object.keys(rewardsIdsObject).length === 2) ? { expReward, qoinsReward } : {};
+            return rewardsIdsObject;
         } else {
             alert('La conexion solo puede realizarse cuando mucho 15 minutos antes de la hora en que esta programado el evento');
         }
@@ -415,6 +435,8 @@ const PubSubTest = ({ user }) => {
 
     return (
         <StreamerDashboardContainer user={user}>
+            <Prompt when={connectedToTwitch}
+                message='If you leave now you will lose the connection with Twitch and the rewards will not be sent in real time to the users' />
             <Grid container>
                 <Grid xs={5} container>
                     <Grid xs={6}>
@@ -431,6 +453,24 @@ const PubSubTest = ({ user }) => {
                             <ContainedButton onClick={enableQoinsReward} className={classes.secondaryButton}>
                                 {t('handleStream.enableQoinsReward')}
                             </ContainedButton>
+                        }
+                        {(connectedToTwitch && connectionStatus !== TWITCH_PUBSUB_UNCONNECTED) &&
+                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 24 }}>
+                                {connectionStatus === TWITCH_PUBSUB_CONNECTED ?
+                                    <ConnectedIcon height={32} width={32} />
+                                    :
+                                    <DisconnectedIcon height={32} width={32} />
+                                }
+                                {connectionStatus === TWITCH_PUBSUB_CONNECTED ?
+                                    <p style={{ color: '#0AFFD2', marginLeft: 8 }}>
+                                        Conectado
+                                    </p>
+                                    :
+                                    <p style={{ color: '#FF0000', marginLeft: 8 }}>
+                                        Error de conexión. Reconectando...
+                                    </p>
+                                }
+                            </div>
                         }
                     </Grid>
                 </Grid>

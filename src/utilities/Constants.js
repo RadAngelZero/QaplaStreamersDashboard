@@ -46,6 +46,7 @@ import OverwatchImage from './../assets/Overwatch.jpg';
 import OvercookedImage from './../assets/Overcooked.jpg';
 import DeadCellsImage from './../assets/DeadCells.jpg';
 import GenshinImpactImage from './../assets/GenshinImpact.jpg';
+import AxieInfinityImage from './../assets/AxieInfinity.jpg';
 
 /**
  * Twitch API keys
@@ -70,6 +71,26 @@ export const PAST_STREAMS_EVENT_TYPE = 3;
  */
 export const XQ = 'xq';
 export const QOINS = 'qoins';
+
+/**
+ * Twitch PubSub connections status
+ */
+export const TWITCH_PUBSUB_UNCONNECTED = 0;
+export const TWITCH_PUBSUB_CONNECTED = 1;
+export const TWITCH_PUBSUB_CONNECTION_LOST = -1;
+
+/**
+ * Twitch webhooks info
+ */
+ export const webhookStreamOnline = {
+    type: 'stream.online',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOnline'
+};
+
+export const webhookStreamOffline = {
+    type: 'stream.offline',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOffline'
+};
 
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
@@ -119,5 +140,6 @@ export const streamsPlaceholderImages = {
     Overwatch: OverwatchImage,
     Overcooked: OvercookedImage,
     DeadCells: DeadCellsImage,
-    GenshinImpact: GenshinImpactImage
+    GenshinImpact: GenshinImpactImage,
+    AxieInfinity: AxieInfinityImage
 };

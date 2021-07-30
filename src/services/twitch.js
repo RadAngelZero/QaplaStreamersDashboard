@@ -8,7 +8,8 @@ import {
     addInfoToEventParticipants,
     saveUserStreamReward,
     saveCustomRewardNonRedemption,
-    getCustomRewardRedemptions
+    getCustomRewardRedemptions,
+    getStreamUserRedemptions
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, XQ, QOINS } from '../utilities/Constants';
 
@@ -22,11 +23,11 @@ let webSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
  * @param {string} accessToken Twitch access token
  * @param {array} topics Array of strings with the topics to listen
  * @param {object} rewardsIds Ids of the qapla custom rewards { expReward: 'expId', qoinsReward: 'qoinsId' }
- * @param {number} timestamp Timestamp of the start hour of the stream
+ * @param {function} onPong Function called every time Twitch answers our ping request
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, timestamp, onInvalidRefreshToken) {
-    let pingInterval = 1000 * 60;
+export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, onInvalidRefreshToken) {
+    let pingInterval = 1000 * 10;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
 
@@ -43,17 +44,16 @@ export function connect(streamId, streamerName, uid, accessToken, refreshToken, 
 
     webSocket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log(message);
-        if (message.data) {
+        if (message.type === 'PONG') {
+            onPong();
+        } else if (message.data) {
             const reward = JSON.parse(message.data.message);
             if (reward.type === 'reward-redeemed') {
                 const redemptionData = reward.data.redemption;
-                handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, timestamp);
+                handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData);
             }
-
-            if (message.type === 'RECONNECT') {
-                setTimeout(() => connect(streamId, streamerName, uid, accessToken, topics, onInvalidRefreshToken), reconnectInterval);
-            }
+        } else if (message.type === 'RECONNECT') {
+            setTimeout(() => connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, onInvalidRefreshToken), reconnectInterval);
         }
     };
 
@@ -81,20 +81,38 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
         if (user) {
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                const userRedemptions = await getStreamUserRedemptions(user.id, streamId);
 
-                const expToGive = 15;
-                giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
-                addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
-                saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+                /**
+                 * In some cases the users are able to redeem a reward twice for example if the streamer close and then reopen
+                 * a stream, to avoide give them the double of rewards we must validate the redemptions with our information
+                 * in the database
+                 */
 
-                const userHasRedeemedQoins = await getCustomRewardRedemptions(streamId, user.id);
+                // By default we give the XQ to the user
+                let giveXQToUser = true;
 
-                if (userHasRedeemedQoins.exists() && Object.keys(userHasRedeemedQoins.val()).length === 2) {
-                    let qoinsToGive = 5;
-                    addQoinsToUser(user.id, qoinsToGive);
-                    addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive * 2);
-                    saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                if (userRedemptions.exists()) {
+                    // If the user has redemptions on our database but has no redemptions of XQ type set giveXQToUser to true
+                    giveXQToUser = !Object.keys(userRedemptions.val()).some((redemptionId) => userRedemptions.val()[redemptionId].type === XQ);
+                }
+
+                if (giveXQToUser) {
+                    await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+
+                    const expToGive = 15;
+                    giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
+                    addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
+                    saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+
+                    const userHasRedeemedQoins = await getCustomRewardRedemptions(streamId, user.id);
+
+                    if (userHasRedeemedQoins.exists() && Object.keys(userHasRedeemedQoins.val()).length === 2) {
+                        let qoinsToGive = 5;
+                        addQoinsToUser(user.id, qoinsToGive);
+                        addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive * 2);
+                        saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                    }
                 }
             } else {
                 await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
@@ -105,21 +123,39 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
         if (user) {
             const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
             if (isUserParticipantOfStream) {
-                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                const userRedemptions = await getStreamUserRedemptions(user.id, streamId);
 
-                const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
+                /**
+                 * In some cases the users are able to redeem a reward twice for example if the streamer close and then reopen
+                 * a stream, to avoide give them the double of rewards we must validate the redemptions with our information
+                 * in the database
+                 */
 
-                let qoinsToGive = 5;
+                // By default we give the Qoins to the user
+                let giveQoinsToUser = true;
 
-                // If the user has already redeemed the exp reward and now the qoins reward
-                if (userHasRedeemedExperience.exists() && Object.keys(userHasRedeemedExperience.val()).length === 2) {
-                    // Give him 10 qoins instead of 5
-                    qoinsToGive = 10;
+                if (userRedemptions.exists()) {
+                    // If the user has redemptions on our database but has no redemptions of XQ type set giveQoinsToUser to true
+                    giveQoinsToUser = !Object.keys(userRedemptions.val()).some((redemptionId) => userRedemptions.val()[redemptionId].type === QOINS);
                 }
 
-                addQoinsToUser(user.id, qoinsToGive);
-                addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
-                saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                if (giveQoinsToUser) {
+                    await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+
+                    const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
+
+                    let qoinsToGive = 5;
+
+                    // If the user has already redeemed the exp reward and now the qoins reward
+                    if (userHasRedeemedExperience.exists() && Object.keys(userHasRedeemedExperience.val()).length === 2) {
+                        // Give him 10 qoins instead of 5
+                        qoinsToGive = 10;
+                    }
+
+                    addQoinsToUser(user.id, qoinsToGive);
+                    addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
+                    saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                }
             }
         }
     }
@@ -200,7 +236,7 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
         if (twitchAccessTokenStatus === 401) {
             const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
             if (newCredentials) {
-                return createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, onInvalidRefreshToken, streamId);
+                return await createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled, maxPerStream);
             }
         }
 

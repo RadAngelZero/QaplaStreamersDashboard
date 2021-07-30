@@ -454,7 +454,7 @@ const PubSubTest = ({ user }) => {
                                 {t('handleStream.enableQoinsReward')}
                             </ContainedButton>
                         }
-                        {connectionStatus !== TWITCH_PUBSUB_UNCONNECTED &&
+                        {(connectedToTwitch && connectionStatus !== TWITCH_PUBSUB_UNCONNECTED) &&
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 24 }}>
                                 {connectionStatus === TWITCH_PUBSUB_CONNECTED ?
                                     <ConnectedIcon height={32} width={32} />

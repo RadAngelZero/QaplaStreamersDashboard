@@ -31,3 +31,18 @@ export async function sednPushNotificationToTopic(topic, titles, bodys, extraDat
 
     return await notificateToTopic({ topic, titles, bodys, extraData, onlyData });
 }
+
+/**
+ * Subscribe a user to the given Twitch webhook
+ * @param {string} streamerId Streamer Twitch id
+ * @param {string} type Webhook name to subscribe
+ * @param {string} callback URL to call when webhook is called
+ */
+export async function subscribeStreamerToTwitchWebhook(streamerId, type, callback) {
+    const authWithTwitch = functions.httpsCallable('subscribeStreamerToTwitchWebhook');
+    try {
+        return await authWithTwitch({ streamerId, type, callback });
+    } catch (error) {
+        console.log(error);
+    }
+}

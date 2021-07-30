@@ -20,6 +20,8 @@ import ContainedButton from '../ContainedButton/ContainedButton';
 import { signInWithTwitch } from '../../services/auth';
 import { streamerProfileExists, createStreamerProfile, updateStreamerProfile } from '../../services/database';
 import { auth } from '../../services/firebase';
+import { subscribeStreamerToTwitchWebhook } from '../../services/functions';
+import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 
 const CustomDialog = withStyles((theme) => ({
     paper: {
@@ -43,6 +45,8 @@ const StreamersSignin = ({ title }) => {
         if (!(await streamerProfileExists(user.firebaseAuthUser.user.uid))) {
             if (inviteCode) {
                 await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
+                await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
+                await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
                 history.push('/profile');
             } else {
                 const user = auth.currentUser;

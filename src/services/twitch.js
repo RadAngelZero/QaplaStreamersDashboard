@@ -28,7 +28,7 @@ let redemptionsIds = {};
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
 export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, onInvalidRefreshToken) {
-    let pingInterval = 1000 * 10;
+    let pingInterval = 1000 * 5;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
 

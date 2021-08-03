@@ -194,10 +194,12 @@ const PubSubTest = ({ user }) => {
     const onPong = () => {
         clearTimeout(pingTimeout);
         setConnectionStatus(TWITCH_PUBSUB_CONNECTED);
+        setConnectedToTwitch(true);
         pingTimeout = setTimeout(() => {
             setConnectionStatus(TWITCH_PUBSUB_CONNECTION_LOST);
+            setConnectedToTwitch(false);
             connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardsIds, onPong, handleTwitchSignIn);
-        }, 22000);
+        }, 16000);
     }
 
     const createReward = async () => {
@@ -454,7 +456,7 @@ const PubSubTest = ({ user }) => {
                                 {t('handleStream.enableQoinsReward')}
                             </ContainedButton>
                         }
-                        {(connectedToTwitch && connectionStatus !== TWITCH_PUBSUB_UNCONNECTED) &&
+                        {(!eventIsAlreadyClosed && connectionStatus !== TWITCH_PUBSUB_UNCONNECTED) &&
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 24 }}>
                                 {connectionStatus === TWITCH_PUBSUB_CONNECTED ?
                                     <ConnectedIcon height={32} width={32} />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip, withStyles } from '@material-ui/core';
+import { withStyles, makeStyles, Grid, Accordion, AccordionSummary, AccordionDetails, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,7 @@ import {
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
 import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
+import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
 
 const BalanceInfoTooltip = withStyles(() => ({
     tooltip: {
@@ -38,10 +39,116 @@ const BalanceInfoTooltip = withStyles(() => ({
     }
 }))(Tooltip);
 
+const useStyles = makeStyles((theme) => ({
+    accordionSummary: {
+        justifyContent: "flex-end"
+    }
+}));
+
+const transctionsHistory = [
+    { currency: 'Bits', date: '06/08/2021', amount: 400 },
+    { currency: 'Qoins', date: '04/08/2021', amount: 330 },
+];
+
+const CheersBalanceCard = ({ user }) => {
+    const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
+    const { t } = useTranslation();
+    const classes = useStyles();
+
+    return (
+        <div className={styles.balanceInfoContainer}>
+            <div className={styles.cheersTitleContainer}
+                style={{ background: user.premium ? 'transparent' : 'linear-gradient(270deg, #3B4BF9 0%, #7E00FC 100%)' }}>
+                <p className={styles.cheersText}>
+                    {t('StreamerProfile.cheersBalance')}
+                </p>
+            </div>
+            <Grid container className={styles.balanceContainer}>
+                {!user.premium &&
+                    <div className={styles.getPremiumBannerContainer}>
+                        <p className={styles.getPremiumBannerText}>
+                            {t('StreamerProfile.premiumBenefits')}
+                        </p>
+                    </div>
+                }
+                <Grid xs={12}>
+                    <div className={user.premium ? '' : styles.blur}>
+                        <div className={styles.balanceCurrencyContainer}>
+                            <p className={styles.balanceCurrencyValue}>
+                                {user.bitsBalance || 0}
+                            </p>
+                            <BitsIcon />
+                        </div>
+                    </div>
+                </Grid>
+                <Grid xs={12}>
+                    <div className={user.premium ? '' : styles.blur}>
+                        <div className={styles.balanceCurrencyContainer}>
+                            <p className={styles.balanceCurrencyValue}>
+                                {user.qoinsBalance || 0}
+                            </p>
+                            <QoinsIcon />
+                        </div>
+                    </div>
+                </Grid>
+                <Grid xs={12}>
+                    <div className={user.premium ? '' : styles.blur}>
+                        <Accordion className={styles.historyAccordion}>
+                            <AccordionSummary
+                                expandIcon={<Arrow />}
+                                classes={{ content: classes.accordionSummary }}>
+                                <p className={styles.historyText}>
+                                    {t('StreamerProfile.history')}
+                                </p>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Grid container>
+                                    {transctionsHistory.map((transaction) => (
+                                        <Grid xs={12}>
+                                            <div className={styles.transactionContainer}>
+                                                <div className={styles.transactionInformationContainer}>
+                                                    <p className={styles.transactionText}>
+                                                        {transaction.currency}
+                                                    </p>
+                                                    <p className={styles.transactionDate}>
+                                                        {transaction.date}
+                                                    </p>
+                                                </div>
+                                                <p className={styles.transactionText}>
+                                                    {transaction.amount}
+                                                </p>
+                                            </div>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </AccordionDetails>
+                        </Accordion>
+                    </div>
+                </Grid>
+            </Grid>
+            <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
+                <BalanceInfoTooltip arrow
+                    onClose={() => setOpenBalanceTooltip(false)}
+                    open={openBalanceTooltip}
+                    disableFocusListener
+                    disableHoverListener
+                    disableTouchListener
+                    title={<div><p>{t('StreamerProfile.cheersBalanceTooltip.title')}</p> <p> {t('StreamerProfile.cheersBalanceTooltip.description')} </p></div>}>
+                    <IconButton onClick={() => setOpenBalanceTooltip(!openBalanceTooltip)} size='small'>
+                        <InfoSquare />
+                    </IconButton>
+                </BalanceInfoTooltip>
+                <p className={styles.learnMoreText}>
+                    {t('StreamerProfile.learnMore')}
+                </p>
+            </div>
+        </div>
+    );
+};
+
 const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
-    const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
     const [streams, setStreams] = useState({});
     const { t } = useTranslation();
 
@@ -121,7 +228,7 @@ const StreamerProfile = ({ user, games }) => {
                     <Grid container>
                         <Grid item xs={12}>
                             <Grid container>
-                                <Grid xs={8}>
+                                <Grid xs={12}>
                                     <Grid item xs={12}>
                                         <Button variant='contained'
                                             className={styles.twitchButton}
@@ -132,6 +239,16 @@ const StreamerProfile = ({ user, games }) => {
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Grid container style={{ marginTop: '6rem' }}>
+                                            <Hidden smDown>
+                                                <div style={{ position: 'absolute', top: 48, right: 32, maxWidth: 360 }}>
+                                                    <CheersBalanceCard user={user} />
+                                                </div>
+                                            </Hidden>
+                                            <Hidden smUp>
+                                                <Grid item xs={12}>
+                                                    <CheersBalanceCard user={user} />
+                                                </Grid>
+                                            </Hidden>
                                             <Grid item xs={12} sm={3}>
                                                 <h1 className={styles.title}>
                                                     {t('StreamerProfile.myStreams')}
@@ -155,60 +272,6 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                         </Grid>
                                     </Grid>
-                                </Grid>
-                                <Grid xs={12} sm={4} className={styles.displayFlex} alignItems='center'>
-                                    <div className={styles.balanceInfoContainer}>
-                                        <div className={styles.cheersTitleContainer}>
-                                            <p className={styles.cheersText}>
-                                                {t('StreamerProfile.cheersBalance')}
-                                            </p>
-                                        </div>
-                                        <Grid container className={styles.balanceContainer}>
-                                            {!user.premium &&
-                                                <div className={styles.getPremiumBannerContainer}>
-                                                    <p className={styles.getPremiumBannerText}>
-                                                        {t('StreamerProfile.premiumBenefits')}
-                                                    </p>
-                                                </div>
-                                            }
-                                            <Grid xs={12}>
-                                                <div className={user.premium ? '' : styles.blur}>
-                                                    <div className={styles.balanceCurrencyContainer}>
-                                                        <p className={styles.balanceCurrencyValue}>
-                                                            {user.bitsBalance || 0}
-                                                        </p>
-                                                        <BitsIcon />
-                                                    </div>
-                                                </div>
-                                            </Grid>
-                                            <Grid xs={12}>
-                                                <div className={user.premium ? '' : styles.blur}>
-                                                    <div className={styles.balanceCurrencyContainer}>
-                                                        <p className={styles.balanceCurrencyValue}>
-                                                            {user.qoinsBalance || 0}
-                                                        </p>
-                                                        <QoinsIcon />
-                                                    </div>
-                                                </div>
-                                            </Grid>
-                                        </Grid>
-                                        <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
-                                            <BalanceInfoTooltip arrow
-                                                onClose={() => setOpenBalanceTooltip(false)}
-                                                open={openBalanceTooltip}
-                                                disableFocusListener
-                                                disableHoverListener
-                                                disableTouchListener
-                                                title={<div><p>{t('StreamerProfile.cheersBalanceTooltip.title')}</p> <p> {t('StreamerProfile.cheersBalanceTooltip.description')} </p></div>}>
-                                                <IconButton onClick={() => setOpenBalanceTooltip(!openBalanceTooltip)} size='small'>
-                                                    <InfoSquare />
-                                                </IconButton>
-                                            </BalanceInfoTooltip>
-                                            <p className={styles.learnMoreText}>
-                                                {t('StreamerProfile.learnMore')}
-                                            </p>
-                                        </div>
-                                    </div>
                                 </Grid>
                                 <Grid xs={1} />
                             </Grid>

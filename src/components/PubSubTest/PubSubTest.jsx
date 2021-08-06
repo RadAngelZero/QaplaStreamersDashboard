@@ -173,7 +173,7 @@ const PubSubTest = ({ user }) => {
                 connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
-                alert('Reconectado con exito');
+                alert(t('handleStream.reconnected'));
             } else {
                 alert(t('handleStream.streamClosed'));
             }
@@ -181,7 +181,7 @@ const PubSubTest = ({ user }) => {
             const currentDate = new Date();
             const streamScheduledDate = new Date(streamTimestamp);
             if (currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
-                alert('Conectando');
+                alert(t('handleStream.connecting'));
                 const rewards = await createReward();
 
                 if (rewards) {
@@ -192,7 +192,7 @@ const PubSubTest = ({ user }) => {
                     alert('Qapla Custom Reward couldn´t been created');
                 }
             } else {
-                alert('Error, la hora de inicio ya paso');
+                alert(t('handleStream.timeError'));
             }
         }
     }

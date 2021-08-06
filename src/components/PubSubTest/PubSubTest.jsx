@@ -42,7 +42,7 @@ import {
     getStreamUserRedemptions
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import { XQ, QOINS, TWITCH_PUBSUB_UNCONNECTED, TWITCH_PUBSUB_CONNECTED, TWITCH_PUBSUB_CONNECTION_LOST } from '../../utilities/Constants';
+import { XQ, QOINS, TWITCH_PUBSUB_UNCONNECTED, TWITCH_PUBSUB_CONNECTED, TWITCH_PUBSUB_CONNECTION_LOST, HOUR_IN_MILISECONDS } from '../../utilities/Constants';
 
 
 
@@ -174,20 +174,26 @@ const PubSubTest = ({ user }) => {
                 connect(streamId, user.displayName, user.uid, userCredentialsUpdated.access_token, userCredentialsUpdated.refresh_token, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
-                alert('Reconectado con exito');
+                alert(t('handleStream.reconnected'));
             } else {
                 alert(t('handleStream.streamClosed'));
             }
         } else {
-            alert('Conectando');
-            const rewards = await createReward(userCredentialsUpdated);
+            const currentDate = new Date();
+            const streamScheduledDate = new Date(streamTimestamp);
+            if (currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
+                alert(t('handleStream.connecting'));
+                const rewards = await createReward();
 
-            if (rewards) {
-                connect(streamId, user.displayName, user.uid, userCredentialsUpdated.access_token, userCredentialsUpdated.refresh_token, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);
-                setOldUser(user);
-                setConnectedToTwitch(true);
+                if (rewards) {
+                    connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);
+                    setOldUser(user);
+                    setConnectedToTwitch(true);
+                } else {
+                    alert('Qapla Custom Reward couldn´t been created');
+                }
             } else {
-                alert('Qapla Custom Reward couldn´t been created');
+                alert(t('handleStream.timeError'));
             }
         }
     }
@@ -195,10 +201,12 @@ const PubSubTest = ({ user }) => {
     const onPong = () => {
         clearTimeout(pingTimeout);
         setConnectionStatus(TWITCH_PUBSUB_CONNECTED);
+        setConnectedToTwitch(true);
         pingTimeout = setTimeout(() => {
             setConnectionStatus(TWITCH_PUBSUB_CONNECTION_LOST);
+            setConnectedToTwitch(false);
             connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardsIds, onPong, handleTwitchSignIn);
-        }, 22000);
+        }, 16000);
     }
 
     const createReward = async (userCredentials) => {
@@ -458,7 +466,7 @@ const PubSubTest = ({ user }) => {
                                 {t('handleStream.enableQoinsReward')}
                             </ContainedButton>
                         }
-                        {(connectedToTwitch && connectionStatus !== TWITCH_PUBSUB_UNCONNECTED) &&
+                        {(!eventIsAlreadyClosed && connectionStatus !== TWITCH_PUBSUB_UNCONNECTED) &&
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 24 }}>
                                 {connectionStatus === TWITCH_PUBSUB_CONNECTED ?
                                     <ConnectedIcon height={32} width={32} />

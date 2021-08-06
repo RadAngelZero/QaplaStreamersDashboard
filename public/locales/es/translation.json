@@ -9,7 +9,10 @@
         "closeStreamConfirmation": "¿Estás seguro que deseas cerrar el stream? Si lo cierras, ya no podrás volver a abrirlo. Las recompensas Qapla se repartirán inmediatamente.",
         "sendingRewards": "Repartiendo recompensas, espera por favor…",
         "rewardsSent": "¡Se han repartido las recompensas con éxito! Hemos eliminado las recompensas de tu canal correctamente :)",
-        "streamClosed": "Este stream ya fue cerrado."
+        "reconnected": "Reconectado con exito",
+        "connecting": "Conectando",
+        "streamClosed": "Este stream ya fue cerrado.",
+        "timeError": "Este evento no puede ser iniciado debido a que ya paso mucho tiempo desde la hora de inicio."
     },
     "SideBar": {
         "dashboard": "Dashboard",

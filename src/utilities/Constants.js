@@ -92,6 +92,8 @@ export const webhookStreamOffline = {
     callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOffline'
 };
 
+export const HOUR_IN_MILISECONDS = 3600000;
+
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

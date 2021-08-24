@@ -17,6 +17,7 @@ const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
+const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -503,4 +504,8 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  */
 export async function markDonationAsRead(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
+}
+
+export async function getLastStreamerPayments(streamerUid) {
+    return await paymentsToStreamersHistory.child(streamerUid).orderByChild('timestamp').limitToLast(5).once('value');
 }

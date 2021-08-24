@@ -9,7 +9,7 @@ import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
-import { loadStreamsByStatus } from '../../services/database';
+import { getLastStreamerPayments, loadStreamsByStatus } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCEHDULED_EVENT_TYPE,
@@ -50,10 +50,19 @@ const transctionsHistory = [
     { currency: 'Qoins', date: '04/08/2021', amount: 330 },
 ];
 
-const CheersBalanceCard = ({ user }) => {
+const CheersBalanceCard = ({ user, paymentsHistory }) => {
     const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
     const { t } = useTranslation();
     const classes = useStyles();
+
+    const formatDate = (timestamp) => {
+        const paymentDate = new Date(timestamp);
+
+        const date = paymentDate.getDate() >= 10 ? paymentDate.getDate() : `0${paymentDate.getDate()}`;
+        const month = (paymentDate.getMonth() + 1) >= 10 ? (paymentDate.getMonth() + 1) : `0${(paymentDate.getMonth() + 1)}`;
+
+        return `${date}/${month}/${paymentDate.getFullYear()}`;
+    }
 
     return (
         <div className={styles.balanceInfoContainer}>
@@ -103,19 +112,19 @@ const CheersBalanceCard = ({ user }) => {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Grid container>
-                                    {transctionsHistory.map((transaction) => (
+                                    {paymentsHistory && Object.keys(paymentsHistory).reverse().map((payment) => (
                                         <Grid xs={12}>
                                             <div className={styles.transactionContainer}>
                                                 <div className={styles.transactionInformationContainer}>
                                                     <p className={styles.transactionText}>
-                                                        {transaction.currency}
+                                                        {paymentsHistory[payment].currency}
                                                     </p>
                                                     <p className={styles.transactionDate}>
-                                                        {transaction.date}
+                                                        {formatDate(paymentsHistory[payment].timestamp)}
                                                     </p>
                                                 </div>
                                                 <p className={styles.transactionText}>
-                                                    {transaction.amount}
+                                                    {paymentsHistory[payment].amount}
                                                 </p>
                                             </div>
                                         </Grid>
@@ -150,6 +159,7 @@ const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
+    const [paymentsHistory, setPaymentsHistory] = useState({});
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -169,7 +179,15 @@ const StreamerProfile = ({ user, games }) => {
             }
         }
 
+        async function loadPayments() {
+            const payments = await getLastStreamerPayments(user.uid);
+            setPaymentsHistory(payments.val());
+        }
+
         loadStreams();
+        if (user) {
+            loadPayments();
+        }
     }, [streamType, user, history]);
 
     const createStream = () => {
@@ -241,7 +259,7 @@ const StreamerProfile = ({ user, games }) => {
                                         <Grid container style={{ marginTop: '6rem' }}>
                                             <Hidden smDown>
                                                 <div style={{ position: 'absolute', top: 48, right: 32, maxWidth: 360 }}>
-                                                    <CheersBalanceCard user={user} />
+                                                    <CheersBalanceCard paymentsHistory={paymentsHistory} user={user} />
                                                 </div>
                                             </Hidden>
                                             <Hidden smUp>

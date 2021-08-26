@@ -183,7 +183,7 @@ const PubSubTest = ({ user }) => {
             const streamScheduledDate = new Date(streamTimestamp);
             if (currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
                 alert(t('handleStream.connecting'));
-                const rewards = await createReward();
+                const rewards = await createReward(userCredentialsUpdated);
 
                 if (rewards) {
                     connect(streamId, user.displayName, user.uid, userCredentialsUpdated.access_token, userCredentialsUpdated.refresh_token, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);

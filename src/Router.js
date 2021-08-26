@@ -21,6 +21,7 @@ import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent'
 import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
+import Lottery from './components/Lottery/Lottery';
 
 window.onbeforeunload = function() {
     return true;
@@ -100,6 +101,9 @@ const Router = () => {
                 </Route>
                 <Route exact path='/settings'>
                     <Settings user={user} />
+                </Route>
+                <Route exact path='/lottery'>
+                    <Lottery user={user} />
                 </Route>
             </Switch>
         </RouterPackage>

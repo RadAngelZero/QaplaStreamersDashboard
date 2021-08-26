@@ -234,13 +234,13 @@ function nonce(length) {
  * @param {boolean} isMaxPerStreamEnabled Whether a maximum per stream is enabled
  * @param {number} maxPerStream The maximum number per stream if enabled
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled = false, maxPerStream) {
+export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, enabled, onInvalidRefreshToken, isMaxPerStreamEnabled = false, maxPerStream = 0, isMaxPerUserPerStreamEnabled = true, maxPerUserPerStream = 0) {
     try {
         const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
         if (twitchAccessTokenStatus === 401) {
             const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
             if (newCredentials) {
-                return await createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, enabled, onInvalidRefreshToken, streamId, isMaxPerStreamEnabled, maxPerStream);
+                return await createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, enabled, onInvalidRefreshToken, isMaxPerStreamEnabled, maxPerStream, isMaxPerUserPerStreamEnabled, maxPerUserPerStream);
             }
         }
 
@@ -254,8 +254,8 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
             body: JSON.stringify({
                 title,
                 cost,
-                is_max_per_user_per_stream_enabled: true,
-                max_per_user_per_stream: 1,
+                is_max_per_user_per_stream_enabled: isMaxPerUserPerStreamEnabled,
+                max_per_user_per_stream: maxPerUserPerStream,
                 is_max_per_stream_enabled: isMaxPerStreamEnabled,
                 max_per_stream: maxPerStream,
                 is_enabled: enabled
@@ -307,6 +307,43 @@ export async function enableCustomReward(uid, twitchId, accessToken, refreshToke
             },
             body: JSON.stringify({
                 is_enabled: true
+            })
+        });
+
+        return response.status;
+    } catch (e) {
+        console.log('Error: ', e);
+    }
+}
+
+/**
+ * Update a custom reward in the user´s twitch
+ * @param {string} uid User identifier
+ * @param {string} twitchId Twitch identifier
+ * @param {string} accessToken Twitch access token
+ * @param {string} refreshToken Twitch refresh token
+ * @param {string} rewardId Id of the reward to delete
+ * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
+ */
+ export async function disableCustomReward(uid, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
+    try {
+        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
+        if (twitchAccessTokenStatus === 401) {
+            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
+            if (newCredentials) {
+                return await enableCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
+            }
+        }
+
+        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
+            method: 'PATCH',
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                is_enabled: false
             })
         });
 

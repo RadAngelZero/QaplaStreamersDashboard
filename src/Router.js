@@ -21,6 +21,7 @@ import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent'
 import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
+import AddStreamerLinks from './components/AddStreamerLinks/AddStreamerLinks';
 
 window.onbeforeunload = function() {
     return true;
@@ -86,8 +87,11 @@ const Router = () => {
                 <Route exact path='/edit/:streamId'>
                     <EditStreamerEvent user={user} games={games} />
                 </Route>
-                <Route exact path='/profile'>
+                <Route exact path='/dashboard'>
                     <StreamerProfile user={user} games={games} />
+                </Route>
+                <Route exact path='/profile'>
+                    <AddStreamerLinks user={user} games={games} />
                 </Route>
                 <Route exact path='/success'>
                     <EventSent user={user} />

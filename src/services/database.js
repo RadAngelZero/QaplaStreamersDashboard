@@ -376,12 +376,12 @@ export async function listenCustomRewardRedemptions(streamId, callback) {
  */
 export async function getUserByTwitchId(twitchId) {
     const users = await userRef.orderByChild('twitchId').equalTo(twitchId).once('value');
-    let user = {};
+    let user = null;
     users.forEach((qaplaUser) => {
         user = { ...qaplaUser.val(), id: qaplaUser.key };
     });
 
-    return users.exists() ? user : null;
+    return user;
 }
 
 /**

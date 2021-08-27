@@ -326,10 +326,12 @@ const PubSubTest = ({ user }) => {
         setStreamInRedemptionsLists(streamId);
         const expRedemptions = await getAllRewardRedemptions(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, rewardsIdsToDelete.expReward, handleTwitchSignIn);
         let usersPrizes = {};
+        console.log(expRedemptions);
         for (let i = 0; i < expRedemptions.length; i++) {
             const redemption = expRedemptions[i];
             const qaplaUser = await getUserByTwitchId(redemption.user_id);
             if (qaplaUser) {
+                console.log(qaplaUser);
                 const userRedemptionsOnDatabase = await getStreamUserRedemptions(qaplaUser.id, streamIdToAssignRewards);
                 usersPrizes[redemption.user_id] = {
                     twitchUserName: redemption.user_name,

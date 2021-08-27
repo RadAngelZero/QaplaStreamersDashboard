@@ -9,16 +9,11 @@ const AddStreamerLinks = ({  user}) => {
     useEffect(() => {
         async function loadLinks() {
             getStreamerLinks(user.uid, (links) => {
-                if (links.exists() && links.val().links) {
-                    setLinks(links.val().links);
-                } else {
-                    setLinks(null);
-                }
+                setLinks(links.val());
             });
         }
 
         if (user && user.uid) {
-            console.log(user);
             loadLinks();
         }
     }, [user]);

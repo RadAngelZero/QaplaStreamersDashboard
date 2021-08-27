@@ -104,7 +104,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
                         const expToGive = 15;
-                        await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
+                        await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
                         await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
                         await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
 

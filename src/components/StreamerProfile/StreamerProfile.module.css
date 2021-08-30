@@ -31,8 +31,6 @@
 
 .balanceInfoContainer {
     flex-direction: row;
-    margin-left: 1.25rem;
-    margin-right: 1rem;
 }
 
 .cheersTitleContainer {
@@ -43,7 +41,7 @@
 
 .cheersText {
     color: #FFF;
-    text-align: center;
+    text-align: right;
     font-weight: 500;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -80,6 +78,9 @@
     border-radius: 20px;
     background-color: #141735;
     padding-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .blur {
@@ -145,7 +146,7 @@
 
 .learnMoreContainer {
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 }
 

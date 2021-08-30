@@ -34,12 +34,12 @@
         "pastStreams": "Past Streams",
         "cheersBalance": "Current Cheers Balance",
         "premiumBenefits": "Get Bits & Subs for free",
-        "history": "Payment history",
+        "receivedCheers": "See received cheers",
         "cheersBalanceTooltip": {
             "title": "Keep track of your Qoins<>Bits balance.",
             "description": "Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period."
         },
-        "learnMore": "Learn More",
+        "learnMore": "What is the balance?",
         "postStream": "Post a\nStream"
     },
     "StreamCard": {

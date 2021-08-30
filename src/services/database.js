@@ -17,6 +17,7 @@ const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
+const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
 
 /**
@@ -507,7 +508,15 @@ export async function markDonationAsRead(streamerUid, donationId) {
 }
 
 /**
- * Streamers Links
+ * Get the last 5 payments received by the streamer
+ * @param {string} streamerUid Uid of the streamer
+ */
+export async function getLastStreamerPayments(streamerUid) {
+    return await paymentsToStreamersHistory.child(streamerUid).orderByChild('timestamp').limitToLast(5).once('value');
+}
+
+/**
+* Streamers Links
  */
 
 /**

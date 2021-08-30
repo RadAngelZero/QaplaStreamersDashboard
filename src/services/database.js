@@ -506,6 +506,10 @@ export async function markDonationAsRead(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
 }
 
+/**
+ * Get the last 5 payments received by the streamer
+ * @param {string} streamerUid Uid of the streamer
+ */
 export async function getLastStreamerPayments(streamerUid) {
     return await paymentsToStreamersHistory.child(streamerUid).orderByChild('timestamp').limitToLast(5).once('value');
 }

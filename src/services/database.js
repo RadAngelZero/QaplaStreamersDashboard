@@ -17,6 +17,7 @@ const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
+const streamerLinksRef = database.ref('/StreamerLinks');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -503,4 +504,29 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  */
 export async function markDonationAsRead(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
+}
+
+/**
+ * Streamers Links
+ */
+
+/**
+ * Saves a link information for the streamer public profile
+ * @param {string} streamerUid Uid of the streamer
+ * @param {string} username Twitch username of the streamer
+ * @param {string} link URL to save
+ * @param {string} title Title for the link to show on streamer profile
+ */
+export async function addStreamerLink(streamerUid, username, link, title) {
+    await streamerLinksRef.child(streamerUid).update({ username });
+    streamerLinksRef.child(streamerUid).child('links').push({ link, title });
+}
+
+/**
+ * Listen for all the links of the given streamer
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Function called every time the link list id updated
+ */
+export async function getStreamerLinks(streamerUid, callback) {
+    streamerLinksRef.child(streamerUid).child('links').on('value', callback);
 }

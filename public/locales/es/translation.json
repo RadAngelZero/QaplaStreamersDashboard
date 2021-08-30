@@ -16,6 +16,7 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
+        "profile": "Perfil",
         "settings": "Ajustes",
         "new": "Nuevo",
         "signOut": "Cerrar sesión"

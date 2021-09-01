@@ -482,12 +482,29 @@ export function listenToUserStreamingStatus(streamerUid, callback) {
 }
 
 /**
+ * Listener to get the last x cheers added to the StreamersDonations
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Handler of the results
+ */
+export function listenForLastStreamerCheers(streamerUid, limit = 10, callback) {
+    streamersDonationsRef.child(streamerUid).limitToLast(limit).on('value', callback);
+}
+
+/**
  * Listener to get every unread streamer cheer added to the StreamersDonations
  * @param {string} streamerUid Uid of the streamer
  * @param {function} callback Handler of the results
  */
-export function listenForUnreadStreamerCheers(streamerUid, callback) {
+ export function listenForUnreadStreamerCheers(streamerUid, callback) {
     streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback);
+}
+
+/**
+ * Remove listener from the Streamers Donation node
+ * @param {string} streamerUid Uid of the streamer
+ */
+ export function removeListenerForLastStreamerCheers(streamerUid) {
+    streamersDonationsRef.child(streamerUid).off('value');
 }
 
 /**
@@ -508,11 +525,13 @@ export async function markDonationAsRead(streamerUid, donationId) {
 }
 
 /**
- * Get the last 5 payments received by the streamer
+ * Get the payments received by the streamer in the giving period
  * @param {string} streamerUid Uid of the streamer
+ * @param {number} startTimestamp Lower limit for the time query
+ * @param {number} endTimestamp Superior limit for the time query
  */
-export async function getLastStreamerPayments(streamerUid) {
-    return await paymentsToStreamersHistory.child(streamerUid).orderByChild('timestamp').limitToLast(5).once('value');
+export async function getPeriodStreamerPayments(streamerUid, startTimestamp, endTimestamp) {
+    return await paymentsToStreamersHistory.child(streamerUid).orderByChild('timestamp').startAt(startTimestamp).endAt(endTimestamp).once('value');
 }
 
 /**

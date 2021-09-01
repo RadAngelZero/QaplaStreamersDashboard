@@ -1,4 +1,18 @@
 {
+    "months": {
+        "jan": "Ene",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Abr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Ago",
+        "sep": "Sept",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dic"
+    },
     "handleStream": {
         "connect": "Conectar a Twitch",
         "reconnect": "Reconectar a Twitch",
@@ -74,5 +88,8 @@
             "title": "5. Pega tu URL personalizado de Qapla",
             "description": "Define tanto la altura como el ancho de la ventana en 400 y desmarca todas las opciones"
         }
+    },
+    "CheersBitsRecordDialog": {
+        "period": "Periodo:"
     }
 }

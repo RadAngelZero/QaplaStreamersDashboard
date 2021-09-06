@@ -226,10 +226,10 @@ const QoinsCheers = ({ qoinsBalance, cheers }) => {
                         <ListItem disableGutters>
                             <ListItemAvatar>
                                 <Avatar alt={cheers[cheerId].userName}
-                                    src={'https://www.amongusavatarcreator.com/assets/img/main/icon.png'} />
+                                    src={cheers[cheerId].photoURL} />
                             </ListItemAvatar>
                             <ListItemText primary={cheers[cheerId].userName}
-                                secondary={formatDate(cheers[cheerId].timestamp * 1000)}
+                                secondary={formatDate(cheers[cheerId].timestamp)}
                                 classes={{
                                     primary: classes.qoinsDonationPrimaryText,
                                     secondary: classes.qoinsCheersecondaryText

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, makeStyles, Grid, Accordion, AccordionSummary, AccordionDetails, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip } from '@material-ui/core';
+import { withStyles, makeStyles, Grid, AccordionSummary, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -9,7 +9,7 @@ import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
-import { getLastStreamerPayments, loadStreamsByStatus } from '../../services/database';
+import { loadStreamsByStatus } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCEHDULED_EVENT_TYPE,
@@ -20,6 +20,7 @@ import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
 import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
 import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
+import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 
 const BalanceInfoTooltip = withStyles(() => ({
     tooltip: {
@@ -39,30 +40,22 @@ const BalanceInfoTooltip = withStyles(() => ({
     }
 }))(Tooltip);
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     accordionSummary: {
         justifyContent: "flex-end"
+    },
+    currencyContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
     }
 }));
 
-const transctionsHistory = [
-    { currency: 'Bits', date: '06/08/2021', amount: 400 },
-    { currency: 'Qoins', date: '04/08/2021', amount: 330 },
-];
-
-const CheersBalanceCard = ({ user, paymentsHistory }) => {
+const CheersBalanceCard = ({ user }) => {
     const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
+    const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
     const { t } = useTranslation();
     const classes = useStyles();
-
-    const formatDate = (timestamp) => {
-        const paymentDate = new Date(timestamp);
-
-        const date = paymentDate.getDate() >= 10 ? paymentDate.getDate() : `0${paymentDate.getDate()}`;
-        const month = (paymentDate.getMonth() + 1) >= 10 ? (paymentDate.getMonth() + 1) : `0${(paymentDate.getMonth() + 1)}`;
-
-        return `${date}/${month}/${paymentDate.getFullYear()}`;
-    }
 
     return (
         <div className={styles.balanceInfoContainer}>
@@ -72,7 +65,7 @@ const CheersBalanceCard = ({ user, paymentsHistory }) => {
                     {t('StreamerProfile.cheersBalance')}
                 </p>
             </div>
-            <Grid container className={styles.balanceContainer}>
+            <div className={styles.balanceContainer}>
                 {!user.premium &&
                     <div className={styles.getPremiumBannerContainer}>
                         <p className={styles.getPremiumBannerText}>
@@ -80,61 +73,47 @@ const CheersBalanceCard = ({ user, paymentsHistory }) => {
                         </p>
                     </div>
                 }
-                <Grid xs={12}>
-                    <div className={user.premium ? '' : styles.blur}>
-                        <div className={styles.balanceCurrencyContainer}>
-                            <p className={styles.balanceCurrencyValue}>
-                                {user.bitsBalance || 0}
-                            </p>
-                            <BitsIcon />
-                        </div>
-                    </div>
-                </Grid>
-                <Grid xs={12}>
-                    <div className={user.premium ? '' : styles.blur}>
-                        <div className={styles.balanceCurrencyContainer}>
-                            <p className={styles.balanceCurrencyValue}>
-                                {user.qoinsBalance || 0}
-                            </p>
-                            <QoinsIcon />
-                        </div>
-                    </div>
-                </Grid>
-                <Grid xs={12}>
-                    <div className={user.premium ? '' : styles.blur}>
-                        <Accordion className={styles.historyAccordion}>
-                            <AccordionSummary
-                                expandIcon={<Arrow />}
-                                classes={{ content: classes.accordionSummary }}>
-                                <p className={styles.historyText}>
-                                    {t('StreamerProfile.history')}
+                <div className={classes.currencyContainer}>
+                    <div>
+                        <div className={user.premium ? '' : styles.blur}>
+                            <div className={styles.balanceCurrencyContainer}>
+                                <p className={styles.balanceCurrencyValue}>
+                                    {user.bitsBalance || 0}
                                 </p>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Grid container>
-                                    {paymentsHistory && Object.keys(paymentsHistory).reverse().map((payment) => (
-                                        <Grid xs={12}>
-                                            <div className={styles.transactionContainer}>
-                                                <div className={styles.transactionInformationContainer}>
-                                                    <p className={styles.transactionText}>
-                                                        {paymentsHistory[payment].currency}
-                                                    </p>
-                                                    <p className={styles.transactionDate}>
-                                                        {formatDate(paymentsHistory[payment].timestamp)}
-                                                    </p>
-                                                </div>
-                                                <p className={styles.transactionText}>
-                                                    {paymentsHistory[payment].amount}
-                                                </p>
-                                            </div>
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </AccordionDetails>
-                        </Accordion>
+                                <BitsIcon />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div className={user.premium ? '' : styles.blur}>
+                            <div className={styles.balanceCurrencyContainer}>
+                                <p className={styles.balanceCurrencyValue}>
+                                    {user.qoinsBalance || 0}
+                                </p>
+                                <QoinsIcon />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <Grid xs={12}>
+                    <div className={user.premium ? '' : styles.blur}>
+                        {/**
+                         * AccordionSummary only used for UI purposes, we are not using any Accordion component here
+                         */}
+                        <AccordionSummary className={styles.historyAccordion}
+                            expandIcon={<Arrow style={{ rotate: '-90deg' }} />}
+                            classes={{ content: classes.accordionSummary }}
+                            onClick={() => setOpenRecordsDialog(true)}>
+                            <p className={styles.historyText}>
+                                {t('StreamerProfile.receivedCheers')}
+                            </p>
+                        </AccordionSummary>
+                        <CheersBitsRecordDialog open={openRecordsDialog}
+                            onClose={() => setOpenRecordsDialog(false)}
+                            user={user} />
                     </div>
                 </Grid>
-            </Grid>
+            </div>
             <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
                 <BalanceInfoTooltip arrow
                     onClose={() => setOpenBalanceTooltip(false)}
@@ -179,15 +158,7 @@ const StreamerProfile = ({ user, games }) => {
             }
         }
 
-        async function loadPayments() {
-            const payments = await getLastStreamerPayments(user.uid);
-            setPaymentsHistory(payments.val());
-        }
-
         loadStreams();
-        if (user) {
-            loadPayments();
-        }
     }, [streamType, user, history]);
 
     const createStream = () => {
@@ -246,7 +217,7 @@ const StreamerProfile = ({ user, games }) => {
                     <Grid container>
                         <Grid item xs={12}>
                             <Grid container>
-                                <Grid xs={12}>
+                                <Grid xs={12} sm={7}>
                                     <Grid item xs={12}>
                                         <Button variant='contained'
                                             className={styles.twitchButton}
@@ -257,14 +228,14 @@ const StreamerProfile = ({ user, games }) => {
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Grid container style={{ marginTop: '6rem' }}>
-                                            <Hidden smDown>
-                                                <div style={{ position: 'absolute', top: 48, right: 32, maxWidth: 360 }}>
+                                            <Hidden xsDown>
+                                                <div style={{ position: 'absolute', top: 48, right: 32, widt: 360, maxWidth: 420 }}>
                                                     <CheersBalanceCard paymentsHistory={paymentsHistory} user={user} />
                                                 </div>
                                             </Hidden>
                                             <Hidden smUp>
                                                 <Grid item xs={12}>
-                                                    <CheersBalanceCard user={user} />
+                                                    <CheersBalanceCard paymentsHistory={paymentsHistory} user={user} />
                                                 </Grid>
                                             </Hidden>
                                             <Grid item xs={12} sm={3}>

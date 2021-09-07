@@ -88,10 +88,10 @@ const Router = () => {
                 <Route exact path='/edit/:streamId'>
                     <EditStreamerEvent user={user} games={games} />
                 </Route>
-                <Route exact path='/dashboard'>
+                <Route exact path='/profile'>
                     <StreamerProfile user={user} games={games} />
                 </Route>
-                <Route exact path='/profile'>
+                <Route exact path='/link'>
                     <AddStreamerLinks user={user} games={games} />
                 </Route>
                 <Route exact path='/success'>
@@ -106,9 +106,9 @@ const Router = () => {
                 <Route exact path='/settings'>
                     <Settings user={user} />
                 </Route>
-                <Route exact path='/lottery'>
+                {/* <Route exact path='/lottery'>
                     <Lottery user={user} />
-                </Route>
+                </Route> */}
             </Switch>
         </RouterPackage>
     );

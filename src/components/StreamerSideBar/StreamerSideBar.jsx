@@ -76,20 +76,20 @@ const StreamerSideBar = ({ user }) => {
     const drawer = (
         <Box display='flex' style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap' }} >
             <List style={{ marginTop: '1rem' }}>
-                <ListItem button onClick={() => history.push('/dashboard')}>
+                <ListItem button onClick={() => history.push('/profile')}>
                     <ListItemIcon style={{ minWidth: 40 }}>
-                        <DashboardIcon active={currentScreen === 'dashboard' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream'} />
+                        <DashboardIcon active={currentScreen === 'profile' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
                         {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => history.push('/profile')}>
+                <ListItem button onClick={() => history.push('/link')}>
                     <ListItemIcon style={{ minWidth: 40 }}>
-                        <ProfileIcon active={currentScreen === 'profile'} />
+                        <ProfileIcon active={currentScreen === 'link'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        {t('SideBar.profile')}
+                        {t('SideBar.link')}
                     </ListItemText>
                 </ListItem>
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={goToSettings}>

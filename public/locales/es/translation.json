@@ -1,4 +1,18 @@
 {
+    "months": {
+        "jan": "Ene",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Abr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Ago",
+        "sep": "Sept",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dic"
+    },
     "handleStream": {
         "connect": "Conectar a Twitch",
         "reconnect": "Reconectar a Twitch",
@@ -16,7 +30,7 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
-        "profile": "Perfil",
+        "link": "Link en bio",
         "settings": "Ajustes",
         "new": "Nuevo",
         "signOut": "Cerrar sesión"
@@ -34,12 +48,12 @@
         "pastStreams": "Streams Anteriores",
         "cheersBalance": "Balance actual de Cheers",
         "premiumBenefits": "Obten Bits y Subs gratis",
-        "history": "Historial de abonos",
+        "receivedCheers": "Ver cheers recibidos",
         "cheersBalanceTooltip": {
             "title": "Realiza seguimiento de tu balance de Qoins<>Bits.",
             "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
         },
-        "learnMore": "Saber Más",
+        "learnMore": "¿Qué es el balance?",
         "postStream": "Publicar un\nStream"
     },
     "StreamCard": {
@@ -74,5 +88,8 @@
             "title": "5. Pega tu URL personalizado de Qapla",
             "description": "Define tanto la altura como el ancho de la ventana en 400 y desmarca todas las opciones"
         }
+    },
+    "CheersBitsRecordDialog": {
+        "period": "Periodo:"
     }
 }

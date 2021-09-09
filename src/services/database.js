@@ -558,3 +558,29 @@ export async function addStreamerLink(streamerUid, username, link, title) {
 export async function getStreamerLinks(streamerUid, callback) {
     streamerLinksRef.child(streamerUid).child('links').on('value', callback);
 }
+
+/**
+ * Validates the limit and add the redemption if the limit is not exceeded yet
+ * @param {string} streamId Stream identifier
+ * @param {number} maxRedemptionsOfQoinsPerStream Maximum of redemptions allowed for the Qoins reward
+ * @param {function} callback Function called if the limit is not exceeded yet
+ */
+export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId, maxRedemptionsOfQoinsPerStream, callback) {
+    streamsRef.child(streamId).child('qoinsRedemptionsCounter').transaction((counter) => {
+        if (counter < maxRedemptionsOfQoinsPerStream) {
+            callback();
+
+            return counter + 1;
+        }
+
+        return counter;
+    });
+}
+
+/**
+ * Returns the value of the qoinsRedemptionsCounter of the given stream
+ * @param {string} streamId Streamer identifier
+ */
+export async function getStreamRedemptionCounter(streamId) {
+    return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
+}

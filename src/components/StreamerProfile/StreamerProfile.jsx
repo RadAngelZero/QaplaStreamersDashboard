@@ -138,7 +138,6 @@ const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
-    const [paymentsHistory, setPaymentsHistory] = useState({});
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -230,12 +229,12 @@ const StreamerProfile = ({ user, games }) => {
                                         <Grid container style={{ marginTop: '6rem' }}>
                                             <Hidden xsDown>
                                                 <div style={{ position: 'absolute', top: 48, right: 32, widt: 360, maxWidth: 420 }}>
-                                                    <CheersBalanceCard paymentsHistory={paymentsHistory} user={user} />
+                                                    <CheersBalanceCard user={user} />
                                                 </div>
                                             </Hidden>
                                             <Hidden smUp>
                                                 <Grid item xs={12}>
-                                                    <CheersBalanceCard paymentsHistory={paymentsHistory} user={user} />
+                                                    <CheersBalanceCard user={user} />
                                                 </Grid>
                                             </Hidden>
                                             <Grid item xs={12} sm={3}>

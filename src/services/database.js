@@ -19,6 +19,7 @@ const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
 const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
+const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -372,6 +373,10 @@ export async function listenCustomRewardRedemptions(streamId, callback) {
 }
 
 /**
+ * App users
+ */
+
+/**
  * Return a user profile object (node Users in our database) based on their twitchId or null
  * if it does not exist
  * @param {string} twitchId Twitch id
@@ -388,6 +393,33 @@ export async function getUserByTwitchId(twitchId) {
  */
 export async function isUserRegisteredToStream(uid, streamId) {
     return (await eventParticipantsRef.child(streamId).child(uid).once('value')).exists();
+}
+
+/**
+ * Returns the snapshot of the lastSeasonLevel of the given user
+ * @param {string} uid User identifier
+ */
+export async function getUserLastSeasonLevel(uid) {
+    return await userRef.child(uid).child('lastSeasonLevel').once('value');
+}
+
+/**
+ * Qapla Levels
+ */
+
+/**
+ * Returns the qoinsToGive snapshot of the given level
+ * @param {number} level Season level
+ */
+export async function getQoinsToGiveToGivenLevel(level) {
+    return await qaplaLevelsRequirementsRef.child(level - 1).child('qoinsToGive').once('value');
+}
+
+/**
+ * Returns the array of Qapla levels
+ */
+export async function getQaplaLevels() {
+    return await qaplaLevelsRequirementsRef.once('value');
 }
 
 /**
@@ -558,6 +590,10 @@ export async function addStreamerLink(streamerUid, username, link, title) {
 export async function getStreamerLinks(streamerUid, callback) {
     streamerLinksRef.child(streamerUid).child('links').on('value', callback);
 }
+
+/**
+ * Qoin Reward Redemption counter
+ */
 
 /**
  * Validates the limit and add the redemption if the limit is not exceeded yet

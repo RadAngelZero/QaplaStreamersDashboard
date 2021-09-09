@@ -40,7 +40,9 @@ import {
     addListToStreamRedemptionList,
     saveStreamerTwitchCustomReward,
     getStreamUserRedemptions,
-    getStreamRedemptionCounter
+    getStreamRedemptionCounter,
+    getUserLastSeasonLevel,
+    getQaplaLevels
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS, TWITCH_PUBSUB_UNCONNECTED, TWITCH_PUBSUB_CONNECTED, TWITCH_PUBSUB_CONNECTION_LOST, HOUR_IN_MILISECONDS } from '../../utilities/Constants';
@@ -416,6 +418,8 @@ const PubSubTest = ({ user }) => {
 
             usersPrizeArray = Object.keys(usersPrizes).map((twitchId) => ({ ...usersPrizes[twitchId], twitchId }));
 
+            const qaplaLevels = await getQaplaLevels();
+
             for (let i = 0; i < usersPrizeArray.length; i++) {
                 if (redemptionCounter < redemptionsAllowedPerStream) {
                     const twitchUser = usersPrizeArray[i];
@@ -430,15 +434,12 @@ const PubSubTest = ({ user }) => {
                     if (giveQoinsToUser) {
                         await saveCustomRewardRedemption(twitchUser.uid, twitchUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, QOINS, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
 
-                        let qoinsToGive = 5;
+                        const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
 
-                        const userHasRedeemedExperience = twitchUser.redemptions ? Object.keys(twitchUser.redemptions).some((redemptionId) => twitchUser.redemptions[redemptionId].type === XQ) : false;
-
-                        // If the user has redeemed both XQ and Qoins rewards
-                        if (userHasRedeemedExperience) {
-                            // Give him 10 qoins instead of 5
-                            qoinsToGive = 10;
-                        }
+                        /**
+                         * userLastSeasonLevel - 1 because in the array the level count stars from 0
+                         */
+                        const qoinsToGive = qaplaLevels.val()[userLastSeasonLevel - 1] || qaplaLevels.val()[0];
 
                         addQoinsToUser(twitchUser.uid, qoinsToGive);
                         addInfoToEventParticipants(streamIdToAssignRewards, twitchUser.uid, 'qoinsRedeemed', qoinsToGive);

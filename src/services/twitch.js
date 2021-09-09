@@ -10,7 +10,9 @@ import {
     saveCustomRewardNonRedemption,
     getCustomRewardRedemptions,
     getStreamUserRedemptions,
-    addRedemptionToCounterIfItHaveNotExceededTheLimit
+    addRedemptionToCounterIfItHaveNotExceededTheLimit,
+    getUserLastSeasonLevel,
+    getQoinsToGiveToGivenLevel
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, XQ, QOINS } from '../utilities/Constants';
 
@@ -149,15 +151,12 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         if (giveQoinsToUser) {
                             await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
-                            const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
+                            /**
+                             * If the user does not have a level we assign level 1 by default
+                             */
+                            const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
 
-                            let qoinsToGive = 5;
-
-                            // If the user has already redeemed the exp reward and now the qoins reward
-                            if (userHasRedeemedExperience.exists() && Object.keys(userHasRedeemedExperience.val()).length === 2) {
-                                // Give him 10 qoins instead of 5
-                                qoinsToGive = 10;
-                            }
+                            const qoinsToGive = await getQoinsToGiveToGivenLevel(userLastSeasonLevel);
 
                             addQoinsToUser(user.id, qoinsToGive);
                             await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);

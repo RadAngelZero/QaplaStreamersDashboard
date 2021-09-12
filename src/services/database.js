@@ -303,6 +303,7 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
     const userLeaderboardExperience = (await donationsLeaderBoardRef.child(uid).child('totalDonations').once('value')).val() || 0;
 
     userUpdate[`/Users/${uid}/qaplaLevel`] = amountOfExperience + userExperience;
+    userUpdate[`/Users/${uid}/seasonXQ`] = userLeaderboardExperience + amountOfExperience;
     userUpdate[`/DonationsLeaderBoard/${uid}/totalDonations`] = userLeaderboardExperience + amountOfExperience;
     userUpdate[`/DonationsLeaderBoard/${uid}/userName`] = userName;
 

@@ -81,7 +81,6 @@ export function closeConnection() {
  * @param {number} maxRedemptionsOfQoinsPerStream Maxmimum of qoins redemptions allowed per stream
  */
 export async function handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, maxRedemptionsOfQoinsPerStream) {
-    
     if (!redemptionsIds[redemptionData.id]) {
         redemptionsIds[redemptionData.id] = true;
         if (redemptionData.reward.id === rewardsIds.expReward) {
@@ -112,15 +111,6 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
                         await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
                         await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
-
-                        const userHasRedeemedQoins = await getCustomRewardRedemptions(streamId, user.id);
-
-                        if (userHasRedeemedQoins.exists() && Object.keys(userHasRedeemedQoins.val()).length === 2) {
-                            let qoinsToGive = 5;
-                            addQoinsToUser(user.id, qoinsToGive);
-                            await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive * 2);
-                            await saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
-                        }
                     }
                 } else {
                     await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);

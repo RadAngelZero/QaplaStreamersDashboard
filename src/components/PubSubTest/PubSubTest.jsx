@@ -184,7 +184,7 @@ const PubSubTest = ({ user }) => {
         } else {
             const currentDate = new Date();
             const streamScheduledDate = new Date(streamTimestamp);
-            if (user.id === '613408163' || currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
+            if (user.id === '213807528' || currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
                 alert(t('handleStream.connecting'));
                 const rewards = await createReward(userCredentialsUpdated);
 
@@ -342,7 +342,7 @@ const PubSubTest = ({ user }) => {
                     timestamp: redemption.redeemed_at,
                     uid: qaplaUser.id,
                     qaplaLevel: qaplaUser.qaplaLevel,
-                    userName: qaplaUser.userName,
+                    userName: qaplaUser.userName ? qaplaUser.userName : redemption.user_name,
                     photoUrl: qaplaUser.photoUrl,
                     redemptions: userRedemptionsOnDatabase.exists() ? userRedemptionsOnDatabase.val() : null
                 };

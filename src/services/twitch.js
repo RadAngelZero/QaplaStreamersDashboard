@@ -8,9 +8,10 @@ import {
     addInfoToEventParticipants,
     saveUserStreamReward,
     saveCustomRewardNonRedemption,
-    getCustomRewardRedemptions,
     getStreamUserRedemptions,
-    addRedemptionToCounterIfItHaveNotExceededTheLimit
+    addRedemptionToCounterIfItHaveNotExceededTheLimit,
+    getUserLastSeasonLevel,
+    getQoinsToGiveToGivenLevel
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, XQ, QOINS } from '../utilities/Constants';
 
@@ -79,7 +80,6 @@ export function closeConnection() {
  * @param {number} maxRedemptionsOfQoinsPerStream Maxmimum of qoins redemptions allowed per stream
  */
 export async function handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, maxRedemptionsOfQoinsPerStream) {
-    
     if (!redemptionsIds[redemptionData.id]) {
         redemptionsIds[redemptionData.id] = true;
         if (redemptionData.reward.id === rewardsIds.expReward) {
@@ -107,18 +107,9 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
                         const expToGive = 15;
-                        await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName, expToGive);
+                        await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
                         await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
                         await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
-
-                        const userHasRedeemedQoins = await getCustomRewardRedemptions(streamId, user.id);
-
-                        if (userHasRedeemedQoins.exists() && Object.keys(userHasRedeemedQoins.val()).length === 2) {
-                            let qoinsToGive = 5;
-                            addQoinsToUser(user.id, qoinsToGive);
-                            await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive * 2);
-                            await saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
-                        }
                     }
                 } else {
                     await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
@@ -142,22 +133,19 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         let giveQoinsToUser = true;
 
                         if (userRedemptions.exists()) {
-                            // If the user has redemptions on our database but has no redemptions of XQ type set giveQoinsToUser to true
+                            // If the user has redemptions on our database but has no redemptions of QOINS type set giveQoinsToUser to true
                             giveQoinsToUser = !Object.keys(userRedemptions.val()).some((redemptionId) => userRedemptions.val()[redemptionId].type === QOINS);
                         }
 
                         if (giveQoinsToUser) {
                             await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
-                            const userHasRedeemedExperience = await getCustomRewardRedemptions(streamId, user.id);
+                            /**
+                             * If the user does not have a level we assign level 1 by default
+                             */
+                            const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
 
-                            let qoinsToGive = 5;
-
-                            // If the user has already redeemed the exp reward and now the qoins reward
-                            if (userHasRedeemedExperience.exists() && Object.keys(userHasRedeemedExperience.val()).length === 2) {
-                                // Give him 10 qoins instead of 5
-                                qoinsToGive = 10;
-                            }
+                            const qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
 
                             addQoinsToUser(user.id, qoinsToGive);
                             await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);

@@ -19,6 +19,7 @@ const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
 const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
+const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -302,6 +303,7 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
     const userLeaderboardExperience = (await donationsLeaderBoardRef.child(uid).child('totalDonations').once('value')).val() || 0;
 
     userUpdate[`/Users/${uid}/qaplaLevel`] = amountOfExperience + userExperience;
+    userUpdate[`/Users/${uid}/seasonXQ`] = userLeaderboardExperience + amountOfExperience;
     userUpdate[`/DonationsLeaderBoard/${uid}/totalDonations`] = userLeaderboardExperience + amountOfExperience;
     userUpdate[`/DonationsLeaderBoard/${uid}/userName`] = userName;
 
@@ -344,15 +346,6 @@ export async function saveCustomRewardRedemption(uid, photoUrl, twitchIdThatRede
 }
 
 /**
- * Return all the custom rewards redeemed by the given user in the given stream
- * @param {string} streamId Stream identifier on the database
- * @param {String} uid User identifier
- */
-export async function getCustomRewardRedemptions(streamId, uid) {
-    return await redeemedCustomRewardsRef.child(streamId).orderByChild('uid').equalTo(uid).once('value');
-}
-
-/**
  * Update the status of the given custom redemption
  * @param {string} streamId Stream identifier in our database
  * @param {string} redemptionId Id of the twitch redemption
@@ -370,6 +363,10 @@ export async function updateCustomRewardRedemptionStatus(streamId, redemptionId,
 export async function listenCustomRewardRedemptions(streamId, callback) {
     redeemedCustomRewardsRef.child(streamId).on('value', callback);
 }
+
+/**
+ * App users
+ */
 
 /**
  * Return a user profile object (node Users in our database) based on their twitchId or null
@@ -393,6 +390,33 @@ export async function getUserByTwitchId(twitchId) {
  */
 export async function isUserRegisteredToStream(uid, streamId) {
     return (await eventParticipantsRef.child(streamId).child(uid).once('value')).exists();
+}
+
+/**
+ * Returns the snapshot of the lastSeasonLevel of the given user
+ * @param {string} uid User identifier
+ */
+export async function getUserLastSeasonLevel(uid) {
+    return await userRef.child(uid).child('lastSeasonLevel').once('value');
+}
+
+/**
+ * Qapla Levels
+ */
+
+/**
+ * Returns the qoinsToGive snapshot of the given level
+ * @param {number} level Season level
+ */
+export async function getQoinsToGiveToGivenLevel(level) {
+    return await qaplaLevelsRequirementsRef.child(level - 1).child('qoinsToGive').once('value');
+}
+
+/**
+ * Returns the array of Qapla levels
+ */
+export async function getQaplaLevels() {
+    return await qaplaLevelsRequirementsRef.once('value');
 }
 
 /**
@@ -566,4 +590,34 @@ export async function addStreamerLink(streamerUid, username, link, title) {
  */
 export async function getStreamerLinks(streamerUid, callback) {
     streamerLinksRef.child(streamerUid).child('links').on('value', callback);
+}
+
+/**
+ * Qoin Reward Redemption counter
+ */
+
+/**
+ * Validates the limit and add the redemption if the limit is not exceeded yet
+ * @param {string} streamId Stream identifier
+ * @param {number} maxRedemptionsOfQoinsPerStream Maximum of redemptions allowed for the Qoins reward
+ * @param {function} callback Function called if the limit is not exceeded yet
+ */
+export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId, maxRedemptionsOfQoinsPerStream, callback) {
+    streamsRef.child(streamId).child('qoinsRedemptionsCounter').transaction((counter) => {
+        if (!counter || counter < maxRedemptionsOfQoinsPerStream) {
+            return counter ? counter + 1 : 1;
+        }
+    }, (a, updated) => {
+        if (updated) {
+            callback();
+        }
+    });
+}
+
+/**
+ * Returns the value of the qoinsRedemptionsCounter of the given stream
+ * @param {string} streamId Streamer identifier
+ */
+export async function getStreamRedemptionCounter(streamId) {
+    return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
 }

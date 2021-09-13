@@ -220,6 +220,21 @@ const NewStream = ({ user, games }) => {
         history.push('/success');
     }
 
+    let gameList = [];
+
+    if (games.allGames) {
+        gameList = Object.keys(games.allGames).map((gameKey) => ({ gameKey, ...games.allGames[gameKey] })).sort((a, b) => {
+            if (a.gameName < b.gameName) {
+                return -1;
+            }
+            if (a.gameName > b.gameName) {
+                return 1;
+            }
+
+            return 0;
+        });
+    }
+
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
@@ -239,12 +254,12 @@ const NewStream = ({ user, games }) => {
                             backgroundColor: '#141833',
                             fontSize: '14px'
                         }} value={null}></option>
-                        {games.allGames && Object.entries(games.allGames).map((game) => {
-                            if (!game[1].gameName.toLowerCase().includes('twitch')) {
+                        {games.allGames && gameList.map((game) => {
+                            if (!game.gameName.toLowerCase().includes('twitch')) {
                                 return <option style={{
                                     backgroundColor: '#141833',
                                     fontSize: '14px'
-                                }} value={game[0]}>{game[1].gameName}</option>
+                                }} value={game.gameKey}>{game.gameName}</option>
                             }
 
                             return null;

@@ -47,6 +47,11 @@ import OvercookedImage from './../assets/Overcooked.jpg';
 import DeadCellsImage from './../assets/DeadCells.jpg';
 import GenshinImpactImage from './../assets/GenshinImpact.jpg';
 import AxieInfinityImage from './../assets/AxieInfinity.jpg';
+import MusicImage from './../assets/Music.jpg';
+import SpidermanMMImage from './../assets/SpidermanMM.jpg';
+import GhostOfTsushimaImage from './../assets/GhostOfTsushima.jpg';
+import StreamRacerImage from './../assets/StreamRacer.jpg';
+import TheLastOfUsImage from './../assets/TheLastOfUs.jpg';
 
 /**
  * Twitch API keys
@@ -143,5 +148,10 @@ export const streamsPlaceholderImages = {
     Overcooked: OvercookedImage,
     DeadCells: DeadCellsImage,
     GenshinImpact: GenshinImpactImage,
-    AxieInfinity: AxieInfinityImage
+    AxieInfinity: AxieInfinityImage,
+    Music: MusicImage,
+    SpidermanMM: SpidermanMMImage,
+    GhostOfTsushima: GhostOfTsushimaImage,
+    StreamRacer: StreamRacerImage,
+    TheLastOfUs: TheLastOfUsImage
 };

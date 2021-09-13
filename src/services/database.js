@@ -378,7 +378,12 @@ export async function listenCustomRewardRedemptions(streamId, callback) {
  */
 export async function getUserByTwitchId(twitchId) {
     const users = await userRef.orderByChild('twitchId').equalTo(twitchId).once('value');
-    return users.exists() ? users.val()[Object.keys(users.val())[0]] : null;
+    let user = null;
+    users.forEach((qaplaUser) => {
+        user = { ...qaplaUser.val(), id: qaplaUser.key };
+    });
+
+    return user;
 }
 
 /**
@@ -409,6 +414,10 @@ export async function addInfoToEventParticipants(streamId, uid, fieldName, value
 export function addQoinsToUser(uid, qoinsToAdd) {
     try {
         userRef.child(uid).child('credits').transaction((credits) => {
+            if (!credits) {
+                return qoinsToAdd;
+            }
+
             if (typeof credits === 'number') {
                 return credits + qoinsToAdd;
             }

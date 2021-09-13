@@ -181,9 +181,9 @@ const PubSubTest = ({ user }) => {
         } else {
             const currentDate = new Date();
             const streamScheduledDate = new Date(streamTimestamp);
-            if (currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
+            if (user.id === '213807528' || currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
                 alert(t('handleStream.connecting'));
-                const rewards = await createReward();
+                const rewards = await createReward(userCredentialsUpdated);
 
                 if (rewards) {
                     connect(streamId, user.displayName, user.uid, userCredentialsUpdated.access_token, userCredentialsUpdated.refresh_token, [`channel-points-channel-v1.${user.id}`], rewards, onPong, handleTwitchSignIn);
@@ -339,7 +339,7 @@ const PubSubTest = ({ user }) => {
                     timestamp: redemption.redeemed_at,
                     uid: qaplaUser.id,
                     qaplaLevel: qaplaUser.qaplaLevel,
-                    userName: qaplaUser.userName,
+                    userName: qaplaUser.userName ? qaplaUser.userName : redemption.user_name,
                     photoUrl: qaplaUser.photoUrl,
                     redemptions: userRedemptionsOnDatabase.exists() ? userRedemptionsOnDatabase.val() : null
                 };
@@ -417,7 +417,7 @@ const PubSubTest = ({ user }) => {
             }
 
             if (giveQoinsToUser) {
-                await saveCustomRewardRedemption(twitchUser.uid, twitchUser.photoUrl, twitchUser.twitchId, twitchUser.userName, streamIdToAssignRewards, QOINS, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
+                await saveCustomRewardRedemption(twitchUser.uid, twitchUser.photoUrl, twitchUser.twitchId, twitchUser.twitchUserName, streamIdToAssignRewards, QOINS, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
 
                 let qoinsToGive = 5;
 

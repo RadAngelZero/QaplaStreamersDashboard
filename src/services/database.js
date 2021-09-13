@@ -346,15 +346,6 @@ export async function saveCustomRewardRedemption(uid, photoUrl, twitchIdThatRede
 }
 
 /**
- * Return all the custom rewards redeemed by the given user in the given stream
- * @param {string} streamId Stream identifier on the database
- * @param {String} uid User identifier
- */
-export async function getCustomRewardRedemptions(streamId, uid) {
-    return await redeemedCustomRewardsRef.child(streamId).orderByChild('uid').equalTo(uid).once('value');
-}
-
-/**
  * Update the status of the given custom redemption
  * @param {string} streamId Stream identifier in our database
  * @param {string} redemptionId Id of the twitch redemption
@@ -613,13 +604,13 @@ export async function getStreamerLinks(streamerUid, callback) {
  */
 export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId, maxRedemptionsOfQoinsPerStream, callback) {
     streamsRef.child(streamId).child('qoinsRedemptionsCounter').transaction((counter) => {
-        if (counter < maxRedemptionsOfQoinsPerStream) {
-            callback();
-
-            return counter + 1;
+        if (!counter || counter < maxRedemptionsOfQoinsPerStream) {
+            return counter ? counter + 1 : 1;
         }
-
-        return counter;
+    }, (a, updated) => {
+        if (updated) {
+            callback();
+        }
     });
 }
 

@@ -8,7 +8,6 @@ import {
     addInfoToEventParticipants,
     saveUserStreamReward,
     saveCustomRewardNonRedemption,
-    getCustomRewardRedemptions,
     getStreamUserRedemptions,
     addRedemptionToCounterIfItHaveNotExceededTheLimit,
     getUserLastSeasonLevel,
@@ -134,7 +133,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         let giveQoinsToUser = true;
 
                         if (userRedemptions.exists()) {
-                            // If the user has redemptions on our database but has no redemptions of XQ type set giveQoinsToUser to true
+                            // If the user has redemptions on our database but has no redemptions of QOINS type set giveQoinsToUser to true
                             giveQoinsToUser = !Object.keys(userRedemptions.val()).some((redemptionId) => userRedemptions.val()[redemptionId].type === QOINS);
                         }
 
@@ -146,7 +145,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                              */
                             const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
 
-                            const qoinsToGive = await getQoinsToGiveToGivenLevel(userLastSeasonLevel);
+                            const qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
 
                             addQoinsToUser(user.id, qoinsToGive);
                             await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);

@@ -22,6 +22,8 @@ import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
 import PlanPicker from './components/PlanPicker/PlanPicker';
+import Lottery from './components/Lottery/Lottery';
+import AddStreamerLinks from './components/AddStreamerLinks/AddStreamerLinks';
 
 window.onbeforeunload = function() {
     return true;
@@ -90,6 +92,9 @@ const Router = () => {
                 <Route exact path='/profile'>
                     <StreamerProfile user={user} games={games} />
                 </Route>
+                <Route exact path='/link'>
+                    <AddStreamerLinks user={user} games={games} />
+                </Route>
                 <Route exact path='/success'>
                     <EventSent user={user} />
                 </Route>
@@ -105,6 +110,9 @@ const Router = () => {
                 <Route exact path='/pricing'>
                     <PlanPicker user={user} />
                 </Route>
+                {/* <Route exact path='/lottery'>
+                    <Lottery user={user} />
+                </Route> */}
             </Switch>
         </RouterPackage>
     );

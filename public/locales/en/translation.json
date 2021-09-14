@@ -1,4 +1,18 @@
 {
+    "months": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
+    },
     "handleStream": {
         "connect": "Establish connection with Twitch",
         "reconnect": "Reconnect to Twitch",
@@ -16,6 +30,7 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
+        "link": "Link in bio",
         "settings": "Settings",
         "new": "New",
         "signOut": "Sign out"
@@ -33,11 +48,12 @@
         "pastStreams": "Past Streams",
         "cheersBalance": "Current Cheers Balance",
         "premiumBenefits": "Get Bits & Subs for free",
+        "receivedCheers": "See received cheers",
         "cheersBalanceTooltip": {
             "title": "Keep track of your Qoins<>Bits balance.",
             "description": "Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period."
         },
-        "learnMore": "Learn More",
+        "learnMore": "What is the balance?",
         "postStream": "Post a\nStream"
     },
     "StreamCard": {
@@ -72,5 +88,8 @@
             "title": "5. Copy paste your custom Qapla URL.",
             "description": "Set both width and height to 400, and uncheck all the other options."
         }
+    },
+    "CheersBitsRecordDialog": {
+        "period": "Period:"
     }
 }

@@ -32,7 +32,6 @@ const useStyles = makeStyles(() => ({
     },
     hourContainer: {
         position: 'absolute',
-        zIndex: 9999,
         right: '1rem',
         top: '1rem',
         background: 'rgba(27, 29, 33, .7)',

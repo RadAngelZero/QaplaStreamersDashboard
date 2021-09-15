@@ -564,7 +564,10 @@ export async function markDonationAsRead(streamerUid, donationId) {
 export async function saveSubscriptionInformation(uid, stripeCustomerId, periodStart, periodEnd) {
     userStreamersRef.child(uid).update({
         premium: true,
-        premiumUntil: periodEnd,
+        currentPeriod: {
+            startDate: periodStart,
+            endDate: periodEnd
+        },
         stripeCustomerId
     });
 }

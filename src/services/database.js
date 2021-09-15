@@ -171,6 +171,14 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         timestamp
     });
 
+    userStreamersRef.child(streamer.uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
+        if (!numberOfRequests) {
+            return 1;
+        }
+
+        return numberOfRequests + 1;
+    });
+
     return await streamsApprovalRef.child(event.key).set({
         date,
         hour,
@@ -208,6 +216,11 @@ export async function loadStreamsByStatus(uid, status) {
 export async function cancelStreamRequest(uid, streamId) {
     await streamersEventsDataRef.child(uid).child(streamId).remove();
     await streamsApprovalRef.child(streamId).remove();
+    userStreamersRef.child(uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
+        if (numberOfRequests) {
+            return numberOfRequests - 1;
+        }
+    });
 }
 
 /**
@@ -567,15 +580,6 @@ export async function markDonationAsRead(streamerUid, donationId) {
  * Streamer Subscriptions
  */
 
-/**
- * Returns all the events of a user during the given range of dates
- * @param {string} streamerUid User identifier of the streamer
- * @param {number} startDate First valid timestamp of the range
- * @param {string} endDate Last valid timestamp of the range
- */
-export async function getStreamerEventsWithDateRange(streamerUid, startDate, endDate) {
-    return await premiumEventsSubscriptionRef.child(streamerUid).orderByChild('timestamp').startAt(startDate).endAt(endDate).once('value');
-}
 /**
  * Get the payments received by the streamer in the giving period
  * @param {string} streamerUid Uid of the streamer

@@ -3,7 +3,7 @@ import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdo
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import DayJsUtils from '@date-io/dayjs';
-import { createNewStreamRequest, getStreamerEventsWithDateRange } from './../../services/database';
+import { createNewStreamRequest } from './../../services/database';
 
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -208,15 +208,14 @@ const NewStream = ({ user, games }) => {
             return;
         }
 
-        const { startDate, endDate } = user.currentPeriod;
+        const { endDate } = user.currentPeriod;
 
         /**
          * Check if the selected date is valid to create the event based on the end of the streamer subscription
          */
-        if (selectedDate.getTime() <=  endDate) {
+        if (selectedDate.getTime() <= endDate) {
 
-            const streamsInSelectedPeriod = await getStreamerEventsWithDateRange(user.uid, startDate, endDate);
-            const numberOfStreamsInTheSelectedPeriod = streamsInSelectedPeriod.exists() ? Object.keys(streamsInSelectedPeriod.val()).length : 0;
+            const numberOfStreamsInTheSelectedPeriod = user.subscriptionDetails.streamsRequested || 0;
 
             /**
              * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)

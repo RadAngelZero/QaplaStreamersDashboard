@@ -3,6 +3,7 @@ import { useParams } from 'react-router';
 
 import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers } from '../../services/database';
 import { ReactComponent as QaplaLogo } from './../../assets/QaplaLogo.svg';
+import donationAudio from '../../assets/notification.wav';
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
@@ -34,15 +35,15 @@ const LiveDonations = () => {
             listenForUnreadStreamerCheers(streamerUid, (donation) => {
                 pushDonation({ ...donation.val(), id: donation.key });
             });
-            setListenersAreSetted(true);
         }
 
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
+                setListenersAreSetted(true);
                 if (isStreaming.exists() && isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
-                    }, 1000);
+                    }, 150000);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -53,13 +54,19 @@ const LiveDonations = () => {
         if (donationQueue.length > 0) {
             setTimeout(() => {
                 const donation = popDonation();
-                setDonationToShow(donation);
-                markDonationAsRead(streamerUid, donation.id);
-            }, 5000);
+                if (donation) {
+                    const audio = new Audio(donationAudio);
+                    audio.play();
+                    setDonationToShow(donation);
+                    markDonationAsRead(streamerUid, donation.id);
+                }
+            }, 10000);
         } else {
-            setTimeout(() => {
-                setDonationToShow(null);
-            }, 5000);
+            if (listenersAreSetted) {
+                setTimeout(() => {
+                    setDonationToShow(null);
+                }, 10000);
+            }
         }
 
         if (!streamerUid) {

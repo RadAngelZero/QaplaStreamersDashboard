@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Grid, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip, withStyles } from '@material-ui/core';
+import { withStyles, makeStyles, Grid, AccordionSummary, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, Tooltip } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,8 @@ import {
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
 import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
+import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
+import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 
 const BalanceInfoTooltip = withStyles(() => ({
     tooltip: {
@@ -38,10 +40,103 @@ const BalanceInfoTooltip = withStyles(() => ({
     }
 }))(Tooltip);
 
+const useStyles = makeStyles(() => ({
+    accordionSummary: {
+        justifyContent: "flex-end"
+    },
+    currencyContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
+    }
+}));
+
+const CheersBalanceCard = ({ user }) => {
+    const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
+    const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
+    const { t } = useTranslation();
+    const classes = useStyles();
+
+    return (
+        <div className={styles.balanceInfoContainer}>
+            <div className={styles.cheersTitleContainer}
+                style={{ background: user.premium ? 'transparent' : 'linear-gradient(270deg, #3B4BF9 0%, #7E00FC 100%)' }}>
+                <p className={styles.cheersText}>
+                    {t('StreamerProfile.cheersBalance')}
+                </p>
+            </div>
+            <div className={styles.balanceContainer}>
+                {!user.premium &&
+                    <div className={styles.getPremiumBannerContainer}>
+                        <p className={styles.getPremiumBannerText}>
+                            {t('StreamerProfile.premiumBenefits')}
+                        </p>
+                    </div>
+                }
+                <div className={classes.currencyContainer}>
+                    <div>
+                        <div className={user.premium ? '' : styles.blur}>
+                            <div className={styles.balanceCurrencyContainer}>
+                                <p className={styles.balanceCurrencyValue}>
+                                    {user.bitsBalance || 0}
+                                </p>
+                                <BitsIcon />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div className={user.premium ? '' : styles.blur}>
+                            <div className={styles.balanceCurrencyContainer}>
+                                <p className={styles.balanceCurrencyValue}>
+                                    {user.qoinsBalance || 0}
+                                </p>
+                                <QoinsIcon />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <Grid xs={12}>
+                    <div className={user.premium ? '' : styles.blur}>
+                        {/**
+                         * AccordionSummary only used for UI purposes, we are not using any Accordion component here
+                         */}
+                        <AccordionSummary className={styles.historyAccordion}
+                            expandIcon={<Arrow style={{ rotate: '-90deg' }} />}
+                            classes={{ content: classes.accordionSummary }}
+                            onClick={() => setOpenRecordsDialog(true)}>
+                            <p className={styles.historyText}>
+                                {t('StreamerProfile.receivedCheers')}
+                            </p>
+                        </AccordionSummary>
+                        <CheersBitsRecordDialog open={openRecordsDialog}
+                            onClose={() => setOpenRecordsDialog(false)}
+                            user={user} />
+                    </div>
+                </Grid>
+            </div>
+            <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
+                <BalanceInfoTooltip arrow
+                    onClose={() => setOpenBalanceTooltip(false)}
+                    open={openBalanceTooltip}
+                    disableFocusListener
+                    disableHoverListener
+                    disableTouchListener
+                    title={<div><p>{t('StreamerProfile.cheersBalanceTooltip.title')}</p> <p> {t('StreamerProfile.cheersBalanceTooltip.description')} </p></div>}>
+                    <IconButton onClick={() => setOpenBalanceTooltip(!openBalanceTooltip)} size='small'>
+                        <InfoSquare />
+                    </IconButton>
+                </BalanceInfoTooltip>
+                <p className={styles.learnMoreText}>
+                    {t('StreamerProfile.learnMore')}
+                </p>
+            </div>
+        </div>
+    );
+};
+
 const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
-    const [openBalanceTooltip, setOpenBalanceTooltip] = useState(false);
     const [streams, setStreams] = useState({});
     const { t } = useTranslation();
 
@@ -121,7 +216,7 @@ const StreamerProfile = ({ user, games }) => {
                     <Grid container>
                         <Grid item xs={12}>
                             <Grid container>
-                                <Grid xs={8}>
+                                <Grid xs={12} sm={7}>
                                     <Grid item xs={12}>
                                         <Button variant='contained'
                                             className={styles.twitchButton}
@@ -132,9 +227,19 @@ const StreamerProfile = ({ user, games }) => {
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Grid container style={{ marginTop: '6rem' }}>
+                                            <Hidden xsDown>
+                                                <div style={{ position: 'absolute', top: 48, right: 32, widt: 360, maxWidth: 420 }}>
+                                                    <CheersBalanceCard user={user} />
+                                                </div>
+                                            </Hidden>
+                                            <Hidden smUp>
+                                                <Grid item xs={12}>
+                                                    <CheersBalanceCard user={user} />
+                                                </Grid>
+                                            </Hidden>
                                             <Grid item xs={12} sm={3}>
                                                 <h1 className={styles.title}>
-                                                    {t('profile.myStreams')}
+                                                    {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
                                             <Grid item xs={12} sm={9}>
@@ -142,67 +247,19 @@ const StreamerProfile = ({ user, games }) => {
                                                     value={streamType}
                                                     onChange={changestreamType}
                                                     Icon={ArrowIcon}>
-                                                    <option value={SCEHDULED_EVENT_TYPE}>Scheduled</option>
-                                                    <option value={PENDING_APPROVAL_EVENT_TYPE}>Pending Approval</option>
-                                                    <option value={PAST_STREAMS_EVENT_TYPE}>Past Streams</option>
+                                                    <option value={SCEHDULED_EVENT_TYPE}>
+                                                        {t('StreamerProfile.scheduled')}
+                                                    </option>
+                                                    <option value={PENDING_APPROVAL_EVENT_TYPE}>
+                                                        {t('StreamerProfile.pendingApproval')}
+                                                    </option>
+                                                    <option value={PAST_STREAMS_EVENT_TYPE}>
+                                                        {t('StreamerProfile.pastStreams')}
+                                                    </option>
                                                 </StreamerSelect>
                                             </Grid>
                                         </Grid>
                                     </Grid>
-                                </Grid>
-                                <Grid xs={12} sm={4} className={styles.displayFlex} alignItems='center'>
-                                    <div className={styles.balanceInfoContainer}>
-                                        <div className={styles.cheersTitleContainer}>
-                                            <p className={styles.cheersText}>
-                                                Current Cheers Balance
-                                            </p>
-                                        </div>
-                                        <Grid container className={styles.balanceContainer}>
-                                            {!user.premium &&
-                                                <div className={styles.getPremiumBannerContainer}>
-                                                    <p className={styles.getPremiumBannerText}>
-                                                        Get Bits & Subs for free
-                                                    </p>
-                                                </div>
-                                            }
-                                            <Grid xs={12}>
-                                                <div className={user.premium ? '' : styles.blur}>
-                                                    <div className={styles.balanceCurrencyContainer}>
-                                                        <p className={styles.balanceCurrencyValue}>
-                                                            {user.bitsBalance || 0}
-                                                        </p>
-                                                        <BitsIcon />
-                                                    </div>
-                                                </div>
-                                            </Grid>
-                                            <Grid xs={12}>
-                                                <div className={user.premium ? '' : styles.blur}>
-                                                    <div className={styles.balanceCurrencyContainer}>
-                                                        <p className={styles.balanceCurrencyValue}>
-                                                            {user.qoinsBalance || 0}
-                                                        </p>
-                                                        <QoinsIcon />
-                                                    </div>
-                                                </div>
-                                            </Grid>
-                                        </Grid>
-                                        <div className={`${styles.displayFlex} ${styles.learnMoreContainer}`}>
-                                            <BalanceInfoTooltip arrow
-                                                onClose={() => setOpenBalanceTooltip(false)}
-                                                open={openBalanceTooltip}
-                                                disableFocusListener
-                                                disableHoverListener
-                                                disableTouchListener
-                                                title={<div><p>{'Keep track of your Qoins<>Bits balance.'}</p> <p> Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period. </p></div>}>
-                                                <IconButton onClick={() => setOpenBalanceTooltip(!openBalanceTooltip)} size='small'>
-                                                    <InfoSquare />
-                                                </IconButton>
-                                            </BalanceInfoTooltip>
-                                            <p className={styles.learnMoreText}>
-                                                Learn More
-                                            </p>
-                                        </div>
-                                    </div>
                                 </Grid>
                                 <Grid xs={1} />
                             </Grid>
@@ -211,8 +268,8 @@ const StreamerProfile = ({ user, games }) => {
                             <Grid container spacing={4}>
                                 <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
                                     <Card className={styles.createEventCard} onClick={createStream}>
-                                        <h1 className={styles.newStream}>
-                                            Post a <br /> Stream
+                                        <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
+                                            {t('StreamerProfile.postStream')}
                                         </h1>
                                         <CardContent>
                                             <Box display='flex' justifyContent='center'>

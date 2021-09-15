@@ -1,12 +1,12 @@
 import React from 'react';
 import { makeStyles, useTheme, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import BurguerMenu from '@material-ui/icons/Menu';
+import { useTranslation } from 'react-i18next';
 
 import { signOut } from './../../services/auth';
 import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';
-import { changeLanguage } from '../../utilities/i18n';
+import LanguageSelect from '../LanguageSelect/LanguageSelect';
 
 const drawerWidth = 240;
 
@@ -32,6 +32,13 @@ const DashboardIcon = ({ active }) => (
     </svg>
 );
 
+const ProfileIcon = ({ active }) => (
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill={active ? "#4040FF" : 'rgba(255, 255, 255, .25)'} d="M5 23.2188C5 26.6189 9.57797 27.5001 15 27.5001C20.3933 27.5001 25 26.6501 25 23.2488C25 19.8488 20.4233 18.9675 15 18.9675C9.60673 18.9675 5 19.8175 5 23.2188Z" />
+        <path fill={active ? "#0AFFD2" : '#FFF'} d="M15 15.7289C18.6739 15.7289 21.6175 12.7851 21.6175 9.11382C21.6175 5.44253 18.6739 2.5 15 2.5C11.3274 2.5 8.38257 5.44253 8.38257 9.11382C8.38257 12.7851 11.3274 15.7289 15 15.7289Z"/>
+    </svg>
+);
+
 const CogIcon = ({ active }) => (
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill={active ? '#0AFFD2' : 'rgba(255, 255, 255, .25)'} d="M26.5377 17.9625C26.2949 17.5875 25.95 17.2125 25.5029 16.975C25.1452 16.8 24.9153 16.5125 24.7109 16.175C24.0594 15.1 24.4427 13.6875 25.5285 13.05C26.8059 12.3375 27.2147 10.75 26.4738 9.5125L25.6179 8.0375C24.8898 6.8 23.2929 6.3625 22.0283 7.0875C20.9041 7.6875 19.4606 7.2875 18.8091 6.225C18.6047 5.875 18.4897 5.5 18.5153 5.125C18.5536 4.6375 18.4003 4.175 18.1704 3.8C17.6977 3.025 16.8418 2.5 15.8965 2.5H14.0953C13.1628 2.525 12.3069 3.025 11.8343 3.8C11.5915 4.175 11.451 4.6375 11.4766 5.125C11.5021 5.5 11.3871 5.875 11.1828 6.225C10.5313 7.2875 9.08774 7.6875 7.97636 7.0875C6.69892 6.3625 5.11488 6.8 4.37396 8.0375L3.51807 9.5125C2.78993 10.75 3.19871 12.3375 4.46338 13.05C5.54921 13.6875 5.93245 15.1 5.29372 16.175C5.07656 16.5125 4.84662 16.8 4.48893 16.975C4.0546 17.2125 3.67137 17.5875 3.46698 17.9625C2.99432 18.7375 3.01987 19.7125 3.49252 20.525L4.37396 22.025C4.84662 22.825 5.72806 23.325 6.64782 23.325C7.08215 23.325 7.59313 23.2 8.00191 22.95C8.32127 22.7375 8.70451 22.6625 9.12606 22.6625C10.3907 22.6625 11.451 23.7 11.4766 24.9375C11.4766 26.375 12.6518 27.5 14.1337 27.5H15.871C17.34 27.5 18.5153 26.375 18.5153 24.9375C18.5536 23.7 19.6139 22.6625 20.8786 22.6625C21.2874 22.6625 21.6706 22.7375 22.0027 22.95C22.4115 23.2 22.9097 23.325 23.3568 23.325C24.2638 23.325 25.1452 22.825 25.6179 22.025L26.5121 20.525C26.972 19.6875 27.0103 18.7375 26.5377 17.9625Z" />
@@ -44,7 +51,7 @@ const StreamerSideBar = ({ user }) => {
     const classes = useStyles();
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
-	const { t } = useTranslation();
+    const { t } = useTranslation();
 
     const closeSession = () => {
         if (window.confirm('Are you sure you want to signout?')) {
@@ -56,10 +63,6 @@ const StreamerSideBar = ({ user }) => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-
-	const selectNewLanguage = (language) => {
-		changeLanguage(language);
-	}
 
 	const goToSettings = () => {
         localStorage.setItem('HasVisitedSettings', 'true');
@@ -78,7 +81,15 @@ const StreamerSideBar = ({ user }) => {
                         <DashboardIcon active={currentScreen === 'profile' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Dashboard
+                        {t('SideBar.dashboard')}
+                    </ListItemText>
+                </ListItem>
+                <ListItem button onClick={() => history.push('/link')}>
+                    <ListItemIcon style={{ minWidth: 40 }}>
+                        <ProfileIcon active={currentScreen === 'link'} />
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFF' }}>
+                        {t('SideBar.link')}
                     </ListItemText>
                 </ListItem>
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={goToSettings}>
@@ -86,23 +97,30 @@ const StreamerSideBar = ({ user }) => {
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Settings
+                        {t('SideBar.settings')}
                     </ListItemText>
                     {showNewLabelOnSettings &&
                         <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)' }}>
-                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24 }}>Nuevo</p>
+                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24 }}>
+                                {t('SideBar.new')}
+                            </p>
                         </div>
                     }
                 </ListItem>
             </List>
             <div style={{ flexGrow: 1 }} />
             <List>
+                <Hidden smUp>
+                    <ListItem style={{ marginTop: '.5rem' }}>
+                        <LanguageSelect />
+                    </ListItem>
+                </Hidden>
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={closeSession}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <LogoutIcon height={32} width={32} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
-                        Sign out
+                        {t('SideBar.signOut')}
                     </ListItemText>
                 </ListItem>
             </List>
@@ -133,8 +151,8 @@ const StreamerSideBar = ({ user }) => {
                 :
                 <Hidden smUp>
                     <IconButton
-                    onClick={handleDrawerToggle}
-                    style={{ marginTop: 24, marginLeft: 24 }}>
+                        onClick={handleDrawerToggle}
+                        style={{ position: 'absolute', top: 24, left: 24 }}>
                         <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
                     </IconButton>
                     <Drawer

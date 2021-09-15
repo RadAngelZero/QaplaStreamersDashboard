@@ -18,6 +18,9 @@ const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
 const premiumEventsSubscriptionRef = database.ref('/PremiumEventsSubscription');
+const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
+const streamerLinksRef = database.ref('/StreamerLinks');
+const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -306,6 +309,7 @@ export async function giveStreamExperienceForRewardRedeemed(uid, qaplaLevel, use
     const userLeaderboardExperience = (await donationsLeaderBoardRef.child(uid).child('totalDonations').once('value')).val() || 0;
 
     userUpdate[`/Users/${uid}/qaplaLevel`] = amountOfExperience + userExperience;
+    userUpdate[`/Users/${uid}/seasonXQ`] = userLeaderboardExperience + amountOfExperience;
     userUpdate[`/DonationsLeaderBoard/${uid}/totalDonations`] = userLeaderboardExperience + amountOfExperience;
     userUpdate[`/DonationsLeaderBoard/${uid}/userName`] = userName;
 
@@ -348,15 +352,6 @@ export async function saveCustomRewardRedemption(uid, photoUrl, twitchIdThatRede
 }
 
 /**
- * Return all the custom rewards redeemed by the given user in the given stream
- * @param {string} streamId Stream identifier on the database
- * @param {String} uid User identifier
- */
-export async function getCustomRewardRedemptions(streamId, uid) {
-    return await redeemedCustomRewardsRef.child(streamId).orderByChild('uid').equalTo(uid).once('value');
-}
-
-/**
  * Update the status of the given custom redemption
  * @param {string} streamId Stream identifier in our database
  * @param {string} redemptionId Id of the twitch redemption
@@ -376,13 +371,22 @@ export async function listenCustomRewardRedemptions(streamId, callback) {
 }
 
 /**
+ * App users
+ */
+
+/**
  * Return a user profile object (node Users in our database) based on their twitchId or null
  * if it does not exist
  * @param {string} twitchId Twitch id
  */
 export async function getUserByTwitchId(twitchId) {
     const users = await userRef.orderByChild('twitchId').equalTo(twitchId).once('value');
-    return users.exists() ? users.val()[Object.keys(users.val())[0]] : null;
+    let user = null;
+    users.forEach((qaplaUser) => {
+        user = { ...qaplaUser.val(), id: qaplaUser.key };
+    });
+
+    return user;
 }
 
 /**
@@ -392,6 +396,33 @@ export async function getUserByTwitchId(twitchId) {
  */
 export async function isUserRegisteredToStream(uid, streamId) {
     return (await eventParticipantsRef.child(streamId).child(uid).once('value')).exists();
+}
+
+/**
+ * Returns the snapshot of the lastSeasonLevel of the given user
+ * @param {string} uid User identifier
+ */
+export async function getUserLastSeasonLevel(uid) {
+    return await userRef.child(uid).child('lastSeasonLevel').once('value');
+}
+
+/**
+ * Qapla Levels
+ */
+
+/**
+ * Returns the qoinsToGive snapshot of the given level
+ * @param {number} level Season level
+ */
+export async function getQoinsToGiveToGivenLevel(level) {
+    return await qaplaLevelsRequirementsRef.child(level - 1).child('qoinsToGive').once('value');
+}
+
+/**
+ * Returns the array of Qapla levels
+ */
+export async function getQaplaLevels() {
+    return await qaplaLevelsRequirementsRef.once('value');
 }
 
 /**
@@ -413,6 +444,10 @@ export async function addInfoToEventParticipants(streamId, uid, fieldName, value
 export function addQoinsToUser(uid, qoinsToAdd) {
     try {
         userRef.child(uid).child('credits').transaction((credits) => {
+            if (!credits) {
+                return qoinsToAdd;
+            }
+
             if (typeof credits === 'number') {
                 return credits + qoinsToAdd;
             }
@@ -486,12 +521,29 @@ export function listenToUserStreamingStatus(streamerUid, callback) {
 }
 
 /**
+ * Listener to get the last x cheers added to the StreamersDonations
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Handler of the results
+ */
+export function listenForLastStreamerCheers(streamerUid, limit = 10, callback) {
+    streamersDonationsRef.child(streamerUid).limitToLast(limit).on('value', callback);
+}
+
+/**
  * Listener to get every unread streamer cheer added to the StreamersDonations
  * @param {string} streamerUid Uid of the streamer
  * @param {function} callback Handler of the results
  */
-export function listenForUnreadStreamerCheers(streamerUid, callback) {
+ export function listenForUnreadStreamerCheers(streamerUid, callback) {
     streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback);
+}
+
+/**
+ * Remove listener from the Streamers Donation node
+ * @param {string} streamerUid Uid of the streamer
+ */
+ export function removeListenerForLastStreamerCheers(streamerUid) {
+    streamersDonationsRef.child(streamerUid).off('value');
 }
 
 /**
@@ -523,4 +575,68 @@ export async function markDonationAsRead(streamerUid, donationId) {
  */
 export async function getStreamerEventsWithDateRange(streamerUid, startDate, endDate) {
     return await premiumEventsSubscriptionRef.child(streamerUid).orderByChild('timestamp').startAt(startDate).endAt(endDate).once('value');
+}
+/**
+ * Get the payments received by the streamer in the giving period
+ * @param {string} streamerUid Uid of the streamer
+ * @param {number} startTimestamp Lower limit for the time query
+ * @param {number} endTimestamp Superior limit for the time query
+ */
+export async function getPeriodStreamerPayments(streamerUid, startTimestamp, endTimestamp) {
+    return await paymentsToStreamersHistory.child(streamerUid).orderByChild('timestamp').startAt(startTimestamp).endAt(endTimestamp).once('value');
+}
+
+/**
+* Streamers Links
+ */
+
+/**
+ * Saves a link information for the streamer public profile
+ * @param {string} streamerUid Uid of the streamer
+ * @param {string} username Twitch username of the streamer
+ * @param {string} link URL to save
+ * @param {string} title Title for the link to show on streamer profile
+ */
+export async function addStreamerLink(streamerUid, username, link, title) {
+    await streamerLinksRef.child(streamerUid).update({ username });
+    streamerLinksRef.child(streamerUid).child('links').push({ link, title });
+}
+
+/**
+ * Listen for all the links of the given streamer
+ * @param {string} streamerUid Uid of the streamer
+ * @param {function} callback Function called every time the link list id updated
+ */
+export async function getStreamerLinks(streamerUid, callback) {
+    streamerLinksRef.child(streamerUid).child('links').on('value', callback);
+}
+
+/**
+ * Qoin Reward Redemption counter
+ */
+
+/**
+ * Validates the limit and add the redemption if the limit is not exceeded yet
+ * @param {string} streamId Stream identifier
+ * @param {number} maxRedemptionsOfQoinsPerStream Maximum of redemptions allowed for the Qoins reward
+ * @param {function} callback Function called if the limit is not exceeded yet
+ */
+export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId, maxRedemptionsOfQoinsPerStream, callback) {
+    streamsRef.child(streamId).child('qoinsRedemptionsCounter').transaction((counter) => {
+        if (!counter || counter < maxRedemptionsOfQoinsPerStream) {
+            return counter ? counter + 1 : 1;
+        }
+    }, (a, updated) => {
+        if (updated) {
+            callback();
+        }
+    });
+}
+
+/**
+ * Returns the value of the qoinsRedemptionsCounter of the given stream
+ * @param {string} streamId Streamer identifier
+ */
+export async function getStreamRedemptionCounter(streamId) {
+    return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
 }

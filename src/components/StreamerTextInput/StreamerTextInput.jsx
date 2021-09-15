@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, rowsMax, containerClassName = {}, textInputClassName = {}, id='' }) => {
+const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, rowsMax, containerClassName = {}, textInputClassName = {}, id='', disabled = false }) => {
     const classes = useStyles();
 
     return (
@@ -34,6 +34,7 @@ const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = fa
                 {label}
             </InputLabel>
             <InputBase
+                disabled={disabled}
                 id={id}
                 rows={rows}
                 rowsMax={rowsMax}

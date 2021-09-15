@@ -47,6 +47,11 @@ import OvercookedImage from './../assets/Overcooked.jpg';
 import DeadCellsImage from './../assets/DeadCells.jpg';
 import GenshinImpactImage from './../assets/GenshinImpact.jpg';
 import AxieInfinityImage from './../assets/AxieInfinity.jpg';
+import MusicImage from './../assets/Music.jpg';
+import SpidermanMMImage from './../assets/SpidermanMM.jpg';
+import GhostOfTsushimaImage from './../assets/GhostOfTsushima.jpg';
+import StreamRacerImage from './../assets/StreamRacer.jpg';
+import TheLastOfUsImage from './../assets/TheLastOfUs.jpg';
 
 /**
  * Twitch API keys
@@ -72,8 +77,27 @@ export const PAST_STREAMS_EVENT_TYPE = 3;
 export const XQ = 'xq';
 export const QOINS = 'qoins';
 
-// 86400000 = Day in miliseconds
-export const MONTH_IN_MILISECONDS = 86400000 * 30;
+/**
+ * Twitch PubSub connections status
+ */
+export const TWITCH_PUBSUB_UNCONNECTED = 0;
+export const TWITCH_PUBSUB_CONNECTED = 1;
+export const TWITCH_PUBSUB_CONNECTION_LOST = -1;
+
+/**
+ * Twitch webhooks info
+ */
+ export const webhookStreamOnline = {
+    type: 'stream.online',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOnline'
+};
+
+export const webhookStreamOffline = {
+    type: 'stream.offline',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOffline'
+};
+
+export const HOUR_IN_MILISECONDS = 3600000;
 
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
@@ -124,5 +148,10 @@ export const streamsPlaceholderImages = {
     Overcooked: OvercookedImage,
     DeadCells: DeadCellsImage,
     GenshinImpact: GenshinImpactImage,
-    AxieInfinity: AxieInfinityImage
+    AxieInfinity: AxieInfinityImage,
+    Music: MusicImage,
+    SpidermanMM: SpidermanMMImage,
+    GhostOfTsushima: GhostOfTsushimaImage,
+    StreamRacer: StreamRacerImage,
+    TheLastOfUs: TheLastOfUsImage
 };

@@ -16,7 +16,6 @@ import { ReactComponent as CheckedIcon } from './../../assets/CheckedIcon.svg';
 import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.svg';
 import BackButton from '../BackButton/BackButton';
 import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
-import { MONTH_IN_MILISECONDS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -209,34 +208,21 @@ const NewStream = ({ user, games }) => {
             return;
         }
 
-        /**
-         * Check if the selected date is valid to create the event based on the end of a
-         * streamer subscription
-         */
-        if (selectedDate.getTime() <=  user.premiumUntil) {
-            let startDate = user.currentBillingPeriod.start;
-            let endDate = user.currentBillingPeriod.end;
+        const { startDate, endDate } = user.currentPeriod;
 
-            // If the event will not be in the current period
-            if (selectedDate.getTime() > user.currentBillingPeriod.end) {
-                /**
-                 * We need to calculate the start and the end timestamps of the period for which the stream is
-                 * intended to be created
-                 */
-                 do {
-                    startDate = endDate;
-                    endDate = endDate + MONTH_IN_MILISECONDS;
-                } while (selectedDate.getTime() > endDate);
-            }
+        /**
+         * Check if the selected date is valid to create the event based on the end of the streamer subscription
+         */
+        if (selectedDate.getTime() <=  endDate) {
 
             const streamsInSelectedPeriod = await getStreamerEventsWithDateRange(user.uid, startDate, endDate);
-            const numberOfStreamsInTheSelectedPeriod = Object.keys(streamsInSelectedPeriod.val()).length;
+            const numberOfStreamsInTheSelectedPeriod = streamsInSelectedPeriod.exists() ? Object.keys(streamsInSelectedPeriod.val()).length : 0;
 
             /**
              * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
              * is lower or equal to the user limit per month then we create the event
              */
-            if (numberOfStreamsInTheSelectedPeriod + 1 <= user.eventsPerMonth) {
+            if (numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded)) {
                 const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
                 const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
                 let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
@@ -249,7 +235,7 @@ const NewStream = ({ user, games }) => {
                 history.push('/success');
             } else {
                 // Hacer un modal chido para convencerlos de mejorar su plan o comprar eventos aparte
-                alert('You have reached the limit of events for this month acording to your subscription');
+                alert('You have reached the limit of streams for your subscription');
             }
         } else {
             alert('The selected date is not valid as your plan will expire before it');

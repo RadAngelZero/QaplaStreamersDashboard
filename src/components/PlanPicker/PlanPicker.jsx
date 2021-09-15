@@ -14,6 +14,7 @@ const PlanPicker = ({ user }) => {
                 billing_page_id: "Aa72ZPxyx4yH5F9HJAC7",
                 email: user.email,
                 handleResponse: async function(payload) {
+                    console.log(payload.event);
                     switch (payload.event) {
                         case 'create_subscription':
                             if (payload.response && payload.response.customer && payload.response.customer.id) {
@@ -23,18 +24,17 @@ const PlanPicker = ({ user }) => {
                             break;
                         case 'post_load_billing':
                             if (userIsTryingToSubscribe && payload.response && payload.response.billingData.products && payload.response.billingData.products[0]) {
-                                const subscriptionDetails = {
-                                    streamsPerMonth: parseInt(payload.response.billingData.products[0].metadata.streamsPerMonth)
-                                };
+                                const subscriptionDetails = payload.response.billingData.products[0].metadata;
 
                                 await updateSubscriptionDetails(user.uid, subscriptionDetails);
                                 history.push('/profile');
                             }
                             break;
                         case 'resubscribe':
-                            if (payload.response && payload.response.customer && payload.response.customer.id) {
+                            console.log(payload.response, payload.response.customer, payload.response.customer.id);
+                            if (payload.response && payload.response.customer) {
                                 userIsTryingToSubscribe = true;
-                                await saveSubscriptionInformation(user.uid, payload.response.customer.id, payload.response.current_period_start, payload.response.current_period_end);
+                                await saveSubscriptionInformation(user.uid, payload.response.customer, payload.response.current_period_start, payload.response.current_period_end);
                             }
                             break;
                         default:

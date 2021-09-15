@@ -1,5 +1,4 @@
 import { database } from './firebase';
-import { MONTH_IN_SECONDS } from '../utilities/Constants';
 
 const gamesRef = database.ref('/GamesResources');
 const InvitationCodeRef = database.ref('/InvitationCode');
@@ -565,10 +564,6 @@ export async function markDonationAsRead(streamerUid, donationId) {
 export async function saveSubscriptionInformation(uid, stripeCustomerId, periodStart, periodEnd) {
     userStreamersRef.child(uid).update({
         premium: true,
-        currentBillingPeriod: {
-            start: periodStart,
-            end: periodStart + MONTH_IN_SECONDS
-        },
         premiumUntil: periodEnd,
         stripeCustomerId
     });

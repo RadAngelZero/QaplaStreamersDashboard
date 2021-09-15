@@ -99,8 +99,6 @@ export const webhookStreamOffline = {
 
 export const HOUR_IN_MILISECONDS = 3600000;
 
-export const MONTH_IN_SECONDS = 86400 * 30;
-
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

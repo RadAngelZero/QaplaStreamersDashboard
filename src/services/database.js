@@ -561,6 +561,13 @@ export async function markDonationAsRead(streamerUid, donationId) {
  * Streamers Subscriptions
  */
 
+/**
+ * Save the subscription information of the given user
+ * @param {string} uid User identifier
+ * @param {string} stripeCustomerId Customer Id given by stripe
+ * @param {number} periodStart Timestamp of period start (in milliseconds)
+ * @param {number} periodEnd Timestamp of period end (in milliseconds)
+ */
 export async function saveSubscriptionInformation(uid, stripeCustomerId, periodStart, periodEnd) {
     userStreamersRef.child(uid).update({
         premium: true,
@@ -572,6 +579,11 @@ export async function saveSubscriptionInformation(uid, stripeCustomerId, periodS
     });
 }
 
+/**
+ * Add/overwrite the subscriptionDetails information on the given user
+ * @param {string} uid User identifier
+ * @param {object} subscriptionDetails Subscription details
+ */
 export async function updateSubscriptionDetails(uid, subscriptionDetails) {
     userStreamersRef.child(uid).update({ subscriptionDetails });
 }

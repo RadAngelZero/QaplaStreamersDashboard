@@ -149,7 +149,7 @@ const PubSubTest = ({ user }) => {
         });
 
         if (rewardsAreCreated() && user.twitchAccessToken !== oldUser.twitchAccessToken) {
-            const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && user.subscriptionDetails.redemptionsPerStream) ? user.subscriptionDetails.redemptionsPerStream : 35;
+            const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && parseInt(user.subscriptionDetails.redemptionsPerStream)) ? parseInt(user.subscriptionDetails.redemptionsPerStream) : 35;
             connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardsIds, onPong, qoinsMaximumRedemptionsPerStream, handleTwitchSignIn);
             setOldUser(user);
         }
@@ -175,7 +175,7 @@ const PubSubTest = ({ user }) => {
                 let rewards = { expReward: rewardOnDatabase.val().expReward.rewardId, qoinsReward: rewardOnDatabase.val().qoinsReward.rewardId }
                 setRewardsIds(rewards);
 
-                const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && user.subscriptionDetails.redemptionsPerStream) ? user.subscriptionDetails.redemptionsPerStream : 35;
+                const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && parseInt(user.subscriptionDetails.redemptionsPerStream)) ? parseInt(user.subscriptionDetails.redemptionsPerStream) : 35;
                 connect(streamId, user.displayName, user.uid, userCredentialsUpdated.access_token, userCredentialsUpdated.refresh_token, [`channel-points-channel-v1.${user.id}`], rewards, onPong, qoinsMaximumRedemptionsPerStream, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
@@ -191,7 +191,7 @@ const PubSubTest = ({ user }) => {
                 const rewards = await createReward(userCredentialsUpdated);
 
                 if (rewards) {
-                    const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && user.subscriptionDetails.redemptionsPerStream) ? user.subscriptionDetails.redemptionsPerStream : 35;
+                    const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && parseInt(user.subscriptionDetails.redemptionsPerStream)) ? parseInt(user.subscriptionDetails.redemptionsPerStream) : 35;
                     connect(streamId, user.displayName, user.uid, userCredentialsUpdated.access_token, userCredentialsUpdated.refresh_token, [`channel-points-channel-v1.${user.id}`], rewards, onPong, qoinsMaximumRedemptionsPerStream, handleTwitchSignIn);
                     setOldUser(user);
                     setConnectedToTwitch(true);
@@ -211,7 +211,7 @@ const PubSubTest = ({ user }) => {
         pingTimeout = setTimeout(() => {
             setConnectionStatus(TWITCH_PUBSUB_CONNECTION_LOST);
             setConnectedToTwitch(false);
-            const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && user.subscriptionDetails.redemptionsPerStream) ? user.subscriptionDetails.redemptionsPerStream : 35;
+            const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && parseInt(user.subscriptionDetails.redemptionsPerStream)) ? parseInt(user.subscriptionDetails.redemptionsPerStream) : 35;
             connect(streamId, user.displayName, user.uid, user.twitchAccessToken, user.refreshToken, [`channel-points-channel-v1.${user.id}`], rewardsIds, onPong, qoinsMaximumRedemptionsPerStream, handleTwitchSignIn);
         }, 16000);
     }
@@ -220,7 +220,7 @@ const PubSubTest = ({ user }) => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
             let rewardsIdsObject = {};
-            const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && user.subscriptionDetails.redemptionsPerStream) ? user.subscriptionDetails.redemptionsPerStream : 35;
+            const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && parseInt(user.subscriptionDetails.redemptionsPerStream)) ? parseInt(user.subscriptionDetails.redemptionsPerStream) : 35;
             const expReward = await createCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, 'XQ Qapla', 500, true, handleTwitchSignIn, false, 0, true, 1);
             const qoinsReward = await createCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, 'Qoins Qapla', 500, false, handleTwitchSignIn, true, qoinsMaximumRedemptionsPerStream, true, 1);
 
@@ -380,7 +380,7 @@ const PubSubTest = ({ user }) => {
 
         let redemptionCounter = (await getStreamRedemptionCounter(streamId)).val();
 
-        const redemptionsAllowedPerStream = (user.subscriptionDetails && user.subscriptionDetails.redemptionsPerStream) ? user.subscriptionDetails.redemptionsPerStream : 35;
+        const redemptionsAllowedPerStream = (user.subscriptionDetails && parseInt(user.subscriptionDetails.redemptionsPerStream)) ? parseInt(user.subscriptionDetails.redemptionsPerStream) : 35;
 
         /**
          * If the counter does not exists or if exists but the value is less than the maximum value allowed

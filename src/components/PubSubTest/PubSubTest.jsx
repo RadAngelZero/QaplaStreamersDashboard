@@ -42,7 +42,8 @@ import {
     getStreamUserRedemptions,
     getStreamRedemptionCounter,
     getUserLastSeasonLevel,
-    getQaplaLevels
+    getQaplaLevels,
+    getStreamCustomRewardsMultipliers
 } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS, TWITCH_PUBSUB_UNCONNECTED, TWITCH_PUBSUB_CONNECTED, TWITCH_PUBSUB_CONNECTION_LOST, HOUR_IN_MILISECONDS } from '../../utilities/Constants';
@@ -272,9 +273,7 @@ const PubSubTest = ({ user }) => {
 
         console.log(result);
 
-        if (result === 204) {
-            alert('Recompensa eliminada correctamente');
-        } else if (result === 404 || result === 403) {
+        if (result === 404 || result === 403) {
             alert(`No se encontro la recompensa a eliminar, status: ${result}`);
         } else if (result === 500) {
             alert('Error de parte de Twitch al tratar de eliminar la recompensa');
@@ -332,6 +331,10 @@ const PubSubTest = ({ user }) => {
 
     const handleFailedRewardRedemptions = async (streamIdToAssignRewards, rewardsIdsToDelete, userCredentials) => {
         setStreamInRedemptionsLists(streamId);
+
+        let customRewardsMultipliers = await getStreamCustomRewardsMultipliers(streamId);
+        customRewardsMultipliers = customRewardsMultipliers.exists() ? customRewardsMultipliers.val() : { xq: 1, qoins: 1 };
+
         const expRedemptions = await getAllRewardRedemptions(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, rewardsIdsToDelete.expReward, handleTwitchSignIn);
         let usersPrizes = {};
         for (let i = 0; i < expRedemptions.length; i++) {
@@ -371,7 +374,7 @@ const PubSubTest = ({ user }) => {
             if (giveXQToUser) {
                 await saveCustomRewardRedemption(twitchUser.uid, twitchUser.photoUrl, twitchUser.twitchId, twitchUser.twitchUserName, streamIdToAssignRewards, XQ, twitchUser.redemptionId, twitchUser.rewardId, twitchUser.status);
 
-                const expToGive = 15;
+                const expToGive = 15 * customRewardsMultipliers.xq;
                 giveStreamExperienceForRewardRedeemed(twitchUser.uid, twitchUser.qaplaLevel, twitchUser.userName, expToGive);
                 addInfoToEventParticipants(streamIdToAssignRewards, twitchUser.uid, 'xqRedeemed', expToGive);
                 saveUserStreamReward(twitchUser.uid, XQ, user.displayName, streamIdToAssignRewards, expToGive);
@@ -434,7 +437,9 @@ const PubSubTest = ({ user }) => {
                         /**
                          * userLastSeasonLevel - 1 because in the array the level count stars from 0
                          */
-                        const qoinsToGive = qaplaLevels.val()[userLastSeasonLevel - 1].qoinsToGive || qaplaLevels.val()[0].qoinsToGive;
+                        let qoinsToGive = qaplaLevels.val()[userLastSeasonLevel - 1].qoinsToGive || qaplaLevels.val()[0].qoinsToGive;
+
+                        qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
 
                         addQoinsToUser(twitchUser.uid, qoinsToGive);
                         addInfoToEventParticipants(streamIdToAssignRewards, twitchUser.uid, 'qoinsRedeemed', qoinsToGive);

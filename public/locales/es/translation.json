@@ -87,7 +87,12 @@
         "instruction5": {
             "title": "5. Pega tu URL personalizado de Qapla",
             "description": "Define tanto la altura como el ancho de la ventana en 400 y desmarca todas las opciones"
-        }
+        },
+        "instruction6": {
+            "title": "6. Prueba tus alertas Qapla",
+            "description": "Presiona el botón para enviar un mensaje falso y comprobar que todo funciona correctamente"
+        },
+        "testButton": "Enviar mensaje de prueba"
     },
     "CheersBitsRecordDialog": {
         "period": "Periodo:"

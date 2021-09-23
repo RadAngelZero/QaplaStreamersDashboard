@@ -87,7 +87,12 @@
         "instruction5": {
             "title": "5. Copy paste your custom Qapla URL.",
             "description": "Set both width and height to 400, and uncheck all the other options."
-        }
+        },
+        "instruction6": {
+            "title": "6. Test your Qapla cheer alerts",
+            "description": "Press the button to send a fake message in order to check if everything is working"
+        },
+        "testButton": "Send test message"
     },
     "CheersBitsRecordDialog": {
         "period": "Period:"

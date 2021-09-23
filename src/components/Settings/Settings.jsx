@@ -16,8 +16,8 @@ const Settings = ({ user }) => {
             <QaplaTabs value={value} onChange={handleChange}>
                 <QaplaTab label='Cheers' />
             </QaplaTabs>
-            {user && user.id &&
-                <CheersSettings twitchId={user.id} />
+            {user && user.uid && user.id &&
+                <CheersSettings uid={user.uid} twitchId={user.id} />
             }
         </StreamerDashboardContainer>
     );

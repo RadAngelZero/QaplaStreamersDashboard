@@ -17,6 +17,7 @@ const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
+const streamersDonationsTestRef = database.ref('/StreamersDonationsTest');
 const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
 const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
@@ -546,6 +547,41 @@ export function listenForLastStreamerCheers(streamerUid, limit = 10, callback) {
  */
 export function removeListenerForUnreadStreamerCheers(streamerUid) {
     streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('child_added');
+}
+
+/**
+ * Write a fake cheer on the test cheers node
+ * @param {string} streamerUid Streamer unique identifier
+ */
+export function writeTestCheer(streamerUid) {
+    streamersDonationsTestRef.child(streamerUid).push({
+        amountQoins: 0,
+        message: 'Test',
+        timestamp: (new Date()).getTime(),
+        uid: '',
+        read: false,
+        twitchUserName: 'QAPLA',
+        userName: 'QAPLA',
+        photoURL: ''
+    });
+}
+
+/**
+ * Listener for the unread test cheers
+ * @param {string} streamerUid Stremer identifier
+ * @param {function} callback Function called for every cheer
+ */
+export function listenForTestCheers(streamerUid, callback) {
+    streamersDonationsTestRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback)
+}
+
+/**
+ * Removes the given test donation
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} donationId Donation identifier
+ */
+export function removeTestDonation(streamerUid, donationId) {
+    streamersDonationsTestRef.child(streamerUid).child(donationId).remove();
 }
 
 /**

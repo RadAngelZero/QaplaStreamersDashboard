@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation } from '../../services/database';
 import { ReactComponent as QaplaLogo } from './../../assets/QaplaLogo.svg';
 import donationAudio from '../../assets/notification.wav';
 
@@ -27,7 +27,11 @@ const LiveDonations = () => {
 
         async function getStreamerUid() {
             if (streamerId) {
-                setStreamerUid(await getStreamerUidWithTwitchId(streamerId));
+                const uid = await getStreamerUidWithTwitchId(streamerId);
+                setStreamerUid(uid);
+                listenForTestCheers(uid, (donation) => {
+                    pushDonation({ ...donation.val(), id: donation.key });
+                });
             }
         }
 
@@ -58,7 +62,11 @@ const LiveDonations = () => {
                     const audio = new Audio(donationAudio);
                     audio.play();
                     setDonationToShow(donation);
-                    markDonationAsRead(streamerUid, donation.id);
+                    if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
+                        removeTestDonation(streamerUid, donation.id);
+                    } else {
+                        markDonationAsRead(streamerUid, donation.id);
+                    }
                 }
             }, 10000);
         } else {

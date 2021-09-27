@@ -552,8 +552,10 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
 /**
  * Write a fake cheer on the test cheers node
  * @param {string} streamerUid Streamer unique identifier
+ * @param {string} completeMessage Message to show if the operation is succesfuly completed
+ * @param {string} errorMessage Message to show if the write operation fails
  */
-export function writeTestCheer(streamerUid) {
+export function writeTestCheer(streamerUid, completeMessage, errorMessage) {
     streamersDonationsTestRef.child(streamerUid).push({
         amountQoins: 0,
         message: 'Test',
@@ -563,6 +565,12 @@ export function writeTestCheer(streamerUid) {
         twitchUserName: 'QAPLA',
         userName: 'QAPLA',
         photoURL: ''
+    }, (error) => {
+        if (error) {
+            alert(errorMessage);
+        } else {
+            alert(completeMessage);
+        }
     });
 }
 

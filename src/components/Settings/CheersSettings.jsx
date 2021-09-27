@@ -88,6 +88,10 @@ const CheersSettings = ({ uid, twitchId }) => {
         }, 1250);
     }
 
+    const sendTestCheer = () => {
+        writeTestCheer(uid, t('CheersSettings.testCheerSuccess'), t('CheersSettings.testCheerError'));
+    }
+
     return (
         <div className={classes.container}>
             <p className={classes.instructionTitle}>
@@ -124,7 +128,7 @@ const CheersSettings = ({ uid, twitchId }) => {
                 src={Step4} />
             <InstructionSection title={t('CheersSettings.instruction6.title')}
                 description={t('CheersSettings.instruction6.description')} />
-            <ContainedButton onClick={() => writeTestCheer(uid)}>
+            <ContainedButton onClick={sendTestCheer}>
                 {t('CheersSettings.testButton')}
             </ContainedButton>
             <div className={classes.instructionsMargin} />

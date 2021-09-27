@@ -92,6 +92,8 @@
             "title": "6. Prueba tus alertas Qapla",
             "description": "Presiona el botón para enviar un mensaje falso y comprobar que todo funciona correctamente"
         },
+        "testCheerError": "Hubo un error al enviar el mensaje de prueba, intenta de nuevo, si el error persiste contacta con soporte tecnico",
+        "testCheerSuccess": "¡El Cheer de prueba fue enviado correctamente! Sera mostrado en tu OBS en unos segundos",
         "testButton": "Enviar mensaje de prueba"
     },
     "CheersBitsRecordDialog": {

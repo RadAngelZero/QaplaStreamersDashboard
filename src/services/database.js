@@ -268,6 +268,14 @@ export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, ho
 }
 
 /**
+ * Returns the customRewardsMultipliers object of the given stream
+ * @param {string} streamId Stream identifier
+ */
+export async function getStreamCustomRewardsMultipliers(streamId) {
+    return await streamsRef.child(streamId).child('customRewardsMultipliers').once('value');
+}
+
+/**
  * Stream Participants
  */
 

@@ -87,7 +87,14 @@
         "instruction5": {
             "title": "5. Copy paste your custom Qapla URL.",
             "description": "Set both width and height to 400, and uncheck all the other options."
-        }
+        },
+        "instruction6": {
+            "title": "6. Test your Qapla cheer alerts",
+            "description": "Press the button to send a fake message in order to check if everything is working"
+        },
+        "testCheerError": "There was an error sending the test message, try again, if the error persists contact technical support",
+        "testCheerSuccess": "Test Cheer sent succesfuly! It will be shown in your OBS in a few seconds",
+        "testButton": "Send test message"
     },
     "CheersBitsRecordDialog": {
         "period": "Period:"

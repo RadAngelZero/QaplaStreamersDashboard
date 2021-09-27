@@ -153,5 +153,6 @@ export const streamsPlaceholderImages = {
     SpidermanMM: SpidermanMMImage,
     GhostOfTsushima: GhostOfTsushimaImage,
     StreamRacer: StreamRacerImage,
-    TheLastOfUs: TheLastOfUsImage
+    TheLastOfUs: TheLastOfUsImage,
+    PokemonUnite: PokemonImage // We use this image also on the Pokemon category
 };

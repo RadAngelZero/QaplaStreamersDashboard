@@ -52,6 +52,7 @@ import SpidermanMMImage from './../assets/SpidermanMM.jpg';
 import GhostOfTsushimaImage from './../assets/GhostOfTsushima.jpg';
 import StreamRacerImage from './../assets/StreamRacer.jpg';
 import TheLastOfUsImage from './../assets/TheLastOfUs.jpg';
+import MetalSlugImage from './../assets/MetalSlug.jpeg';
 
 /**
  * Twitch API keys
@@ -154,5 +155,6 @@ export const streamsPlaceholderImages = {
     GhostOfTsushima: GhostOfTsushimaImage,
     StreamRacer: StreamRacerImage,
     TheLastOfUs: TheLastOfUsImage,
-    PokemonUnite: PokemonImage // We use this image also on the Pokemon category
+    PokemonUnite: PokemonImage, // We use this image also on the Pokemon category
+    MetalSlug: MetalSlugImage
 };

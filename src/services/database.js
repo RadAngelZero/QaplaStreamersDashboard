@@ -673,7 +673,3 @@ export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId
 export async function getStreamRedemptionCounter(streamId) {
     return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
 }
-
-export async function lista() {
-    return await redemptionsListsRef.child('-MkdEn5uQpApEAWg_brw').child('QoinsReward').once('value');
-}

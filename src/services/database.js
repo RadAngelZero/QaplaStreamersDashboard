@@ -445,23 +445,23 @@ export async function addInfoToEventParticipants(streamId, uid, fieldName, value
  * @param {number} qoinsToAdd Qoins to add
  */
 export function addQoinsToUser(uid, qoinsToAdd) {
-    try {
-        userRef.child(uid).child('credits').transaction((credits) => {
-            if (!credits) {
-                return qoinsToAdd;
-            }
+    userRef.child(uid).child('credits').transaction((credits) => {
+        if (!credits) {
+            return qoinsToAdd;
+        }
 
-            if (typeof credits === 'number') {
-                return credits + qoinsToAdd;
-            }
+        if (typeof credits === 'number') {
+            return credits + qoinsToAdd;
+        }
 
-            return credits;
-        }, (error) => {
-            console.log(error);
-        });
-    } catch (error) {
-        console.error(error);
-    }
+        return credits;
+    }, (error) => {
+        if (error) {
+            try {
+                database.ref('/QoinsTransactionsErrors').push({ error, uid, qoinsToAdd });
+            } catch (error) {}
+        }
+    });
 }
 
 /**
@@ -672,4 +672,8 @@ export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId
  */
 export async function getStreamRedemptionCounter(streamId) {
     return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
+}
+
+export async function lista() {
+    return await redemptionsListsRef.child('-MkdEn5uQpApEAWg_brw').child('QoinsReward').once('value');
 }

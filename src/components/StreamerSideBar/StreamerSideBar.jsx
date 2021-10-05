@@ -84,14 +84,14 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => history.push('/link')}>
+                {/* <ListItem button onClick={() => history.push('/link')}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <ProfileIcon active={currentScreen === 'link'} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFF' }}>
                         {t('SideBar.link')}
                     </ListItemText>
-                </ListItem>
+                </ListItem> */}
                 <ListItem button style={{ marginTop: '.5rem' }} onClick={goToSettings}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <CogIcon active={currentScreen === 'settings'} />

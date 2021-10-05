@@ -53,6 +53,9 @@ import GhostOfTsushimaImage from './../assets/GhostOfTsushima.jpg';
 import StreamRacerImage from './../assets/StreamRacer.jpg';
 import TheLastOfUsImage from './../assets/TheLastOfUs.jpg';
 import MetalSlugImage from './../assets/MetalSlug.jpeg';
+import BrawlhallaImage from './../assets/Brawlhalla.jpeg';
+import NewWorldImage from './../assets/NewWorld.jpeg';
+import WarframeImage from './../assets/Warframe.jpeg';
 
 /**
  * Twitch API keys
@@ -156,5 +159,8 @@ export const streamsPlaceholderImages = {
     StreamRacer: StreamRacerImage,
     TheLastOfUs: TheLastOfUsImage,
     PokemonUnite: PokemonImage, // We use this image also on the Pokemon category
-    MetalSlug: MetalSlugImage
+    MetalSlug: MetalSlugImage,
+    Brawlhalla: BrawlhallaImage,
+    NewWorld: NewWorldImage,
+    Warframe: WarframeImage
 };

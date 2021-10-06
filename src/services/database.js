@@ -22,6 +22,7 @@ const streamersDonationsTestRef = database.ref('/StreamersDonationsTest');
 const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
 const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
+const streamsPackagesRef = database.ref('/StreamsPackages');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -721,4 +722,25 @@ export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId
  */
 export async function getStreamRedemptionCounter(streamId) {
     return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
+}
+
+/**
+ * Gets all the packages on the Streams Packages node
+ */
+export async function getStreamsPackages() {
+    return await streamsPackagesRef.once('value');
+}
+
+/**
+ * Add a child on the boughtStreams node in the user profile so the user can have more streams independently
+ * of the streams that their subscription already included
+ * @param {string} streamerUid User identifier
+ * @param {number} boughtStreams Number of streams bought by the streamer
+ * @param {timestamp} expirationTimestamp Timestamp of the maxim date to use the streams
+ */
+export async function addBoughtStreamsToStreamer(streamerUid, boughtStreams, expirationTimestamp) {
+    await userStreamersRef.child(streamerUid).child('boughtStreams').push({
+        boughtStreams,
+        expirationTimestamp
+    });
 }

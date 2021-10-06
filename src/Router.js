@@ -24,6 +24,8 @@ import Settings from './components/Settings/Settings';
 import PlanPicker from './components/PlanPicker/PlanPicker';
 import Lottery from './components/Lottery/Lottery';
 import AddStreamerLinks from './components/AddStreamerLinks/AddStreamerLinks';
+import StreamsPackages from './components/StreamsPackages/StreamsPackages';
+import StreamsPackagesCheckout from './components/StreamsPackagesCheckout/StreamsPackagesCheckout';
 
 window.onbeforeunload = function() {
     return true;
@@ -109,6 +111,12 @@ const Router = () => {
                 </Route>
                 <Route exact path='/pricing'>
                     <PlanPicker user={user} />
+                </Route>
+                <Route exact path='/buyStreams'>
+                    <StreamsPackages user={user} games={games} />
+                </Route>
+                <Route exact path='/streamsCheckout/:billingPageId'>
+                    <StreamsPackagesCheckout user={user} games={games} />
                 </Route>
                 {/* <Route exact path='/lottery'>
                     <Lottery user={user} />

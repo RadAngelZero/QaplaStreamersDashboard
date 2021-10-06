@@ -25,5 +25,5 @@ export function getAvailableLanguages() {
 }
 
 export function getCurrentLanguage() {
-    return i18n.language;
+    return typeof i18n.language === 'string' ? i18n.language.substring(0, 2) : i18n.language;
 }

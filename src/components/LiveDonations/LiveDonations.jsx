@@ -3,8 +3,7 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation } from '../../services/database';
-import { ReactComponent as QaplaLogo } from './../../assets/QaplaLogo.svg';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, loadStreamerProfile } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 
 const LiveDonations = () => {
@@ -12,6 +11,7 @@ const LiveDonations = () => {
     const [donationQueue, setDonationQueue] = useState([]);
     const [donationToShow, setDonationToShow] = useState(null);
     const [listenersAreSetted, setListenersAreSetted] = useState(false);
+    const [alertSideRight, setAlertSideRight] = useState(false)
     const { streamerId } = useParams();
 
     useEffect(() => {
@@ -31,6 +31,11 @@ const LiveDonations = () => {
             if (streamerId) {
                 const uid = await getStreamerUidWithTwitchId(streamerId);
                 setStreamerUid(uid);
+                loadStreamerProfile(uid, (userData) => {
+                    if (userData.donationAlertRight) {
+                        setAlertSideRight(userData.donationAlertRight)
+                    }
+                })
                 listenForTestCheers(uid, (donation) => {
                     pushDonation({ ...donation.val(), id: donation.key });
                 });
@@ -63,6 +68,7 @@ const LiveDonations = () => {
                 if (donation) {
                     const audio = new Audio(donationAudio);
                     audio.play();
+                    donation['isRightSide'] = alertSideRight
                     setDonationToShow(donation);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         removeTestDonation(streamerUid, donation.id);
@@ -82,7 +88,7 @@ const LiveDonations = () => {
         if (!streamerUid) {
             getStreamerUid();
         }
-    }, [streamerId, streamerUid, donationQueue, listenersAreSetted]);
+    }, [streamerId, streamerUid, donationQueue, listenersAreSetted, alertSideRight]);
 
     document.body.style.backgroundColor = 'transparent';
 
@@ -99,7 +105,6 @@ const LiveDonations = () => {
 
 const DonationHandler = (donationToShow) => {
     const donation = donationToShow.donationToShow;
-
     return (
         <div style={{ display: 'flex', flex: 1, flexDirection: 'column', fontFamily: 'Montserrat', backgroundColor: '#f0f0' }}>
             <div
@@ -112,7 +117,8 @@ const DonationHandler = (donationToShow) => {
                     minWidth: '340px',
                     height: '60px',
                     borderRadius: '18px',
-                    padding: '0 18px'
+                    padding: '0 18px',
+                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start'
                 }}
             >
                 <div style={{ display: 'flex', alignSelf: 'center' }}>
@@ -135,8 +141,10 @@ const DonationHandler = (donationToShow) => {
                         width: 'fit-content',
                         backgroundColor: '#4D00FB',
                         borderRadius: '18px',
-                        borderBottomLeftRadius: '4px',
-                        padding: '16.3px 20.4px'
+                        borderBottomLeftRadius: donation.isRightSide ? '18px' : '4px',
+                        borderBottomRightRadius: donation.isRightSide ? '4px' : '18px',
+                        padding: '16.3px 20.4px',
+                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start'
                     }}>
                         <p style={{ display: 'flex', color: 'white', fontSize: '1rem' }}>{donation.message}</p>
                     </div>

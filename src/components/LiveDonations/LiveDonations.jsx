@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, loadStreamerProfile } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 
 const LiveDonations = () => {
@@ -31,11 +31,6 @@ const LiveDonations = () => {
             if (streamerId) {
                 const uid = await getStreamerUidWithTwitchId(streamerId);
                 setStreamerUid(uid);
-                loadStreamerProfile(uid, (userData) => {
-                    if (userData.donationAlertRight) {
-                        setAlertSideRight(userData.donationAlertRight)
-                    }
-                })
                 listenForTestCheers(uid, (donation) => {
                     pushDonation({ ...donation.val(), id: donation.key });
                 });
@@ -68,7 +63,7 @@ const LiveDonations = () => {
                 if (donation) {
                     const audio = new Audio(donationAudio);
                     audio.play();
-                    donation['isRightSide'] = alertSideRight
+                    donation.isRightSide = alertSideRight
                     setDonationToShow(donation);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         removeTestDonation(streamerUid, donation.id);
@@ -88,7 +83,7 @@ const LiveDonations = () => {
         if (!streamerUid) {
             getStreamerUid();
         }
-    }, [streamerId, streamerUid, donationQueue, listenersAreSetted, alertSideRight]);
+    }, [streamerId, streamerUid, donationQueue, listenersAreSetted]);
 
     document.body.style.backgroundColor = 'transparent';
 

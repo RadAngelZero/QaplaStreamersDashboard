@@ -86,7 +86,7 @@
         },
         "instruction5": {
             "title": "5. Copy paste your custom Qapla URL.",
-            "description": "Set both width and height to 400, and uncheck all the other options."
+            "description": "In the source options define the width in 400 and the height in 200 and uncheck all the options."
         },
         "instruction6": {
             "title": "6. Test your Qapla cheer alerts",

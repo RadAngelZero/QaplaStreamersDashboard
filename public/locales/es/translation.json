@@ -86,7 +86,7 @@
         },
         "instruction5": {
             "title": "5. Pega tu URL personalizado de Qapla",
-            "description": "Define tanto la altura como el ancho de la ventana en 400 y desmarca todas las opciones"
+            "description": "En las opciones de la fuente define la anchura en 400 y la altura en 200 y desmarca todas las opciones"
         },
         "instruction6": {
             "title": "6. Prueba tus alertas Qapla",

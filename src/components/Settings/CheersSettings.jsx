@@ -8,6 +8,8 @@ import Step1 from './../../assets/addCheersTutorial1.jpg';
 import Step2 from './../../assets/addCheersTutorial2.jpg';
 import Step3 from './../../assets/addCheersTutorial3.jpg';
 import Step4 from './../../assets/addCheersTutorial4.jpg';
+import ContainedButton from '../ContainedButton/ContainedButton';
+import { writeTestCheer } from './../../services/database';
 
 const useStyles = makeStyles(() =>({
     instructionsMargin: {
@@ -72,7 +74,7 @@ const InstructionSection = ({ title, description, mediaContainerComponent = 'img
     );
 };
 
-const CheersSettings = ({ twitchId }) => {
+const CheersSettings = ({ uid, twitchId }) => {
     const classes = useStyles();
     const cheersURL = `https://dashboard.qapla.gg/liveDonations/${twitchId}`;
     const [openTooltip, setOpenTooltip] = useState(false);
@@ -84,6 +86,10 @@ const CheersSettings = ({ twitchId }) => {
         setTimeout(() => {
             setOpenTooltip(false);
         }, 1250);
+    }
+
+    const sendTestCheer = () => {
+        writeTestCheer(uid, t('CheersSettings.testCheerSuccess'), t('CheersSettings.testCheerError'));
     }
 
     return (
@@ -120,6 +126,11 @@ const CheersSettings = ({ twitchId }) => {
             <InstructionSection title={t('CheersSettings.instruction5.title')}
                 description={t('CheersSettings.instruction5.description')}
                 src={Step4} />
+            <InstructionSection title={t('CheersSettings.instruction6.title')}
+                description={t('CheersSettings.instruction6.description')} />
+            <ContainedButton onClick={sendTestCheer}>
+                {t('CheersSettings.testButton')}
+            </ContainedButton>
             <div className={classes.instructionsMargin} />
         </div>
     );

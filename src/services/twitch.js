@@ -11,7 +11,8 @@ import {
     getStreamUserRedemptions,
     addRedemptionToCounterIfItHaveNotExceededTheLimit,
     getUserLastSeasonLevel,
-    getQoinsToGiveToGivenLevel
+    getQoinsToGiveToGivenLevel,
+    getStreamCustomRewardsMultipliers
 } from './database';
 import { TWITCH_CLIENT_ID, TWITCH_SECRET_ID, XQ, QOINS } from '../utilities/Constants';
 
@@ -29,10 +30,13 @@ let redemptionsIds = {};
  * @param {function} onPong Function called every time Twitch answers our ping request
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, maxRedemptionsOfQoinsPerStream = 35, onInvalidRefreshToken) {
+export async function connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, maxRedemptionsOfQoinsPerStream = 35, onInvalidRefreshToken) {
     let pingInterval = 1000 * 5;
     let reconnectInterval = 1000 * 3;
     let pingHandle;
+
+    let customRewardsMultipliers = await getStreamCustomRewardsMultipliers(streamId);
+    customRewardsMultipliers = customRewardsMultipliers.exists() ? customRewardsMultipliers.val() : { xq: 1, qoins: 1 };
 
     webSocket = new WebSocket('wss://pubsub-edge.twitch.tv');
     webSocket.onopen = (error) => {
@@ -53,7 +57,7 @@ export function connect(streamId, streamerName, uid, accessToken, refreshToken, 
             const reward = JSON.parse(message.data.message);
             if (reward.type === 'reward-redeemed') {
                 const redemptionData = reward.data.redemption;
-                handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, maxRedemptionsOfQoinsPerStream);
+                handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, maxRedemptionsOfQoinsPerStream, customRewardsMultipliers);
             }
         } else if (message.type === 'RECONNECT') {
             setTimeout(() => connect(streamId, streamerName, uid, accessToken, refreshToken, topics, rewardsIds, onPong, onInvalidRefreshToken), reconnectInterval);
@@ -78,8 +82,9 @@ export function closeConnection() {
  * @param {object} rewardsIds Ids of the qapla custom rewards { expReward: 'expId', qoinsReward: 'qoinsId' }
  * @param {object} redemptionData Redemption twitch object
  * @param {number} maxRedemptionsOfQoinsPerStream Maxmimum of qoins redemptions allowed per stream
+ * @param {object} customRewardsMultipliers Multipliers for custom rewards on the current stream { xq: number, qoins: number }
  */
-export async function handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, maxRedemptionsOfQoinsPerStream) {
+export async function handleCustomRewardRedemption(streamId, streamerName, rewardsIds, redemptionData, maxRedemptionsOfQoinsPerStream, customRewardsMultipliers) {
     if (!redemptionsIds[redemptionData.id]) {
         redemptionsIds[redemptionData.id] = true;
         if (redemptionData.reward.id === rewardsIds.expReward) {
@@ -104,12 +109,16 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                     }
 
                     if (giveXQToUser) {
-                        await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                        try {
+                            await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
-                        const expToGive = 15;
-                        await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
-                        await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
-                        await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+                            const expToGive = 15 * customRewardsMultipliers.xq;
+                            await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
+                            await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
+                            await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+                        } catch (error) {
+                            console.log(error);
+                        }
                     }
                 } else {
                     await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
@@ -138,18 +147,24 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         }
 
                         if (giveQoinsToUser) {
-                            await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                            try {
+                                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
-                            /**
-                             * If the user does not have a level we assign level 1 by default
-                             */
-                            const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
+                                /**
+                                 * If the user does not have a level we assign level 1 by default
+                                 */
+                                const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
 
-                            const qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
+                                let qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
 
-                            addQoinsToUser(user.id, qoinsToGive);
-                            await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
-                            await saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                                qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+
+                                addQoinsToUser(user.id, qoinsToGive);
+                                await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
+                                await saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                            } catch (error) {
+                                console.log(error);
+                            }
                         }
                     }
                 }

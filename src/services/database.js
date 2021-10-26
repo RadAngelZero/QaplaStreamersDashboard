@@ -17,6 +17,8 @@ const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
+const premiumEventsSubscriptionRef = database.ref('/PremiumEventsSubscription');
+const streamersDonationsTestRef = database.ref('/StreamersDonationsTest');
 const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
 const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
@@ -165,6 +167,19 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         stringDate
     });
 
+    await premiumEventsSubscriptionRef.child(streamer.uid).child(event.key).set({
+        approved: false,
+        timestamp
+    });
+
+    userStreamersRef.child(streamer.uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
+        if (!numberOfRequests) {
+            return 1;
+        }
+
+        return numberOfRequests + 1;
+    });
+
     return await streamsApprovalRef.child(event.key).set({
         date,
         hour,
@@ -202,6 +217,11 @@ export async function loadStreamsByStatus(uid, status) {
 export async function cancelStreamRequest(uid, streamId) {
     await streamersEventsDataRef.child(uid).child(streamId).remove();
     await streamsApprovalRef.child(streamId).remove();
+    userStreamersRef.child(uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
+        if (numberOfRequests) {
+            return numberOfRequests - 1;
+        }
+    });
 }
 
 /**
@@ -265,6 +285,14 @@ export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, ho
         hour: hourUTC,
         timestamp
     });
+}
+
+/**
+ * Returns the customRewardsMultipliers object of the given stream
+ * @param {string} streamId Stream identifier
+ */
+export async function getStreamCustomRewardsMultipliers(streamId) {
+    return await streamsRef.child(streamId).child('customRewardsMultipliers').once('value');
 }
 
 /**
@@ -436,23 +464,23 @@ export async function addInfoToEventParticipants(streamId, uid, fieldName, value
  * @param {number} qoinsToAdd Qoins to add
  */
 export function addQoinsToUser(uid, qoinsToAdd) {
-    try {
-        userRef.child(uid).child('credits').transaction((credits) => {
-            if (!credits) {
-                return qoinsToAdd;
-            }
+    userRef.child(uid).child('credits').transaction((credits) => {
+        if (!credits) {
+            return qoinsToAdd;
+        }
 
-            if (typeof credits === 'number') {
-                return credits + qoinsToAdd;
-            }
+        if (typeof credits === 'number') {
+            return credits + qoinsToAdd;
+        }
 
-            return credits;
-        }, (error) => {
-            console.log(error);
-        });
-    } catch (error) {
-        console.error(error);
-    }
+        return credits;
+    }, (error) => {
+        if (error) {
+            try {
+                database.ref('/QoinsTransactionsErrors').push({ error, uid, qoinsToAdd });
+            } catch (error) {}
+        }
+    });
 }
 
 /**
@@ -546,6 +574,49 @@ export function listenForLastStreamerCheers(streamerUid, limit = 10, callback) {
  */
 export function removeListenerForUnreadStreamerCheers(streamerUid) {
     streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('child_added');
+}
+
+/**
+ * Write a fake cheer on the test cheers node
+ * @param {string} streamerUid Streamer unique identifier
+ * @param {string} completeMessage Message to show if the operation is succesfuly completed
+ * @param {string} errorMessage Message to show if the write operation fails
+ */
+export function writeTestCheer(streamerUid, completeMessage, errorMessage) {
+    streamersDonationsTestRef.child(streamerUid).push({
+        amountQoins: 0,
+        message: 'Test',
+        timestamp: (new Date()).getTime(),
+        uid: '',
+        read: false,
+        twitchUserName: 'QAPLA',
+        userName: 'QAPLA',
+        photoURL: ''
+    }, (error) => {
+        if (error) {
+            alert(errorMessage);
+        } else {
+            alert(completeMessage);
+        }
+    });
+}
+
+/**
+ * Listener for the unread test cheers
+ * @param {string} streamerUid Stremer identifier
+ * @param {function} callback Function called for every cheer
+ */
+export function listenForTestCheers(streamerUid, callback) {
+    streamersDonationsTestRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback)
+}
+
+/**
+ * Removes the given test donation
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} donationId Donation identifier
+ */
+export function removeTestDonation(streamerUid, donationId) {
+    streamersDonationsTestRef.child(streamerUid).child(donationId).remove();
 }
 
 /**

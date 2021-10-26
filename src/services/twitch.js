@@ -109,12 +109,16 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                     }
 
                     if (giveXQToUser) {
-                        await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                        try {
+                            await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
-                        const expToGive = 15 * customRewardsMultipliers.xq;
-                        await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
-                        await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
-                        await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+                            const expToGive = 15 * customRewardsMultipliers.xq;
+                            await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
+                            await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
+                            await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
+                        } catch (error) {
+                            console.log(error);
+                        }
                     }
                 } else {
                     await saveCustomRewardNonRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, redemptionData.id, redemptionData.reward.id, redemptionData.status);
@@ -143,20 +147,24 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                         }
 
                         if (giveQoinsToUser) {
-                            await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
+                            try {
+                                await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, QOINS, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
-                            /**
-                             * If the user does not have a level we assign level 1 by default
-                             */
-                            const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
+                                /**
+                                 * If the user does not have a level we assign level 1 by default
+                                 */
+                                const userLastSeasonLevel = (await getUserLastSeasonLevel(user.id)).val() || 1;
 
-                            let qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
+                                let qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
 
-                            qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+                                qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
 
-                            addQoinsToUser(user.id, qoinsToGive);
-                            await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
-                            await saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                                addQoinsToUser(user.id, qoinsToGive);
+                                await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
+                                await saveUserStreamReward(user.id, QOINS, streamerName, streamId, qoinsToGive);
+                            } catch (error) {
+                                console.log(error);
+                            }
                         }
                     }
                 }

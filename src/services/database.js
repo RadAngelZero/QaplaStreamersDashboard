@@ -17,6 +17,7 @@ const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
 const redemptionsListsRef = database.ref('/RedemptionsLists');
 const streamersDonationsRef = database.ref('/StreamersDonations');
+const premiumEventsSubscriptionRef = database.ref('/PremiumEventsSubscription');
 const streamersDonationsTestRef = database.ref('/StreamersDonationsTest');
 const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
@@ -166,6 +167,19 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         stringDate
     });
 
+    await premiumEventsSubscriptionRef.child(streamer.uid).child(event.key).set({
+        approved: false,
+        timestamp
+    });
+
+    userStreamersRef.child(streamer.uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
+        if (!numberOfRequests) {
+            return 1;
+        }
+
+        return numberOfRequests + 1;
+    });
+
     return await streamsApprovalRef.child(event.key).set({
         date,
         hour,
@@ -203,6 +217,11 @@ export async function loadStreamsByStatus(uid, status) {
 export async function cancelStreamRequest(uid, streamId) {
     await streamersEventsDataRef.child(uid).child(streamId).remove();
     await streamsApprovalRef.child(streamId).remove();
+    userStreamersRef.child(uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
+        if (numberOfRequests) {
+            return numberOfRequests - 1;
+        }
+    });
 }
 
 /**
@@ -608,6 +627,10 @@ export function removeTestDonation(streamerUid, donationId) {
 export async function markDonationAsRead(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
 }
+
+/**
+ * Streamer Subscriptions
+ */
 
 /**
  * Get the payments received by the streamer in the giving period

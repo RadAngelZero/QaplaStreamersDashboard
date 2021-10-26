@@ -198,7 +198,7 @@ const NewStream = ({ user, games }) => {
 
     const openConfirmationDialog = () => setOpenDetailsDialog(true);
 
-    const submitEvent = () => {
+    const submitEvent = async () => {
         if (selectedDate < minDate) {
             alert('All requests must be sent at least 24 hours before the stream');
             return;
@@ -208,16 +208,37 @@ const NewStream = ({ user, games }) => {
             return;
         }
 
-        const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
-        const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
-        let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
+        const { endDate } = user.currentPeriod;
 
-        const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
-        const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
-        let UTCTime = `${UTCHour}:${UTCMinutes}`;
+        /**
+         * Check if the selected date is valid to create the event based on the end of the streamer subscription
+         */
+        if (selectedDate.getTime() <= endDate) {
 
-        createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
-        history.push('/success');
+            const numberOfStreamsInTheSelectedPeriod = user.subscriptionDetails.streamsRequested || 0;
+
+            /**
+             * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
+             * is lower or equal to the user limit per month then we create the event
+             */
+            if (numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded)) {
+                const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
+                const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
+                let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
+
+                const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
+                const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
+                let UTCTime = `${UTCHour}:${UTCMinutes}`;
+
+                await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+                history.push('/success');
+            } else {
+                // Hacer un modal chido para convencerlos de mejorar su plan o comprar eventos aparte
+                alert('You have reached the limit of streams for your subscription');
+            }
+        } else {
+            alert('The selected date is not valid as your plan will expire before it');
+        }
     }
 
     let gameList = [];

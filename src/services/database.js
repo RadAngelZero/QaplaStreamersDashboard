@@ -629,9 +629,35 @@ export async function markDonationAsRead(streamerUid, donationId) {
 }
 
 /**
- * Streamer Subscriptions
+ * Streamers Subscriptions
  */
 
+/**
+ * Save the subscription information of the given user
+ * @param {string} uid User identifier
+ * @param {string} stripeCustomerId Customer Id given by stripe
+ * @param {number} periodStart Timestamp of period start (in milliseconds)
+ * @param {number} periodEnd Timestamp of period end (in milliseconds)
+ */
+export async function saveSubscriptionInformation(uid, stripeCustomerId, periodStart, periodEnd) {
+    userStreamersRef.child(uid).update({
+        premium: true,
+        currentPeriod: {
+            startDate: periodStart,
+            endDate: periodEnd
+        },
+        stripeCustomerId
+    });
+}
+
+/**
+ * Add/overwrite the subscriptionDetails information on the given user
+ * @param {string} uid User identifier
+ * @param {object} subscriptionDetails Subscription details
+ */
+export async function updateSubscriptionDetails(uid, subscriptionDetails) {
+    userStreamersRef.child(uid).update({ subscriptionDetails });
+}
 /**
  * Get the payments received by the streamer in the giving period
  * @param {string} streamerUid Uid of the streamer

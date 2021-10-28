@@ -127,5 +127,11 @@
         "qoinsStore": "Tienda de Qoins",
         "discounts": "Descuento en tienda de Qoins",
         "subscribeNow": "Suscríbete ahora"
+    },
+    "ProcessingPaymentDialog": {
+        "successfulPayment": "Pago realizado con exito",
+        "activatingAccount": "Por favor espera un momento mientras activamos tu cuenta",
+        "membershipReady": "Listo, tu membresia esta activa, presiona el boton para terminar",
+        "finish": "Terminar"
     }
 }

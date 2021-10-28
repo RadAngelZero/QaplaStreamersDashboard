@@ -7,6 +7,7 @@ import { initReactI18next } from 'react-i18next';
 i18n.use(Backend).use(LanguageDetector).use(initReactI18next).init({
     debug: true,
     fallbackLng: 'en',
+    supportedLngs: ['en', 'es'],
     interpolation: {
         escapeValue: false
     }

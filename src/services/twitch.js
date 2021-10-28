@@ -498,7 +498,7 @@ async function getRewardRedemptionsWithCursor(uid, cursor, twitchId, accessToken
     `&reward_id=${rewardId}` +
     '&status=UNFULFILLED' +
     `&after=${cursor}` +
-    '&first=2', {
+    '&first=50', {
         method: 'GET',
         headers: {
             'Client-Id': TWITCH_CLIENT_ID,

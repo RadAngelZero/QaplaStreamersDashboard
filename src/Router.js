@@ -22,10 +22,11 @@ import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
 import PlanPicker from './components/PlanPicker/PlanPicker';
-import Lottery from './components/Lottery/Lottery';
+// import Lottery from './components/Lottery/Lottery';
 import AddStreamerLinks from './components/AddStreamerLinks/AddStreamerLinks';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamsPackagesCheckout from './components/StreamsPackagesCheckout/StreamsPackagesCheckout';
+import CustomerPortal from './components/CustomerPortal/CustomerPortal';
 
 window.onbeforeunload = function() {
     return true;
@@ -109,8 +110,11 @@ const Router = () => {
                 <Route exact path='/settings'>
                     <Settings user={user} />
                 </Route>
-                <Route exact path='/pricing'>
+                <Route exact path='/membership'>
                     <PlanPicker user={user} />
+                </Route>
+                <Route exact path='/subscriptions'>
+                    <CustomerPortal user={user} />
                 </Route>
                 <Route exact path='/buyStreams'>
                     <StreamsPackages user={user} games={games} />

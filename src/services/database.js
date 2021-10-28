@@ -1,3 +1,4 @@
+import { QOINS, XQ } from '../utilities/Constants';
 import { database } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
@@ -23,6 +24,7 @@ const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
 const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
 const streamsPackagesRef = database.ref('/StreamsPackages');
+const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDetails');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -649,7 +651,7 @@ export async function saveSubscriptionInformation(uid, stripeCustomerId, periodS
  * @param {object} subscriptionDetails Subscription details
  */
 export async function updateSubscriptionDetails(uid, subscriptionDetails) {
-    userStreamersRef.child(uid).update({ subscriptionDetails });
+    await userStreamersRef.child(uid).update({ subscriptionDetails });
 }
 /**
  * Get the payments received by the streamer in the giving period
@@ -721,6 +723,13 @@ export async function getStreamRedemptionCounter(streamId) {
  */
 export async function getStreamsPackages() {
     return await streamsPackagesRef.once('value');
+}
+
+/**
+ * Gets all the subscriptions informations in the Streamers Subscriptions Details node
+ */
+export async function getSubscriptionsDetails() {
+    return await streamersSubscriptionsDetailsRef.once('value');
 }
 
 /**

@@ -46,6 +46,12 @@ const CogIcon = ({ active }) => (
     </svg>
 );
 
+const MembershipIcon = ({ active }) => (
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.8173 1.27764C13.2648 0.240787 14.735 0.240787 15.1824 1.27764L17.9902 7.78415C18.1797 8.22318 18.5967 8.52112 19.0735 8.55797L26.2738 9.11434C27.4291 9.20361 27.8881 10.6539 26.9947 11.3917L21.5797 15.8623C21.1977 16.1778 21.0305 16.6842 21.1494 17.165L22.816 23.8988C23.09 25.0062 21.8954 25.8968 20.9123 25.318L14.6533 21.6333C14.25 21.3958 13.7498 21.3958 13.3466 21.6333L7.08747 25.318C6.10439 25.8968 4.9098 25.0062 5.18386 23.8988L6.85036 17.165C6.96935 16.6842 6.80209 16.1778 6.42014 15.8623L1.00517 11.3917C0.11165 10.6539 0.57067 9.20361 1.72594 9.11434L8.92633 8.55797C9.40309 8.52112 9.82019 8.22318 10.0096 7.78415L12.8173 1.27764Z" fill={active ? '#0AFFD2' : 'rgba(255, 255, 255, .25)'}/>
+    </svg>
+);
+
 const StreamerSideBar = ({ user }) => {
     const history = useHistory();
     const classes = useStyles();
@@ -92,7 +98,15 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.link')}
                     </ListItemText>
                 </ListItem> */}
-                <ListItem button style={{ marginTop: '.5rem' }} onClick={goToSettings}>
+                <ListItem button onClick={() => user.premium ? history.push('/subscriptions') : history.push('/membership')}>
+                    <ListItemIcon style={{ minWidth: 40 }}>
+                        <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFF' }}>
+                        {t('SideBar.membership')}
+                    </ListItemText>
+                </ListItem>
+                <ListItem button onClick={goToSettings}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>
@@ -101,7 +115,7 @@ const StreamerSideBar = ({ user }) => {
                     </ListItemText>
                     {showNewLabelOnSettings &&
                         <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)' }}>
-                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24 }}>
+                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24, marginTop: 8, marginBottom: 8 }}>
                                 {t('SideBar.new')}
                             </p>
                         </div>

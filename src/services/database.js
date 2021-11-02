@@ -1,3 +1,4 @@
+import { QOINS, XQ } from '../utilities/Constants';
 import { database } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
@@ -22,6 +23,8 @@ const streamersDonationsTestRef = database.ref('/StreamersDonationsTest');
 const paymentsToStreamersHistory = database.ref('/PaymentsToStreamersHistory');
 const streamerLinksRef = database.ref('/StreamerLinks');
 const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
+const streamsPackagesRef = database.ref('/StreamsPackages');
+const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDetails');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -170,14 +173,6 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
     await premiumEventsSubscriptionRef.child(streamer.uid).child(event.key).set({
         approved: false,
         timestamp
-    });
-
-    userStreamersRef.child(streamer.uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
-        if (!numberOfRequests) {
-            return 1;
-        }
-
-        return numberOfRequests + 1;
     });
 
     return await streamsApprovalRef.child(event.key).set({
@@ -656,7 +651,7 @@ export async function saveSubscriptionInformation(uid, stripeCustomerId, periodS
  * @param {object} subscriptionDetails Subscription details
  */
 export async function updateSubscriptionDetails(uid, subscriptionDetails) {
-    userStreamersRef.child(uid).update({ subscriptionDetails });
+    await userStreamersRef.child(uid).update({ subscriptionDetails });
 }
 /**
  * Get the payments received by the streamer in the giving period
@@ -721,4 +716,71 @@ export async function addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId
  */
 export async function getStreamRedemptionCounter(streamId) {
     return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
+}
+
+/**
+ * Gets all the packages on the Streams Packages node
+ */
+export async function getStreamsPackages() {
+    return await streamsPackagesRef.once('value');
+}
+
+/**
+ * Gets all the subscriptions informations in the Streamers Subscriptions Details node
+ */
+export async function getSubscriptionsDetails() {
+    return await streamersSubscriptionsDetailsRef.once('value');
+}
+
+/**
+ * Add a child on the boughtStreams node in the user profile so the user can have more streams independently
+ * of the streams that their subscription already included
+ * @param {string} streamerUid User identifier
+ * @param {number} boughtStreams Number of streams bought by the streamer
+ * @param {timestamp} expirationTimestamp Timestamp of the maxim date to use the streams
+ */
+export async function addBoughtStreamsToStreamer(streamerUid, boughtStreams, expirationTimestamp) {
+    await userStreamersRef.child(streamerUid).child('boughtStreams').push({
+        boughtStreams,
+        expirationTimestamp
+    });
+}
+
+/**
+ * Add one to the streamsRequested node of the given streamer in their subscriptionDetails
+ * (streamsRequested in this node is the counter of events for their included on their subscription streams)
+ * @param {string} streamerUid Streamer user identifier
+ */
+export async function addToStreamsRequestedOnSubscriptionDetails(streamerUid) {
+    userStreamersRef.child(streamerUid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
+        if (!numberOfRequests) {
+            return 1;
+        }
+
+        return numberOfRequests + 1;
+    });
+}
+
+/**
+ * Add one to the streamsRequested node of the given streamer in their boughtStreams/{package}
+ * (streamsRequested in this node is the counter of events for their package that the user bought)
+ * @param {string} streamerUid Streamer user identifier
+ */
+export async function addToStreamsRequestedOnStreamsPackage(streamerUid, packageId) {
+    userStreamersRef.child(streamerUid).child('boughtStreams').child(packageId).child('streamsRequested').transaction((numberOfRequests) => {
+        if (!numberOfRequests) {
+            return 1;
+        }
+
+        return numberOfRequests + 1;
+    });
+}
+
+/**
+ * Remove a package of the boughtStreams node in the user profile
+ * @param {string} streamerUid Streamer user identifier
+ * @param {string} packageId Package identifier
+ */
+export async function removeStreamPackageOfStreamer(streamerUid, packageId) {
+    userStreamersRef.child(streamerUid).child('boughtStreams').child(packageId).remove();
 }

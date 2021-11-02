@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerDashboardContainer = ({ children, user }) => {
+const StreamerDashboardContainer = ({ children, user, containerStyle = {} }) => {
     const history = useHistory();
     const classes = useStyles();
 
@@ -56,9 +56,9 @@ const StreamerDashboardContainer = ({ children, user }) => {
                 :
                 <>
                     {history.location.pathname !== '/welcome' &&
-                        <StreamerSideBar />
+                        <StreamerSideBar user={user} />
                     }
-                    <div className={classes.content}>
+                    <div className={`${classes.content} ${containerStyle}`}>
                         {children}
                         <LanguageHandler />
                     </div>

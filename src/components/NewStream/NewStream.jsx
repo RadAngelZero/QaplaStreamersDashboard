@@ -3,7 +3,7 @@ import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdo
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import DayJsUtils from '@date-io/dayjs';
-import { createNewStreamRequest } from './../../services/database';
+import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer } from './../../services/database';
 
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -217,11 +217,32 @@ const NewStream = ({ user, games }) => {
 
             const numberOfStreamsInTheSelectedPeriod = user.subscriptionDetails.streamsRequested || 0;
 
+            let userCanCreateStream = numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded);
+
+            if (!userCanCreateStream) {
+                if (user.boughtStreams) {
+                    /**
+                     * Check for packages of streams bought by the streamer, if some package has not expired and has not used the total amount of streams bought
+                     * the user can create the stream, this function will also remove expired packages or packages that has been already used
+                     */
+                     userCanCreateStream = Object.keys(user.boughtStreams).some((streamsPackageId) => {
+                        if (selectedDate.getTime() <= user.boughtStreams[streamsPackageId].expirationTimestamp && (!user.boughtStreams[streamsPackageId].streamsRequested || user.boughtStreams[streamsPackageId].streamsRequested + 1 <= user.boughtStreams[streamsPackageId].boughtStreams)) {
+                            addToStreamsRequestedOnStreamsPackage(user.uid, streamsPackageId);
+                            return true;
+                        } else {
+                            removeStreamPackageOfStreamer(user.uid, streamsPackageId);
+                        }
+                    });
+                }
+            } else {
+                addToStreamsRequestedOnSubscriptionDetails(user.uid);
+            }
+
             /**
              * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
              * is lower or equal to the user limit per month then we create the event
              */
-            if (numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded)) {
+            if (userCanCreateStream) {
                 const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
                 const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
                 let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;

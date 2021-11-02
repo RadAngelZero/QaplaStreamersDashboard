@@ -30,6 +30,7 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
+        "membership": "Membresía",
         "link": "Link en bio",
         "settings": "Ajustes",
         "new": "Nuevo",
@@ -98,5 +99,39 @@
     },
     "CheersBitsRecordDialog": {
         "period": "Periodo:"
+    },
+    "PlanPicker": {
+        "titlePart1": "Genera visibilidad para tu contenido",
+        "titlePart2": "publicando tus streams en Qapla",
+        "plansPeriods": {
+            "monthly": "Mensual",
+            "quarterly": "Trimestral",
+            "yearly": "Anual"
+        },
+        "plansDescriptions": {
+            "essential": "Genera tráfico de valor a tu canal",
+            "growth": "Recompensa a tu comunidad mientras creces"
+        },
+        "month": "mes",
+        "payment": "Pago",
+        "saving": "Ahorras {{saving}}%",
+        "monthlyPublications": "{{numberOfPublications}} publicaciones al mes",
+        "with": "con",
+        "doubleXQ": "XQ doble",
+        "redemptions": "{{numberOfRedemptions}} canjes de Qoins y XQ por stream",
+        "cheers": "Recibe cheers de Qoins.",
+        "bitsPerCheerEssential": "10 Bits por cheer",
+        "bitsPerCheerGrowth": "20 Bits por cheer",
+        "extraPublications": "Publicaciones extras incluyen",
+        "noQoinsMinimum": "Sin mínimo de retiro de Qoins",
+        "qoinsStore": "Tienda de Qoins",
+        "discounts": "Descuento en tienda de Qoins",
+        "subscribeNow": "Suscríbete ahora"
+    },
+    "ProcessingPaymentDialog": {
+        "successfulPayment": "Pago realizado con exito",
+        "activatingAccount": "Por favor espera un momento mientras activamos tu cuenta",
+        "membershipReady": "Listo, tu membresia esta activa, presiona el boton para terminar",
+        "finish": "Terminar"
     }
 }

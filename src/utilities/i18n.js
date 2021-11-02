@@ -7,6 +7,7 @@ import { initReactI18next } from 'react-i18next';
 i18n.use(Backend).use(LanguageDetector).use(initReactI18next).init({
     debug: true,
     fallbackLng: 'en',
+    supportedLngs: ['en', 'es'],
     interpolation: {
         escapeValue: false
     }
@@ -25,5 +26,5 @@ export function getAvailableLanguages() {
 }
 
 export function getCurrentLanguage() {
-    return i18n.language;
+    return typeof i18n.language === 'string' ? i18n.language.substring(0, 2) : i18n.language;
 }

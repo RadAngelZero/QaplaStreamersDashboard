@@ -74,18 +74,20 @@ const SubscriptionCheckout = ({ user, open, onClose, billingPageId }) => {
 
     return (
         <>
-            <Dialog open={open}
-                onClose={!openProcessingPaymentDialog ? onClose : () => {}}
-                fullWidth
-                maxWidth='md'
-                classes={{
-                    scrollPaper: classes.scrollPaper,
-                    paper: classes.paper
-                }}>
-                <DialogContent>
-                    <div id="billflow-embed"></div>
-                </DialogContent>
-            </Dialog>
+            {!paymentProcessed &&
+                <Dialog open={open}
+                    onClose={!openProcessingPaymentDialog ? onClose : () => {}}
+                    fullWidth
+                    maxWidth='md'
+                    classes={{
+                        scrollPaper: classes.scrollPaper,
+                        paper: classes.paper
+                    }}>
+                    <DialogContent>
+                        <div id="billflow-embed"></div>
+                    </DialogContent>
+                </Dialog>
+            }
             <ProcessingPaymentDialog open={openProcessingPaymentDialog}
                 finished={paymentProcessed}
                 onClose={() => { setOpenProcessingPaymentDialog(false); history.push('/profile') }} />

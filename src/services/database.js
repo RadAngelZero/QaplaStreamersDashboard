@@ -1,4 +1,3 @@
-import { QOINS, XQ } from '../utilities/Constants';
 import { database } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
@@ -12,7 +11,6 @@ const streamParticipantsRef = database.ref('/EventParticipants');
 const userRef = database.ref('/Users');
 const donationsLeaderBoardRef = database.ref('/DonationsLeaderBoard');
 const redeemedCustomRewardsRef = database.ref('/RedeemedCustomRewards');
-const eventParticipantsRef = database.ref('/EventParticipants');
 const userStreamsRewardsRef = database.ref('/UserStreamsRewards');
 const nonRedeemedCustomRewardsRef = database.ref('/NonRedeemedCustomRewards');
 const activeCustomRewardsRef = database.ref('/ActiveCustomRewards');
@@ -412,7 +410,7 @@ export async function getUserByTwitchId(twitchId) {
  * @param {string} streamId Stream identifier in our database
  */
 export async function isUserRegisteredToStream(uid, streamId) {
-    return (await eventParticipantsRef.child(streamId).child(uid).once('value')).exists();
+    return (await streamParticipantsRef.child(streamId).child(uid).once('value')).exists();
 }
 
 /**
@@ -450,7 +448,7 @@ export async function getQaplaLevels() {
  * @param {any} value Value to save
  */
 export async function addInfoToEventParticipants(streamId, uid, fieldName, value) {
-    eventParticipantsRef.child(streamId).child(uid).update({ [fieldName]: value });
+    streamParticipantsRef.child(streamId).child(uid).update({ [fieldName]: value });
 }
 
 /**

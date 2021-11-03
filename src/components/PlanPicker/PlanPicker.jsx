@@ -252,12 +252,12 @@ const PlanPicker = ({ user }) => {
                                                     <div className={classes.listItem}>
                                                         {t('PlanPicker.monthlyPublications', { numberOfPublications: plan[1].streamsIncluded })}
                                                         {plan[0] === 'growth' && ` ${t('PlanPicker.with')}`}
+                                                        {plan[0] === 'growth' &&
+                                                            <span className={classes.growthExtraBenefit}>
+                                                                {t('PlanPicker.doubleXQ')}
+                                                            </span>
+                                                        }
                                                     </div>
-                                                    {plan[0] === 'growth' &&
-                                                        <div className={classes.growthExtraBenefit}>
-                                                            {t('PlanPicker.doubleXQ')}
-                                                        </div>
-                                                    }
                                                 </div>
                                             </Box>
                                         </li>
@@ -278,12 +278,12 @@ const PlanPicker = ({ user }) => {
                                                     <div className={classes.listItem}>
                                                         {t('PlanPicker.cheers')}
                                                         {plan[0] === 'essential' && ` ${t('PlanPicker.bitsPerCheerEssential')}`}
+                                                        {plan[0] === 'growth' &&
+                                                            <span className={classes.growthExtraBenefit}>
+                                                                {t('PlanPicker.bitsPerCheerGrowth')}
+                                                            </span>
+                                                        }
                                                     </div>
-                                                    {plan[0] === 'growth' &&
-                                                        <div className={classes.growthExtraBenefit}>
-                                                            {t('PlanPicker.bitsPerCheerGrowth')}
-                                                        </div>
-                                                    }
                                                 </div>
                                             </Box>
                                         </li>
@@ -294,9 +294,9 @@ const PlanPicker = ({ user }) => {
                                                     <div className={classes.listItemDescription}>
                                                         <div className={classes.listItem}>
                                                             {t('PlanPicker.extraPublications')}
-                                                        </div>
-                                                        <div className={classes.growthExtraBenefit}>
-                                                            {t('PlanPicker.doubleXQ')}
+                                                            <span className={classes.growthExtraBenefit}>
+                                                                {t('PlanPicker.doubleXQ')}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </Box>

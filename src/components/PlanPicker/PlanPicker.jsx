@@ -173,7 +173,6 @@ const PlanPicker = ({ user }) => {
     const [selectedPlanBillingPageId, setSelectedPlanBillingPageId] = useState('');
 
     const { t } = useTranslation();
-    const history = useHistory();
     const classes = useStyles();
 
     useEffect(() => {
@@ -194,11 +193,17 @@ const PlanPicker = ({ user }) => {
     return (
         <StreamerDashboardContainer user={user} containerStyle={classes.backgroundContainer}>
             <Box display='flex' alignItems='center' justifyContent='center'>
-                <h1 className={classes.title}>
-                    {t('PlanPicker.titlePart1')}
-                    <br />
-                    {t('PlanPicker.titlePart2')}
-                </h1>
+                {user &&
+                    <h1 className={classes.title}>
+                        {!user.freeTrial ?
+                            t('PlanPicker.titlePart1')
+                            :
+                            t('PlanPicker.titlePart1FreeTrial')
+                        }
+                        <br />
+                        {t('PlanPicker.titlePart2')}
+                    </h1>
+                }
             </Box>
             <Box display='flex' alignItems='center' justifyContent='center'>
                 {Object.keys(subscriptions).map((subscriptionType) => (
@@ -237,9 +242,9 @@ const PlanPicker = ({ user }) => {
                                             {plan[1].saving && '.'}
                                         </p>
                                         {plan[1].saving &&
-                                            <p className={classes.planSavingPercentage}>
+                                            <span className={classes.planSavingPercentage}>
                                                 {t(`PlanPicker.saving`, { saving: plan[1].saving })}
-                                            </p>
+                                            </span>
                                         }
                                     </div>
                                 </div>

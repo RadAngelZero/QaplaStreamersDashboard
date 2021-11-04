@@ -10,6 +10,7 @@ import {
     DialogContentText,
     DialogActions
 } from '@material-ui/core';
+import dayjs from 'dayjs';
 
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPage.svg';
@@ -18,10 +19,13 @@ import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { signInWithTwitch } from '../../services/auth';
-import { streamerProfileExists, createStreamerProfile, updateStreamerProfile } from '../../services/database';
+import { streamerProfileExists, createStreamerProfile, updateStreamerProfile, getInvitationCodeParams } from '../../services/database';
 import { auth } from '../../services/firebase';
 import { subscribeStreamerToTwitchWebhook } from '../../services/functions';
 import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
+
+var utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
 
 const CustomDialog = withStyles((theme) => ({
     paper: {
@@ -43,8 +47,19 @@ const StreamersSignin = ({ title }) => {
         localStorage.setItem('twitchPermission', 'channel:read:redemptions');
         localStorage.setItem('termsAndConditions', 'true');
         if (!(await streamerProfileExists(user.firebaseAuthUser.user.uid))) {
-            if (inviteCode) {
+            const invitationCodeSnap = await getInvitationCodeParams(inviteCode);
+            if (inviteCode && invitationCodeSnap.exists()) {
                 await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
+                if (invitationCodeSnap.val().freeTrial && invitationCodeSnap.val().subscriptionDetails) {
+                    const startDate = dayjs.utc().toDate().getTime();
+                    const endDate = dayjs.utc().add(1, 'month').endOf('day').toDate().getTime();
+                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, {
+                        freeTrial: true,
+                        premium: true,
+                        currentPeriod: { startDate, endDate },
+                        subscriptionDetails: invitationCodeSnap.val().subscriptionDetails
+                    });
+                }
                 await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
                 await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
                 history.push('/profile');

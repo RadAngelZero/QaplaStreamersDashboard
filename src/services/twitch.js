@@ -273,14 +273,13 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
         const response = await res.json();
         if (response.data && response.data[0]) {
 
-            return response.data[0];
+            return { status: res.status, data: response.data[0] };
         } else if (response.error) {
             if (res.status === 400) {
-                return null;
+                return { status: res.status, error: response.error, message: response.message };
             }
         } else {
-            console.log(res);
-            console.log(res.status);
+            return { status: res.status };
         }
     } catch (e) {
         console.log('Error: ', e);

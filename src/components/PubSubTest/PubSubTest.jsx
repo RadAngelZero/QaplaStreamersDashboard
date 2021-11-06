@@ -11,7 +11,8 @@ import {
     TableRow,
     TableBody,
     Avatar,
-    CircularProgress
+    CircularProgress,
+    Snackbar
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
@@ -37,6 +38,7 @@ import {
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { XQ, QOINS, TWITCH_PUBSUB_UNCONNECTED, TWITCH_PUBSUB_CONNECTED, TWITCH_PUBSUB_CONNECTION_LOST, HOUR_IN_MILISECONDS } from '../../utilities/Constants';
 import { distributeStreamRedemptionsRewards } from '../../services/functions';
+import { notifyBugToDevelopTeam } from '../../services/discord';
 
 const useStyles = makeStyles((theme) => ({
     tableHead: {
@@ -96,6 +98,8 @@ const PubSubTest = ({ user }) => {
     const [buttonFirstText, setButtonFirstText] = useState(t('handleStream.connect'));
     const [eventIsAlreadyClosed, setEventIsAlreadyClosed] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState(TWITCH_PUBSUB_UNCONNECTED);
+    const [statusMessage, setStatusMessage] = useState('');
+
     let pingTimeout;
 
     useEffect(() => {
@@ -173,7 +177,7 @@ const PubSubTest = ({ user }) => {
                 connect(streamId, user.displayName, user.uid, userCredentialsUpdated.access_token, userCredentialsUpdated.refresh_token, [`channel-points-channel-v1.${user.id}`], rewards, onPong, qoinsMaximumRedemptionsPerStream, handleTwitchSignIn);
                 setOldUser(user);
                 setConnectedToTwitch(true);
-                alert(t('handleStream.reconnected'));
+                setStatusMessage(t('handleStream.reconnected'));
             } else {
                 alert(t('handleStream.streamClosed'));
             }
@@ -181,7 +185,7 @@ const PubSubTest = ({ user }) => {
             const currentDate = new Date();
             const streamScheduledDate = new Date(streamTimestamp);
             if (user.id === '213807528' || currentDate.getTime() <= (streamScheduledDate.getTime() + (HOUR_IN_MILISECONDS * 2))) {
-                alert(t('handleStream.connecting'));
+                setStatusMessage(t('handleStream.connecting'));
                 const rewards = await createReward(userCredentialsUpdated);
 
                 if (rewards) {
@@ -213,22 +217,45 @@ const PubSubTest = ({ user }) => {
     const createReward = async (userCredentials) => {
         let date = new Date();
         if (date.getTime() >= streamTimestamp - 900000) {
-            let rewardsIdsObject = {};
+            let rewardsIdsObject = { expReward: '', qoinsReward: '' };
             const qoinsMaximumRedemptionsPerStream = (user.subscriptionDetails && parseInt(user.subscriptionDetails.redemptionsPerStream)) ? parseInt(user.subscriptionDetails.redemptionsPerStream) : 35;
-            const expReward = await createCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, 'XQ Qapla', 500, true, handleTwitchSignIn, false, 0, true, 1);
-            const qoinsReward = await createCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, 'Qoins Qapla', 500, false, handleTwitchSignIn, true, qoinsMaximumRedemptionsPerStream, true, 1);
-
-            if (!expReward || !qoinsReward) {
-                return await handleDuplicatedCustomReward();
+            const expReward = await createCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, 'XQ Qapla', 500, false, handleTwitchSignIn, false, 0, true, 1);
+            if (expReward.status === 200) {
+                rewardsIdsObject.expReward = expReward.data.id;
+            } else {
+                if (expReward.status === 400) {
+                    return await handleDuplicatedCustomReward(XQ, expReward);
+                }
             }
 
-            rewardsIdsObject = { expReward: expReward.id, qoinsReward: qoinsReward.id };
+            const qoinsReward = await createCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, 'Qoins Qapla', 500, false, handleTwitchSignIn, true, qoinsMaximumRedemptionsPerStream, true, 1);
+            if (qoinsReward.status === 200) {
+                rewardsIdsObject.qoinsReward = qoinsReward.data.id;
+            } else {
+                // Problem creating Qoins reward
+                // Delete XQ reward
+                await deleteCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, expReward.data.id, handleTwitchSignIn);
 
-            if (Object.keys(rewardsIdsObject).length === 2) {
-                setRewardsIds({ expReward: expReward.id, qoinsReward: qoinsReward.id });
-                await saveStreamerTwitchCustomReward(user.uid, 'expReward', expReward.id, expReward.title, expReward.cost, streamId);
-                await saveStreamerTwitchCustomReward(user.uid, 'qoinsReward', qoinsReward.id, qoinsReward.title, qoinsReward.cost, streamId);
-                alert(t('handleStream.rewardsCreated'));
+                let errorMessage = `Error creating Qoins Reward\nStatus: ${qoinsReward.status}`;
+                if (qoinsReward.error) {
+                    errorMessage += `\nError: ${qoinsReward.error}\nMessage: ${qoinsReward.message}\nStreamer: ${user.displayName}\nStream Id: ${streamId}`;
+                }
+                // Abort and notify Qapla developers
+                notifyBugToDevelopTeam(errorMessage);
+
+                if (qoinsReward.status === 400) {
+                    return await handleDuplicatedCustomReward(QOINS, qoinsReward);
+                }
+            }
+
+            if (expReward.status === 200 && qoinsReward.status === 200) {
+                setRewardsIds({ expReward: expReward.data.id, qoinsReward: qoinsReward.data.id });
+                await saveStreamerTwitchCustomReward(user.uid, 'expReward', expReward.data.id, expReward.data.title, expReward.data.cost, streamId);
+                await saveStreamerTwitchCustomReward(user.uid, 'qoinsReward', qoinsReward.data.id, qoinsReward.data.title, qoinsReward.data.cost, streamId);
+
+                // Enable XQ reward
+                await enableCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, expReward.data.id, handleTwitchSignIn);
+                setStatusMessage(t('handleStream.rewardsCreated'));
             }
 
             return rewardsIdsObject;
@@ -239,26 +266,38 @@ const PubSubTest = ({ user }) => {
         return null;
     }
 
-    const handleDuplicatedCustomReward = async () => {
-        alert(t('handleStream.streamerHasAnOpenStream'));
-        const activeRewards = await getOpenCustomRewards(user.uid);
-        let rewardsIdsToDelete = {};
+    const handleDuplicatedCustomReward = async (rewardType, rewardError) => {
+        let rewardsIdsToDelete = { expReward: '', qoinsReward: '' };
         let streamIdToClose;
-        activeRewards.forEach((activeReward) => {
-            rewardsIdsToDelete.expReward = activeReward.val().expReward.rewardId;
-            rewardsIdsToDelete.qoinsReward = activeReward.val().qoinsReward.rewardId;
-            streamIdToClose = activeReward.key;
-        });
+        const activeRewards = await getOpenCustomRewards(user.uid);
+        if (activeRewards.exists()) {
+            alert(t('handleStream.streamerHasAnOpenStream'));
+            activeRewards.forEach((activeReward) => {
+                rewardsIdsToDelete.expReward = activeReward.val().expReward.rewardId;
+                rewardsIdsToDelete.qoinsReward = activeReward.val().qoinsReward.rewardId;
+                streamIdToClose = activeReward.key;
+            });
+        }
 
         if (rewardsIdsToDelete.expReward && rewardsIdsToDelete.qoinsReward && streamIdToClose) {
-            const userCredentialsUpdated = await handleTwitchSignIn();
-
             await finishStream(streamIdToClose, rewardsIdsToDelete);
+
+            const userCredentialsUpdated = await handleTwitchSignIn();
 
             return await createReward(userCredentialsUpdated);
         } else {
-            alert('Las recompensas existentes no han podido ser eliminadas, contacta con soporte técnico.');
+            // Problem creating reward not caused by previous open stream
+            let errorMessage = `Error creating ${rewardType} Reward\nStatus: ${rewardError.status}`;
+            if (rewardError.error) {
+                errorMessage += `\nError: ${rewardError.error}\nMessage: ${rewardError.message}\nStreamer: ${user.displayName}\nStream Id: ${streamId}`;
+            }
+            // Abort and notify Qapla developers
+            notifyBugToDevelopTeam(errorMessage);
+
+            alert(t('handleStream.rewardsCantBeRemoved'));
         }
+
+        return null;
     }
 
     const deleteReward = async (rewardIdToDelete, userCredentials) => {
@@ -433,6 +472,12 @@ const PubSubTest = ({ user }) => {
                     </Grid>
                 }
             </Grid>
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={statusMessage !== ''}
+                autoHideDuration={5000}
+                onClose={() => setStatusMessage('')}
+                message={statusMessage} />
         </StreamerDashboardContainer>
     );
 }

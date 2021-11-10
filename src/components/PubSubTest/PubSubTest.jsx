@@ -12,8 +12,16 @@ import {
     TableBody,
     Avatar,
     CircularProgress,
-    Snackbar
+    Snackbar,
+    List,
+    ListItem,
+    LinearProgress,
+    ListItemIcon,
+    ListItemText,
+    Typography,
+    Box
 } from '@material-ui/core';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
@@ -39,6 +47,7 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import { XQ, QOINS, TWITCH_PUBSUB_UNCONNECTED, TWITCH_PUBSUB_CONNECTED, TWITCH_PUBSUB_CONNECTION_LOST, HOUR_IN_MILISECONDS } from '../../utilities/Constants';
 import { distributeStreamRedemptionsRewards } from '../../services/functions';
 import { notifyBugToDevelopTeam } from '../../services/discord';
+import CloseStreamDialog from '../CloseStreamDialog/CloseStreamDialog';
 
 const useStyles = makeStyles((theme) => ({
     tableHead: {
@@ -70,6 +79,15 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#00FFDD !important',
         marginTop: 16,
         color: '#000'
+    },
+    whiteColor: {
+        color: '#FFF'
+    },
+    linearProgressBackgroundColor: {
+        backgroundColor: '#0AFFD2'
+    },
+    greenQaplaColor: {
+        color: '#0AFFD2'
     }
 }));
 
@@ -82,6 +100,39 @@ const TableCellStyled = withStyles(() => ({
         color: '#FFFFFF'
     }
 }))(TableCell);
+
+const CLOSING_STREAM_STEPS = 4;
+
+const CloseStreamStep = ({ label, currentStep, step, progress }) => {
+    const classes = useStyles();
+    const percentageProgress = progress * 100;
+
+    return (
+        <ListItem style={{ display: 'flex', marginBottom: 16 }}>
+            <ListItemIcon>
+                {step === currentStep ?
+                    <Box display='flex' flexDirection='column' alignItems='center'>
+                        <Box width='100%' mr={1}>
+                            <LinearProgress classes={{ barColorPrimary: classes.linearProgressBackgroundColor }} variant='determinate' value={percentageProgress} />
+                        </Box>
+                        <br />
+                        <Box minWidth={35}>
+                            <Typography className={classes.whiteColor}>{`${Math.round(
+                            percentageProgress,
+                            )}%`}</Typography>
+                        </Box>
+                    </Box>
+                    :
+                    currentStep > step &&
+                        <CheckCircleIcon className={classes.greenQaplaColor} />
+                }
+            </ListItemIcon>
+            <ListItemText>
+                {label}
+            </ListItemText>
+        </ListItem>
+    );
+}
 
 const PubSubTest = ({ user }) => {
     const { streamId } = useParams();
@@ -99,6 +150,7 @@ const PubSubTest = ({ user }) => {
     const [eventIsAlreadyClosed, setEventIsAlreadyClosed] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState(TWITCH_PUBSUB_UNCONNECTED);
     const [statusMessage, setStatusMessage] = useState('');
+    const [currentCloseStep, setCurrentCloseStep] = useState({ step: -1, progress: 0 });
 
     let pingTimeout;
 
@@ -254,7 +306,8 @@ const PubSubTest = ({ user }) => {
                 await saveStreamerTwitchCustomReward(user.uid, 'qoinsReward', qoinsReward.data.id, qoinsReward.data.title, qoinsReward.data.cost, streamId);
 
                 // Enable XQ reward
-                await enableCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, expReward.data.id, handleTwitchSignIn);
+                // await enableCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, expReward.data.id, handleTwitchSignIn);
+                setStatusMessage('');
                 setStatusMessage(t('handleStream.rewardsCreated'));
             }
 
@@ -339,9 +392,11 @@ const PubSubTest = ({ user }) => {
 
         const rewardsIdToDeleteArray = Object.keys(rewardsIdsToDelete).map((reward) => rewardsIdsToDelete[reward]);
 
+        setCurrentCloseStep({ step: 0, progress: 0 });
         // Disable custom rewards on Twitch
         for (let i = 0; i < rewardsIdToDeleteArray.length; i++) {
             await disableCustomReward(user.id, userCredentialsUpdated.access_token, rewardsIdToDeleteArray[i], handleTwitchSignIn);
+            setCurrentCloseStep({ step: 0, progress: (i + 1) / rewardsIdToDeleteArray.length  });
         }
 
         // Remove the custom reward from the ActiveCustomReward node on the database
@@ -353,37 +408,49 @@ const PubSubTest = ({ user }) => {
         // Save the lists of redemptions on database
         await saveRedemptionsLists(lists);
 
+        setCurrentCloseStep({ step: 3, progress: 0 });
         // Delete the rewards. This lines can not never be before the saveRedemptionsLists function call
         for (let i = 0; i < rewardsIdToDeleteArray.length; i++) {
             await deleteReward(rewardsIdToDeleteArray[i], userCredentialsUpdated);
+            setCurrentCloseStep({ step: 3, progress: (i + 1) / rewardsIdToDeleteArray.length });
         }
 
+        setCurrentCloseStep({ step: 4, progress: 0 });
         // Mark as closed the stream on the database
         await markAsClosedStreamerTwitchCustomReward(user.uid, streamIdToClose);
+        setCurrentCloseStep({ step: 4, progress: 1 });
 
         // Call cloud functions tu distribute XQ and Qoins
         distributeStreamRedemptionsRewards(user.uid, user.displayName, streamId, XQ, lists.XQRedemptions);
         distributeStreamRedemptionsRewards(user.uid, user.displayName, streamId, QOINS, lists.QoinsRedemptions);
+
+        setCurrentCloseStep({ step: 5, progress: 0 });
 
         setRewardsIds({});
 
         setVerifyngRedemptions(false);
         setConnectedToTwitch(false);
 
-        alert(t('handleStream.rewardsSent'));
+        // alert(t('handleStream.rewardsSent'));
     }
 
     const getRedemptionsLists = async (rewardsIdsToGet, userCredentials) => {
+        setCurrentCloseStep({ step: 1, progress: 0 });
         const XQRedemptions = await getAllRewardRedemptions(user.id, userCredentials.access_token, rewardsIdsToGet.expReward);
+        setCurrentCloseStep({ step: 1, progress: 0.5 });
         const QoinsRedemptions = await getAllRewardRedemptions(user.id, userCredentials.access_token, rewardsIdsToGet.qoinsReward);
+        setCurrentCloseStep({ step: 1, progress: 1 });
 
         return { XQRedemptions, QoinsRedemptions };
     }
 
     const saveRedemptionsLists = async (lists) => {
         setStreamInRedemptionsLists(streamId);
+        setCurrentCloseStep({ step: 2, progress: 0 });
         await addListToStreamRedemptionList(streamId, 'XQReward', lists.XQRedemptions);
+        setCurrentCloseStep({ step: 2, progress: 0.5 });
         await addListToStreamRedemptionList(streamId, 'QoinsReward', lists.QoinsRedemptions);
+        setCurrentCloseStep({ step: 2, progress: 1 });
     }
 
     const enableQoinsReward = async () => {
@@ -472,6 +539,36 @@ const PubSubTest = ({ user }) => {
                     </Grid>
                 }
             </Grid>
+            <CloseStreamDialog open={currentCloseStep.step !== -1}
+                onClose={() => setCurrentCloseStep({ step: -1, progress: 0 })}
+                finished={currentCloseStep.step > CLOSING_STREAM_STEPS}>
+                <List className={classes.whiteColor}>
+                    <CloseStreamStep label={t('handleStream.closingStreamSteps.0')}
+                        currentStep={currentCloseStep.step}
+                        step={0}
+                        progress={currentCloseStep.progress} />
+
+                    <CloseStreamStep label={t('handleStream.closingStreamSteps.1')}
+                        currentStep={currentCloseStep.step}
+                        step={1}
+                        progress={currentCloseStep.progress} />
+
+                    <CloseStreamStep label={t('handleStream.closingStreamSteps.2')}
+                        currentStep={currentCloseStep.step}
+                        step={2}
+                        progress={currentCloseStep.progress} />
+
+                    <CloseStreamStep label={t('handleStream.closingStreamSteps.3')}
+                        currentStep={currentCloseStep.step}
+                        step={3}
+                        progress={currentCloseStep.progress} />
+
+                    <CloseStreamStep label={t('handleStream.closingStreamSteps.4')}
+                        currentStep={currentCloseStep.step}
+                        step={4}
+                        progress={currentCloseStep.progress} />
+                </List>
+            </CloseStreamDialog>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={statusMessage !== ''}

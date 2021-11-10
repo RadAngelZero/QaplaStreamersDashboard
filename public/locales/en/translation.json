@@ -27,7 +27,16 @@
         "reconnected": "Successfully reconnected",
         "connecting": "Connecting",
         "streamClosed": "This stream has ended, it’s no longer available.",
-        "timeError": "This event cannot be started because a long time has passed since the start time."
+        "timeError": "This event cannot be started because a long time has passed since the start time.",
+        "closingStreamSteps": {
+            "closing": "Closing Stream",
+            "0": "Disabling rewards",
+            "1": "Getting the rewards lists",
+            "2": "Saving lists",
+            "3": "Deleting rewards",
+            "4": "Marking stream as closed",
+            "streamSuccesfulyClosed": "Stream succesfuly closed! Thanks for using Qapla, you can now close the window"
+        }
     },
     "SideBar": {
         "dashboard": "Dashboard",

@@ -27,7 +27,16 @@
         "reconnected": "Reconectado con exito",
         "connecting": "Conectando",
         "streamClosed": "Este stream ya fue cerrado.",
-        "timeError": "Este evento no puede ser iniciado debido a que ya paso mucho tiempo desde la hora de inicio."
+        "timeError": "Este evento no puede ser iniciado debido a que ya paso mucho tiempo desde la hora de inicio.",
+        "closingStreamSteps": {
+            "closing": "Cerrando Stream",
+            "0": "Deshabilitando recompensas",
+            "1": "Obteniendo las listas de las recompensas",
+            "2": "Guardando listas",
+            "3": "Eliminando recompensas",
+            "4": "Marcando stream como cerrado",
+            "streamSuccesfulyClosed": "¡Stream cerrado con exito! Gracias por usar Qapla, ya puedes cerrar la ventana"
+        }
     },
     "SideBar": {
         "dashboard": "Dashboard",

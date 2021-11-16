@@ -415,6 +415,7 @@ const PubSubTest = ({ user }) => {
                         qaplaLevel: qaplaUser.qaplaLevel,
                         userName: qaplaUser.userName,
                         photoUrl: qaplaUser.photoUrl,
+                        rewardsBoost: qaplaUser.rewardsBoost || { qoins: 0 },
                         redemptions: userRedemptionsOnDatabase.exists() ? userRedemptionsOnDatabase.val() : null // We can remove this in the near future as the information is now validated when writed on database
                     };
                 }
@@ -448,7 +449,17 @@ const PubSubTest = ({ user }) => {
                              */
                             let qoinsToGive = qaplaLevels.val()[userLastSeasonLevel - 1].qoinsToGive || qaplaLevels.val()[0].qoinsToGive;
 
-                            qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+                            if (twitchUser.rewardsBoost && twitchUser.rewardsBoost.qoins) {
+                                const qoinsPerLevel = qoinsToGive;
+
+                                qoinsToGive = qoinsPerLevel * twitchUser.rewardsBoost.qoins;
+
+                                if (customRewardsMultipliers.qoins > 1) {
+                                    qoinsToGive += qoinsPerLevel * customRewardsMultipliers.qoins;
+                                }
+                            } else {
+                                qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+                            }
 
                             addQoinsToUser(twitchUser.uid, qoinsToGive);
                             addInfoToEventParticipants(streamIdToAssignRewards, twitchUser.uid, 'qoinsRedeemed', qoinsToGive);

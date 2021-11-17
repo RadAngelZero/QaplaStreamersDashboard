@@ -113,6 +113,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                             await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
                             const expToGive = 15 * customRewardsMultipliers.xq;
+
                             await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
                             await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
                             await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
@@ -157,7 +158,17 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
 
                                 let qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
 
-                                qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+                                if (user.rewardsBoost && user.rewardsBoost.qoins) {
+                                    const qoinsPerLevel = qoinsToGive;
+
+                                    qoinsToGive = qoinsPerLevel * user.rewardsBoost.qoins;
+
+                                    if (customRewardsMultipliers.qoins > 1) {
+                                        qoinsToGive += qoinsPerLevel * customRewardsMultipliers.qoins;
+                                    }
+                                } else {
+                                    qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+                                }
 
                                 addQoinsToUser(user.id, qoinsToGive);
                                 await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);

@@ -58,7 +58,7 @@ import NewWorldImage from './../assets/NewWorld.jpeg';
 import WarframeImage from './../assets/Warframe.jpeg';
 import MarioPartyImage from './../assets/MarioParty.jpeg';
 import PhasmophobiaImage from './../assets/Phasmophobia.jpeg';
-
+import ClashMiniImage from './../assets/ClashMiniImage.jpg';
 
 /**
  * Twitch API keys
@@ -167,5 +167,6 @@ export const streamsPlaceholderImages = {
     NewWorld: NewWorldImage,
     Warframe: WarframeImage,
     MarioParty: MarioPartyImage,
-    Phasmophobia: PhasmophobiaImage
+    Phasmophobia: PhasmophobiaImage,
+    ClashMini: ClashMiniImage
 };

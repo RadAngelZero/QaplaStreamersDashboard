@@ -1,4 +1,3 @@
-import { QOINS, XQ } from '../utilities/Constants';
 import { database } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
@@ -55,6 +54,14 @@ export async function invitationCodeExists(invitationCode) {
 }
 
 /**
+ * Get the invitationCode node information (users with free trials code have special fields)
+ * @param {string} invitationCode Random invitation code
+ */
+export async function getInvitationCodeParams(invitationCode) {
+    return await InvitationCodeRef.child(invitationCode).once('value');
+}
+
+/**
  * Return true if the streamer id exists
  * @param {string} uid Streamer Identifier
  */
@@ -79,7 +86,7 @@ export async function createStreamerProfile(uid, userData, inviteCode) {
  * @param {object} userData Data to update
  */
 export async function updateStreamerProfile(uid, userData) {
-    userStreamersRef.child(uid).update(userData);
+    await userStreamersRef.child(uid).update(userData);
 }
 
 /**
@@ -636,6 +643,7 @@ export async function markDonationAsRead(streamerUid, donationId) {
  */
 export async function saveSubscriptionInformation(uid, stripeCustomerId, periodStart, periodEnd) {
     userStreamersRef.child(uid).update({
+        freeTrial: null,
         premium: true,
         currentPeriod: {
             startDate: periodStart,

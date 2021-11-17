@@ -112,6 +112,7 @@
     },
     "PlanPicker": {
         "titlePart1": "Generate visibility for your content",
+        "titlePart1FreeTrial": "Continue generating visibility to your content",
         "titlePart2": "by publishing your streams on Qapla",
         "plansPeriods": {
             "monthly": "Monthly",

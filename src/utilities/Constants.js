@@ -56,6 +56,9 @@ import MetalSlugImage from './../assets/MetalSlug.jpeg';
 import BrawlhallaImage from './../assets/Brawlhalla.jpeg';
 import NewWorldImage from './../assets/NewWorld.jpeg';
 import WarframeImage from './../assets/Warframe.jpeg';
+import MarioPartyImage from './../assets/MarioParty.jpeg';
+import PhasmophobiaImage from './../assets/Phasmophobia.jpeg';
+
 
 /**
  * Twitch API keys
@@ -162,5 +165,7 @@ export const streamsPlaceholderImages = {
     MetalSlug: MetalSlugImage,
     Brawlhalla: BrawlhallaImage,
     NewWorld: NewWorldImage,
-    Warframe: WarframeImage
+    Warframe: WarframeImage,
+    MarioParty: MarioPartyImage,
+    Phasmophobia: PhasmophobiaImage
 };

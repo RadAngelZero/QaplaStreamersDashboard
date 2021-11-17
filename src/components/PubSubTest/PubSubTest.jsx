@@ -306,7 +306,7 @@ const PubSubTest = ({ user }) => {
                 await saveStreamerTwitchCustomReward(user.uid, 'qoinsReward', qoinsReward.data.id, qoinsReward.data.title, qoinsReward.data.cost, streamId);
 
                 // Enable XQ reward
-                // await enableCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, expReward.data.id, handleTwitchSignIn);
+                await enableCustomReward(user.uid, user.id, userCredentials.access_token, userCredentials.refresh_token, expReward.data.id, handleTwitchSignIn);
                 setStatusMessage('');
                 setStatusMessage(t('handleStream.rewardsCreated'));
             }

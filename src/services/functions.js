@@ -46,3 +46,21 @@ export async function subscribeStreamerToTwitchWebhook(streamerId, type, callbac
         console.log(error);
     }
 }
+
+/**
+ * Call the distributeStreamRedemptionsRewards cloud function to distribute
+ * XQ or Qoins
+ * @param {string} streamerId Streamer uid
+ * @param {string} streamerName Name of the streamer
+ * @param {string} streamId Stream identifier
+ * @param {('xq'|'qoins')} rewardType Type of reward to distribute
+ * @param {array} redemptions Array of redemptions (List gattered from Twitch API)
+ */
+export async function distributeStreamRedemptionsRewards(streamerId, streamerName, streamId, rewardType, redemptions) {
+    const distributeRewards = functions.httpsCallable('distributeStreamRedemptionsRewards');
+    try {
+        return await distributeRewards({ streamerId, streamerName, type: rewardType, streamId, redemptions });
+    } catch (error) {
+        console.log(error);
+    }
+}

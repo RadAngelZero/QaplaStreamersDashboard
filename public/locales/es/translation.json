@@ -18,6 +18,7 @@
         "reconnect": "Reconectar a Twitch",
         "rewardsCreated": "Se han creado las recompensas del canal. Mantén esta ventana abierta durante tu stream para evitar desconexiones.",
         "streamerHasAnOpenStream": "Aún tienes un stream abierto con recompensas activas. Terminaremos el stream y se crearán nuevas recompensas del canal para continuar.",
+        "rewardsCantBeRemoved": "Las recompensas existentes de XQ y/o Qoins no han podido ser eliminadas, contacta con soporte técnico.",
         "endStream": "Terminar stream",
         "enableQoinsReward": "Habilitar recompensa de Qoins",
         "closeStreamConfirmation": "¿Estás seguro que deseas cerrar el stream? Si lo cierras, ya no podrás volver a abrirlo. Las recompensas Qapla se repartirán inmediatamente.",
@@ -26,7 +27,16 @@
         "reconnected": "Reconectado con exito",
         "connecting": "Conectando",
         "streamClosed": "Este stream ya fue cerrado.",
-        "timeError": "Este evento no puede ser iniciado debido a que ya paso mucho tiempo desde la hora de inicio."
+        "timeError": "Este evento no puede ser iniciado debido a que ya paso mucho tiempo desde la hora de inicio.",
+        "closingStreamSteps": {
+            "closing": "Cerrando Stream",
+            "0": "Deshabilitando recompensas",
+            "1": "Obteniendo las listas de las recompensas",
+            "2": "Guardando listas",
+            "3": "Eliminando recompensas",
+            "4": "Marcando stream como cerrado",
+            "streamSuccesfulyClosed": "¡Stream cerrado con exito! Gracias por usar Qapla, ya puedes cerrar la ventana"
+        }
     },
     "SideBar": {
         "dashboard": "Dashboard",
@@ -102,6 +112,7 @@
     },
     "PlanPicker": {
         "titlePart1": "Genera visibilidad para tu contenido",
+        "titlePart1FreeTrial": "Continua generando visibilidad a tu contenido",
         "titlePart2": "publicando tus streams en Qapla",
         "plansPeriods": {
             "monthly": "Mensual",

@@ -25,12 +25,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, rowsMax, containerClassName = {}, textInputClassName = {}, id='', disabled = false }) => {
+const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, rowsMax, containerClassName = {}, labelClassName = {}, textInputClassName = {}, id = '', disabled = false }) => {
     const classes = useStyles();
 
     return (
         <div className={containerClassName}>
-            <InputLabel className={classes.label}>
+            <InputLabel className={[labelClassName, classes.label]}>
                 {label}
             </InputLabel>
             <InputBase

@@ -27,6 +27,7 @@ import AddStreamerLinks from './components/AddStreamerLinks/AddStreamerLinks';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamsPackagesCheckout from './components/StreamsPackagesCheckout/StreamsPackagesCheckout';
 import CustomerPortal from './components/CustomerPortal/CustomerPortal';
+import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
 
 window.onbeforeunload = function() {
     return true;
@@ -121,6 +122,9 @@ const Router = () => {
                 </Route>
                 <Route exact path='/streamsCheckout/:billingPageId'>
                     <StreamsPackagesCheckout user={user} games={games} />
+                </Route>
+                <Route exact path='/editProfile'>
+                    <StreamerProfileEditor user={user}/>
                 </Route>
                 {/* <Route exact path='/lottery'>
                     <Lottery user={user} />

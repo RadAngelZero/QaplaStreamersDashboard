@@ -1,0 +1,144 @@
+.profileEditorContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+
+.coverContainer {
+  background-color: '#f0f';
+  display: block;
+  /* flex: 1; */
+  overflow: hidden;
+  width: 100%;
+  max-height: 20rem;
+}
+
+.cover {
+  vertical-align: middle;
+  /* flex:1; */
+  /* resize: horizontal; */
+  margin-top: -50%;
+  width: 100%;
+}
+
+.profileContainer {
+  background-color: #0D1021;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  border-radius: 2rem;
+  margin-top: -10%;
+  padding: 5%;
+  width: 60%;
+  max-width: 30rem;
+}
+
+.profilePicContainer {
+  display: flex;
+}
+
+.profilePic {
+  max-width: 5rem;
+  max-height: 5rem;
+  border-radius: 100rem;
+}
+
+.streamerNameAndEditBioButtonContainer {
+  margin-top: 6%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.streamerNameContainer {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+}
+
+.streamerName {
+  color: #FFF;
+  align-self: center;
+  font-size: 2rem;
+}
+
+.founderBadgeContainer {
+  align-self: center;
+  margin-left: 10%;
+}
+
+.founderBadge {
+  align-self: center;
+}
+
+.twitchURLContainer {
+  background-color: #202750;
+  display: flex;
+  border-radius: 0.4rem;
+  margin-top: 1rem;
+  padding: 0.25rem;
+  width: fit-content;
+
+}
+
+.twitchURL {
+  color: #6C5DD3;
+  text-decoration: none;
+}
+
+.bioContainer {
+  margin-top: 1rem;
+}
+
+.bioText {
+  color: #FFF;
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin-left: -0.25rem;
+  width: fit-content;
+  align-content: flex-start;
+  justify-content: flex-start;
+}
+
+.tag {
+  display: flex;
+  margin: 0.3rem 0.2rem;
+}
+
+.showNextStreamsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+}
+
+.showNextStreamsText {
+  color: #FFF;
+  display: flex;
+  align-self: center;
+}
+
+.socialLinksContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.socialLinkContainer {
+  margin-top: 1.6rem;
+}
+
+.socialLinkLabel {
+  color: #FFF !important;
+  font-size: 1rem !important;
+}
+
+.socialLinkTextInput {
+  margin-top: 0.8rem;
+  width: 100%;
+}

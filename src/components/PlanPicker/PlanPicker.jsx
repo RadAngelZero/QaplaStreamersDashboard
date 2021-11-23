@@ -192,6 +192,21 @@ const PlanPicker = ({ user }) => {
 
     }, [user]);
 
+    const renderTotalPayment = (period, monthlyAmount) => {
+        let totalPayment = 0;
+        if (period === 'quarterly') {
+            totalPayment = monthlyAmount * 3;
+        } else if (period === 'yearly') {
+            totalPayment = monthlyAmount * 12;
+        }
+
+        return (
+            <p className={classes.planSavingPeriod}>
+                {`${t('PlanPicker.totalPeriodPayment', { totalPayment })} ${t(`PlanPicker.plansPeriods.${period}`)}.`}
+            </p>
+        );
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={classes.backgroundContainer}>
             <Box display='flex' alignItems='center' justifyContent='center'>
@@ -239,10 +254,14 @@ const PlanPicker = ({ user }) => {
                                         </span>
                                     </div>
                                     <div className={classes.planSavingContainer}>
-                                        <p className={classes.planSavingPeriod}>
-                                            {`${t('PlanPicker.payment')} ${t(`PlanPicker.plansPeriods.${period}`)}`}
-                                            {plan[1].saving && '.'}
-                                        </p>
+                                        {period === 'monthly' ?
+                                            <p className={classes.planSavingPeriod}>
+                                                {`${t('PlanPicker.payment')} ${t(`PlanPicker.plansPeriods.${period}`)}`}
+                                                {plan[1].saving && '.'}
+                                            </p>
+                                            :
+                                            renderTotalPayment(period, plan[1].cost)
+                                        }
                                         {plan[1].saving &&
                                             <span className={classes.planSavingPercentage}>
                                                 {t(`PlanPicker.saving`, { saving: plan[1].saving })}

@@ -125,6 +125,7 @@
         },
         "month": "month",
         "payment": "Payment",
+        "totalPeriodPayment": "${{totalPayment}} Payment",
         "saving": "You save {{saving}}%",
         "monthlyPublications": "{{numberOfPublications}} monthly publications",
         "with": "with",

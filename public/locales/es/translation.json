@@ -125,6 +125,7 @@
         },
         "month": "mes",
         "payment": "Pago",
+        "totalPeriodPayment": "${{totalPayment}} Pago",
         "saving": "Ahorras {{saving}}%",
         "monthlyPublications": "{{numberOfPublications}} publicaciones al mes",
         "with": "con",

@@ -131,8 +131,6 @@
         "doubleXQ": "Double XQ",
         "redemptions": "{{numberOfRedemptions}} redemptions of Qoins and XQ per stream",
         "cheers": "Receives cheers of Qoins.",
-        "bitsPerCheerEssential": "10 Bits per cheer",
-        "bitsPerCheerGrowth": "20 Bits per cheer",
         "extraPublications": "Extra publications include",
         "noQoinsMinimum": "No minimum withdrawal of Qoins",
         "qoinsStore": "Qoins store",

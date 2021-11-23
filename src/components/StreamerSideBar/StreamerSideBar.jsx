@@ -20,6 +20,11 @@ const useStyles = makeStyles((theme) => ({
     drawerPaper: {
         width: drawerWidth,
         backgroundColor: '#141833'
+    },
+    listItemsText: {
+        color: '#FFF',
+        fontSize: 14,
+        fontWeight: 500
     }
 }));
 
@@ -87,7 +92,7 @@ const StreamerSideBar = ({ user }) => {
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <DashboardIcon active={currentScreen === 'profile' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream'} />
                     </ListItemIcon>
-                    <ListItemText style={{ color: '#FFF' }}>
+                    <ListItemText style={{ opacity: currentScreen === 'profile' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                         {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
@@ -95,7 +100,7 @@ const StreamerSideBar = ({ user }) => {
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <ProfileIcon active={currentScreen === 'link'} />
                     </ListItemIcon>
-                    <ListItemText style={{ color: '#FFF' }}>
+                    <ListItemText style={{ opacity: currentScreen === 'link' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                         {t('SideBar.link')}
                     </ListItemText>
                 </ListItem> */}
@@ -103,7 +108,7 @@ const StreamerSideBar = ({ user }) => {
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
                     </ListItemIcon>
-                    <ListItemText style={{ color: '#FFF' }}>
+                    <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                         {t('SideBar.membership')}
                     </ListItemText>
                 </ListItem>
@@ -111,7 +116,7 @@ const StreamerSideBar = ({ user }) => {
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>
-                    <ListItemText style={{ color: '#FFF' }}>
+                    <ListItemText style={{ opacity: currentScreen === 'settings' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                         {t('SideBar.settings')}
                     </ListItemText>
                     {showNewLabelOnSettings &&
@@ -134,7 +139,7 @@ const StreamerSideBar = ({ user }) => {
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <LogoutIcon height={32} width={32} />
                     </ListItemIcon>
-                    <ListItemText style={{ color: '#FFF' }}>
+                    <ListItemText style={{ opacity: 0.6 }} classes={{ primary: classes.listItemsText }}>
                         {t('SideBar.signOut')}
                     </ListItemText>
                 </ListItem>

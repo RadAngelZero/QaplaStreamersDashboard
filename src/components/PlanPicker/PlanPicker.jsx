@@ -85,6 +85,7 @@ const useStyles = makeStyles(() => ({
     planSavingContainer: {
         display: 'flex',
         flexDirection: 'row',
+        alignItems: 'baseline',
         marginTop: 10,
         marginBottom: 42
     },
@@ -115,7 +116,8 @@ const useStyles = makeStyles(() => ({
         paddingBottom: 12
     },
     smallIcon: {
-        width: 18
+        width: 18,
+        opacity: 0.4
     },
     listItemDescription: {
         marginLeft: 12,
@@ -282,12 +284,6 @@ const PlanPicker = ({ user }) => {
                                                 <div className={classes.listItemDescription}>
                                                     <div className={classes.listItem}>
                                                         {t('PlanPicker.cheers')}
-                                                        {plan[0] === 'essential' && ` ${t('PlanPicker.bitsPerCheerEssential')}`}
-                                                        {plan[0] === 'growth' &&
-                                                            <span className={classes.growthExtraBenefit}>
-                                                                {t('PlanPicker.bitsPerCheerGrowth')}
-                                                            </span>
-                                                        }
                                                     </div>
                                                 </div>
                                             </Box>

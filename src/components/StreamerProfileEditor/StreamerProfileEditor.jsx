@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, makeStyles, Grid, AccordionSummary, Avatar, Button, Chip, Switch, AppBar, Tabs, Tab } from '@material-ui/core';
+import { withStyles, makeStyles, Grid, AccordionSummary, Avatar, Button, Chip, Switch, AppBar, Tabs, Tab, TextField, Box } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { loadStreamsByStatus } from '../../services/database';
+import { getStreamerLinks, getStreamerPublicProfile, loadStreamsByStatus, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
@@ -20,6 +20,7 @@ import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
 import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
 import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
+import ContainedButton from '../ContainedButton/ContainedButton';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -28,6 +29,14 @@ const useStyles = makeStyles((theme) => ({
         boxSizing: 'border-box',
         flexWrap: 'nowrap'
     },
+    linkPlaceholder: {
+        '&::placeholder': {
+            color: 'rgba(108, 93, 211, 0.4)'
+        }
+    },
+    linkInput: {
+        backgroundColor: '#202750'
+    }
 }));
 
 const EditBioButton = withStyles(() => ({
@@ -36,6 +45,10 @@ const EditBioButton = withStyles(() => ({
         color: '#FFFFFF99',
         '&:hover': {
             backgroundColor: '#24456680'
+        },
+        '&:disabled': {
+            backgroundColor: '#272D5780',
+            color: '#FFFFFF99',
         }
     },
 
@@ -48,6 +61,10 @@ const QaplaChip = withStyles(() => ({
         padding: '0 0.4rem',
         '&:focus' : {
             backgroundColor: '#4040FF4F',
+        },
+        '&:hover' : {
+            backgroundColor: '#4040FF4F',
+            opacity: 0.8
         }
     },
     deletable: {
@@ -125,7 +142,7 @@ function TabPanel(props) {
 
     return (
         <div
-            role="tabpanel"
+            role='tabpanel'
             hidden={value !== index}
             id={`profile-editor-tabpanel-${index}`}
             aria-labelledby={`profile-editor-tab-${index}`}
@@ -149,130 +166,269 @@ function a11yProps(index) {
 }
 
 const StreamerProfileEditor = ({ user }) => {
-    const history = useHistory();
-    const classes = useStyles();
-    const [selectedTab, setSelectedTab] = useState(0);
-    const [socialLinks, setSocialLinks] = useState([
+    const socialLinksInitialValue = [
         {
-            key: 0,
             socialPage: 'Twitch',
-            input: 'https://www.twitch.tv/QaplaGaming'
+            value: ''
         },
         {
-            key: 1,
             socialPage: 'Twitter',
-            input: ''
+            value: ''
         },
         {
-            key: 2,
             socialPage: 'Instagram',
-            input: ''
+            value: ''
         },
         {
-            key: 3,
             socialPage: 'Discord',
-            input: ''
+            value: ''
         },
         {
-            key: 4,
             socialPage: 'Youtube',
-            input: ''
+            value: ''
         },
-    ])
+    ];
+
+    const socialLinksPlaceholders = {
+        Twitch: `https://twitch.tv/${user ? user.displayName : ''}`,
+        Twitter: `https://twitter.com/${user ? user.displayName : ''}`,
+        Instagram: `https://instagram.com/${user ? user.displayName : ''}`,
+        Discord: `https://discord.gg/inviteCode`,
+        Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`
+    };
+
+    const classes = useStyles();
+    const [dataIsFetched, setDataIsFetched] = useState(false);
+    const [selectedTab, setSelectedTab] = useState(0);
+    const [editingBio, setEditingBio] = useState(false);
+    const [streamerBio, setStreamerBio] = useState('');
+    const [backgroundUrl, setBackgroundUrl] = useState('https://wallpaperaccess.com/full/2124973.png');
+    const [socialLinks, setSocialLinks] = useState(socialLinksInitialValue);
+    const [streamerTags, setStreamerTags] = useState([]);
+    const [socialLinksChanged, setSocialLinksChanged] = useState(false);
+
+    useEffect(() => {
+        async function getStreamerInfo() {
+            const info = await getStreamerPublicProfile(user.uid);
+            if (info.exists()) {
+                const { bio, tags, backgroundUrl } = info.val();
+                setStreamerBio(bio);
+                setBackgroundUrl(backgroundUrl || 'https://wallpaperaccess.com/full/2124973.png');
+                setStreamerTags(tags);
+            }
+
+            const links = await getStreamerLinks(user.uid);
+            if (links.exists()) {
+                setSocialLinks(links.val());
+            } else {
+                setSocialLinks(socialLinksInitialValue);
+            }
+
+            setDataIsFetched(true);
+        }
+
+        if (user && user.uid) {
+            getStreamerInfo();
+        }
+    }, [user]);
 
     const handleTabChange = (event, newValue) => {
         setSelectedTab(newValue)
     }
 
-    const [tagsData, setTagsData] = useState([
-        { key: 0, label: 'Just Chatting' },
-        { key: 1, label: 'Anime' },
-        { key: 2, label: 'Hochos' },
-        { key: 3, label: 'Brawl Stars' },
-        { key: 4, label: 'Among Us' },
-        { key: 5, label: 'Pokemon' },
-    ])
+    const handleTagDelete = async (indexToDelete) => {
+        const tags = streamerTags.filter((tag, index) => indexToDelete !== index);
 
-    const handleTagDelete = (tagToDelete) => () => {
-        setTagsData((tags) => tags.filter((tag) => tag.key !== tagToDelete.key))
+        try {
+            await updateStreamerPublicProfile(user.uid, { tags });
+            setStreamerTags(tags);
+        } catch (error) {
+            console.log(error);
+            alert('Hubo un problema al eliminar el tag, intentalo mas tarde o contacta con soporte tecnico');
+        }
+    }
+
+    const updateSocialLinks = (value, index) => {
+        setSocialLinksChanged(true);
+        let newArray = [...socialLinks];
+        newArray[index] = {
+            ...newArray[index],
+            value
+        };
+
+        setSocialLinks(newArray);
+    }
+
+    const saveLinks = async () => {
+        // Creates an array without the placeholder value
+        const objectToSave = {};
+        socialLinks.forEach((link, index) => {
+            objectToSave[index] = { socialPage: link.socialPage, value: link.value };
+        });
+
+        try {
+            await saveStreamerLinks(user.uid, objectToSave);
+        } catch (error) {
+            console.log(error);
+            alert('Hubo un problema al actualizar los links, intentalo mas tarde o contacta con soporte tecnico');
+        }
+        setSocialLinksChanged(false);
+    }
+
+    const saveBio = async () => {
+        try {
+            await updateStreamerPublicProfile(user.uid, { bio: streamerBio });
+            setEditingBio(false);
+        } catch (error) {
+            console.log(error);
+            alert('Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico');
+        }
+    }
+
+    const addTag = async () => {
+        const value = window.prompt('Tag:');
+
+        if (value) {
+            let tags = [...streamerTags];
+            tags.push(value);
+
+            try {
+                await updateStreamerPublicProfile(user.uid, { tags });
+                setStreamerTags(tags);
+            } catch (error) {
+                console.log(error);
+                alert('Hubo un problema al agregar el tag, intentalo mas tarde o contacta con soporte tecnico');
+            }
+        }
+    }
+
+    const updateTag = async (index, currentValue) => {
+        const value = window.prompt('Tag:', currentValue);
+
+        if (value) {
+            let tags = [...streamerTags];
+            tags[index] = value;
+
+            try {
+                await updateStreamerPublicProfile(user.uid, { tags });
+                setStreamerTags(tags);
+            } catch (error) {
+                console.log(error);
+                alert('Hubo un problema al actualizar el tag, intentalo mas tarde o contacta con soporte tecnico');
+            }
+        }
     }
 
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
-            <div className={styles.coverContainer}>
-                <img src='https://wallpaperaccess.com/full/2124973.png' alt={"Cover"} className={styles.cover} />
-            </div>
-            <div className={styles.profileContainer}>
-                <div className={styles.profilePicContainer}>
-                    <img src='https://play-lh.googleusercontent.com/8ddL1kuoNUB5vUvgDVjYY3_6HwQcrg1K2fd_R8soD-e2QYj8fT9cfhfh3G0hnSruLKec' alt={"Amogus"} className={styles.profilePic} />
+            {dataIsFetched &&
+                <>
+                <div className={styles.coverContainer}>
+                    <img src={backgroundUrl} alt='Cover' className={styles.cover} />
                 </div>
-                <div className={styles.streamerNameAndEditBioButtonContainer}>
-                    <div className={styles.streamerNameContainer}>
-                        <p className={styles.streamerName}>Catskull</p>
-                        <div className={styles.founderBadgeContainer}>
-                            <FounderBadge className={styles.founderBadge} />
+                <div className={styles.profileContainer}>
+                    <div className={styles.profilePicContainer}>
+                        <img src={user.photoUrl} alt='User profile image' className={styles.profilePic} />
+                    </div>
+                    <div className={styles.streamerNameAndEditBioButtonContainer}>
+                        <div className={styles.streamerNameContainer}>
+                            <p className={styles.streamerName}>
+                                {user.displayName}
+                            </p>
+                            <div className={styles.founderBadgeContainer}>
+                                <FounderBadge className={styles.founderBadge} />
+                            </div>
+                        </div>
+                        <div className={styles.editBioButtonContainer}>
+                            <EditBioButton variant='contained'
+                                onClick={() => !editingBio ? setEditingBio(true) : saveBio()}>
+                                {!editingBio ?
+                                    'Editar Bio'
+                                    :
+                                    'Guardar cambios'
+                                }
+                            </EditBioButton>
                         </div>
                     </div>
-                    <div className={styles.editBioButtonContainer}>
-                        <EditBioButton variant="contained">
-                            Editar Bio
-                        </EditBioButton>
+                    <div className={styles.twitchURLContainer}>
+                        <a href='https://www.twitch.tv' target='_blank' rel='noreferrer' className={styles.twitchURL} >https://www.twitch.tv</a>
                     </div>
-                </div>
-                <div className={styles.twitchURLContainer}>
-                    <a href="https://www.twitch.tv" target='_blank' rel='noreferrer' className={styles.twitchURL} >https://www.twitch.tv</a>
-                </div>
-                <div className={styles.bioContainer}>
-                    <p className={styles.bioText}>
-                        Soy un streamer mediocre, y esta es una bio de mis gustos mediocres.
-                    </p>
-                </div>
-                <ul className={styles.tagsList}>
-                    {tagsData.map((data) => {
-                        return (
-                            <li key={data.key} className={styles.tag}>
-                                <QaplaChip
-                                    label={data.label}
-                                    onDelete={handleTagDelete(data)}
-                                />
-                            </li>
-                        )
-                    })}
-                    <li key={'new'} className={styles.tag}>
-                        <QaplaChip
-                            label={'Agregar tag'}
+                    <div className={styles.bioContainer}>
+                        {!editingBio ?
+                            <p className={styles.bioText} onClick={() => setEditingBio(true)}>
+                                {streamerBio}
+                            </p>
+                            :
+                            <StreamerTextInput multiline
+                                fullWidth
+                                rows={5}
+                                rowsMax={5}
+                                onChange={(e) => setStreamerBio(e.target.value)}
+                                value={streamerBio}
+                                max />
+                        }
+                    </div>
+                    <ul className={styles.tagsList}>
+                        {streamerTags.map((data, index) => {
+                            return (
+                                <li key={`chip-${data}-${index}`} className={styles.tag}>
+                                    <QaplaChip
+                                        label={data}
+                                        onDelete={() => handleTagDelete(index)}
+                                        onClick={() => updateTag(index, data)}
+                                    />
+                                </li>
+                            )
+                        })}
+                        <li key='new' className={styles.tag}>
+                            <QaplaChip onClick={addTag}
+                                label='Agregar tag'
+                            />
+                        </li>
+                    </ul>
+                    <div className={styles.showNextStreamsContainer}>
+                        <p className={styles.showNextStreamsText}>Mostar próximos streams</p>
+                        <QaplaSwitch
+                            name='showNextStreams'
                         />
-                    </li>
-                </ul>
-                <div className={styles.showNextStreamsContainer}>
-                    <p className={styles.showNextStreamsText}>Mostar próximos streams</p>
-                    <QaplaSwitch
-                        name="showNextStreams"
-                    />
+                    </div>
+                    <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
+                        <QaplaTab wid label='Social' {...a11yProps(0)} />
+                        <QaplaTab label='Códigos de creador' {...a11yProps(1)} />
+                    </QaplaTabs>
+                    <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
+                        {socialLinks.map((data, index) => {
+                            return (
+                                <>
+                                    {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
+                                    <StreamerTextInput
+                                        label={data.socialPage}
+                                        containerClassName={styles.socialLinkContainer}
+                                        labelClassName={styles.socialLinkLabel}
+                                        textInputClassName={styles.socialLinkTextInput}
+                                        value={data.value}
+                                        placeholder={socialLinksPlaceholders[data.socialPage]}
+                                        classes={{ input: classes.linkPlaceholder }}
+                                        textInputClassName={classes.linkInput}
+                                        fullWidth
+                                        onChange={(e) => updateSocialLinks(e.target.value, index)}
+                                    />
+                                </>
+                            )
+                        })}
+                        <br />
+                        {socialLinksChanged &&
+                            <ContainedButton onClick={saveLinks}>
+                                Guardar cambios
+                            </ContainedButton>
+                        }
+                    </TabPanel>
+                    <TabPanel value={selectedTab} index={1}>
+                        <p>b</p>
+                    </TabPanel>
                 </div>
-                <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label="profile editor tabs" >
-                    <QaplaTab wid label="Social" {...a11yProps(0)} />
-                    <QaplaTab label="Códigos de creador" {...a11yProps(1)} />
-                </QaplaTabs>
-                <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
-                    {socialLinks.map((data) => {
-                        return (
-                            <>
-                                {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
-                                <StreamerTextInput
-                                    label={data.socialPage}
-                                    containerClassName={styles.socialLinkContainer}
-                                    labelClassName={styles.socialLinkLabel}
-                                    textInputClassName={styles.socialLinkTextInput}
-                                />
-                            </>
-                        )
-                    })}
-                </TabPanel>
-                <TabPanel value={selectedTab} index={1}>
-                    <p>b</p>
-                </TabPanel>
-            </div>
+                </>
+            }
         </StreamerDashboardContainer>
     )
 }

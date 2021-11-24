@@ -202,7 +202,7 @@ const PlanPicker = ({ user }) => {
 
         return (
             <p className={classes.planSavingPeriod}>
-                {`${t('PlanPicker.totalPeriodPayment', { totalPayment })} ${t(`PlanPicker.plansPeriods.${period}`)}.`}
+                {`${t('PlanPicker.totalPeriodPayment', { totalPayment: Number.isInteger(totalPayment) ? totalPayment : totalPayment.toFixed(2) })} ${t(`PlanPicker.plansPeriods.${period}`)}.`}
             </p>
         );
     }
@@ -248,7 +248,7 @@ const PlanPicker = ({ user }) => {
                             <CardContent className={classes.planBody}>
                                 <div className={classes.planTitle}>
                                     <div className={classes.planTitleText}>
-                                        ${plan[1].cost}
+                                        ${Number.isInteger(plan[1].cost) ? plan[1].cost : plan[1].cost.toString().substring(0, plan[1].cost.toString().indexOf('.') + 3)}
                                         <span className={classes.planTitleSmallElement}>
                                             /{t('PlanPicker.month')}
                                         </span>

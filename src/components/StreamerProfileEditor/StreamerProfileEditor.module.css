@@ -92,6 +92,8 @@
 
 .bioText {
   color: #FFF;
+  white-space: pre-line;
+  cursor: pointer;
 }
 
 .tagsList {

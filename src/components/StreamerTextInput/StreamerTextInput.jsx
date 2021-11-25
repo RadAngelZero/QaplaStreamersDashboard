@@ -25,19 +25,19 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, rowsMax, containerClassName = {}, labelClassName = {}, textInputClassName = {}, id = '', disabled = false }) => {
-    const classes = useStyles();
+const StreamerTextInput = ({ label, classes, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, rowsMax, containerClassName = {}, labelClassName = {}, textInputClassName = {}, id = '', disabled = false, onBlur }) => {
+    const classesMaterial = useStyles();
 
     return (
         <div className={containerClassName}>
-            <InputLabel className={[labelClassName, classes.label]}>
+            <InputLabel className={[labelClassName, classesMaterial.label]}>
                 {label}
             </InputLabel>
             <InputBase
                 disabled={disabled}
                 id={id}
                 rows={rows}
-                rowsMax={rowsMax}
+                maxRows={rowsMax}
                 multiline={multiline}
                 type={type}
                 endAdornment={Icon ?
@@ -49,11 +49,13 @@ const StreamerTextInput = ({ label, placeholder, value, onChange, fullWidth = fa
                 }
                 variant='outlined'
                 label={label}
-                className={[textInputClassName, classes.textInput]}
+                className={[textInputClassName, classesMaterial.textInput]}
+                classes={classes}
                 fullWidth={fullWidth}
                 placeholder={placeholder}
                 value={value}
-                onChange={onChange} />
+                onChange={onChange}
+                onBlur={onBlur} />
         </div>
     );
 }

@@ -21,6 +21,7 @@ import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
 import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 import ContainedButton from '../ContainedButton/ContainedButton';
+import { uploadImage } from '../../services/storage';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -203,6 +204,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [editingBio, setEditingBio] = useState(false);
     const [streamerBio, setStreamerBio] = useState('');
     const [backgroundUrl, setBackgroundUrl] = useState('https://wallpaperaccess.com/full/2124973.png');
+    const [uploadImageStatus, setUploadImageStatus] = useState(0);
     const [socialLinks, setSocialLinks] = useState(socialLinksInitialValue);
     const [streamerTags, setStreamerTags] = useState([]);
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
@@ -317,6 +319,33 @@ const StreamerProfileEditor = ({ user }) => {
                 alert('Hubo un problema al actualizar el tag, intentalo mas tarde o contacta con soporte tecnico');
             }
         }
+    }
+
+    const uploadBackgroundImage = (e) => {
+        const newBackgroundImage = (e.target.files[0]);
+
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+            setBackgroundUrl(reader.result);
+        });
+
+        reader.readAsDataURL(e.target.files[0]);
+
+        uploadImage(
+            newBackgroundImage,
+            `/StreamersProfilesBackgroundImages/${user.uid}`,
+            (progressValue) => setUploadImageStatus(progressValue * 100),
+            (error) => { alert('Error al agregar imagen'); console.log(error); },
+            async (url) => {
+                try {
+                    await updateStreamerPublicProfile(user.uid, { backgroundUrl: url });
+                    alert('Imagen guardada correctamente');
+                } catch (error) {
+                    alert('Hubo un error al guardar la imagen');
+                    console.log(error);
+                }
+            }
+        );
     }
 
     return (

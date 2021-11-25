@@ -202,7 +202,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                 </div>
                 <img
                     alt='Game'
-                    src={streamsPlaceholderImages[game]}
+                    src={streamsPlaceholderImages[game] || games.allGames[game].fallbackImageUrl}
                     width='100%'
                     height='160'
                     className={classes.eventImage} />

@@ -113,6 +113,7 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                             await saveCustomRewardRedemption(user.id, user.photoUrl, redemptionData.user.id, redemptionData.user.display_name, streamId, XQ, redemptionData.id, redemptionData.reward.id, redemptionData.status);
 
                             const expToGive = 15 * customRewardsMultipliers.xq;
+
                             await giveStreamExperienceForRewardRedeemed(user.id, user.qaplaLevel, user.userName ? user.userName : user.twitchUsername, expToGive);
                             await addInfoToEventParticipants(streamId, user.id, 'xqRedeemed', expToGive);
                             await saveUserStreamReward(user.id, XQ, streamerName, streamId, expToGive);
@@ -125,11 +126,11 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                 }
             }
         } else if (redemptionData.reward.id === rewardsIds.qoinsReward) {
-            addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId, maxRedemptionsOfQoinsPerStream, async () => {
-                const user = await getUserByTwitchId(redemptionData.user.id);
-                if (user) {
-                    const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
-                    if (isUserParticipantOfStream) {
+            const user = await getUserByTwitchId(redemptionData.user.id);
+            if (user) {
+                const isUserParticipantOfStream = await isUserRegisteredToStream(user.id, streamId);
+                if (isUserParticipantOfStream) {
+                    addRedemptionToCounterIfItHaveNotExceededTheLimit(streamId, maxRedemptionsOfQoinsPerStream, async () => {
                         const userRedemptions = await getStreamUserRedemptions(user.id, streamId);
 
                         /**
@@ -157,7 +158,17 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
 
                                 let qoinsToGive = (await getQoinsToGiveToGivenLevel(userLastSeasonLevel)).val() || 5;
 
-                                qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+                                if (user.rewardsBoost && user.rewardsBoost.qoins) {
+                                    const qoinsPerLevel = qoinsToGive;
+
+                                    qoinsToGive = qoinsPerLevel * user.rewardsBoost.qoins;
+
+                                    if (customRewardsMultipliers.qoins > 1) {
+                                        qoinsToGive += qoinsPerLevel * customRewardsMultipliers.qoins;
+                                    }
+                                } else {
+                                    qoinsToGive = qoinsToGive * customRewardsMultipliers.qoins;
+                                }
 
                                 addQoinsToUser(user.id, qoinsToGive);
                                 await addInfoToEventParticipants(streamId, user.id, 'qoinsRedeemed', qoinsToGive);
@@ -166,9 +177,9 @@ export async function handleCustomRewardRedemption(streamId, streamerName, rewar
                                 console.log(error);
                             }
                         }
-                    }
+                    });
                 }
-            });
+            }
         }
     }
 }
@@ -273,14 +284,13 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
         const response = await res.json();
         if (response.data && response.data[0]) {
 
-            return response.data[0];
+            return { status: res.status, data: response.data[0] };
         } else if (response.error) {
             if (res.status === 400) {
-                return null;
+                return { status: res.status, error: response.error, message: response.message };
             }
         } else {
-            console.log(res);
-            console.log(res.status);
+            return { status: res.status };
         }
     } catch (e) {
         console.log('Error: ', e);
@@ -333,16 +343,8 @@ export async function enableCustomReward(uid, twitchId, accessToken, refreshToke
  * @param {string} rewardId Id of the reward to delete
  * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
- export async function disableCustomReward(uid, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
+ export async function disableCustomReward(twitchId, accessToken, rewardId) {
     try {
-        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-        if (twitchAccessTokenStatus === 401) {
-            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
-            if (newCredentials) {
-                return await enableCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
-            }
-        }
-
         let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
             method: 'PATCH',
             headers: {
@@ -443,15 +445,7 @@ export async function updateRedemptionStatus(uid, redemptionId, streamerId, acce
     return response.data[0].status;
 }
 
-export async function getAllRewardRedemptions(uid, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
-    const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-    if (twitchAccessTokenStatus === 401) {
-        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
-        if (newCredentials) {
-            return await getAllRewardRedemptions(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
-        }
-    }
-
+export async function getAllRewardRedemptions(twitchId, accessToken, rewardId) {
     let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
     `broadcaster_id=${twitchId}` +
     `&reward_id=${rewardId}` +
@@ -472,7 +466,7 @@ export async function getAllRewardRedemptions(uid, twitchId, accessToken, refres
             redemptions.push(redemption);
         });
         while (response.pagination && response.pagination.cursor && response.pagination.cursor !== 'IA') {
-            response = await getRewardRedemptionsWithCursor(uid, response.pagination.cursor, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken)
+            response = await getRewardRedemptionsWithCursor(response.pagination.cursor, twitchId, accessToken, rewardId);
             if (response.data) {
                 response.data.forEach(redemption => {
                     redemptions.push(redemption);
@@ -484,15 +478,7 @@ export async function getAllRewardRedemptions(uid, twitchId, accessToken, refres
     return redemptions;
 }
 
-async function getRewardRedemptionsWithCursor(uid, cursor, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
-    const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-    if (twitchAccessTokenStatus === 401) {
-        const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
-        if (newCredentials) {
-            return await getRewardRedemptionsWithCursor(uid, cursor, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
-        }
-    }
-
+async function getRewardRedemptionsWithCursor(cursor, twitchId, accessToken, rewardId) {
     let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
     `&broadcaster_id=${twitchId}` +
     `&reward_id=${rewardId}` +

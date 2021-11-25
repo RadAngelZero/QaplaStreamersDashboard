@@ -18,6 +18,7 @@
         "reconnect": "Reconnect to Twitch",
         "rewardsCreated": "Channel rewards have been created successfully. Keep this window open during your stream to avoid connection failures.",
         "streamerHasAnOpenStream": "We noticed you have an open stream with active rewards. The stream will be terminated and new channel rewards will be created for the new stream.",
+        "rewardsCantBeRemoved": "Existing XQ and/or Qoins rewards could not be removed, contact technical support.",
         "endStream": "End stream",
         "enableQoinsReward": "Enable Qoins channel rewards",
         "closeStreamConfirmation": "Are you sure you want to end the stream? If you do, the stream will be no longer available. The remaining Qapla rewards will get distributed to your audience immediately.",
@@ -26,7 +27,16 @@
         "reconnected": "Successfully reconnected",
         "connecting": "Connecting",
         "streamClosed": "This stream has ended, it’s no longer available.",
-        "timeError": "This event cannot be started because a long time has passed since the start time."
+        "timeError": "This event cannot be started because a long time has passed since the start time.",
+        "closingStreamSteps": {
+            "closing": "Closing Stream",
+            "0": "Disabling rewards",
+            "1": "Getting the rewards lists",
+            "2": "Saving lists",
+            "3": "Deleting rewards",
+            "4": "Marking stream as closed",
+            "streamSuccesfulyClosed": "Stream succesfuly closed! Thanks for using Qapla, you can now close the window"
+        }
     },
     "SideBar": {
         "dashboard": "Dashboard",
@@ -102,6 +112,7 @@
     },
     "PlanPicker": {
         "titlePart1": "Generate visibility for your content",
+        "titlePart1FreeTrial": "Continue generating visibility to your content",
         "titlePart2": "by publishing your streams on Qapla",
         "plansPeriods": {
             "monthly": "Monthly",
@@ -114,14 +125,13 @@
         },
         "month": "month",
         "payment": "Payment",
+        "totalPeriodPayment": "${{totalPayment}} Payment",
         "saving": "You save {{saving}}%",
         "monthlyPublications": "{{numberOfPublications}} monthly publications",
         "with": "with",
         "doubleXQ": "Double XQ",
         "redemptions": "{{numberOfRedemptions}} redemptions of Qoins and XQ per stream",
         "cheers": "Receives cheers of Qoins.",
-        "bitsPerCheerEssential": "10 Bits per cheer",
-        "bitsPerCheerGrowth": "20 Bits per cheer",
         "extraPublications": "Extra publications include",
         "noQoinsMinimum": "No minimum withdrawal of Qoins",
         "qoinsStore": "Qoins store",

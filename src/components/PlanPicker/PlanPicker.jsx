@@ -85,6 +85,7 @@ const useStyles = makeStyles(() => ({
     planSavingContainer: {
         display: 'flex',
         flexDirection: 'row',
+        alignItems: 'baseline',
         marginTop: 10,
         marginBottom: 42
     },
@@ -115,7 +116,8 @@ const useStyles = makeStyles(() => ({
         paddingBottom: 12
     },
     smallIcon: {
-        width: 18
+        width: 18,
+        opacity: 0.4
     },
     listItemDescription: {
         marginLeft: 12,
@@ -173,7 +175,6 @@ const PlanPicker = ({ user }) => {
     const [selectedPlanBillingPageId, setSelectedPlanBillingPageId] = useState('');
 
     const { t } = useTranslation();
-    const history = useHistory();
     const classes = useStyles();
 
     useEffect(() => {
@@ -191,14 +192,35 @@ const PlanPicker = ({ user }) => {
 
     }, [user]);
 
+    const renderTotalPayment = (period, monthlyAmount) => {
+        let totalPayment = 0;
+        if (period === 'quarterly') {
+            totalPayment = monthlyAmount * 3;
+        } else if (period === 'yearly') {
+            totalPayment = monthlyAmount * 12;
+        }
+
+        return (
+            <p className={classes.planSavingPeriod}>
+                {`${t('PlanPicker.totalPeriodPayment', { totalPayment: Number.isInteger(totalPayment) ? totalPayment : totalPayment.toFixed(2) })} ${t(`PlanPicker.plansPeriods.${period}`)}.`}
+            </p>
+        );
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={classes.backgroundContainer}>
             <Box display='flex' alignItems='center' justifyContent='center'>
-                <h1 className={classes.title}>
-                    {t('PlanPicker.titlePart1')}
-                    <br />
-                    {t('PlanPicker.titlePart2')}
-                </h1>
+                {user &&
+                    <h1 className={classes.title}>
+                        {!user.freeTrial ?
+                            t('PlanPicker.titlePart1')
+                            :
+                            t('PlanPicker.titlePart1FreeTrial')
+                        }
+                        <br />
+                        {t('PlanPicker.titlePart2')}
+                    </h1>
+                }
             </Box>
             <Box display='flex' alignItems='center' justifyContent='center'>
                 {Object.keys(subscriptions).map((subscriptionType) => (
@@ -226,20 +248,24 @@ const PlanPicker = ({ user }) => {
                             <CardContent className={classes.planBody}>
                                 <div className={classes.planTitle}>
                                     <div className={classes.planTitleText}>
-                                        ${plan[1].cost}
+                                        ${Number.isInteger(plan[1].cost) ? plan[1].cost : plan[1].cost.toString().substring(0, plan[1].cost.toString().indexOf('.') + 3)}
                                         <span className={classes.planTitleSmallElement}>
                                             /{t('PlanPicker.month')}
                                         </span>
                                     </div>
                                     <div className={classes.planSavingContainer}>
-                                        <p className={classes.planSavingPeriod}>
-                                            {`${t('PlanPicker.payment')} ${t(`PlanPicker.plansPeriods.${period}`)}`}
-                                            {plan[1].saving && '.'}
-                                        </p>
-                                        {plan[1].saving &&
-                                            <p className={classes.planSavingPercentage}>
-                                                {t(`PlanPicker.saving`, { saving: plan[1].saving })}
+                                        {period === 'monthly' ?
+                                            <p className={classes.planSavingPeriod}>
+                                                {`${t('PlanPicker.payment')} ${t(`PlanPicker.plansPeriods.${period}`)}`}
+                                                {plan[1].saving && '.'}
                                             </p>
+                                            :
+                                            renderTotalPayment(period, plan[1].cost)
+                                        }
+                                        {plan[1].saving &&
+                                            <span className={classes.planSavingPercentage}>
+                                                {t(`PlanPicker.saving`, { saving: plan[1].saving })}
+                                            </span>
                                         }
                                     </div>
                                 </div>
@@ -252,12 +278,12 @@ const PlanPicker = ({ user }) => {
                                                     <div className={classes.listItem}>
                                                         {t('PlanPicker.monthlyPublications', { numberOfPublications: plan[1].streamsIncluded })}
                                                         {plan[0] === 'growth' && ` ${t('PlanPicker.with')}`}
+                                                        {plan[0] === 'growth' &&
+                                                            <span className={classes.growthExtraBenefit}>
+                                                                {t('PlanPicker.doubleXQ')}
+                                                            </span>
+                                                        }
                                                     </div>
-                                                    {plan[0] === 'growth' &&
-                                                        <div className={classes.growthExtraBenefit}>
-                                                            {t('PlanPicker.doubleXQ')}
-                                                        </div>
-                                                    }
                                                 </div>
                                             </Box>
                                         </li>
@@ -277,13 +303,7 @@ const PlanPicker = ({ user }) => {
                                                 <div className={classes.listItemDescription}>
                                                     <div className={classes.listItem}>
                                                         {t('PlanPicker.cheers')}
-                                                        {plan[0] === 'essential' && ` ${t('PlanPicker.bitsPerCheerEssential')}`}
                                                     </div>
-                                                    {plan[0] === 'growth' &&
-                                                        <div className={classes.growthExtraBenefit}>
-                                                            {t('PlanPicker.bitsPerCheerGrowth')}
-                                                        </div>
-                                                    }
                                                 </div>
                                             </Box>
                                         </li>
@@ -294,9 +314,9 @@ const PlanPicker = ({ user }) => {
                                                     <div className={classes.listItemDescription}>
                                                         <div className={classes.listItem}>
                                                             {t('PlanPicker.extraPublications')}
-                                                        </div>
-                                                        <div className={classes.growthExtraBenefit}>
-                                                            {t('PlanPicker.doubleXQ')}
+                                                            <span className={classes.growthExtraBenefit}>
+                                                                {t('PlanPicker.doubleXQ')}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </Box>

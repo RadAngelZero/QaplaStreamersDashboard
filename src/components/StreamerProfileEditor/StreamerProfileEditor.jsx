@@ -419,7 +419,7 @@ const StreamerProfileEditor = ({ user }) => {
                         </div>
                         <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
                             <QaplaTab wid label='Social' {...a11yProps(0)} />
-                            <QaplaTab label='Códigos de creador' {...a11yProps(1)} />
+                            {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
                         </QaplaTabs>
                         <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
                             {socialLinks.map((data, index) => {

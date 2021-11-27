@@ -12,7 +12,6 @@ import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
-import { width } from 'dom-helpers';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -209,7 +208,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
     const [openTooltip, setOpenTooltip] = useState(false);
 
-    const twitchURL = 'https://www.twitch.tv/' + user.login
+    const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
 
     useEffect(() => {
         async function getStreamerInfo() {
@@ -324,30 +323,32 @@ const StreamerProfileEditor = ({ user }) => {
     }
 
     const uploadBackgroundImage = (e) => {
-        const newBackgroundImage = (e.target.files[0]);
-
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-            setBackgroundUrl(reader.result);
-        });
-
-        reader.readAsDataURL(e.target.files[0]);
-
-        uploadImage(
-            newBackgroundImage,
-            `/StreamersProfilesBackgroundImages/${user.uid}`,
-            (progressValue) => setUploadImageStatus(progressValue * 100),
-            (error) => { alert('Error al agregar imagen'); console.log(error); },
-            async (url) => {
-                try {
-                    await updateStreamerPublicProfile(user.uid, { backgroundUrl: url });
-                    alert('Imagen guardada correctamente');
-                } catch (error) {
-                    alert('Hubo un error al guardar la imagen');
-                    console.log(error);
+        console.log(e.target.files);
+        if (e.target.files[0]) {
+            const newBackgroundImage = (e.target.files[0]);
+            uploadImage(
+                newBackgroundImage,
+                `/StreamersProfilesBackgroundImages/${user.uid}`,
+                (progressValue) => setUploadImageStatus(progressValue * 100),
+                (error) => { alert('Error al agregar imagen'); console.log(error); },
+                async (url) => {
+                    try {
+                        await updateStreamerPublicProfile(user.uid, { backgroundUrl: url });
+                        alert('Imagen guardada correctamente');
+                    } catch (error) {
+                        alert('Hubo un error al guardar la imagen');
+                        console.log(error);
+                    }
                 }
-            }
-        );
+            );
+
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                setBackgroundUrl(reader.result);
+            });
+
+            reader.readAsDataURL(e.target.files[0]);
+        }
     }
 
     const copyTwitchURL = () => {
@@ -367,11 +368,19 @@ const StreamerProfileEditor = ({ user }) => {
                         <img src={backgroundUrl} alt='Cover' className={styles.cover} />
                     </div>
                     <div className={styles.editCoverButtonContainer}>
-                        <EditBioButton id='cover'>
-                            <CameraIcon />
-                            <div style={{ width: '0.4rem' }} />
-                            Editar cover
-                        </EditBioButton>
+                        <input
+                            accept='image/*'
+                            style={{ display: 'none' }}
+                            type='file'
+                            id='image-input'
+                            onChange={uploadBackgroundImage} />
+                        <label htmlFor='image-input'>
+                            <EditBioButton id='cover' component='span'>
+                                <CameraIcon />
+                                <div style={{ width: '0.4rem' }} />
+                                Editar cover
+                            </EditBioButton>
+                        </label>
                     </div>
                     <div className={styles.profileContainer}>
                         <div className={styles.profilePicContainer}>

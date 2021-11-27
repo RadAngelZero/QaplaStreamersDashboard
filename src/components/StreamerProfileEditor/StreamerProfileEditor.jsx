@@ -1,27 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, makeStyles, Grid, AccordionSummary, Avatar, Button, Chip, Switch, AppBar, Tabs, Tab, TextField, Box } from '@material-ui/core';
-import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
 
 import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
-import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
-import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
-import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
-import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getStreamerLinks, getStreamerPublicProfile, loadStreamsByStatus, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
-import StreamCard from '../StreamCard/StreamCard';
+import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
 
-import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
-import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
-import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
-import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
-import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
+import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
+import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
+import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
+import { width } from 'dom-helpers';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -36,7 +27,11 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     linkInput: {
-        backgroundColor: '#202750'
+        backgroundColor: '#202750',
+        color: '#FFF',
+        '&.Mui-disabled': {
+            color: '#AAA'
+        }
     }
 }));
 
@@ -44,12 +39,16 @@ const EditBioButton = withStyles(() => ({
     root: {
         backgroundColor: '#272D5780',
         color: '#FFFFFF99',
+        padding: '0.6rem 1rem',
         '&:hover': {
             backgroundColor: '#24456680'
         },
         '&:disabled': {
             backgroundColor: '#272D5780',
             color: '#FFFFFF99',
+        },
+        '&#cover': {
+            backgroundColor: '#272D5780'
         }
     },
 
@@ -60,10 +59,10 @@ const QaplaChip = withStyles(() => ({
         backgroundColor: '#272D5780',
         color: '#FFFFFFA6',
         padding: '0 0.4rem',
-        '&:focus' : {
+        '&:focus': {
             backgroundColor: '#4040FF4F',
         },
-        '&:hover' : {
+        '&:hover': {
             backgroundColor: '#4040FF4F',
             opacity: 0.8
         }
@@ -72,7 +71,7 @@ const QaplaChip = withStyles(() => ({
         backgroundColor: '#4040FF4F',
         color: '#FFFFFFA6',
         padding: '0 0.4rem',
-        '&:focus' : {
+        '&:focus': {
             backgroundColor: '#4040FF4F',
         }
     },
@@ -208,6 +207,9 @@ const StreamerProfileEditor = ({ user }) => {
     const [socialLinks, setSocialLinks] = useState(socialLinksInitialValue);
     const [streamerTags, setStreamerTags] = useState([]);
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
+    const [openTooltip, setOpenTooltip] = useState(false);
+
+    const twitchURL = 'https://www.twitch.tv/' + user.login
 
     useEffect(() => {
         async function getStreamerInfo() {
@@ -348,114 +350,138 @@ const StreamerProfileEditor = ({ user }) => {
         );
     }
 
+    const copyTwitchURL = () => {
+        navigator.clipboard.writeText(twitchURL);
+        setOpenTooltip(true);
+        setTimeout(() => {
+            setOpenTooltip(false);
+        }, 1250);
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
                 <>
-                <div className={styles.coverContainer}>
-                    <img src={backgroundUrl} alt='Cover' className={styles.cover} />
-                </div>
-                <div className={styles.profileContainer}>
-                    <div className={styles.profilePicContainer}>
-                        <img src={user.photoUrl} alt='User profile image' className={styles.profilePic} />
+
+                    <div className={styles.coverContainer}>
+                        <img src={backgroundUrl} alt='Cover' className={styles.cover} />
                     </div>
-                    <div className={styles.streamerNameAndEditBioButtonContainer}>
-                        <div className={styles.streamerNameContainer}>
-                            <p className={styles.streamerName}>
-                                {user.displayName}
-                            </p>
-                            <div className={styles.founderBadgeContainer}>
-                                <FounderBadge className={styles.founderBadge} />
+                    <div className={styles.editCoverButtonContainer}>
+                        <EditBioButton id='cover'>
+                            <CameraIcon />
+                            <div style={{ width: '0.4rem' }} />
+                            Editar cover
+                        </EditBioButton>
+                    </div>
+                    <div className={styles.profileContainer}>
+                        <div className={styles.profilePicContainer}>
+                            <img src={user.photoUrl} alt='User pfp' className={styles.profilePic} />
+                        </div>
+                        <div className={styles.streamerNameAndEditBioButtonContainer}>
+                            <div className={styles.streamerNameContainer}>
+                                <p className={styles.streamerName}>
+                                    {user.displayName}
+                                </p>
+                                <div className={styles.founderBadgeContainer}>
+                                    <FounderBadge className={styles.founderBadge} />
+                                </div>
+                            </div>
+                            <div className={styles.editBioButtonContainer}>
+                                <EditBioButton variant='contained'
+                                    onClick={() => !editingBio ? setEditingBio(true) : saveBio()}>
+                                    {!editingBio ?
+                                        <>
+                                            <EditIcon />
+                                            <div style={{ width: '0.4rem' }} />
+                                            Editar Bio
+                                        </>
+                                        :
+                                        'Guardar cambios'
+                                    }
+                                </EditBioButton>
                             </div>
                         </div>
-                        <div className={styles.editBioButtonContainer}>
-                            <EditBioButton variant='contained'
-                                onClick={() => !editingBio ? setEditingBio(true) : saveBio()}>
-                                {!editingBio ?
-                                    'Editar Bio'
-                                    :
-                                    'Guardar cambios'
-                                }
-                            </EditBioButton>
+                        <div className={styles.twitchURLContainer}>
+                            <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
+                            <Tooltip placement='top' open={openTooltip} title='Copiado'>
+                                <CopyIcon onClick={copyTwitchURL} />
+                            </Tooltip>
                         </div>
-                    </div>
-                    <div className={styles.twitchURLContainer}>
-                        <a href='https://www.twitch.tv' target='_blank' rel='noreferrer' className={styles.twitchURL} >https://www.twitch.tv</a>
-                    </div>
-                    <div className={styles.bioContainer}>
-                        {!editingBio ?
-                            <p className={styles.bioText} onClick={() => setEditingBio(true)}>
-                                {streamerBio}
-                            </p>
-                            :
-                            <StreamerTextInput multiline
-                                fullWidth
-                                rows={5}
-                                rowsMax={5}
-                                onChange={(e) => setStreamerBio(e.target.value)}
-                                value={streamerBio}
-                                max />
-                        }
-                    </div>
-                    <ul className={styles.tagsList}>
-                        {streamerTags.map((data, index) => {
-                            return (
-                                <li key={`chip-${data}-${index}`} className={styles.tag}>
-                                    <QaplaChip
-                                        label={data}
-                                        onDelete={() => handleTagDelete(index)}
-                                        onClick={() => updateTag(index, data)}
-                                    />
-                                </li>
-                            )
-                        })}
-                        <li key='new' className={styles.tag}>
-                            <QaplaChip onClick={addTag}
-                                label='Agregar tag'
+                        <div className={styles.bioContainer}>
+                            {!editingBio ?
+                                <p className={styles.bioText} onClick={() => setEditingBio(true)}>
+                                    {streamerBio}
+                                </p>
+                                :
+                                <StreamerTextInput multiline
+                                    fullWidth
+                                    rows={5}
+                                    rowsMax={5}
+                                    onChange={(e) => setStreamerBio(e.target.value)}
+                                    value={streamerBio}
+                                    max />
+                            }
+                        </div>
+                        <ul className={styles.tagsList}>
+                            {streamerTags.map((data, index) => {
+                                return (
+                                    <li key={`chip-${data}-${index}`} className={styles.tag}>
+                                        <QaplaChip
+                                            label={data}
+                                            onDelete={() => handleTagDelete(index)}
+                                            onClick={() => updateTag(index, data)}
+                                        />
+                                    </li>
+                                )
+                            })}
+                            <li key='new' className={styles.tag}>
+                                <QaplaChip onClick={addTag}
+                                    label='Agregar tag'
+                                />
+                            </li>
+                        </ul>
+                        <div className={styles.showNextStreamsContainer}>
+                            <p className={styles.showNextStreamsText}>Mostar próximos streams</p>
+                            <QaplaSwitch
+                                name='showNextStreams'
                             />
-                        </li>
-                    </ul>
-                    <div className={styles.showNextStreamsContainer}>
-                        <p className={styles.showNextStreamsText}>Mostar próximos streams</p>
-                        <QaplaSwitch
-                            name='showNextStreams'
-                        />
+                        </div>
+                        <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
+                            <QaplaTab wid label='Social' {...a11yProps(0)} />
+                            {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
+                        </QaplaTabs>
+                        <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
+                            {socialLinks.map((data, index) => {
+                                return (
+                                    <>
+                                        {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
+                                        <StreamerTextInput
+                                            label={data.socialPage}
+                                            containerClassName={styles.socialLinkContainer}
+                                            labelClassName={styles.socialLinkLabel}
+                                            // textInputClassName={styles.socialLinkTextInput}
+                                            value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
+                                            disabled={data.socialPage.toLowerCase() === 'twitch'}
+                                            placeholder={socialLinksPlaceholders[data.socialPage]}
+                                            classes={{ input: classes.linkPlaceholder }}
+                                            textInputClassName={classes.linkInput}
+                                            fullWidth
+                                            onChange={(e) => updateSocialLinks(e.target.value, index)}
+                                        />
+                                    </>
+                                )
+                            })}
+                            <br />
+                            {socialLinksChanged &&
+                                <ContainedButton onClick={saveLinks}>
+                                    Guardar cambios
+                                </ContainedButton>
+                            }
+                        </TabPanel>
+                        <TabPanel value={selectedTab} index={1}>
+                            <p>b</p>
+                        </TabPanel>
                     </div>
-                    <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
-                        <QaplaTab wid label='Social' {...a11yProps(0)} />
-                        <QaplaTab label='Códigos de creador' {...a11yProps(1)} />
-                    </QaplaTabs>
-                    <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
-                        {socialLinks.map((data, index) => {
-                            return (
-                                <>
-                                    {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
-                                    <StreamerTextInput
-                                        label={data.socialPage}
-                                        containerClassName={styles.socialLinkContainer}
-                                        labelClassName={styles.socialLinkLabel}
-                                        textInputClassName={styles.socialLinkTextInput}
-                                        value={data.value}
-                                        placeholder={socialLinksPlaceholders[data.socialPage]}
-                                        classes={{ input: classes.linkPlaceholder }}
-                                        textInputClassName={classes.linkInput}
-                                        fullWidth
-                                        onChange={(e) => updateSocialLinks(e.target.value, index)}
-                                    />
-                                </>
-                            )
-                        })}
-                        <br />
-                        {socialLinksChanged &&
-                            <ContainedButton onClick={saveLinks}>
-                                Guardar cambios
-                            </ContainedButton>
-                        }
-                    </TabPanel>
-                    <TabPanel value={selectedTab} index={1}>
-                        <p>b</p>
-                    </TabPanel>
-                </div>
                 </>
             }
         </StreamerDashboardContainer>

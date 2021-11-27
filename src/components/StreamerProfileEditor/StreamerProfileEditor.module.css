@@ -21,6 +21,25 @@
   width: 100%;
 }
 
+.editCoverButtonContainer {
+  position: absolute;
+  top: 16rem;
+  right: 1.2rem;
+}
+
+@media (max-width: 1250px) {
+  .editCoverButtonContainer {
+    top: 10rem;
+  }
+}
+
+@media (max-width: 800px) and (min-width: 600px) {
+  .editCoverButtonContainer {
+    top: 6rem;
+  }
+}
+
+
 .profileContainer {
   background-color: #0D1021;
   display: flex;
@@ -47,6 +66,7 @@
   margin-top: 6%;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 
@@ -54,6 +74,10 @@
   display: flex;
   flex-direction: row;
   align-content: center;
+}
+
+.editBioButtonContainer {
+  /* padding: 10rem; */
 }
 
 .streamerName {
@@ -76,13 +100,15 @@
   display: flex;
   border-radius: 0.4rem;
   margin-top: 1rem;
-  padding: 0.25rem;
+  /* padding: 0.25rem; */
   width: fit-content;
 
 }
 
 .twitchURL {
   color: #6C5DD3;
+  margin: 0.6rem;
+  align-self: center;
   text-decoration: none;
 }
 

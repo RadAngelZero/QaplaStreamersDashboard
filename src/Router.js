@@ -23,10 +23,10 @@ import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
 import PlanPicker from './components/PlanPicker/PlanPicker';
 // import Lottery from './components/Lottery/Lottery';
-import AddStreamerLinks from './components/AddStreamerLinks/AddStreamerLinks';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamsPackagesCheckout from './components/StreamsPackagesCheckout/StreamsPackagesCheckout';
 import CustomerPortal from './components/CustomerPortal/CustomerPortal';
+import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
 
 window.onbeforeunload = function() {
     return true;
@@ -95,9 +95,6 @@ const Router = () => {
                 <Route exact path='/profile'>
                     <StreamerProfile user={user} games={games} />
                 </Route>
-                <Route exact path='/link'>
-                    <AddStreamerLinks user={user} games={games} />
-                </Route>
                 <Route exact path='/success'>
                     <EventSent user={user} />
                 </Route>
@@ -121,6 +118,9 @@ const Router = () => {
                 </Route>
                 <Route exact path='/streamsCheckout/:billingPageId'>
                     <StreamsPackagesCheckout user={user} games={games} />
+                </Route>
+                <Route exact path='/editProfile'>
+                    <StreamerProfileEditor user={user}/>
                 </Route>
                 {/* <Route exact path='/lottery'>
                     <Lottery user={user} />

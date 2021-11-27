@@ -23,6 +23,7 @@ const streamerLinksRef = database.ref('/StreamerLinks');
 const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
 const streamsPackagesRef = database.ref('/StreamsPackages');
 const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDetails');
+const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -677,22 +678,18 @@ export async function getPeriodStreamerPayments(streamerUid, startTimestamp, end
 /**
  * Saves a link information for the streamer public profile
  * @param {string} streamerUid Uid of the streamer
- * @param {string} username Twitch username of the streamer
- * @param {string} link URL to save
- * @param {string} title Title for the link to show on streamer profile
+ * @param {Array} link Array of URLs and titles to save [ { title: 'Twitch', url: 'https://twitch.tv/mr_yuboto' } ]
  */
-export async function addStreamerLink(streamerUid, username, link, title) {
-    await streamerLinksRef.child(streamerUid).update({ username });
-    streamerLinksRef.child(streamerUid).child('links').push({ link, title });
+ export async function saveStreamerLinks(streamerUid, links) {
+    await streamerLinksRef.child(streamerUid).update(links);
 }
 
 /**
- * Listen for all the links of the given streamer
+ * Get all the links of the given streamer
  * @param {string} streamerUid Uid of the streamer
- * @param {function} callback Function called every time the link list id updated
  */
-export async function getStreamerLinks(streamerUid, callback) {
-    streamerLinksRef.child(streamerUid).child('links').on('value', callback);
+export async function getStreamerLinks(streamerUid) {
+    return await streamerLinksRef.child(streamerUid).once('value');
 }
 
 /**
@@ -790,4 +787,16 @@ export async function addToStreamsRequestedOnStreamsPackage(streamerUid, package
  */
 export async function removeStreamPackageOfStreamer(streamerUid, packageId) {
     userStreamersRef.child(streamerUid).child('boughtStreams').child(packageId).remove();
+}
+
+/**
+ * Streamers Public Profiles
+ */
+
+export async function getStreamerPublicProfile(uid) {
+    return await streamersPublicProfilesRef.child(uid).once('value');
+}
+
+export async function updateStreamerPublicProfile(uid, dataToUpdate) {
+    return await streamersPublicProfilesRef.child(uid).update(dataToUpdate);
 }

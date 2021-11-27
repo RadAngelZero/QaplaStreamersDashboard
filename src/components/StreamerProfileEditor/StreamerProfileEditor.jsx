@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -207,6 +208,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [streamerTags, setStreamerTags] = useState([]);
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
     const [openTooltip, setOpenTooltip] = useState(false);
+    const { t } = useTranslation();
 
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
 
@@ -363,7 +365,6 @@ const StreamerProfileEditor = ({ user }) => {
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
                 <>
-
                     <div className={styles.coverContainer}>
                         <img src={backgroundUrl} alt='Cover' className={styles.cover} />
                     </div>
@@ -378,7 +379,7 @@ const StreamerProfileEditor = ({ user }) => {
                             <EditBioButton id='cover' component='span'>
                                 <CameraIcon />
                                 <div style={{ width: '0.4rem' }} />
-                                Editar cover
+                                {t('StreamerProfileEditor.editCover')}
                             </EditBioButton>
                         </label>
                     </div>
@@ -402,10 +403,10 @@ const StreamerProfileEditor = ({ user }) => {
                                         <>
                                             <EditIcon />
                                             <div style={{ width: '0.4rem' }} />
-                                            Editar Bio
+                                            {t('StreamerProfileEditor.editBio')}
                                         </>
                                         :
-                                        'Guardar cambios'
+                                        t('StreamerProfileEditor.saveChanges')
                                     }
                                 </EditBioButton>
                             </div>
@@ -445,18 +446,20 @@ const StreamerProfileEditor = ({ user }) => {
                             })}
                             <li key='new' className={styles.tag}>
                                 <QaplaChip onClick={addTag}
-                                    label='Agregar tag'
+                                    label={t('StreamerProfileEditor.addTag')}
                                 />
                             </li>
                         </ul>
                         <div className={styles.showNextStreamsContainer}>
-                            <p className={styles.showNextStreamsText}>Mostar próximos streams</p>
+                            <p className={styles.showNextStreamsText}>
+                                {t('StreamerProfileEditor.showUpcomingStreams')}
+                            </p>
                             <QaplaSwitch
                                 name='showNextStreams'
                             />
                         </div>
                         <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
-                            <QaplaTab wid label='Social' {...a11yProps(0)} />
+                            <QaplaTab wid label={t('StreamerProfileEditor.social')} {...a11yProps(0)} />
                             {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
                         </QaplaTabs>
                         <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
@@ -483,7 +486,7 @@ const StreamerProfileEditor = ({ user }) => {
                             <br />
                             {socialLinksChanged &&
                                 <ContainedButton onClick={saveLinks}>
-                                    Guardar cambios
+                                    {t('StreamerProfileEditor.saveChanges')}
                                 </ContainedButton>
                             }
                         </TabPanel>

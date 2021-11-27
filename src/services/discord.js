@@ -29,3 +29,28 @@ export async function notifyUpdateToQaplaAdmins(streamId, streamerName, newDateO
         }
     );
 }
+
+export async function notifyBugToDevelopTeam(error) {
+	let adminsToTagOnDiscordMessage = ['586019077546442752', /* '269616250861256712' */];
+
+	let adminTags = '';
+	adminsToTagOnDiscordMessage.forEach((adminId) => {
+		adminTags += `<@${adminId}>`;
+	});
+
+    await fetch(
+		'https://discord.com/api/webhooks/906607024811417651/o6TiSFGNFH57VN8z5v56LJQ-UNa_nvRUzSKjndzWi_0txhAP4rKMXtmNS8TP0mGrA2S-',
+        {
+            method: 'POST',
+            headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				content: `${error} \n${adminTags}`,
+            	username: "Qapla Bug Notifier",
+				tts: false
+			})
+        }
+    );
+}

@@ -7,9 +7,10 @@ import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
 
-import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
+import { ReactComponent as CopyIcon } from './../../assets/Copy.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
+import { ReactComponent as XIcon } from './../../assets/xIcon.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
 
@@ -38,7 +39,13 @@ const EditBioButton = withStyles(() => ({
     root: {
         backgroundColor: '#272D5780',
         color: '#FFFFFF99',
-        padding: '0.6rem 1rem',
+        justifyItems: 'center',
+        padding: '0.8rem 1rem',
+        borderRadius: '0.8rem',
+        maxHeight: '46px',
+        textTransform: 'capitalize',
+        fontSize: '14px',
+        fontWeight: 600,
         '&:hover': {
             backgroundColor: '#24456680'
         },
@@ -57,7 +64,10 @@ const QaplaChip = withStyles(() => ({
     root: {
         backgroundColor: '#272D5780',
         color: '#FFFFFFA6',
-        padding: '0 0.4rem',
+        minHeight: '41px',
+        borderRadius: '100rem',
+        padding: '1.2rem 0.4rem',
+        fontWeight: 600,
         '&:focus': {
             backgroundColor: '#4040FF4F',
         },
@@ -69,18 +79,26 @@ const QaplaChip = withStyles(() => ({
     deletable: {
         backgroundColor: '#4040FF4F',
         color: '#FFFFFFA6',
-        padding: '0 0.4rem',
+        // padding: '1.2rem 0.4rem',
         '&:focus': {
             backgroundColor: '#4040FF4F',
+        },
+        '&:hover': {
+
         }
     },
     deleteIcon: {
-        color: '#FFFD',
+        display: 'flex',
+        backgroundColor: '#FFFD',
+        borderRadius: '100px',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: '-4px',
         '&:hover': {
-            color: '#F00D'
+            backgroundColor: '#F00D'
         },
         '&:active': {
-            color: '#A00D'
+            backgroundColor: '#A00D'
         }
     }
 }))(Chip)
@@ -105,7 +123,8 @@ const QaplaSwitch = withStyles(() => ({
 
 const QaplaTabs = withStyles({
     root: {
-        minHeight: 0
+        minHeight: 0,
+        marginTop: '3rem'
     },
     indicator: {
         display: 'flex',
@@ -209,6 +228,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [openTooltip, setOpenTooltip] = useState(false);
 
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
+    const shortTwitchURL = `twitch.tv/${user && user.login ? user.login : ''}`;
 
     useEffect(() => {
         async function getStreamerInfo() {
@@ -376,7 +396,10 @@ const StreamerProfileEditor = ({ user }) => {
                             onChange={uploadBackgroundImage} />
                         <label htmlFor='image-input'>
                             <EditBioButton id='cover' component='span'>
-                                <CameraIcon />
+                                <CameraIcon style={{
+                                    width: '20px',
+                                    height: '18px'
+                                }} />
                                 <div style={{ width: '0.4rem' }} />
                                 Editar cover
                             </EditBioButton>
@@ -400,7 +423,10 @@ const StreamerProfileEditor = ({ user }) => {
                                     onClick={() => !editingBio ? setEditingBio(true) : saveBio()}>
                                     {!editingBio ?
                                         <>
-                                            <EditIcon />
+                                            <EditIcon style={{
+                                                width: '18px',
+                                                height: '18px'
+                                            }} />
                                             <div style={{ width: '0.4rem' }} />
                                             Editar Bio
                                         </>
@@ -411,10 +437,15 @@ const StreamerProfileEditor = ({ user }) => {
                             </div>
                         </div>
                         <div className={styles.twitchURLContainer}>
-                            <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
-                            <Tooltip placement='top' open={openTooltip} title='Copiado'>
-                                <CopyIcon onClick={copyTwitchURL} />
-                            </Tooltip>
+                            <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{shortTwitchURL}</a>
+                            <div className={styles.copyIconContainer} onClick={copyTwitchURL}>
+                                <Tooltip placement='top' open={openTooltip} title='Copiado'>
+                                    <CopyIcon style={{
+                                        width: '15px',
+                                        height: '15px'
+                                    }} />
+                                </Tooltip>
+                            </div>
                         </div>
                         <div className={styles.bioContainer}>
                             {!editingBio ?
@@ -437,6 +468,15 @@ const StreamerProfileEditor = ({ user }) => {
                                     <li key={`chip-${data}-${index}`} className={styles.tag}>
                                         <QaplaChip
                                             label={data}
+                                            deleteIcon={<div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                            }}>
+                                                <XIcon style={{
+                                                    width: '12px',
+                                                    height: '12px'
+                                                }} />
+                                            </div>}
                                             onDelete={() => handleTagDelete(index)}
                                             onClick={() => updateTag(index, data)}
                                         />

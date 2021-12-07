@@ -194,7 +194,8 @@ const StreamerProfileEditor = ({ user }) => {
         Twitter: `https://twitter.com/${user ? user.displayName : ''}`,
         Instagram: `https://instagram.com/${user ? user.displayName : ''}`,
         Discord: `https://discord.gg/inviteCode`,
-        Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`
+        Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`,
+        tiktok: '' // ToDo: Add tiktok to list of social media links
     };
 
     const classes = useStyles();
@@ -456,6 +457,7 @@ const StreamerProfileEditor = ({ user }) => {
                             </p>
                             <QaplaSwitch
                                 name='showNextStreams'
+                                /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
                             />
                         </div>
                         <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >

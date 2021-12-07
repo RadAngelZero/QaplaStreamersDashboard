@@ -87,6 +87,10 @@ const StreamerSideBar = ({ user }) => {
 
     const drawer = (
         <Box display='flex' style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap' }} >
+            {/**
+             * ToDo:
+             * Add Qapla Image (see Figma for details)
+             */}
             <List style={{ marginTop: '1rem' }}>
                 <ListItem button onClick={() => history.push('/profile')}>
                     <ListItemIcon style={{ minWidth: 40 }}>

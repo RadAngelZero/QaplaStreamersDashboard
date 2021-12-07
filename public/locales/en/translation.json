@@ -41,7 +41,7 @@
     "SideBar": {
         "dashboard": "Dashboard",
         "membership": "Membership",
-        "link": "Link in bio",
+        "universalProfile": "Universal Profile",
         "settings": "Settings",
         "new": "New",
         "signOut": "Sign out"
@@ -143,5 +143,13 @@
         "activatingAccount": "Please wait a moment while we activate your account",
         "membershipReady": "Done, your membership is active, press the button to finish",
         "finish": "Finish"
+    },
+    "StreamerProfileEditor": {
+        "editCover": "Edit cover",
+        "editBio": "Edit bio",
+        "saveChanges": "Save changes",
+        "addTag": "Add tag",
+        "showUpcomingStreams": "Show upcoming streams",
+        "social": "Social"
     }
 }

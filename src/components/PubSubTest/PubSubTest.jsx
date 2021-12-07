@@ -221,7 +221,7 @@ const PubSubTest = ({ user }) => {
                 setRewardsIds(rewards);
 
                 // Get redemptions lists
-                const lists = await getRedemptionsLists(rewards, userCredentialsUpdated);
+                const lists = await getRedemptionsLists(rewards, userCredentialsUpdated, false);
                 distributeStreamRedemptionsRewards(user.uid, user.displayName, streamId, XQ, lists.XQRedemptions);
                 distributeStreamRedemptionsRewards(user.uid, user.displayName, streamId, QOINS, lists.QoinsRedemptions);
 
@@ -403,7 +403,7 @@ const PubSubTest = ({ user }) => {
         await removeActiveCustomRewardFromList(streamIdToClose);
 
         // Get redemptions lists
-        const lists = await getRedemptionsLists(rewardsIdsToDelete, userCredentialsUpdated);
+        const lists = await getRedemptionsLists(rewardsIdsToDelete, userCredentialsUpdated, true);
 
         // Save the lists of redemptions on database
         await saveRedemptionsLists(lists);
@@ -434,12 +434,18 @@ const PubSubTest = ({ user }) => {
         // alert(t('handleStream.rewardsSent'));
     }
 
-    const getRedemptionsLists = async (rewardsIdsToGet, userCredentials) => {
-        setCurrentCloseStep({ step: 1, progress: 0 });
+    const getRedemptionsLists = async (rewardsIdsToGet, userCredentials, isClosingStream) => {
+        if (isClosingStream) {
+            setCurrentCloseStep({ step: 1, progress: 0 });
+        }
         const XQRedemptions = await getAllRewardRedemptions(user.id, userCredentials.access_token, rewardsIdsToGet.expReward);
-        setCurrentCloseStep({ step: 1, progress: 0.5 });
+        if (isClosingStream) {
+            setCurrentCloseStep({ step: 1, progress: 0.5 });
+        }
         const QoinsRedemptions = await getAllRewardRedemptions(user.id, userCredentials.access_token, rewardsIdsToGet.qoinsReward);
-        setCurrentCloseStep({ step: 1, progress: 1 });
+        if (isClosingStream) {
+            setCurrentCloseStep({ step: 1, progress: 1 });
+        }
 
         return { XQRedemptions, QoinsRedemptions };
     }

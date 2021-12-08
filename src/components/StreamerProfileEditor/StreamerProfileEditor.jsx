@@ -79,7 +79,6 @@ const QaplaChip = withStyles(() => ({
     deletable: {
         backgroundColor: '#4040FF4F',
         color: '#FFFFFFA6',
-        // padding: '1.2rem 0.4rem',
         '&:focus': {
             backgroundColor: '#4040FF4F',
         },
@@ -93,7 +92,6 @@ const QaplaChip = withStyles(() => ({
         borderRadius: '100px',
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: '-4px',
         '&:hover': {
             backgroundColor: '#F00D'
         },
@@ -226,6 +224,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [streamerTags, setStreamerTags] = useState([]);
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
     const [openTooltip, setOpenTooltip] = useState(false);
+    const [chipHover, setChipHover] = useState({});
 
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
     const shortTwitchURL = `twitch.tv/${user && user.login ? user.login : ''}`;
@@ -464,19 +463,33 @@ const StreamerProfileEditor = ({ user }) => {
                         </div>
                         <ul className={styles.tagsList}>
                             {streamerTags.map((data, index) => {
+                                const id = `chip-${data}-${index}`  
                                 return (
                                     <li key={`chip-${data}-${index}`} className={styles.tag}>
                                         <QaplaChip
                                             label={data}
                                             deleteIcon={<div style={{
-                                                width: '32px',
-                                                height: '32px',
+                                                width: chipHover[id] ? '32px' : '0px',
+                                                height: chipHover[id] ? '32px' : '0px',
                                             }}>
                                                 <XIcon style={{
                                                     width: '12px',
                                                     height: '12px'
                                                 }} />
                                             </div>}
+                                            id={id}
+                                            onMouseEnter={(e) => {
+                                                setChipHover({
+                                                    ...chipHover,
+                                                    [id]: true
+                                                })
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                setChipHover({
+                                                    ...chipHover,
+                                                    [id]: false
+                                                })
+                                            }}
                                             onDelete={() => handleTagDelete(index)}
                                             onClick={() => updateTag(index, data)}
                                         />

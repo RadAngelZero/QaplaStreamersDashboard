@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -210,7 +211,8 @@ const StreamerProfileEditor = ({ user }) => {
         Twitter: `https://twitter.com/${user ? user.displayName : ''}`,
         Instagram: `https://instagram.com/${user ? user.displayName : ''}`,
         Discord: `https://discord.gg/inviteCode`,
-        Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`
+        Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`,
+        tiktok: '' // ToDo: Add tiktok to list of social media links
     };
 
     const classes = useStyles();
@@ -225,7 +227,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
     const [openTooltip, setOpenTooltip] = useState(false);
     const [chipHover, setChipHover] = useState({});
-
+    const { t } = useTranslation();
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
     const shortTwitchURL = `twitch.tv/${user && user.login ? user.login : ''}`;
 
@@ -382,7 +384,6 @@ const StreamerProfileEditor = ({ user }) => {
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
                 <>
-
                     <div className={styles.coverContainer}>
                         <img src={backgroundUrl} alt='Cover' className={styles.cover} />
                     </div>
@@ -400,7 +401,7 @@ const StreamerProfileEditor = ({ user }) => {
                                     height: '18px'
                                 }} />
                                 <div style={{ width: '0.4rem' }} />
-                                Editar cover
+                                {t('StreamerProfileEditor.editCover')}
                             </EditBioButton>
                         </label>
                     </div>
@@ -427,10 +428,10 @@ const StreamerProfileEditor = ({ user }) => {
                                                 height: '18px'
                                             }} />
                                             <div style={{ width: '0.4rem' }} />
-                                            Editar Bio
+                                            {t('StreamerProfileEditor.editBio')}
                                         </>
                                         :
-                                        'Guardar cambios'
+                                        t('StreamerProfileEditor.saveChanges')
                                     }
                                 </EditBioButton>
                             </div>
@@ -498,18 +499,21 @@ const StreamerProfileEditor = ({ user }) => {
                             })}
                             <li key='new' className={styles.tag}>
                                 <QaplaChip onClick={addTag}
-                                    label='Agregar tag'
+                                    label={t('StreamerProfileEditor.addTag')}
                                 />
                             </li>
                         </ul>
                         <div className={styles.showNextStreamsContainer}>
-                            <p className={styles.showNextStreamsText}>Mostar próximos streams</p>
+                            <p className={styles.showNextStreamsText}>
+                                {t('StreamerProfileEditor.showUpcomingStreams')}
+                            </p>
                             <QaplaSwitch
                                 name='showNextStreams'
+                                /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
                             />
                         </div>
                         <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
-                            <QaplaTab wid label='Social' {...a11yProps(0)} />
+                            <QaplaTab wid label={t('StreamerProfileEditor.social')} {...a11yProps(0)} />
                             {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
                         </QaplaTabs>
                         <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
@@ -536,7 +540,7 @@ const StreamerProfileEditor = ({ user }) => {
                             <br />
                             {socialLinksChanged &&
                                 <ContainedButton onClick={saveLinks}>
-                                    Guardar cambios
+                                    {t('StreamerProfileEditor.saveChanges')}
                                 </ContainedButton>
                             }
                         </TabPanel>

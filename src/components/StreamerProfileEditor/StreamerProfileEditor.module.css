@@ -17,14 +17,17 @@
   vertical-align: middle;
   /* flex:1; */
   /* resize: horizontal; */
-  margin-top: -50%;
   width: 100%;
 }
 
 .editCoverButtonContainer {
   position: absolute;
-  top: 16rem;
-  right: 1.2rem;
+  /**
+  Here we need to decide, if we want the button at the bottom of the image we must set a maxHeight for the
+  img component otherwise we could put the button at the top
+  **/
+  top: 1rem;
+  right: 1rem;
 }
 
 @media (max-width: 1420px) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -362,6 +363,13 @@ const StreamerProfileEditor = ({ user }) => {
         }, 1250);
     }
 
+    const onDragEnd = (result) => {
+        console.log(result)
+        if (!result.destination) {
+            return
+        }
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
@@ -457,7 +465,7 @@ const StreamerProfileEditor = ({ user }) => {
                             </p>
                             <QaplaSwitch
                                 name='showNextStreams'
-                                /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
+                            /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
                             />
                         </div>
                         <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
@@ -465,26 +473,44 @@ const StreamerProfileEditor = ({ user }) => {
                             {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
                         </QaplaTabs>
                         <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
-                            {socialLinks.map((data, index) => {
-                                return (
-                                    <>
-                                        {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
-                                        <StreamerTextInput
-                                            label={data.socialPage}
-                                            containerClassName={styles.socialLinkContainer}
-                                            labelClassName={styles.socialLinkLabel}
-                                            // textInputClassName={styles.socialLinkTextInput}
-                                            value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
-                                            disabled={data.socialPage.toLowerCase() === 'twitch'}
-                                            placeholder={socialLinksPlaceholders[data.socialPage]}
-                                            classes={{ input: classes.linkPlaceholder }}
-                                            textInputClassName={classes.linkInput}
-                                            fullWidth
-                                            onChange={(e) => updateSocialLinks(e.target.value, index)}
-                                        />
-                                    </>
-                                )
-                            })}
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                <Droppable droppableId='links-droppable'>
+                                    {(provided, snapshot) => (
+                                        <div style={{ backgroundColor: '#f0f' }}
+                                            {...provided.droppableProps}
+                                            ref={provided.innerRef}
+                                        >
+                                            {socialLinks.map((data, index) => (
+                                                <Draggable key={`draggable-link-${index}`} draggableId={`draggable-link-${index}`} index={index}    >
+                                                    {(provided, snapshot) => (
+                                                        <div style={{ backgroundColor: '#ff0' }}
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}>
+                                                            {/* text */}
+                                                            <StreamerTextInput
+                                                                    label={data.socialPage}
+                                                                    containerClassName={styles.socialLinkContainer}
+                                                                    labelClassName={styles.socialLinkLabel}
+                                                                    // textInputClassName={styles.socialLinkTextInput}
+                                                                    value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
+                                                                    disabled={data.socialPage.toLowerCase() === 'twitch'}
+                                                                    placeholder={socialLinksPlaceholders[data.socialPage]}
+                                                                    classes={{ input: classes.linkPlaceholder }}
+                                                                    textInputClassName={classes.linkInput}
+                                                                    fullWidth
+                                                                    onChange={(e) => updateSocialLinks(e.target.value, index)}
+                                                                />
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+
                             <br />
                             {socialLinksChanged &&
                                 <ContainedButton onClick={saveLinks}>

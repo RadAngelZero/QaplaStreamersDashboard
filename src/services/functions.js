@@ -64,3 +64,17 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
         console.log(error);
     }
 }
+
+/**
+ * Returns the hash necessary to show the authenticate with billflow (necessary
+ * for show the customer portal for example)
+ * @param {string} stripeCustomerId Streamer customer id of stripe
+ */
+export async function getBillflowHMAC(stripeCustomerId) {
+    const getHMAC = functions.httpsCallable('getBillflowAuthHMAC');
+    try {
+        return await getHMAC({ stripeCustomerId });
+    } catch (error) {
+        console.log(error);
+    }
+}

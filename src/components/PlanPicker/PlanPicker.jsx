@@ -172,6 +172,8 @@ const ToggleButton = ({ currentValue, value, label, onChange }) => {
 const PlanPicker = ({ user }) => {
     const [subscriptions, setSubscriptions] = useState({});
     const [period, setPeriod] = useState('quarterly');
+    const [streamsIncluded, setStreamsIncluded] = useState('');
+    const [redemptionsPerStream, setRedemptionsPerStream] = useState('');
     const [selectedPlanBillingPageId, setSelectedPlanBillingPageId] = useState('');
 
     const { t } = useTranslation();
@@ -205,6 +207,12 @@ const PlanPicker = ({ user }) => {
                 {`${t('PlanPicker.totalPeriodPayment', { totalPayment: Number.isInteger(totalPayment) ? totalPayment : totalPayment.toFixed(2) })} ${t(`PlanPicker.plansPeriods.${period}`)}.`}
             </p>
         );
+    }
+
+    const setSelectedPlanDetails = (streamsIncluded, redemptionsPerStream, billing_page_id) => {
+        setStreamsIncluded(streamsIncluded);
+        setRedemptionsPerStream(redemptionsPerStream);
+        setSelectedPlanBillingPageId(billing_page_id);
     }
 
     return (
@@ -360,7 +368,7 @@ const PlanPicker = ({ user }) => {
                             <CardActions className={classes.actionArea}>
                                 <ContainedButton size='large'
                                     className={`${classes.subscribeButton} ${plan[0] === 'growth' ? classes.growthSubscribeButton : ''}`}
-                                    onClick={() => setSelectedPlanBillingPageId(plan[1].billingPageId)}>
+                                    onClick={() => setSelectedPlanDetails(plan[1].streamsIncluded, plan[1].redemptionsPerStream, plan[1].billingPageId)}>
                                     {t('PlanPicker.subscribeNow')}
                                 </ContainedButton>
                             </CardActions>
@@ -372,7 +380,9 @@ const PlanPicker = ({ user }) => {
                 <SubscriptionCheckout open={selectedPlanBillingPageId !== ''}
                     user={user}
                     onClose={() => setSelectedPlanBillingPageId('')}
-                    billingPageId={selectedPlanBillingPageId} />
+                    billingPageId={selectedPlanBillingPageId}
+                    streamsIncluded={streamsIncluded}
+                    redemptionsPerStream={redemptionsPerStream} />
             }
         </StreamerDashboardContainer>
     );

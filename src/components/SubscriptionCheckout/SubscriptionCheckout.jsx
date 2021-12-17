@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const SubscriptionCheckout = ({ user, open, onClose, billingPageId }) => {
+const SubscriptionCheckout = ({ user, open, onClose, billingPageId, streamsIncluded, redemptionsPerStream }) => {
     const [openProcessingPaymentDialog, setOpenProcessingPaymentDialog] = useState(false);
     const [paymentProcessed, setPaymentProcessed] = useState(false);
 
@@ -39,13 +39,8 @@ const SubscriptionCheckout = ({ user, open, onClose, billingPageId }) => {
                                 setOpenProcessingPaymentDialog(true);
                                 userIsTryingToSubscribe = true;
                                 await saveSubscriptionInformation(user.uid, payload.response.customer.id, payload.response.current_period_start * 1000, payload.response.current_period_end * 1000);
-                            }
-                            break;
-                        case 'post_load_billing':
-                            if (userIsTryingToSubscribe && payload.response && payload.response.currentConfig && payload.response.currentConfig.productData && payload.response.currentConfig.productData[0] && payload.response.currentConfig.productData[0].metadata) {
-                                const subscriptionDetails = payload.response.currentConfig.productData[0].metadata;
+                                await updateSubscriptionDetails(user.uid, { streamsIncluded, redemptionsPerStream });
 
-                                await updateSubscriptionDetails(user.uid, subscriptionDetails);
                                 setPaymentProcessed(true);
                             }
                             break;
@@ -54,6 +49,9 @@ const SubscriptionCheckout = ({ user, open, onClose, billingPageId }) => {
                                 setOpenProcessingPaymentDialog(true);
                                 userIsTryingToSubscribe = true;
                                 await saveSubscriptionInformation(user.uid, payload.response.customer, payload.response.current_period_start * 1000, payload.response.current_period_end * 1000);
+                                await updateSubscriptionDetails(user.uid, { streamsIncluded, redemptionsPerStream });
+
+                                setPaymentProcessed(true);
                             }
                             break;
                         default:

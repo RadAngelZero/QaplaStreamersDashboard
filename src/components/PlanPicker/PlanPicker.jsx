@@ -210,6 +210,11 @@ const PlanPicker = ({ user }) => {
     }
 
     const setSelectedPlanDetails = (streamsIncluded, redemptionsPerStream, billing_page_id) => {
+        if (period === 'quarterly') {
+            streamsIncluded *= 3;
+        } else if (period === 'yearly') {
+            streamsIncluded *= 12;
+        }
         setStreamsIncluded(streamsIncluded);
         setRedemptionsPerStream(redemptionsPerStream);
         setSelectedPlanBillingPageId(billing_page_id);

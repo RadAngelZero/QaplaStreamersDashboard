@@ -368,6 +368,15 @@ const StreamerProfileEditor = ({ user }) => {
         if (!result.destination) {
             return
         }
+        let source = result.source.index
+        let destination = result.destination.index
+        
+        if (source === destination) {
+            return
+        }
+
+        socialLinks.splice(destination, 0, socialLinks.splice(source, 1)[0])
+        setSocialLinksChanged(true)
     }
 
     return (

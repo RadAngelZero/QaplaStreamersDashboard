@@ -61,8 +61,12 @@ const LiveDonations = () => {
             setTimeout(() => {
                 const donation = popDonation();
                 if (donation) {
-                    const audio = new Audio(donationAudio);
-                    audio.play();
+                    if ('speechSynthesis' in window && donation.message) {
+                        readMessage(donation.message);
+                    } else {
+                        const audio = new Audio(donationAudio);
+                        audio.play();
+                    }
                     donation.isRightSide = alertSideRight
                     setDonationToShow(donation);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
@@ -84,6 +88,16 @@ const LiveDonations = () => {
             getStreamerUid();
         }
     }, [streamerId, streamerUid, donationQueue, listenersAreSetted]);
+
+    const readMessage = (message) => {
+        const availableVoices = window.speechSynthesis.getVoices();
+        let utterThis = new SpeechSynthesisUtterance(message);
+        const spanishVoice = availableVoices.find((voice) => voice.lang.substring(0, 2) === 'es');
+        utterThis.voice = spanishVoice || availableVoices[0];
+        utterThis.pitch = 1;
+        utterThis.rate = 1;
+        window.speechSynthesis.speak(utterThis);
+    }
 
     document.body.style.backgroundColor = 'transparent';
 

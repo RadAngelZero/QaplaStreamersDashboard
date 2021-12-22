@@ -61,12 +61,13 @@ const LiveDonations = () => {
             setTimeout(() => {
                 const donation = popDonation();
                 if (donation) {
-                    if ('speechSynthesis' in window && donation.message) {
-                        readMessage(donation.message);
-                    } else {
-                        const audio = new Audio(donationAudio);
-                        audio.play();
-                    }
+                    const audio = new Audio(donationAudio);
+                    audio.play();
+                    setTimeout(() => {
+                        if ('speechSynthesis' in window && donation.message) {
+                            readMessage(donation.message);
+                        }
+                    }, 500);
                     donation.isRightSide = alertSideRight
                     setDonationToShow(donation);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {

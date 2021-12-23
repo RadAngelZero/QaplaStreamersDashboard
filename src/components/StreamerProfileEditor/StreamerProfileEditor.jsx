@@ -374,7 +374,7 @@ const StreamerProfileEditor = ({ user }) => {
         if (source === destination) {
             return
         }
-
+        //check for change to setState
         socialLinks.splice(destination, 0, socialLinks.splice(source, 1)[0])
         setSocialLinksChanged(true)
     }

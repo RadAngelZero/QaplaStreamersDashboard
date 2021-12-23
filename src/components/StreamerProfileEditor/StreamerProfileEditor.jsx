@@ -485,7 +485,7 @@ const StreamerProfileEditor = ({ user }) => {
                             <DragDropContext onDragEnd={onDragEnd}>
                                 <Droppable droppableId='links-droppable'>
                                     {(provided, snapshot) => (
-                                        <div style={{ backgroundColor: '#f0f0', width: '100%' }}
+                                        <div style={{ width: '100%' }}
                                             {...provided.droppableProps}
                                             ref={provided.innerRef}
                                         >
@@ -499,9 +499,7 @@ const StreamerProfileEditor = ({ user }) => {
                                                         >
                                                             <div
                                                                 style={{
-                                                                    // backgroundColor: '#f00',
                                                                     display: 'flex',
-                                                                    // flex: 1,
                                                                     flexDirection: 'row',
                                                                     alignItems: 'center',
                                                                     width: '100%'

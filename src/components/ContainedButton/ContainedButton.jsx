@@ -4,7 +4,7 @@ import { makeStyles, Button } from '@material-ui/core';
 const useStyles = makeStyles({
     button: {
         color: '#FFF',
-        backgroundColor: '#6C5DD3 !important',
+        backgroundColor: '#6C5DD3',
         borderRadius: '1rem',
         padding: '1rem 3rem 1rem 3rem',
         textTransform: 'none',
@@ -12,7 +12,7 @@ const useStyles = makeStyles({
     }
 });
 
-const ContainedButton = ({ children, onClick, size = 'medium', className = {}, startIcon, endIcon, disabled = false }) => {
+const ContainedButton = ({ children, onClick, size = 'medium', className = {}, style, startIcon, endIcon, disabled = false }) => {
     const classes = useStyles();
 
     return (
@@ -28,7 +28,8 @@ const ContainedButton = ({ children, onClick, size = 'medium', className = {}, s
                 endIcon
                 :
                 null}
-            onClick={onClick}>
+            onClick={onClick}
+            style={style}>
             {children}
         </Button>
     );

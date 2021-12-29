@@ -3,14 +3,17 @@ import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from
 import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditorOnBoarding.module.css';
-import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
 
-import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
-import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
-import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
+import { ReactComponent as BoldIcon } from './../../assets/textFormatting/bold.svg';
+import { ReactComponent as ItalicIcon } from './../../assets/textFormatting/italic.svg';
+import { ReactComponent as UnderlineIcon } from './../../assets/textFormatting/underline.svg';
+import { ReactComponent as StrikeThroughIcon } from './../../assets/textFormatting/strikeThrough.svg';
+import { ReactComponent as EmojiIcon } from './../../assets/textFormatting/smile.svg';
+import { ReactComponent as UnorderedListIcon } from './../../assets/textFormatting/unorderedList.svg';
+import { ReactComponent as OrderedListIcon } from './../../assets/textFormatting/orderedList.svg';
+
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
 
@@ -38,11 +41,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const EditBioButton = withStyles(() => ({
+const FormattingButton = withStyles(() => ({
     root: {
-        backgroundColor: '#272D5780',
+        display: 'flex',
+        flex: 1,
+        backgroundColor: '#232A54',
         color: '#FFFFFF99',
-        padding: '0.6rem 1rem',
+        minWidth: 'auto',
         '&:hover': {
             backgroundColor: '#24456680'
         },
@@ -50,9 +55,6 @@ const EditBioButton = withStyles(() => ({
             backgroundColor: '#272D5780',
             color: '#FFFFFF99',
         },
-        '&#cover': {
-            backgroundColor: '#272D5780'
-        }
     },
 
 }))(Button);
@@ -89,136 +91,193 @@ const QaplaChip = withStyles(() => ({
     }
 }))(Chip)
 
-const QaplaSwitch = withStyles(() => ({
-    root: {
+const StreamerProfileEditorOnBoarding = ({ user }) => {
+    const [isPresentation, setIsPresentation] = useState(false)
+    const [bold, setBold] = useState(false)
+    const [italic, setItalic] = useState(false)
+    const [underline, setUnderline] = useState(false)
+    const [strikeThrough, setStrikeThrough] = useState(false)
+    const [emoji, setEmoji] = useState(false)
+    const [unorderedList, setUnorderedList] = useState(false)
+    const [orderedList, setOrderedList] = useState(false)
+    const [bio, setBio] = useState('')
 
-    },
-    track: {
-        backgroundColor: '#202750'
-    },
-    checked: {
-        color: '#2CE9D2 !important',
-        '& + .MuiSwitch-track': {
-            backgroundColor: '#202750 !important'
-        }
-    },
-    thumb: {
+    const toggleBold = () => {
+        setBold(!bold)
+    }
+
+    const toggleItalic = () => {
+        setItalic(!italic)
+    }
+
+    const toggleUnderline = () => {
+        setUnderline(!underline)
+    }
+
+    const toggleStrikeThrough = () => {
+        setStrikeThrough(!strikeThrough)
+    }
+
+    const toggleEmoji = () => {
+        setEmoji(!emoji)
+    }
+
+    const toggleUnorderedList = () => {
+        setUnorderedList(!unorderedList)
+    }
+
+    const toggleOrderedList = () => {
+        setOrderedList(!orderedList)
+    }
+
+    const continueButtonPresentation = () => {
 
     }
-}))(Switch);
 
-const QaplaTabs = withStyles({
-    root: {
-        minHeight: 0
-    },
-    indicator: {
-        display: 'flex',
-        justifyContent: 'center',
-        backgroundColor: 'transparent',
-        '& > span': {
-            // maxWidth: 50,
-            width: '100%',
-            backgroundColor: '#0AFFD2',
-        },
-    },
-})((props) => <Tabs {...props} TabIndicatorProps={{ children: <span /> }} />);
+    const continueButtonForm = () => {
 
-const QaplaTab = withStyles((theme) => ({
-    root: {
-        padding: '0 0.6rem',
-        minWidth: 0,
-        minHeight: 0,
-        textTransform: 'none',
-        color: '#fff',
-        fontWeight: theme.typography.fontWeightRegular,
-        fontSize: theme.typography.pxToRem(15),
-        marginRight: theme.spacing(1),
-        '&:focus': {
-            opacity: 1,
-        },
-    },
-}))((props) => <Tab disableRipple {...props} />);
+    }
 
+    const laterButtonForm = () => {
 
-function TabPanel(props) {
-    const { children, value, index, className, ...other } = props;
+    }
 
-    return (
-        <div
-            role='tabpanel'
-            hidden={value !== index}
-            id={`profile-editor-tabpanel-${index}`}
-            aria-labelledby={`profile-editor-tab-${index}`}
-            {...other}
-            className={className}
-        >
-            {value === index && (
-                <>
-                    {children}
-                </>
-            )}
-        </div>
-    )
-}
+    const onBioChange = (e) => {
+        let reg = /\n/g
+        let input = e.target.value
+        let nl = input.match(reg)
+        if (nl) {
+            if (nl.length >= 10) {
+                let stringArr = input.split('\n')
+                if (stringArr[10].length > 0) {
+                    if (stringArr[9] <= 0) {
+                        stringArr[9] = stringArr[10]
+                    }
+                }
+                while (stringArr.length > 10) {
+                    stringArr.pop()
+                }
+                input = stringArr.join('\n')
+            }
+            // Limit last line, useless if don't limit other lines
+            // if (nl.length >= 9) {
+            //     let stringArr = input.split('\n')
+            //     if (stringArr[9].length > 43) {
+            //         let lastLineArr = stringArr[9].split('')
+            //         lastLineArr.splice(43, lastLineArr.length - 43)
+            //         lastLineArr = lastLineArr.join('')
+            //         stringArr[9] = lastLineArr
+            //         input = stringArr.join('\n')
+            //     }
+            // }
 
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
+        }
+        if (input.length > 300) {
+            let stringArr = input.split('')
+            stringArr.splice(300, stringArr.length - 300)
+            input = stringArr.join('')
+        }
 
-const StreamerProfileEditorOnBoarding = ({ user }) => {
+        setBio(input)
+    }
 
     return (
         <div className={styles.profileOnBoardingContainer}>
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#141833',
-                width: '450px',
-                height: '570px',
-                borderRadius: '35px',
-                overflow: 'hidden',
-                alignItems: 'center',
-            }}>
-                <div style={{
-                    display: 'flex',
-                    backgroundColor: '#AEFFEC',
-                    width: '100%',
-                    height: '254px'
-                }}>
-                    <img src={MobileProfile}/>
-                </div>
-                <p style={{
-                    display: 'flex',
-                    color: '#FFF',
-                    fontSize: '18px',
-                    fontWeight: '700',
-                    textAlign: 'center',
-                    marginTop: '40px',
-                }}>
-                    Incrementa tu visibilidad
-                </p>
-                <p style={{
-                    display: 'flex',
-                    color: '#FFF',
-                    fontSize: '18px',
-                    fontWeight: '500',
-                    textAlign: 'center',
-                    marginTop: '25px',
-                    
-                }}>
-                    Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil.
-                </p>
-                <ContainedButton onClick={() => { }} style={{
-                    display: 'flex',
-                    width: '390px',
-                    marginTop: 'auto',
-                    marginBottom: '30px'
-                }}>
-                    Continuar
-                </ContainedButton>
+            <div className={styles.modal}>
+                {isPresentation ?
+                    <>
+                        <div className={styles.modalImgContainer}>
+                            <img src={MobileProfile} />
+                        </div>
+                        <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
+                            Incrementa tu visibilidad
+                        </p>
+                        <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
+                            Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil.
+                        </p>
+                        <ContainedButton onClick={continueButtonPresentation} className={styles.modalButtonPresentation}>
+                            Continuar
+                        </ContainedButton>
+                    </>
+                    :
+                    <>
+                        <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
+                            Preséntate con la comunidad
+                        </p>
+                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px' }}>
+                            Tu intro es un vistazo de ti mismo y tu contenido.
+                            Hazlo ameno 😉
+                        </p>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            backgroundColor: '#202750',
+                            borderRadius: '15px',
+                            width: '390px',
+                            height: '234px',
+                            marginTop: '20px',
+                            overflow: 'hidden'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                height: '46px',
+                                width: '100%'
+                            }}>
+                                <FormattingButton onClick={toggleBold}>
+                                    <div style={{ backgroundColor: bold ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
+                                        <BoldIcon />
+                                    </div>
+                                </FormattingButton>
+                                <FormattingButton onClick={toggleItalic}>
+                                    <div style={{ backgroundColor: italic ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
+                                        <ItalicIcon />
+                                    </div>
+                                </FormattingButton>
+                                <FormattingButton onClick={toggleUnderline}>
+                                    <div style={{ backgroundColor: underline ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
+                                        <UnderlineIcon />
+                                    </div>
+                                </FormattingButton>
+                                <FormattingButton onClick={toggleStrikeThrough}>
+                                    <div style={{ backgroundColor: strikeThrough ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
+                                        <StrikeThroughIcon />
+                                    </div>
+                                </FormattingButton>
+                                <FormattingButton onClick={toggleEmoji}>
+                                    <div style={{ backgroundColor: emoji ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
+                                        <EmojiIcon />
+                                    </div>
+                                </FormattingButton>
+                                <FormattingButton onClick={toggleUnorderedList}>
+                                    <div style={{ backgroundColor: unorderedList ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
+                                        <UnorderedListIcon />
+                                    </div>
+                                </FormattingButton>
+                                <FormattingButton onClick={toggleOrderedList}>
+                                    <div style={{ backgroundColor: orderedList ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
+                                        <OrderedListIcon />
+                                    </div>
+                                </FormattingButton>
+                            </div>
+                            <StreamerTextInput
+                                containerClassName={styles.modalTextInputContainer}
+                                textInputClassName={styles.modalTextInput}
+                                rows={10}
+                                rowsMax={10}
+                                value={bio}
+                                onChange={onBioChange}
+                                fullWidth
+                                multiline
+                            />
+                        </div>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonFormContinue}>
+                            Continuar
+                        </ContainedButton>
+                        <ContainedButton onClick={laterButtonForm} className={styles.modalButtonFormLater}>
+                            Después lo hago
+                        </ContainedButton>
+                    </>
+                }
             </div>
         </div>
     )

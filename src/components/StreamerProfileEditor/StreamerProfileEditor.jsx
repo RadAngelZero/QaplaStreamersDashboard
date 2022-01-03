@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -380,6 +381,22 @@ const StreamerProfileEditor = ({ user }) => {
         }, 1250);
     }
 
+    const onDragEnd = (result) => {
+        console.log(result)
+        if (!result.destination) {
+            return
+        }
+        let source = result.source.index
+        let destination = result.destination.index
+        
+        if (source === destination) {
+            return
+        }
+        //check for change to setState
+        socialLinks.splice(destination, 0, socialLinks.splice(source, 1)[0])
+        setSocialLinksChanged(true)
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
@@ -509,7 +526,7 @@ const StreamerProfileEditor = ({ user }) => {
                             </p>
                             <QaplaSwitch
                                 name='showNextStreams'
-                                /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
+                            /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
                             />
                         </div>
                         <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
@@ -517,26 +534,146 @@ const StreamerProfileEditor = ({ user }) => {
                             {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
                         </QaplaTabs>
                         <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
-                            {socialLinks.map((data, index) => {
-                                return (
-                                    <>
-                                        {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
-                                        <StreamerTextInput
-                                            label={data.socialPage}
-                                            containerClassName={styles.socialLinkContainer}
-                                            labelClassName={styles.socialLinkLabel}
-                                            // textInputClassName={styles.socialLinkTextInput}
-                                            value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
-                                            disabled={data.socialPage.toLowerCase() === 'twitch'}
-                                            placeholder={socialLinksPlaceholders[data.socialPage]}
-                                            classes={{ input: classes.linkPlaceholder }}
-                                            textInputClassName={classes.linkInput}
-                                            fullWidth
-                                            onChange={(e) => updateSocialLinks(e.target.value, index)}
-                                        />
-                                    </>
-                                )
-                            })}
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                <Droppable droppableId='links-droppable'>
+                                    {(provided, snapshot) => (
+                                        <div style={{ width: '100%' }}
+                                            {...provided.droppableProps}
+                                            ref={provided.innerRef}
+                                        >
+                                            {socialLinks.map((data, index) => (
+                                                <Draggable key={`draggable-link-${index}`} draggableId={`draggable-link-${index}`} index={index}>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}
+                                                        >
+                                                            <div
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    flexDirection: 'row',
+                                                                    alignItems: 'center',
+                                                                    width: '100%'
+                                                                }}>
+                                                                <div style={{ display: 'flex', width: '100%' }}>
+                                                                    <StreamerTextInput
+                                                                        label={data.socialPage}
+                                                                        containerClassName={styles.socialLinkContainer}
+                                                                        labelClassName={styles.socialLinkLabel}
+                                                                        // textInputClassName={styles.socialLinkTextInput}
+                                                                        value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
+                                                                        disabled={data.socialPage.toLowerCase() === 'twitch'}
+                                                                        placeholder={socialLinksPlaceholders[data.socialPage]}
+                                                                        classes={{ input: classes.linkPlaceholder }}
+                                                                        textInputClassName={classes.linkInput}
+                                                                        fullWidth
+                                                                        onChange={(e) => updateSocialLinks(e.target.value, index)}
+                                                                    />
+                                                                </div>
+                                                                <div style={{
+                                                                    display: 'flex',
+                                                                    backgroundColor: '#141833',
+                                                                    width: '30px',
+                                                                    minWidth: '30px',
+                                                                    height: '45px',
+                                                                    marginBottom: '12px',
+                                                                    alignSelf: 'flex-end',
+                                                                    borderRadius: '8px'
+
+                                                                }} >
+                                                                    <div style={{
+                                                                        display: 'flex',
+                                                                        flex: 1,
+                                                                        padding: '14px 10px',
+                                                                    }}>
+                                                                        <div style={{
+                                                                            display: 'flex',
+                                                                            flex: 1,
+                                                                            flexDirection: 'column',
+                                                                            justifyContent: 'space-between',
+                                                                        }}>
+                                                                            <div style={{
+                                                                                display: 'flex',
+                                                                                flex: 1,
+                                                                                flexDirection: 'row',
+                                                                                justifyContent: 'space-between',
+                                                                                maxHeight: '3px'
+                                                                            }}>
+                                                                                <div style={{
+                                                                                    display: 'flex',
+                                                                                    backgroundColor: '#C4C4C4',
+                                                                                    width: '3px',
+                                                                                    height: '3px',
+                                                                                    borderRadius: '100px'
+                                                                                }} />
+                                                                                <div style={{
+                                                                                    display: 'flex',
+                                                                                    backgroundColor: '#C4C4C4',
+                                                                                    width: '3px',
+                                                                                    height: '3px',
+                                                                                    borderRadius: '100px'
+                                                                                }} />
+                                                                            </div>
+                                                                            <div style={{
+                                                                                display: 'flex',
+                                                                                flex: 1,
+                                                                                flexDirection: 'row',
+                                                                                justifyContent: 'space-between',
+                                                                                maxHeight: '3px'
+                                                                            }}>
+                                                                                <div style={{
+                                                                                    display: 'flex',
+                                                                                    backgroundColor: '#C4C4C4',
+                                                                                    width: '3px',
+                                                                                    height: '3px',
+                                                                                    borderRadius: '100px'
+                                                                                }} />
+                                                                                <div style={{
+                                                                                    display: 'flex',
+                                                                                    backgroundColor: '#C4C4C4',
+                                                                                    width: '3px',
+                                                                                    height: '3px',
+                                                                                    borderRadius: '100px'
+                                                                                }} />
+                                                                            </div>
+                                                                            <div style={{
+                                                                                display: 'flex',
+                                                                                flex: 1,
+                                                                                flexDirection: 'row',
+                                                                                justifyContent: 'space-between',
+                                                                                maxHeight: '3px'
+                                                                            }}>
+                                                                                <div style={{
+                                                                                    display: 'flex',
+                                                                                    backgroundColor: '#C4C4C4',
+                                                                                    width: '3px',
+                                                                                    height: '3px',
+                                                                                    borderRadius: '100px'
+                                                                                }} />
+                                                                                <div style={{
+                                                                                    display: 'flex',
+                                                                                    backgroundColor: '#C4C4C4',
+                                                                                    width: '3px',
+                                                                                    height: '3px',
+                                                                                    borderRadius: '100px'
+                                                                                }} />
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+
                             <br />
                             {socialLinksChanged &&
                                 <ContainedButton onClick={saveLinks}>

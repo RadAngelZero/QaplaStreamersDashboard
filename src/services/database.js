@@ -81,12 +81,16 @@ export async function createStreamerProfile(uid, userData, inviteCode) {
 }
 
 /**
- * Update the streamer profile with the given data
+ * Update the streamer private and public (if exists) profile with the given data
  * @param {string} uid User identifier
  * @param {object} userData Data to update
  */
 export async function updateStreamerProfile(uid, userData) {
     await userStreamersRef.child(uid).update(userData);
+    const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
+    if (publicProfile.exists() && userData.displayName && userData.photoUrl) {
+        await streamersPublicProfilesRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
+    }
 }
 
 /**

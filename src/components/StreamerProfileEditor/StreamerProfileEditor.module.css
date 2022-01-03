@@ -30,7 +30,7 @@
   right: 1rem;
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1420px) {
   .editCoverButtonContainer {
     top: 10rem;
   }
@@ -42,7 +42,6 @@
   }
 }
 
-
 .profileContainer {
   background-color: #0D1021;
   display: flex;
@@ -50,9 +49,9 @@
   align-self: center;
   border-radius: 2rem;
   margin-top: -10%;
-  padding: 5%;
-  width: 60%;
-  max-width: 30rem;
+  padding: 60px 64px;
+  width: 100%;
+  max-width: 680px;
 }
 
 .profilePicContainer {
@@ -60,16 +59,17 @@
 }
 
 .profilePic {
-  max-width: 5rem;
-  max-height: 5rem;
+  max-width: 80px;
+  max-height: 80px;
   border-radius: 100rem;
 }
 
 .streamerNameAndEditBioButtonContainer {
-  margin-top: 6%;
+  margin-top: 20px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 10px;
   justify-content: space-between;
 }
 
@@ -77,6 +77,7 @@
   display: flex;
   flex-direction: row;
   align-content: center;
+  margin-right: 10px;
 }
 
 .editBioButtonContainer {
@@ -86,37 +87,51 @@
 .streamerName {
   color: #FFF;
   align-self: center;
-  font-size: 2rem;
+  font-size: 30px;
+  font-weight: 500;
 }
 
 .founderBadgeContainer {
   align-self: center;
-  margin-left: 10%;
+  margin-left: 8.5px;
 }
 
 .founderBadge {
   align-self: center;
+  width: 25px;
+  height: 25px;
 }
 
 .twitchURLContainer {
   background-color: #202750;
   display: flex;
-  border-radius: 0.4rem;
-  margin-top: 1rem;
+  border-radius: 8px;
+  margin-top: 42px;
+  min-height: 28px;
   /* padding: 0.25rem; */
   width: fit-content;
-
+  overflow: hidden;
 }
 
 .twitchURL {
+  display: flex;
   color: #6C5DD3;
-  margin: 0.6rem;
+  padding: 0 14px;
   align-self: center;
   text-decoration: none;
 }
 
+.copyIconContainer {
+  background-color: #2906A4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 28px;
+  cursor: pointer;
+}
+
 .bioContainer {
-  margin-top: 1rem;
+  margin-top: 3rem;
 }
 
 .bioText {
@@ -130,6 +145,7 @@
   flex-wrap: wrap;
   list-style: none;
   padding: 0;
+  margin-top: 3rem;
   margin-left: -0.25rem;
   width: fit-content;
   align-content: flex-start;
@@ -146,6 +162,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-content: center;
+  margin-top: 2rem;
 }
 
 .showNextStreamsText {
@@ -157,11 +174,13 @@
 .socialLinksContainer {
   display: flex;
   flex-direction: column;
-  margin-top: 1rem;
+  margin-top: 48px;
 }
 
 .socialLinkContainer {
-  margin-top: 1.6rem;
+  margin: 12px 0;
+  margin-right: 5px;
+  width: 100%;
 }
 
 .socialLinkLabel {

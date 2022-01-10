@@ -241,6 +241,10 @@ const StreamerProfileEditor = ({ user }) => {
         }
     }, [user]);
 
+    const onBoardingDoneByStreamer = () => {
+        setOnBoardingDone(true)
+    }
+
     const handleTabChange = (event, newValue) => {
         setSelectedTab(newValue)
     }
@@ -503,7 +507,7 @@ const StreamerProfileEditor = ({ user }) => {
                             </div>
                         </>
                         :
-                        <StreamerProfileEditorOnBoarding user={user} />
+                        <StreamerProfileEditorOnBoarding user={user} onBoardingDone={onBoardingDoneByStreamer} />
                     }
                 </>
             }

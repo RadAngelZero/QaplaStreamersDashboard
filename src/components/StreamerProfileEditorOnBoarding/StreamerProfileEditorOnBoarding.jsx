@@ -63,7 +63,12 @@ const QaplaChip = withStyles(() => ({
     root: {
         backgroundColor: '#272D5780',
         color: '#FFFFFFA6',
-        padding: '0 0.4rem',
+        fontWeight: '600',
+        fontSize: '14px',
+        padding: '10px 6px',
+        minWidth: '90px',
+        minHeight: '40px',
+        borderRadius: '100px',
         '&:focus': {
             backgroundColor: '#4040FF4F',
         },
@@ -91,10 +96,40 @@ const QaplaChip = withStyles(() => ({
     }
 }))(Chip)
 
-const StreamerProfileEditorOnBoarding = ({ user }) => {
-    const [isPresentation, setIsPresentation] = useState(false)
-    const [isBioCreation, setIsBioCreation] = useState(false)
+const QaplaDots = ({ index, dots, activeWidth = '30px' }) => {
+
+    let dotsRender = []
+
+    for (let i = 0; i < dots; i++) {
+        dotsRender.push(
+            <div style={{
+                backgroundColor: index === i ? '#00FEDF' : '#00FEDF8A',
+                width: index === i ? activeWidth : '8px',
+                height: '8px',
+                margin: '0px 6.5px',
+                borderRadius: '100px'
+            }}>
+            </div>
+        )
+    }
+
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'row'
+        }}>
+            {dotsRender}
+        </div>
+    )
+}
+
+const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
+    const [dotsIndex, setDotsIndex] = useState(0)
+    const [isPresentation, setIsPresentation] = useState(true)
+    const [isBioCreation, setIsBioCreation] = useState(true)
     const [tagSearch, setTagSearch] = useState('')
+    const [tagSearchLimit, setTagSearchLimit] = useState(false)
+    const [tags, setTags] = useState([])
     const [bio, setBio] = useState('')
     const [bold, setBold] = useState(false)
     const [italic, setItalic] = useState(false)
@@ -103,6 +138,25 @@ const StreamerProfileEditorOnBoarding = ({ user }) => {
     const [emoji, setEmoji] = useState(false)
     const [unorderedList, setUnorderedList] = useState(false)
     const [orderedList, setOrderedList] = useState(false)
+
+    useEffect(() => {
+        // async function fetchTags() {
+        //     let addTags = []
+        //     addTags.push({
+        //         label: 'Halo',
+        //         selected: false
+        //     })
+        //     addTags.push({
+        //         label: 'LoL',
+        //         selected: false
+        //     })
+        //     setTags(addTags)
+        // }
+
+        if (user && user.uid) {
+            // fetchTags();
+        }
+    }, [user]);
 
     const toggleBold = () => {
         setBold(!bold)
@@ -133,19 +187,42 @@ const StreamerProfileEditorOnBoarding = ({ user }) => {
     }
 
     const continueButtonPresentation = () => {
-
+        setDotsIndex(dotsIndex + 1)
+        if (dotsIndex === 2) {
+            setIsPresentation(false)
+        }
     }
 
     const continueButtonForm = () => {
-
+        setDotsIndex(dotsIndex + 1)
+        if (isBioCreation) {
+            console.log('Uploading bio')
+            setIsBioCreation(false)
+            return
+        }
+        onBoardingDone()
     }
 
     const laterButtonForm = () => {
-
+        setDotsIndex(dotsIndex + 1)
+        if (isBioCreation) {
+            setIsBioCreation(false)
+            return
+        }
+        onBoardingDone()
     }
 
     const onTagSearchChange = (e) => {
         let input = e.target.value
+        if (input.length > 43) {
+            input = input.slice(0, 43)
+        }
+        if (tagSearchLimit === false && input.length >= 43) {
+            setTagSearchLimit(true)
+        }
+        else if (tagSearchLimit === true && input.length < 43) {
+            setTagSearchLimit(false)
+        }
         setTagSearch(input)
     }
 
@@ -188,13 +265,36 @@ const StreamerProfileEditorOnBoarding = ({ user }) => {
         setBio(input)
     }
 
+    const addNewTag = () => {
+        let tagsArr = [...tags]
+        tagsArr.unshift({
+            label: tagSearch,
+            selected: true,
+            isCustom: true
+        })
+        setTags(tagsArr)
+        setTagSearch('')
+    }
+
+    const tagClick = (data, index, e) => {
+        let tagsArr = [...tags]
+        tagsArr[index] = {
+            ...data,
+            selected: !data.selected
+        }
+        if (data.isCustom) {
+            tagsArr.splice(index, 1)
+        }
+        setTags(tagsArr)
+    }
+
     return (
         <div className={styles.profileOnBoardingContainer}>
-            <div className={styles.modal}>
+            <div className={styles.profileOnBoardingModalContainer}>
                 {isPresentation ?
                     <>
                         <div className={styles.modalImgContainer}>
-                            <img src={MobileProfile} />
+                            <img src={MobileProfile} alt='Mobile Profile' />
                         </div>
                         <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
                             Incrementa tu visibilidad
@@ -258,6 +358,7 @@ const StreamerProfileEditorOnBoarding = ({ user }) => {
                                     <StreamerTextInput
                                         containerClassName={styles.modalBioTextInputContainer}
                                         textInputClassName={styles.modalBioTextInput}
+                                        textInputStyle={{ backgroundColor: '#202750' }}
                                         rows={10}
                                         rowsMax={10}
                                         value={bio}
@@ -271,13 +372,39 @@ const StreamerProfileEditorOnBoarding = ({ user }) => {
                             <>
                                 <StreamerTextInput
                                     containerClassName={styles.modalTagSearchContainer}
+                                    textInputStyle={{ backgroundColor: tagSearchLimit ? '#802750' : '#202750' }}
                                     textInputClassName={styles.modalTagSearchTextInput}
                                     value={tagSearch}
                                     onChange={onTagSearchChange}
                                     placeholder={'Busca o crea un tag'}
                                     fullWidth
                                 />
-                                
+                                <ul className={styles.modalTagsList}
+                                    style={{
+                                        width: '100%',
+                                        overflowY: 'auto',
+                                        scrollBehavior: 'smooth',
+                                    }}>
+                                    {tagSearch !== '' &&
+                                        <li className={styles.modalTag}>
+                                            <QaplaChip
+                                                label={tagSearch.length > 20 ? tagSearch.slice(0, 20) + '...' : tagSearch}
+                                                onClick={addNewTag}
+                                            />
+                                        </li>
+                                    }
+                                    {tags.map((data, index) => {
+                                        return (
+                                            <li key={index} className={styles.modalTag}>
+                                                <QaplaChip
+                                                    label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
+                                                    style={{ backgroundColor: data.selected ? '#4040FF' : '#232A54' }}
+                                                    onClick={(e) => tagClick(data, index, e)}
+                                                />
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
                             </>
                         }
 
@@ -289,6 +416,16 @@ const StreamerProfileEditorOnBoarding = ({ user }) => {
                         </ContainedButton>
                     </>
                 }
+            </div>
+            <div style={{
+                display: 'flex',
+                marginTop: '50px'
+            }}>
+                <QaplaDots
+                    index={dotsIndex}
+                    dots={5}
+                    activeWidth='29px'
+                />
             </div>
         </div>
     )

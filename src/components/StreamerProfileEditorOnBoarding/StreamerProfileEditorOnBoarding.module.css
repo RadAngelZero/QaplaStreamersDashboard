@@ -8,7 +8,7 @@
     justify-content: center;
 }
 
-.modal {
+.profileOnBoardingModalContainer {
     display: flex;
     flex-direction: column;
     background-color: #141833;
@@ -110,7 +110,7 @@
 }
 
 .modalBioTextInput {
-    background-color: #202750 !important;
+    background-color: #202750;
     margin-top: 0 !important;
     padding-right: 16px !important;
     align-items: flex-start !important;
@@ -125,10 +125,44 @@
 .modalTagSearchContainer {
     composes: modalBioEditorContainer;
     height: 45px;
+    min-height: 45px;
     border-radius: 8px;
 }
 
 .modalTagSearchTextInput {
     composes: modalBioTextInput;
     color: #6C5DD3 !important;
+}
+
+.modalTagsList {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin-left: -0.25rem;
+    width: fit-content;
+    max-width: 390px;
+    align-content: flex-start;
+    justify-content: flex-start;
+}
+
+.modalTag {
+    display: flex;
+    margin: 0.3rem 0.2rem;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #202750;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4040FF;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #8080FF;
 }

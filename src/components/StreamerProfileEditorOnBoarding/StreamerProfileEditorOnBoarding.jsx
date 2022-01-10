@@ -272,6 +272,9 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
             selected: true,
             isCustom: true
         })
+        if (tagSearchLimit) {
+            setTagSearchLimit(false)
+        }
         setTags(tagsArr)
         setTagSearch('')
     }

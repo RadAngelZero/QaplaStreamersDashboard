@@ -106,6 +106,11 @@ export const webhookStreamOffline = {
 
 export const HOUR_IN_MILISECONDS = 3600000;
 
+/**
+ * Streamers Profiles constants
+ */
+export const MAX_ROWS_IN_BIO = 5;
+
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

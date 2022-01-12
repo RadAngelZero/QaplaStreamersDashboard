@@ -1,63 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
+import { withStyles, makeStyles, Chip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditorOnBoarding.module.css';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
-
-import { ReactComponent as BoldIcon } from './../../assets/textFormatting/bold.svg';
-import { ReactComponent as ItalicIcon } from './../../assets/textFormatting/italic.svg';
-import { ReactComponent as UnderlineIcon } from './../../assets/textFormatting/underline.svg';
-import { ReactComponent as StrikeThroughIcon } from './../../assets/textFormatting/strikeThrough.svg';
-import { ReactComponent as EmojiIcon } from './../../assets/textFormatting/smile.svg';
-import { ReactComponent as UnorderedListIcon } from './../../assets/textFormatting/unorderedList.svg';
-import { ReactComponent as OrderedListIcon } from './../../assets/textFormatting/orderedList.svg';
-
+import { updateStreamerPublicProfile } from '../../services/database';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { uploadImage } from '../../services/storage';
-
 import MobileProfile from './../../assets/MobileProfile.png';
-
-
-const useStyles = makeStyles((theme) => ({
-    gridContainer: {
-        width: '100%',
-        display: 'flex',
-        boxSizing: 'border-box',
-        flexWrap: 'nowrap'
-    },
-    linkPlaceholder: {
-        '&::placeholder': {
-            color: 'rgba(108, 93, 211, 0.4)'
-        }
-    },
-    linkInput: {
-        backgroundColor: '#202750',
-        color: '#FFF',
-        '&.Mui-disabled': {
-            color: '#AAA'
-        }
-    }
-}));
-
-const FormattingButton = withStyles(() => ({
-    root: {
-        display: 'flex',
-        flex: 1,
-        backgroundColor: '#232A54',
-        color: '#FFFFFF99',
-        minWidth: 'auto',
-        '&:hover': {
-            backgroundColor: '#24456680'
-        },
-        '&:disabled': {
-            backgroundColor: '#272D5780',
-            color: '#FFFFFF99',
-        },
-    },
-
-}))(Button);
+import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 
 const QaplaChip = withStyles(() => ({
     root: {
@@ -131,60 +81,6 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
     const [tagSearchLimit, setTagSearchLimit] = useState(false)
     const [tags, setTags] = useState([])
     const [bio, setBio] = useState('')
-    const [bold, setBold] = useState(false)
-    const [italic, setItalic] = useState(false)
-    const [underline, setUnderline] = useState(false)
-    const [strikeThrough, setStrikeThrough] = useState(false)
-    const [emoji, setEmoji] = useState(false)
-    const [unorderedList, setUnorderedList] = useState(false)
-    const [orderedList, setOrderedList] = useState(false)
-
-    useEffect(() => {
-        // async function fetchTags() {
-        //     let addTags = []
-        //     addTags.push({
-        //         label: 'Halo',
-        //         selected: false
-        //     })
-        //     addTags.push({
-        //         label: 'LoL',
-        //         selected: false
-        //     })
-        //     setTags(addTags)
-        // }
-
-        if (user && user.uid) {
-            // fetchTags();
-        }
-    }, [user]);
-
-    const toggleBold = () => {
-        setBold(!bold)
-    }
-
-    const toggleItalic = () => {
-        setItalic(!italic)
-    }
-
-    const toggleUnderline = () => {
-        setUnderline(!underline)
-    }
-
-    const toggleStrikeThrough = () => {
-        setStrikeThrough(!strikeThrough)
-    }
-
-    const toggleEmoji = () => {
-        setEmoji(!emoji)
-    }
-
-    const toggleUnorderedList = () => {
-        setUnorderedList(!unorderedList)
-    }
-
-    const toggleOrderedList = () => {
-        setOrderedList(!orderedList)
-    }
 
     const continueButtonPresentation = () => {
         setDotsIndex(dotsIndex + 1)
@@ -193,12 +89,11 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
         }
     }
 
-    const continueButtonForm = () => {
+    const continueButtonForm = async () => {
         setDotsIndex(dotsIndex + 1)
         if (isBioCreation) {
-            console.log('Uploading bio')
-            setIsBioCreation(false)
-            return
+            await saveBio();
+            return setIsBioCreation(false);
         }
         onBoardingDone()
     }
@@ -224,45 +119,6 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
             setTagSearchLimit(false)
         }
         setTagSearch(input)
-    }
-
-    const onBioChange = (e) => {
-        let reg = /\n/g
-        let input = e.target.value
-        let nl = input.match(reg)
-        if (nl) {
-            if (nl.length >= 10) {
-                let stringArr = input.split('\n')
-                if (stringArr[10].length > 0) {
-                    if (stringArr[9] <= 0) {
-                        stringArr[9] = stringArr[10]
-                    }
-                }
-                while (stringArr.length > 10) {
-                    stringArr.pop()
-                }
-                input = stringArr.join('\n')
-            }
-            // Limit last line, useless if don't limit other lines
-            // if (nl.length >= 9) {
-            //     let stringArr = input.split('\n')
-            //     if (stringArr[9].length > 43) {
-            //         let lastLineArr = stringArr[9].split('')
-            //         lastLineArr.splice(43, lastLineArr.length - 43)
-            //         lastLineArr = lastLineArr.join('')
-            //         stringArr[9] = lastLineArr
-            //         input = stringArr.join('\n')
-            //     }
-            // }
-
-        }
-        if (input.length > 300) {
-            let stringArr = input.split('')
-            stringArr.splice(300, stringArr.length - 300)
-            input = stringArr.join('')
-        }
-
-        setBio(input)
     }
 
     const addNewTag = () => {
@@ -291,6 +147,15 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
         setTags(tagsArr)
     }
 
+    const saveBio = async () => {
+        try {
+            await updateStreamerPublicProfile(user.uid, { bio });
+        } catch (error) {
+            console.log(error);
+            alert('Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico');
+        }
+    }
+
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
@@ -312,65 +177,13 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
                     :
                     <>
                         <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            {isBioCreation ? 'Tags' : 'Preséntate con la comunidad'}
+                            {isBioCreation ? 'Preséntate con la comunidad' : 'Tags'}
                         </p>
                         <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: isBioCreation ? '70%' : '60%' }}>
-                            {isBioCreation ? 'Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.' : 'Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉'}
+                            {isBioCreation ? 'Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉' : 'Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.'}
                         </p>
                         {isBioCreation ?
-                            <>
-
-                                <div className={styles.modalBioEditorContainer}>
-                                    <div className={styles.modalBioEditorFormatterButtonsContainer}>
-                                        <FormattingButton onClick={toggleBold}>
-                                            <div style={{ backgroundColor: bold ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <BoldIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleItalic}>
-                                            <div style={{ backgroundColor: italic ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <ItalicIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleUnderline}>
-                                            <div style={{ backgroundColor: underline ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <UnderlineIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleStrikeThrough}>
-                                            <div style={{ backgroundColor: strikeThrough ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <StrikeThroughIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleEmoji}>
-                                            <div style={{ backgroundColor: emoji ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <EmojiIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleUnorderedList}>
-                                            <div style={{ backgroundColor: unorderedList ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <UnorderedListIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleOrderedList}>
-                                            <div style={{ backgroundColor: orderedList ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <OrderedListIcon />
-                                            </div>
-                                        </FormattingButton>
-                                    </div>
-                                    <StreamerTextInput
-                                        containerClassName={styles.modalBioTextInputContainer}
-                                        textInputClassName={styles.modalBioTextInput}
-                                        textInputStyle={{ backgroundColor: '#202750' }}
-                                        rows={10}
-                                        rowsMax={10}
-                                        value={bio}
-                                        onChange={onBioChange}
-                                        fullWidth
-                                        multiline
-                                    />
-                                </div>
-                            </>
+                            <BioEditorTextArea bio={bio} setBio={setBio} />
                             :
                             <>
                                 <StreamerTextInput

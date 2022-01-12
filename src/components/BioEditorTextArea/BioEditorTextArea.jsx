@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#202750',
         borderRadius: 15,
         width: '90%',
-        marginTop: 'auto',
+        marginTop: 36,
         overflow: 'hidden',
         alignSelf: 'center'
     },
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))(Button); */
 
-const BioEditorTextArea = ({ bio, setBio }) => {
+const BioEditorTextArea = ({ bio, setBio, error }) => {
     let textAreaRef = useRef(null);
     /* const [bold, setBold] = useState(false);
     const [italic, setItalic] = useState(false);
@@ -137,7 +137,7 @@ const BioEditorTextArea = ({ bio, setBio }) => {
     }
 
     return (
-        <div className={classes.container}>
+        <div className={classes.container} style={error ? { border: '1px solid #FF0000', borderRadius: '15px 15px 15px 15px' } : {}}>
             {/* Currently we don´t have support for text edition */}
             {/* <div className={classes.buttonsContainer}>
                 <FormattingButton onClick={toggleBold}>

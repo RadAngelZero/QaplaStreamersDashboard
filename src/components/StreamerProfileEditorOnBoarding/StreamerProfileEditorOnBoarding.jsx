@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { withStyles, makeStyles, Chip } from '@material-ui/core';
+import React, { useState } from 'react';
+import { withStyles, Chip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditorOnBoarding.module.css';
@@ -73,51 +73,46 @@ const QaplaDots = ({ index, dots, activeWidth = '30px' }) => {
     )
 }
 
-const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
-    const [dotsIndex, setDotsIndex] = useState(0)
-    const [isPresentation, setIsPresentation] = useState(true)
-    const [isBioCreation, setIsBioCreation] = useState(true)
+const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
+    const [currentStep, setCurrentStep] = useState(step)
     const [tagSearch, setTagSearch] = useState('')
     const [tagSearchLimit, setTagSearchLimit] = useState(false)
     const [tags, setTags] = useState([])
-    const [bio, setBio] = useState('')
-
-    const continueButtonPresentation = () => {
-        setDotsIndex(dotsIndex + 1)
-        if (dotsIndex === 2) {
-            setIsPresentation(false)
-        }
-    }
+    const [bio, setBio] = useState('');
+    const [bioError, setBioError] = useState(false);
+    const [tagError, setTagError] = useState(false);
 
     const continueButtonForm = async () => {
-        setDotsIndex(dotsIndex + 1)
-        if (isBioCreation) {
-            await saveBio();
-            return setIsBioCreation(false);
-        }
-        onBoardingDone()
-    }
+        const step = currentStep + 1;
 
-    const laterButtonForm = () => {
-        setDotsIndex(dotsIndex + 1)
-        if (isBioCreation) {
-            setIsBioCreation(false)
-            return
+        if (step <= 3) {
+            setCurrentStep(step);
+            return;
+        } else if (step === 4) {
+            if (bio.replace(/\s/g, '').length === 0) {
+                setBioError(true);
+                return;
+            } else {
+                setCurrentStep(step);
+                return await saveBio();
+            }
+        } else {
+            if (tags.length > 0) {
+                await updateStreamerPublicProfile(user.uid, { tags: tags.map((tag) => tag.label) });
+                return onBoardingDone();
+            } else {
+                setTagError(true);
+            }
         }
-        onBoardingDone()
     }
 
     const onTagSearchChange = (e) => {
+        setTagError(false);
         let input = e.target.value
         if (input.length > 43) {
             input = input.slice(0, 43)
         }
-        if (tagSearchLimit === false && input.length >= 43) {
-            setTagSearchLimit(true)
-        }
-        else if (tagSearchLimit === true && input.length < 43) {
-            setTagSearchLimit(false)
-        }
+
         setTagSearch(input)
     }
 
@@ -159,7 +154,7 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
-                {isPresentation ?
+                {(currentStep === 0 || currentStep === 1 || currentStep === 2) &&
                     <>
                         <div className={styles.modalImgContainer}>
                             <img src={MobileProfile} alt='Mobile Profile' />
@@ -170,65 +165,77 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
                         <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
                             Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil.
                         </p>
-                        <ContainedButton onClick={continueButtonPresentation} className={styles.modalButtonPresentation}>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
                             Continuar
                         </ContainedButton>
                     </>
-                    :
+                }
+                {currentStep === 3 &&
                     <>
                         <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            {isBioCreation ? 'Preséntate con la comunidad' : 'Tags'}
+                            {'Preséntate con la comunidad'}
                         </p>
-                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: isBioCreation ? '70%' : '60%' }}>
-                            {isBioCreation ? 'Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉' : 'Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.'}
+                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '70%' }}>
+                            {'Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉'}
                         </p>
-                        {isBioCreation ?
-                            <BioEditorTextArea bio={bio} setBio={setBio} />
-                            :
-                            <>
-                                <StreamerTextInput
-                                    containerClassName={styles.modalTagSearchContainer}
-                                    textInputStyle={{ backgroundColor: tagSearchLimit ? '#802750' : '#202750' }}
-                                    textInputClassName={styles.modalTagSearchTextInput}
-                                    value={tagSearch}
-                                    onChange={onTagSearchChange}
-                                    placeholder={'Busca o crea un tag'}
-                                    fullWidth
-                                />
-                                <ul className={styles.modalTagsList}
-                                    style={{
-                                        width: '100%',
-                                        overflowY: 'auto',
-                                        scrollBehavior: 'smooth',
-                                    }}>
-                                    {tagSearch !== '' &&
-                                        <li className={styles.modalTag}>
-                                            <QaplaChip
-                                                label={tagSearch.length > 20 ? tagSearch.slice(0, 20) + '...' : tagSearch}
-                                                onClick={addNewTag}
-                                            />
-                                        </li>
-                                    }
-                                    {tags.map((data, index) => {
-                                        return (
-                                            <li key={index} className={styles.modalTag}>
-                                                <QaplaChip
-                                                    label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
-                                                    style={{ backgroundColor: data.selected ? '#4040FF' : '#232A54' }}
-                                                    onClick={(e) => tagClick(data, index, e)}
-                                                />
-                                            </li>
-                                        )
-                                    })}
-                                </ul>
-                            </>
+                        <BioEditorTextArea bio={bio}
+                            setBio={setBio}
+                            error={bioError} />
+                        {bioError &&
+                            <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>La bio no puede quedar vacia</p>
                         }
-
-                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonFormContinue}>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
                             Continuar
                         </ContainedButton>
-                        <ContainedButton onClick={laterButtonForm} className={styles.modalButtonFormLater}>
-                            Después lo hago
+                    </>
+                }
+                {currentStep === 4 &&
+                    <>
+                        <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
+                            {'Tags'}
+                        </p>
+                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '60%' }}>
+                            {'Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.'}
+                        </p>
+                        <StreamerTextInput
+                            containerClassName={styles.modalTagSearchContainer}
+                            textInputStyle={{ backgroundColor: (tagSearch.length === 43 || tagError) ? '#802750' : '#202750' }}
+                            textInputClassName={styles.modalTagSearchTextInput}
+                            value={tagSearch}
+                            onChange={onTagSearchChange}
+                            placeholder={'Busca o crea un tag'}
+                            fullWidth />
+                        {tagError &&
+                            <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>Agrega al menos un tag para continuar</p>
+                        }
+                        <ul className={styles.modalTagsList}
+                            style={{
+                                width: '100%',
+                                overflowY: 'auto',
+                                scrollBehavior: 'smooth',
+                            }}>
+                            {tagSearch !== '' &&
+                                <li className={styles.modalTag}>
+                                    <QaplaChip
+                                        label={tagSearch}
+                                        onClick={addNewTag}
+                                    />
+                                </li>
+                            }
+                            {tags.map((data, index) => {
+                                return (
+                                    <li key={index} className={styles.modalTag}>
+                                        <QaplaChip
+                                            label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
+                                            style={{ backgroundColor: data.selected ? '#4040FF' : '#232A54' }}
+                                            onClick={(e) => tagClick(data, index, e)}
+                                        />
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
+                            Continuar
                         </ContainedButton>
                     </>
                 }
@@ -238,7 +245,7 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
                 marginTop: '50px'
             }}>
                 <QaplaDots
-                    index={dotsIndex}
+                    index={currentStep}
                     dots={5}
                     activeWidth='29px'
                 />

@@ -9,7 +9,6 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
-
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
@@ -189,6 +188,10 @@ const StreamerProfileEditor = ({ user }) => {
             socialPage: 'Youtube',
             value: ''
         },
+        /* {
+            socialPage: 'TikTok',
+            value: ''
+        } */
     ];
 
     const socialLinksPlaceholders = {
@@ -197,7 +200,7 @@ const StreamerProfileEditor = ({ user }) => {
         Instagram: `https://instagram.com/${user ? user.displayName : ''}`,
         Discord: `https://discord.gg/inviteCode`,
         Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`,
-        tiktok: '' // ToDo: Add tiktok to list of social media links
+        tiktok: `https://www.tiktok.com/@${user ? user.displayName : ''}`
     };
 
     const classes = useStyles();
@@ -211,7 +214,8 @@ const StreamerProfileEditor = ({ user }) => {
     const [streamerTags, setStreamerTags] = useState([]);
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
     const [openTooltip, setOpenTooltip] = useState(false);
-    const [onBoardingDone, setOnBoardingDone] = useState(false);
+    const [onBoardingDone, setOnBoardingDone] = useState(true);
+    const [onBoardingStep, setOnBoardingStep] = useState(0);
     const { t } = useTranslation();
 
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
@@ -221,9 +225,20 @@ const StreamerProfileEditor = ({ user }) => {
             const info = await getStreamerPublicProfile(user.uid);
             if (info.exists()) {
                 const { bio, tags, backgroundUrl } = info.val();
-                setStreamerBio(bio);
+                if (!tags) {
+                    setOnBoardingDone(false);
+                    setOnBoardingStep(4);
+                }
+
+                if (!bio) {
+                    setOnBoardingDone(false);
+                    setOnBoardingStep(3);
+                }
+                setStreamerBio(bio || '');
                 setBackgroundUrl(backgroundUrl || 'https://wallpaperaccess.com/full/2124973.png');
-                setStreamerTags(tags);
+                setStreamerTags(tags || []);
+            } else {
+                setOnBoardingDone(false);
             }
 
             const links = await getStreamerLinks(user.uid);
@@ -239,7 +254,7 @@ const StreamerProfileEditor = ({ user }) => {
         if (user && user.uid) {
             getStreamerInfo();
         }
-    }, [user]);
+    }, [user, onBoardingDone]);
 
     const onBoardingDoneByStreamer = () => {
         setOnBoardingDone(true)
@@ -479,6 +494,7 @@ const StreamerProfileEditor = ({ user }) => {
                                             <>
                                                 {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
                                                 <StreamerTextInput
+                                                    key={`SocialLink-${index}`}
                                                     label={data.socialPage}
                                                     containerClassName={styles.socialLinkContainer}
                                                     labelClassName={styles.socialLinkLabel}
@@ -507,7 +523,9 @@ const StreamerProfileEditor = ({ user }) => {
                             </div>
                         </>
                         :
-                        <StreamerProfileEditorOnBoarding user={user} onBoardingDone={onBoardingDoneByStreamer} />
+                        <StreamerProfileEditorOnBoarding step={onBoardingStep}
+                            user={user}
+                            onBoardingDone={onBoardingDoneByStreamer} />
                     }
                 </>
             }

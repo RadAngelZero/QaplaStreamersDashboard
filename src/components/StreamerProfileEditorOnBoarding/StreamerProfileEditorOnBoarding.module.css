@@ -64,16 +64,9 @@
 
 .modalButtonFormContinue {
     composes: modalButtonForm;
-    margin-top: auto !important;
-}
-
-.modalButtonFormLater {
-    composes: modalButtonForm;
+    margin-bottom: 30px;
     margin-bottom: 24px !important;
-    width: 220px;
-    background-color: #0000 !important;
-    box-shadow: none !important;
-    color: #FFFFFF99 !important;
+    margin-top: auto !important;
 }
 
 .modalTextSubParagraph {

@@ -112,8 +112,9 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                 return await saveBio();
             }
         } else {
-            if (tags.length > 0) {
-                await updateStreamerPublicProfile(user.uid, { tags: tags.filter((tag) => tag.selected).map((tag) => tag.label) });
+            const tagsSelected = tags.filter((tag) => tag.selected);
+            if (tagsSelected.length > 0) {
+                await updateStreamerPublicProfile(user.uid, { tags: tagsSelected.map((tag) => tag.label) });
                 return onBoardingDone();
             } else {
                 setTagError(true);

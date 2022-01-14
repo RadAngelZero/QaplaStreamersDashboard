@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Button, makeStyles, TextField, withStyles } from '@material-ui/core';
+import React, { useRef } from 'react';
+import { makeStyles, TextField } from '@material-ui/core';
 
 // Uncomment when uncomment JSX using this icons
 /* import { ReactComponent as BoldIcon } from './../../assets/textFormatting/bold.svg';
@@ -28,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
         width: '100%'
     },
     textInputContainer: {
+        fontSize: 12,
+        letterSpacing: .49,
+        fontWeight: '400',
         backgroundColor: '#202750',
         paddingLeft: '16px',
         paddingRight: '24px',

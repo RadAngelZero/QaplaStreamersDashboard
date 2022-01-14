@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#202750',
         borderRadius: 15,
         width: '90%',
-        marginTop: 36,
+        marginTop: 24,
         overflow: 'hidden',
         alignSelf: 'center'
     },

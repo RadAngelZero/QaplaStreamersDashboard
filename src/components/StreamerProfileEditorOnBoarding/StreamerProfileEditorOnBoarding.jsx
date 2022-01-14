@@ -11,7 +11,7 @@ import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 
 const QaplaChip = withStyles(() => ({
     root: {
-        backgroundColor: '#272D5780',
+        backgroundColor: 'rgba(64, 64, 255, 0.30859)',
         color: '#FFFFFFA6',
         fontWeight: '600',
         fontSize: '14px',
@@ -73,14 +73,29 @@ const QaplaDots = ({ index, dots, activeWidth = '30px' }) => {
     )
 }
 
+const createDefaultTag = (label) => ({ label, selected: false, isCustom: false });
+
+const DEFUALT_TAGS = [
+    createDefaultTag('Just Chatting'),
+    createDefaultTag('Musica'),
+    createDefaultTag('IRL'),
+    createDefaultTag('Brawl Stars'),
+    createDefaultTag('Minecraft'),
+    createDefaultTag('CoD'),
+    createDefaultTag('KPop'),
+    createDefaultTag('Ajedrez'),
+    createDefaultTag('Valorant')
+]
+
 const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
     const [currentStep, setCurrentStep] = useState(step)
     const [tagSearch, setTagSearch] = useState('')
     const [tagSearchLimit, setTagSearchLimit] = useState(false)
-    const [tags, setTags] = useState([])
+    const [tags, setTags] = useState(DEFUALT_TAGS)
     const [bio, setBio] = useState('');
     const [bioError, setBioError] = useState(false);
     const [tagError, setTagError] = useState(false);
+    const [showTagHelper, setShowTagHelper] = useState(true);
 
     const continueButtonForm = async () => {
         const step = currentStep + 1;
@@ -98,7 +113,7 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
             }
         } else {
             if (tags.length > 0) {
-                await updateStreamerPublicProfile(user.uid, { tags: tags.map((tag) => tag.label) });
+                await updateStreamerPublicProfile(user.uid, { tags: tags.filter((tag) => tag.selected).map((tag) => tag.label) });
                 return onBoardingDone();
             } else {
                 setTagError(true);
@@ -117,8 +132,10 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
     }
 
     const addNewTag = () => {
+        setShowTagHelper(false);
+        setTagError(false);
         let tagsArr = [...tags]
-        tagsArr.unshift({
+        tagsArr.push({
             label: tagSearch,
             selected: true,
             isCustom: true
@@ -131,6 +148,7 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
     }
 
     const tagClick = (data, index, e) => {
+        setTagError(false);
         let tagsArr = [...tags]
         tagsArr[index] = {
             ...data,
@@ -206,7 +224,13 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                             placeholder={'Busca o crea un tag'}
                             fullWidth />
                         {tagError &&
-                            <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>Agrega al menos un tag para continuar</p>
+                            <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>
+                                {showTagHelper ?
+                                    'Para agregar un tag escribelo y da click en el'
+                                    :
+                                    'Agrega al menos un tag para continuar'
+                                }
+                            </p>
                         }
                         <ul className={styles.modalTagsList}
                             style={{
@@ -214,6 +238,15 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                                 overflowY: 'auto',
                                 scrollBehavior: 'smooth',
                             }}>
+                            {tags.map((data, index) => (
+                                <li key={index} className={styles.modalTag}>
+                                    <QaplaChip
+                                        label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
+                                        style={{ backgroundColor: data.selected ? '#4040FF' : 'rgba(64, 64, 255, 0.30859)' }}
+                                        onClick={(e) => tagClick(data, index, e)}
+                                    />
+                                </li>
+                            ))}
                             {tagSearch !== '' &&
                                 <li className={styles.modalTag}>
                                     <QaplaChip
@@ -222,20 +255,13 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                                     />
                                 </li>
                             }
-                            {tags.map((data, index) => {
-                                return (
-                                    <li key={index} className={styles.modalTag}>
-                                        <QaplaChip
-                                            label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
-                                            style={{ backgroundColor: data.selected ? '#4040FF' : '#232A54' }}
-                                            onClick={(e) => tagClick(data, index, e)}
-                                        />
-                                    </li>
-                                )
-                            })}
                         </ul>
                         <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
-                            Continuar
+                            {currentStep !== 4 ?
+                                'Continuar'
+                                :
+                                'Ir a mi perfil'
+                            }
                         </ContainedButton>
                     </>
                 }

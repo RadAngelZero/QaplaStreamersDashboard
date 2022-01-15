@@ -14,6 +14,7 @@ import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
+import { PROFILE_BACKGROUND_GRADIENTS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -208,7 +209,8 @@ const StreamerProfileEditor = ({ user }) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const [editingBio, setEditingBio] = useState(false);
     const [streamerBio, setStreamerBio] = useState('');
-    const [backgroundUrl, setBackgroundUrl] = useState('https://wallpaperaccess.com/full/2124973.png');
+    const [backgroundUrl, setBackgroundUrl] = useState('');
+    const [backgroundGradient, setBackgroundGradient] = useState(null);
     const [uploadImageStatus, setUploadImageStatus] = useState(0);
     const [socialLinks, setSocialLinks] = useState(socialLinksInitialValue);
     const [streamerTags, setStreamerTags] = useState([]);
@@ -224,7 +226,7 @@ const StreamerProfileEditor = ({ user }) => {
         async function getStreamerInfo() {
             const info = await getStreamerPublicProfile(user.uid);
             if (info.exists()) {
-                const { bio, tags, backgroundUrl } = info.val();
+                const { bio, tags, backgroundUrl, backgroundGradient } = info.val();
                 if (!tags) {
                     setOnBoardingDone(false);
                     setOnBoardingStep(4);
@@ -235,7 +237,8 @@ const StreamerProfileEditor = ({ user }) => {
                     setOnBoardingStep(3);
                 }
                 setStreamerBio(bio || '');
-                setBackgroundUrl(backgroundUrl || 'https://wallpaperaccess.com/full/2124973.png');
+                setBackgroundGradient(backgroundGradient);
+                setBackgroundUrl(backgroundUrl);
                 setStreamerTags(tags || []);
             } else {
                 setOnBoardingDone(false);
@@ -256,8 +259,20 @@ const StreamerProfileEditor = ({ user }) => {
         }
     }, [user, onBoardingDone]);
 
-    const onBoardingDoneByStreamer = () => {
-        setOnBoardingDone(true)
+    const onBoardingDoneByStreamer = async () => {
+        const min = 0;
+        const max = 4;
+        const randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        const backgroundSelected = PROFILE_BACKGROUND_GRADIENTS[randomIndex];
+        setBackgroundGradient(backgroundSelected);
+
+        await updateStreamerPublicProfile(user.uid, {
+            backgroundGradient: backgroundSelected,
+            displayName: user.displayName,
+            photoUrl: user.photoUrl
+        });
+        setOnBoardingDone(true);
     }
 
     const handleTabChange = (event, newValue) => {
@@ -348,7 +363,6 @@ const StreamerProfileEditor = ({ user }) => {
     }
 
     const uploadBackgroundImage = (e) => {
-        console.log(e.target.files);
         if (e.target.files[0]) {
             const newBackgroundImage = (e.target.files[0]);
             uploadImage(
@@ -384,6 +398,23 @@ const StreamerProfileEditor = ({ user }) => {
         }, 1250);
     }
 
+    const createLinearGradientCSS = () => {
+        if (backgroundGradient) {
+            let colorsString = '';
+            backgroundGradient.colors.forEach((color, index) => {
+                if (index !== backgroundGradient.colors.length - 1) {
+                    colorsString += `${color},`;
+                } else {
+                    colorsString += color;
+                }
+            });
+
+            return `linear-gradient(${backgroundGradient.angle}deg, ${colorsString})`;
+        }
+
+        return '';
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
@@ -391,7 +422,11 @@ const StreamerProfileEditor = ({ user }) => {
                     {onBoardingDone ?
                         <>
                             <div className={styles.coverContainer}>
-                                <img src={backgroundUrl} alt='Cover' className={styles.cover} />
+                                {backgroundUrl ?
+                                    <img src={backgroundUrl} alt='Cover' className={styles.cover} />
+                                    :
+                                    <div className={styles.cover} style={{ background: createLinearGradientCSS() }} />
+                                }
                             </div>
                             <div className={styles.editCoverButtonContainer}>
                                 <input

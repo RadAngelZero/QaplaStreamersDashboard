@@ -15,6 +15,7 @@
 
 .cover {
   vertical-align: middle;
+  height: 35vh;
   /* flex:1; */
   /* resize: horizontal; */
   width: 100%;

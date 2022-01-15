@@ -118,6 +118,7 @@ const PlanPicker = ({ user }) => {
 
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.backgroundContainer}>
+            <div className={styles.backgroundFilter}/>
             <Box display='flex' alignItems='center' justifyContent='center'>
                 {user &&
                     <h1 className={styles.title}>

@@ -219,7 +219,7 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                             Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y enlaces para tus diferentes canales de comunicación 🎙
                         </p>
                         <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
-                            Continuar
+                            Comenzar
                         </ContainedButton>
                     </>
                 }

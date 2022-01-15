@@ -471,12 +471,12 @@ const StreamerProfileEditor = ({ user }) => {
                                         </EditBioButton>
                                     </div>
                                 </div>
-                                <div className={styles.twitchURLContainer}>
+                                {/* <div className={styles.twitchURLContainer}>
                                     <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
                                     <Tooltip placement='top' open={openTooltip} title='Copiado'>
                                         <CopyIcon onClick={copyTwitchURL} />
                                     </Tooltip>
-                                </div>
+                                </div> */}
                                 <div className={styles.bioContainer}>
                                     {!editingBio ?
                                         <p className={styles.bioText} onClick={() => setEditingBio(true)}>

@@ -38,6 +38,16 @@ const useStyles = makeStyles(() => ({
         padding: '40px',
         paddingBottom: '0px'
     },
+    subscribeButton: {
+        height: '52px',
+        width: '260px',
+        lineHeight: '17px',
+        fontSize: '14px',
+        fontWeight: 700,
+        padding: '0px',
+        borderRadius: '10px',
+        letterSpacing: '-0.23px'
+    }
 }));
 
 const ToggleButton = ({ currentValue, value, label, onChange }) => {
@@ -258,9 +268,9 @@ const PlanPicker = ({ user }) => {
                             </CardContent>
                             <CardActions className={styles.actionArea}>
                                 <ContainedButton size='large'
-                                    className={`${styles.subscribeButton} ${plan[0] === 'growth' ? styles.growthSubscribeButton : ''}`}
+                                    className={`${classes.subscribeButton} ${plan[0] === 'growth' ? styles.growthSubscribeButton : ''}`}
                                     onClick={() => setSelectedPlanDetails(plan[1].streamsIncluded, plan[1].redemptionsPerStream, plan[1].billingPageId)}>
-                                    {t('PlanPicker.subscribeNow')}
+                                    {plan[0] === 'growth' ? t('PlanPicker.rewardYourCommunity') : t('PlanPicker.getVisibility')}
                                 </ContainedButton>
                             </CardActions>
                         </Card>

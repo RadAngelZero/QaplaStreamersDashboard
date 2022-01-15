@@ -141,15 +141,10 @@
     max-width: 260px;
 }
 
-.subscribeButton {
-    height: 52px;
-    width: 260px;
-    line-height: 17px;
-    font-size: 14px;
-    font-weight: 700;
-}
-
 .growthSubscribeButton {
     background-color: #0AFFD2 !important;
     color: #4E2D92 !important;
+}
+.growthSubscribeButton:hover {
+    background-color: #9affed !important;
 }

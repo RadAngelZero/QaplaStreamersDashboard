@@ -136,7 +136,8 @@
         "noQoinsMinimum": "Sin mínimo de retiro de Qoins",
         "qoinsStore": "Tienda de Qoins",
         "discounts": "Descuento en tienda de Qoins",
-        "subscribeNow": "Suscríbete ahora"
+        "getVisibility": "Dale visibilidad a tu contenido",
+        "rewardYourCommunity": "Recompensa a tu comunidad"
     },
     "ProcessingPaymentDialog": {
         "successfulPayment": "Pago realizado con exito",

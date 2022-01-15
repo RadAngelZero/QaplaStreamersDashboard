@@ -7,6 +7,8 @@ import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { updateStreamerPublicProfile } from '../../services/database';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import MobileProfile from './../../assets/MobileProfile.png';
+import StreamHost from './../../assets/StreamHost.png';
+import ProfileTags from './../../assets/ProfileTags.png';
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 
 const QaplaChip = withStyles(() => ({
@@ -173,9 +175,9 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
-                {(currentStep === 0 || currentStep === 1 || currentStep === 2) &&
+                {currentStep === 0 &&
                     <>
-                        <div className={styles.modalImgContainer}>
+                        <div className={styles.modalImgContainer} style={{ backgroundColor: '#AEFFEC' }}>
                             <img src={MobileProfile} alt='Mobile Profile' />
                         </div>
                         <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
@@ -189,13 +191,45 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                         </ContainedButton>
                     </>
                 }
+                {currentStep === 1 &&
+                    <>
+                        <div className={styles.modalImgContainer} style={{ backgroundColor: '#FBFE6C' }}>
+                            <img src={StreamHost} alt='Stream Host' />
+                        </div>
+                        <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
+                            Mejora la interacción en vivo
+                        </p>
+                        <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
+                            Comparte tus gustos, de que trata tu contenido, ó ¡lo que tu quieras!, para incrementar las posibilidades hacer match con la gente que se pasa a tu stream 💜
+                        </p>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
+                            Continuar
+                        </ContainedButton>
+                    </>
+                }
+                {currentStep === 2 &&
+                    <>
+                        <div className={styles.modalImgContainer} style={{ backgroundColor: '#4BFFD4' }}>
+                            <img src={ProfileTags} alt='Profile Tags' style={{ marginBottom: 18 }} />
+                        </div>
+                        <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
+                            Amplifica tu alcance
+                        </p>
+                        <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
+                            Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y enlaces para tus diferentes canales de comunicación 🎙
+                        </p>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
+                            Continuar
+                        </ContainedButton>
+                    </>
+                }
                 {currentStep === 3 &&
                     <>
                         <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            {'Preséntate con la comunidad'}
+                            Preséntate con la comunidad
                         </p>
                         <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '70%' }}>
-                            {'Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉'}
+                            Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉
                         </p>
                         <BioEditorTextArea bio={bio}
                             setBio={setBio}
@@ -211,10 +245,10 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                 {currentStep === 4 &&
                     <>
                         <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            {'Tags'}
+                            Tags
                         </p>
                         <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '60%' }}>
-                            {'Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.'}
+                            Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.
                         </p>
                         <StreamerTextInput
                             containerClassName={styles.modalTagSearchContainer}

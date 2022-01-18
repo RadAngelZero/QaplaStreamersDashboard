@@ -87,14 +87,14 @@ const DEFUALT_TAGS = [
     createDefaultTag('KPop'),
     createDefaultTag('Ajedrez'),
     createDefaultTag('Valorant')
-]
+];
 
-const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
+const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, user, onBoardingDone, streamerBio = '', streamerTags = [], closeOnBoarding = () => {} }) => {
     const [currentStep, setCurrentStep] = useState(step)
     const [tagSearch, setTagSearch] = useState('')
     const [tagSearchLimit, setTagSearchLimit] = useState(false)
-    const [tags, setTags] = useState(DEFUALT_TAGS)
-    const [bio, setBio] = useState('');
+    const [tags, setTags] = useState(streamerTags.length === 0 ? DEFUALT_TAGS : streamerTags.map((tag) => ({ label: tag, selected: true, isCustom: true })));
+    const [bio, setBio] = useState(streamerBio);
     const [bioError, setBioError] = useState(false);
     const [tagError, setTagError] = useState(false);
     const [showTagHelper, setShowTagHelper] = useState(true);
@@ -110,14 +110,22 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                 setBioError(true);
                 return;
             } else {
-                setCurrentStep(step);
+                if (showOnlySpecificStep) {
+                    closeOnBoarding();
+                } else {
+                    setCurrentStep(step);
+                }
                 return await saveBio();
             }
         } else {
             const tagsSelected = tags.filter((tag) => tag.selected);
             if (tagsSelected.length > 0) {
                 await updateStreamerPublicProfile(user.uid, { tags: tagsSelected.map((tag) => tag.label) });
-                return onBoardingDone();
+                if (showOnlySpecificStep) {
+                    return closeOnBoarding();
+                } else {
+                    return onBoardingDone();
+                }
             } else {
                 setTagError(true);
             }
@@ -237,9 +245,20 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                         {bioError &&
                             <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>La bio no puede quedar vacia</p>
                         }
-                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
-                            Continuar
-                        </ContainedButton>
+                        {showOnlySpecificStep ?
+                            <>
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonEditing}>
+                                Guardar
+                            </ContainedButton>
+                            <ContainedButton onClick={closeOnBoarding} className={styles.modalButtonFormLater}>
+                                Cancelar
+                            </ContainedButton>
+                            </>
+                        :
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
+                                Continuar
+                            </ContainedButton>
+                        }
                     </>
                 }
                 {currentStep === 4 &&
@@ -291,26 +310,35 @@ const StreamerProfileEditorOnBoarding = ({ step, user, onBoardingDone }) => {
                                 </li>
                             }
                         </ul>
-                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
-                            {currentStep !== 4 ?
-                                'Continuar'
-                                :
-                                'Ir a mi perfil'
-                            }
-                        </ContainedButton>
+                        {showOnlySpecificStep ?
+                            <>
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonEditing}>
+                                Guardar
+                            </ContainedButton>
+                            <ContainedButton onClick={closeOnBoarding} className={styles.modalButtonFormLater}>
+                                Cancelar
+                            </ContainedButton>
+                            </>
+                        :
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
+                                Ir a mi perfil
+                            </ContainedButton>
+                        }
                     </>
                 }
             </div>
-            <div style={{
-                display: 'flex',
-                marginTop: '50px'
-            }}>
-                <QaplaDots
-                    index={currentStep}
-                    dots={5}
-                    activeWidth='29px'
-                />
-            </div>
+            {!showOnlySpecificStep &&
+                <div style={{
+                    display: 'flex',
+                    marginTop: '50px'
+                }}>
+                    <QaplaDots
+                        index={currentStep}
+                        dots={5}
+                        activeWidth='29px'
+                    />
+                </div>
+            }
         </div>
     )
 }

@@ -59,9 +59,25 @@
     margin-bottom: 30px !important;
 }
 
+.modalButtonEditing {
+    composes: modalButton;
+    margin-top: auto !important;
+}
+
 .modalButtonForm {
     composes: modalButton;
     height: 49px;
+}
+.modalButtonFormLater {
+    margin-top: 14px !important;
+    composes: modalButtonForm;
+    margin-bottom: 14px !important;
+    width: 220px;
+    background-color: #0000 !important;
+    box-shadow: none !important;
+    color: #FFFFFF99 !important;
+    font-weight: 400 !important;
+    font-size: 16px !important;
 }
 
 .modalButtonFormContinue {

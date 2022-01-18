@@ -8,7 +8,7 @@ import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
+import { getStreamerLinks, listenStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
@@ -208,6 +208,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [dataIsFetched, setDataIsFetched] = useState(false);
     const [selectedTab, setSelectedTab] = useState(0);
     const [editingBio, setEditingBio] = useState(false);
+    const [addingTag, setAddingTag] = useState(false);
     const [streamerBio, setStreamerBio] = useState('');
     const [backgroundUrl, setBackgroundUrl] = useState('');
     const [backgroundGradient, setBackgroundGradient] = useState(null);
@@ -224,40 +225,41 @@ const StreamerProfileEditor = ({ user }) => {
 
     useEffect(() => {
         async function getStreamerInfo() {
-            const info = await getStreamerPublicProfile(user.uid);
-            if (info.exists()) {
-                const { bio, tags, backgroundUrl, backgroundGradient } = info.val();
-                if (!tags) {
+            listenStreamerPublicProfile(user.uid, async (info) => {
+                if (info.exists()) {
+                    const { bio, tags, backgroundUrl, backgroundGradient } = info.val();
+                    if (!tags) {
+                        setOnBoardingDone(false);
+                        setOnBoardingStep(4);
+                    }
+
+                    if (!bio) {
+                        setOnBoardingDone(false);
+                        setOnBoardingStep(3);
+                    }
+                    setStreamerBio(bio || '');
+                    setBackgroundGradient(backgroundGradient);
+                    setBackgroundUrl(backgroundUrl);
+                    setStreamerTags(tags || []);
+                } else {
                     setOnBoardingDone(false);
-                    setOnBoardingStep(4);
                 }
 
-                if (!bio) {
-                    setOnBoardingDone(false);
-                    setOnBoardingStep(3);
+                const links = await getStreamerLinks(user.uid);
+                if (links.exists()) {
+                    setSocialLinks(links.val());
+                } else {
+                    setSocialLinks(socialLinksInitialValue);
                 }
-                setStreamerBio(bio || '');
-                setBackgroundGradient(backgroundGradient);
-                setBackgroundUrl(backgroundUrl);
-                setStreamerTags(tags || []);
-            } else {
-                setOnBoardingDone(false);
-            }
 
-            const links = await getStreamerLinks(user.uid);
-            if (links.exists()) {
-                setSocialLinks(links.val());
-            } else {
-                setSocialLinks(socialLinksInitialValue);
-            }
-
-            setDataIsFetched(true);
+                setDataIsFetched(true);
+            });
         }
 
         if (user && user.uid) {
             getStreamerInfo();
         }
-    }, [user, onBoardingDone]);
+    }, [user]);
 
     const onBoardingDoneByStreamer = async () => {
         const min = 0;
@@ -318,31 +320,9 @@ const StreamerProfileEditor = ({ user }) => {
         setSocialLinksChanged(false);
     }
 
-    const saveBio = async () => {
-        try {
-            await updateStreamerPublicProfile(user.uid, { bio: streamerBio });
-            setEditingBio(false);
-        } catch (error) {
-            console.log(error);
-            alert('Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico');
-        }
-    }
-
     const addTag = async () => {
-        const value = window.prompt('Tag:');
-
-        if (value) {
-            let tags = [...streamerTags];
-            tags.push(value);
-
-            try {
-                await updateStreamerPublicProfile(user.uid, { tags });
-                setStreamerTags(tags);
-            } catch (error) {
-                console.log(error);
-                alert('Hubo un problema al agregar el tag, intentalo mas tarde o contacta con soporte tecnico');
-            }
-        }
+        setOnBoardingStep(4);
+        setAddingTag(true);
     }
 
     const updateTag = async (index, currentValue) => {
@@ -415,11 +395,21 @@ const StreamerProfileEditor = ({ user }) => {
         return '';
     }
 
+    const editBio = () => {
+        setOnBoardingStep(3);
+        setEditingBio(true);
+    }
+
+    const cancelEditing = () => {
+        setEditingBio(false);
+        setAddingTag(false);
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
                 <>
-                    {onBoardingDone ?
+                    {onBoardingDone && !editingBio && !addingTag ?
                         <>
                             <div className={styles.coverContainer}>
                                 {backgroundUrl ?
@@ -458,7 +448,7 @@ const StreamerProfileEditor = ({ user }) => {
                                     </div>
                                     <div className={styles.editBioButtonContainer}>
                                         <EditBioButton variant='contained'
-                                            onClick={() => !editingBio ? setEditingBio(true) : saveBio()}>
+                                            onClick={editBio}>
                                             {!editingBio ?
                                                 <>
                                                     <EditIcon />
@@ -478,19 +468,9 @@ const StreamerProfileEditor = ({ user }) => {
                                     </Tooltip>
                                 </div> */}
                                 <div className={styles.bioContainer}>
-                                    {!editingBio ?
-                                        <p className={styles.bioText} onClick={() => setEditingBio(true)}>
-                                            {streamerBio}
-                                        </p>
-                                        :
-                                        <StreamerTextInput multiline
-                                            fullWidth
-                                            rows={5}
-                                            rowsMax={5}
-                                            onChange={(e) => setStreamerBio(e.target.value)}
-                                            value={streamerBio}
-                                            max />
-                                    }
+                                    <p className={styles.bioText} onClick={editBio}>
+                                        {streamerBio}
+                                    </p>
                                 </div>
                                 <ul className={styles.tagsList}>
                                     {streamerTags.map((data, index) => {
@@ -560,7 +540,11 @@ const StreamerProfileEditor = ({ user }) => {
                         :
                         <StreamerProfileEditorOnBoarding step={onBoardingStep}
                             user={user}
-                            onBoardingDone={onBoardingDoneByStreamer} />
+                            onBoardingDone={onBoardingDoneByStreamer}
+                            showOnlySpecificStep={editingBio || addingTag}
+                            streamerBio={streamerBio}
+                            streamerTags={streamerTags}
+                            closeOnBoarding={cancelEditing} />
                     }
                 </>
             }

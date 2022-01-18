@@ -17,7 +17,9 @@ import { ReactComponent as OrderedListIcon } from './../../assets/textFormatting
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
 
-import MobileProfile from './../../assets/MobileProfile.png';
+import ProfilesPresentation1 from './../../assets/ProfilesPresentation1.png';
+import ProfilesPresentation2 from './../../assets/ProfilesPresentation2.png';
+import ProfilesPresentation3 from './../../assets/ProfilesPresentation3.png';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -138,6 +140,8 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
     const [emoji, setEmoji] = useState(false)
     const [unorderedList, setUnorderedList] = useState(false)
     const [orderedList, setOrderedList] = useState(false)
+
+    const { t } = useTranslation();
 
     useEffect(() => {
         // async function fetchTags() {
@@ -291,19 +295,44 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
         setTags(tagsArr)
     }
 
+    const renderBackgroundColor = (index) => {
+        switch (index) {
+            case 0:
+                return '#4BFFD4'
+            case 1:
+                return '#FBFE6C'
+            case 2:
+                return '#4BFFD4'
+            default:
+                break;
+        }
+    }
+    const renderImage = (index) => {
+        switch (index) {
+            case 0:
+                return ProfilesPresentation1
+            case 1:
+                return ProfilesPresentation2
+            case 2:
+                return ProfilesPresentation3
+            default:
+                break;
+        }
+    }
+
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
                 {isPresentation ?
                     <>
-                        <div className={styles.modalImgContainer}>
-                            <img src={MobileProfile} alt='Mobile Profile' />
+                        <div className={styles.modalImgContainer} style={{backgroundColor: renderBackgroundColor(dotsIndex)}}>
+                            <img src={renderImage(dotsIndex)} alt='Profile Presentation' />
                         </div>
                         <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
-                            Incrementa tu visibilidad
+                            {t(`StreamerProfileEditor.OnBoarding.header${dotsIndex + 1}`)}
                         </p>
                         <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
-                            Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil.
+                            {t(`StreamerProfileEditor.OnBoarding.body${dotsIndex + 1}`)}
                         </p>
                         <ContainedButton onClick={continueButtonPresentation} className={styles.modalButtonPresentation}>
                             Continuar

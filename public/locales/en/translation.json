@@ -150,6 +150,14 @@
         "saveChanges": "Save changes",
         "addTag": "Add tag",
         "showUpcomingStreams": "Show upcoming streams",
-        "social": "Social"
+        "social": "Social",
+        "OnBoarding": {
+            "header1": "Increase your visibility",
+            "header2": "Improve live interaction",
+            "header3": "Amplify your reach",
+            "body1": "Welcome to your Qapla profile 😍. Connect with more members of the community by enabling your profile",
+            "body2": "Share what you like, what your content is about, or whatever you want!, to increase the chances of matching with the people who come to your stream 💜",
+            "body3": "Drive traffic to your networks from your Qapla profile. One place for your next streams and your different communication channels 🎙"
+        }
     }
 }

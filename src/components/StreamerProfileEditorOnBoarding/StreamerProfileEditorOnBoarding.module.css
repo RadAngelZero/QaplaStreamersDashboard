@@ -21,7 +21,6 @@
 
 .modalImgContainer {
     display: flex;
-    background-color: #AEFFEC;
     width: 100%;
     height: 254px;
 }
@@ -42,7 +41,9 @@
 
 .modalTextParagraph {
     composes: modalText;
+    width: 342px;
     font-weight: 500;
+    font-size: 14px;
     text-align: center;
 }
 

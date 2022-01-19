@@ -100,7 +100,13 @@
         "streamDescription": "Stream description",
         "subtitle": "Subtitle",
         "descriptionPlaceholder": "Share what your stream is going to be about",
-        "submit": "Submit"
+        "submit": "Submit",
+        "confirmDialog": {
+            "almostDone": "We are almost done",
+            "confirmDetails": "Just confirm the details to continue",
+            "dateAndHour": "Date and hour",
+            "localTime": "Local time"
+        }
     },
     "CheersSettings": {
         "title": "Receive messages from your community",
@@ -179,5 +185,10 @@
         "addTag": "Add tag",
         "showUpcomingStreams": "Show upcoming streams",
         "social": "Social"
-    }
+    },
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "title": "title",
+    "description": "Description",
+    "game": "Game"
 }

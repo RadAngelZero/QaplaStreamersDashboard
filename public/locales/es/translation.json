@@ -95,12 +95,18 @@
         },
         "advanced": "Avanzado (Opcional)",
         "feelingCreative": "¿Te sientes creativo? Dale un nombre genial a tu stream",
-        "streamTitle": "Titulo del stream",
+        "streamTitle": "Título del stream",
         "streamTitlePlaceholder": "Manqueando en Fall Guys",
         "streamDescription": "Descripción del stream",
         "subtitle": "Subtitulo",
         "descriptionPlaceholder": "Describe lo que tienes planeado para tu stream",
-        "submit": "Enviar"
+        "submit": "Enviar",
+        "confirmDialog": {
+            "almostDone": "Ya casi terminamos",
+            "confirmDetails": "Sólo confirma los detalles para continuar",
+            "dateAndHour": "Fecha y hora",
+            "localTime": "Tiempo local"
+        }
     },
     "CheersSettings": {
         "title": "Recibe mensajes de parte de tu comunidad",
@@ -179,5 +185,10 @@
         "addTag": "Agregar tag",
         "showUpcomingStreams": "Mostar próximos streams",
         "social": "Social"
-    }
+    },
+    "continue": "Continuar",
+    "cancel": "Cancelar",
+    "title": "Título ",
+    "description": "Descripción",
+    "game": "Juego"
 }

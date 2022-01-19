@@ -2,6 +2,7 @@ import React, { useState, useReducer, useEffect } from 'react';
 import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import DayJsUtils from '@date-io/dayjs';
 import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer } from './../../services/database';
 
@@ -114,6 +115,7 @@ const NewStream = ({ user, games }) => {
 
     const classes = useStyles();
     const history = useHistory();
+    const { t } = useTranslation();
     const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
     const optionalDataReducer = (state, action) => {
@@ -200,11 +202,11 @@ const NewStream = ({ user, games }) => {
 
     const submitEvent = async () => {
         if (selectedDate < minDate) {
-            alert('All requests must be sent at least 24 hours before the stream');
+            alert(t('NewStream.alerts.before24h'));
             return;
         }
         if (!selectedGame) {
-            alert('Verify that all fields have been filled correctly');
+            alert(t('NewStream.alerts.missingData'));
             return;
         }
 
@@ -255,10 +257,10 @@ const NewStream = ({ user, games }) => {
                 history.push('/success');
             } else {
                 // Hacer un modal chido para convencerlos de mejorar su plan o comprar eventos aparte
-                alert('You have reached the limit of streams for your subscription');
+                alert(t('NewStream.alerts.streamsLimit'));
             }
         } else {
-            alert('The selected date is not valid as your plan will expire before it');
+            alert(t('NewStream.alerts.beforePlanExpiration'));
         }
     }
 
@@ -285,13 +287,13 @@ const NewStream = ({ user, games }) => {
                 </Grid>
                 <Grid item sm={8}>
                     <h1 className={styles.title}>
-                        What are you playing?
+                        {t('NewStream.whatAreYouPlaying')}
                     </h1>
                     <StreamerSelect
                         value={selectedGame}
                         onChange={handleGameChange}
                         Icon={ArrowIcon}
-                        label='Select your game'>
+                        label={t('NewStream.selectYourGame')}>
                         <option style={{
                             backgroundColor: '#141833',
                             fontSize: '14px'
@@ -308,13 +310,13 @@ const NewStream = ({ user, games }) => {
                         })}
                     </StreamerSelect>
                     <h1 className={styles.title}>
-                        When?
+                        {t('NewStream.when')}
                     </h1>
                     <MuiPickersUtilsProvider utils={DayJsUtils}>
                         <Grid container spacing={4}>
                             <Grid item sm={4}>
                                 <InputLabel className={classes.datePickerLabel}>
-                                    Date
+                                    {t('NewStream.date')}
                                 </InputLabel>
                                 <KeyboardDatePicker
                                     clearable
@@ -326,7 +328,7 @@ const NewStream = ({ user, games }) => {
                                     onChange={handleDateChange}
                                     defaultValue={new Date()}
                                     minDate={minDate}
-                                    minDateMessage='All requests must be sent at least 24 hours before the stream'
+                                    minDateMessage={t('NewStream.alerts.before24h')}
                                     format='DD-MM-YY ddd'
                                     keyboardIcon={
                                         <InputAdornment position='end' >
@@ -347,14 +349,14 @@ const NewStream = ({ user, games }) => {
                             </Grid>
                             <Grid item sm={4}>
                                 <InputLabel className={classes.datePickerLabel}>
-                                    Time
+                                    {t('NewStream.time')}
                                 </InputLabel>
                                 <KeyboardTimePicker
                                     ampm={false}
                                     disableToolbar
                                     autoOk
                                     error={selectedDate <= minDate}
-                                    helperText={selectedDate >= minDate ? '' : 'All requests must be sent at least 24 hours before the stream'}
+                                    helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.before24h')}
                                     value={selectedDate}
                                     placeholder='08:00 AM'
                                     onChange={handleDateChange}
@@ -379,9 +381,9 @@ const NewStream = ({ user, games }) => {
                             </Grid>
                             <Grid item sm={8}>
                                 <InputLabel className={classes.datePickerLabel}>
-                                    Confirm your date
+                                    {t('NewStream.confirmDate')}
                                 </InputLabel>
-                                <StreamerTextInput placeholder='Example: 15 de abril 16:00 Hora de Ciudad de México'
+                                <StreamerTextInput placeholder={t('NewStream.confirmDatePlaceholder')}
                                     fullWidth
                                     value={stringDate}
                                     onChange={handleStringDateChange} />
@@ -389,7 +391,7 @@ const NewStream = ({ user, games }) => {
                         </Grid>
                     </MuiPickersUtilsProvider>
                     <h1 className={styles.title}>
-                        Stream type
+                        {t('NewStream.streamType')}
                     </h1>
                     <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
                         <Grid container>
@@ -403,7 +405,7 @@ const NewStream = ({ user, games }) => {
                                             icon={<UncheckedIcon />}
                                             style={{ backgroundColor: 'transparent' }} />
                                     }
-                                    label='Casual (XQ)' />
+                                    label={t('NewStream.streamTypes.casual')} />
                             </Grid>
                             {/* <Grid item sm={2}>
                                 <FormControlLabel
@@ -431,23 +433,23 @@ const NewStream = ({ user, games }) => {
                                 <InputLabel
                                     className={classes.label}
                                 >
-                                    Advanced (optional)
+                                    {t('NewStream.advanced')}
                             </InputLabel>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Grid container direction={'column'} className={classes.accordionGridRoot}>
                                     <InputLabel className={classes.label}>
-                                        Feeling creative? Give your stream a cool name. Write it in Spanish! It's OK.
+                                        {t('NewStream.feelingCreative')}
                                     </InputLabel>
                                     <Grid container>
                                         <h1 className={styles.title}>
-                                            Stream title
+                                            {t('NewStream.streamTitle')}
                                         </h1>
                                         <Grid container spacing={4}>
                                             <Grid item className={classes.accordionGridItem}>
                                                 <StreamerTextInput
-                                                    label='Stream Title'
-                                                    placeholder='i.e. Manqueando en Fall Guys'
+                                                    label={t('NewStream.streamTitle')}
+                                                    placeholder={t('NewStream.streamTitlePlaceholder')}
                                                     id='eventTitle'
                                                     fullWidth={true}
                                                     value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
@@ -457,15 +459,15 @@ const NewStream = ({ user, games }) => {
                                         </Grid>
                                     </Grid>
                                     <h1 className={styles.title}>
-                                        Stream description
+                                        {t('NewStream.streamDescription')}
                                     </h1>
                                     <Grid>
                                         <Grid container spacing={4}>
                                             <Grid item className={classes.accordionGridItem}>
                                                 <StreamerTextInput
-                                                    label='Subtitle'
+                                                    label={t('NewStream.subtitle')}
                                                     id={'eventDescriptionTitle'}
-                                                    placeholder='Subtitle'
+                                                    placeholder={t('NewStream.subtitle')}
                                                     fullWidth={true}
                                                     value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
                                                     onChange={(e) => optionalDataDispatcher({ target: e.target })}
@@ -478,8 +480,8 @@ const NewStream = ({ user, games }) => {
                                             <Grid item className={classes.accordionGridItem} style={{ marginTop: '1rem' }}>
                                                 <StreamerTextInput
                                                     id={'eventDescription'}
-                                                    label='Stream Description'
-                                                    placeholder='Share what your stream is going to be about.'
+                                                    label={t('NewStream.streamDescription')}
+                                                    placeholder={t('NewStream.descriptionPlaceholder')}
                                                     multiline={true}
                                                     rows={3}
                                                     rowsMax={30}
@@ -497,7 +499,7 @@ const NewStream = ({ user, games }) => {
                     <Button
                         className={styles.button}
                         onClick={openConfirmationDialog}>
-                        Submit
+                        {t('NewStream.submit')}
                     </Button>
                 </Grid>
             </Grid>

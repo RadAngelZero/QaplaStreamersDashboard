@@ -43,7 +43,10 @@
     font-size: 14px;
     line-height: 22px;
     color: #FFF;
+    composes: modalText;
+    width: 342px;
     font-weight: 500;
+    font-size: 14px;
     text-align: center;
     max-width: 80%;
 }

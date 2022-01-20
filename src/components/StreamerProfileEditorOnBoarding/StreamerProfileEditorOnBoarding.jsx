@@ -12,6 +12,34 @@ import ProfileTags from './../../assets/ProfileTags.png';
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
 
+import { uploadImage } from '../../services/storage';
+
+import ProfilesPresentation1 from './../../assets/ProfilesPresentation1.png';
+import ProfilesPresentation2 from './../../assets/ProfilesPresentation2.png';
+import ProfilesPresentation3 from './../../assets/ProfilesPresentation3.png';
+
+
+const useStyles = makeStyles((theme) => ({
+    gridContainer: {
+        width: '100%',
+        display: 'flex',
+        boxSizing: 'border-box',
+        flexWrap: 'nowrap'
+    },
+    linkPlaceholder: {
+        '&::placeholder': {
+            color: 'rgba(108, 93, 211, 0.4)'
+        }
+    },
+    linkInput: {
+        backgroundColor: '#202750',
+        color: '#FFF',
+        '&.Mui-disabled': {
+            color: '#AAA'
+        }
+    }
+}));
+
 const QaplaChip = withStyles(() => ({
     root: {
         backgroundColor: 'rgba(64, 64, 255, 0.30859)',
@@ -99,6 +127,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
     const [bioError, setBioError] = useState(false);
     const [tagError, setTagError] = useState(false);
     const [showTagHelper, setShowTagHelper] = useState(true);
+    const { t } = useTranslation();
 
     const continueButtonForm = async () => {
         const step = currentStep + 1;
@@ -183,66 +212,58 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
         }
     }
 
+    const renderBackgroundColor = (index) => {
+        switch (index) {
+            case 0:
+                return '#4BFFD4'
+            case 1:
+                return '#FBFE6C'
+            case 2:
+                return '#4BFFD4'
+            default:
+                break;
+        }
+    }
+    const renderImage = (index) => {
+        switch (index) {
+            case 0:
+                return ProfilesPresentation1
+            case 1:
+                return ProfilesPresentation2
+            case 2:
+                return ProfilesPresentation3
+            default:
+                break;
+        }
+    }
+
     const tagsSelected = tags.filter((tag) => tag.selected);
-    console.log(tagsSelected);
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
-                {currentStep === 0 &&
+                {currentStep < 3 &&
                     <>
-                        <div className={styles.modalImgContainer} style={{ backgroundColor: '#AEFFEC' }}>
-                            <img src={MobileProfile} alt='Mobile Profile' />
+                        <div className={styles.modalImgContainer} style={{backgroundColor: renderBackgroundColor(dotsIndex)}}>
+                            <img src={renderImage(dotsIndex)} alt='Profile Presentation' />
                         </div>
                         <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
-                            Incrementa tu visibilidad
+                            {t(`StreamerProfileEditor.OnBoarding.header${dotsIndex + 1}`)}
                         </p>
                         <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
-                            Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil.
+                            {t(`StreamerProfileEditor.OnBoarding.body${dotsIndex + 1}`)}
                         </p>
-                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
-                            Continuar
-                        </ContainedButton>
-                    </>
-                }
-                {currentStep === 1 &&
-                    <>
-                        <div className={styles.modalImgContainer} style={{ backgroundColor: '#FBFE6C' }}>
-                            <img src={StreamHost} alt='Stream Host' />
-                        </div>
-                        <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
-                            Mejora la interacción en vivo
-                        </p>
-                        <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
-                            Comparte tus gustos, de que trata tu contenido, ó ¡lo que tu quieras!, para incrementar las posibilidades hacer match con la gente que se pasa a tu stream 💜
-                        </p>
-                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
-                            Continuar
-                        </ContainedButton>
-                    </>
-                }
-                {currentStep === 2 &&
-                    <>
-                        <div className={styles.modalImgContainer} style={{ backgroundColor: '#4BFFD4' }}>
-                            <img src={ProfileTags} alt='Profile Tags' style={{ marginBottom: 18 }} />
-                        </div>
-                        <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
-                            Amplifica tu alcance
-                        </p>
-                        <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
-                            Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y enlaces para tus diferentes canales de comunicación 🎙
-                        </p>
-                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
-                            Comenzar
+                        <ContainedButton onClick={continueButtonPresentation} className={styles.modalButtonPresentation}>
+                            {t('continue')}
                         </ContainedButton>
                     </>
                 }
                 {currentStep === 3 &&
                     <>
                         <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            Preséntate con la comunidad
+                            {isBioCreation ? 'Tags' : t('StreamerProfileEditor.OnBoarding.presentYourself')}
                         </p>
-                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '70%' }}>
-                            Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉
+                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: isBioCreation ? '70%' : '60%' }}>
+                            {isBioCreation ? t('StreamerProfileEditor.OnBoarding.addTags') : t('StreamerProfileEditor.OnBoarding.yourIntro')}
                         </p>
                         <BioEditorTextArea bio={bio}
                             setBio={setBio}
@@ -281,7 +302,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                             textInputClassName={styles.modalTagSearchTextInput}
                             value={tagSearch}
                             onChange={onTagSearchChange}
-                            placeholder={'Busca o crea un tag'}
+                            placeholder={t('StreamerProfileEditor.addTagPlaceholder')}
                             fullWidth />
                         {tagError &&
                             <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>
@@ -340,7 +361,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                                 </p>
                             </p>
                             <ContainedButton onClick={continueButtonForm} className={styles.modalButtonContinue}>
-                                Ir a mi perfil
+                                {t('goToProfile')}
                             </ContainedButton>
                             </>
                         }

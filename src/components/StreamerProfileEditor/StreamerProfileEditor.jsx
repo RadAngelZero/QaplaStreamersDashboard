@@ -290,7 +290,7 @@ const StreamerProfileEditor = ({ user }) => {
             setStreamerTags(tags);
         } catch (error) {
             console.log(error);
-            alert('Hubo un problema al eliminar el tag, intentalo mas tarde o contacta con soporte tecnico');
+            alert(t('StreamerProfileEditor.errors.deleteTag'));
         }
     }
 
@@ -316,7 +316,7 @@ const StreamerProfileEditor = ({ user }) => {
             await saveStreamerLinks(user.uid, objectToSave);
         } catch (error) {
             console.log(error);
-            alert('Hubo un problema al actualizar los links, intentalo mas tarde o contacta con soporte tecnico');
+            alert(t('StreamerProfileEditor.errors.updateLinks'));
         }
         setSocialLinksChanged(false);
     }
@@ -337,9 +337,9 @@ const StreamerProfileEditor = ({ user }) => {
                 async (url) => {
                     try {
                         await updateStreamerPublicProfile(user.uid, { backgroundUrl: url });
-                        alert('Imagen guardada correctamente');
+                        alert(t('StreamerProfileEditor.confirmations.saveImage'));
                     } catch (error) {
-                        alert('Hubo un error al guardar la imagen');
+                        alert(t('StreamerProfileEditor.errors.saveImage'));
                         console.log(error);
                     }
                 }

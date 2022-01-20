@@ -74,6 +74,40 @@
         "resume": "Resume",
         "cancelStreamRequest": "Cancel"
     },
+    "NewStream": {
+        "alerts": {
+            "before24h": "All requests must be sent at least 24 hours before the stream",
+            "missingData": "Verify that all fields have been filled correctly",
+            "streamsLimit": "You have reached the limit of streams for your subscription",
+            "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
+        },
+        "whatAreYouPlaying": "What are you playing?",
+        "selectYourGame": "Select your game",
+        "when": "When?",
+        "date": "Date",
+        "time": "Time",
+        "confirmDate": "Confirm your date",
+        "confirmDatePlaceholder": "April 15 16:00 Mexico City Time",
+        "streamType": "Stream type",
+        "streamTypes": {
+            "casual": "Casual (XQ)",
+            "tournamen": "Tournament"
+        },
+        "advanced": "Advenced (Optional)",
+        "feelingCreative": "Feeling creative? Give your stream a cool name",
+        "streamTitle": "Stream title",
+        "streamTitlePlaceholder": "Trolling on Apex Arena",
+        "streamDescription": "Stream description",
+        "subtitle": "Subtitle",
+        "descriptionPlaceholder": "Share what your stream is going to be about",
+        "submit": "Submit",
+        "confirmDialog": {
+            "almostDone": "We are almost done",
+            "confirmDetails": "Just confirm the details to continue",
+            "dateAndHour": "Date and hour",
+            "localTime": "Local time"
+        }
+    },
     "CheersSettings": {
         "title": "Receive messages from your community",
         "description": "Show the messages of the cheers that your community sends you in your streams by adding this link into your OBS.",

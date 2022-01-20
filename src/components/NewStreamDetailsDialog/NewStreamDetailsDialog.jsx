@@ -1,5 +1,6 @@
 import React from 'react';
 import { withStyles, makeStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 import ContainedButton from '../ContainedButton/ContainedButton';
 
 const CustomDialog = withStyles((theme) => ({
@@ -27,32 +28,33 @@ const useStyles = makeStyles({
 
 const NewStreamDetailsDialog = ({ open, onClose, userName, submitEvent, date, game, title, descriptions, descriptionsTitle }) => {
     const classes = useStyles();
+    const { t } = useTranslation();
 
     return (
         <CustomDialog open={open} onClose={onClose} className={classes.container} fullWidth>
             <DialogTitle>
-                We are almost done {userName}!
+                {t('NewStream.confirmDialog.almostDone')} {userName}!
             </DialogTitle>
             <DialogContent>
                 <DialogContentText className={classes.text}>
-                    Just confirm the details to continue
+                    {t('NewStream.confirmDialog.confirmDetails')}
                 </DialogContentText>
                 <DialogContentText className={classes.text}>
-                    Date and hour: {date} (local time)
+                    {t('NewStream.confirmDialog.dateAndHour')}: {date} ({t('NewStream.confirmDialog.localTime')})
                 </DialogContentText>
                 <DialogContentText className={classes.text}>
-                    Game: {game}
+                    {t('game')}: {game}
                 </DialogContentText>
                 {title instanceof Object &&
                     Object.keys(title).map((language) => (
                         <DialogContentText className={classes.text}>
-                            Title: {title[language]}
+                            {t('title')}: {title[language]}
                         </DialogContentText>
                     ))
                 }
                 {descriptions instanceof Object &&
                     <DialogContentText className={classes.text}>
-                        Description:
+                        {t('description')}:
                         {descriptionsTitle instanceof Object &&
                             Object.keys(descriptionsTitle).map((language) => (
                                 <DialogContentText className={classes.text}>
@@ -70,10 +72,10 @@ const NewStreamDetailsDialog = ({ open, onClose, userName, submitEvent, date, ga
             </DialogContent>
             <DialogActions>
                 <ContainedButton variant='outlined' onClick={onClose} color="primary">
-                    Cancel
+                    {t('cancel')}
                 </ContainedButton>
                 <ContainedButton variant='outlined' onClick={submitEvent} color="primary" autoFocus>
-                    Continue
+                    {t('continue')}
                 </ContainedButton>
             </DialogActions>
         </CustomDialog>

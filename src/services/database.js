@@ -75,7 +75,9 @@ export async function streamerProfileExists(uid) {
  * @param {string} inviteCode Invitation code used
  */
 export async function createStreamerProfile(uid, userData, inviteCode) {
-    InvitationCodeRef.child(inviteCode).remove();
+    if (inviteCode) {
+        InvitationCodeRef.child(inviteCode).remove();
+    }
     return await userStreamersRef.child(uid).update(userData);
 }
 

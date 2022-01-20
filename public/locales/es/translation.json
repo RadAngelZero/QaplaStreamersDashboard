@@ -139,12 +139,6 @@
         "getVisibility": "Dale visibilidad a tu contenido",
         "rewardYourCommunity": "Recompensa a tu comunidad"
     },
-    "ProcessingPaymentDialog": {
-        "successfulPayment": "Pago realizado con exito",
-        "activatingAccount": "Por favor espera un momento mientras activamos tu cuenta",
-        "membershipReady": "Listo, tu membresia esta activa, presiona el boton para terminar",
-        "finish": "Terminar"
-    },
     "StreamerProfileEditor": {
         "editCover": "Editar cover",
         "editBio": "Editar bio",

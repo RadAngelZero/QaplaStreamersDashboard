@@ -133,17 +133,11 @@
         "redemptions": "{{numberOfRedemptions}} redemptions of Qoins and XQ per stream",
         "cheers": "Receives cheers of Qoins.",
         "extraPublications": "Extra publications include",
-        "noQoinsMinimum": "No minimum withdrawal of Qoins",
+        "noQoinsMinimum": "No minimum Qoins withdrawal",
         "qoinsStore": "Qoins store",
-        "discounts": "Discount on the Qoins store",
+        "discounts": "Qoins store discounts",
         "getVisibility": "Get visibility for your content",
         "rewardYourCommunity": "Reward your community"
-    },
-    "ProcessingPaymentDialog": {
-        "successfulPayment": "Successful payment",
-        "activatingAccount": "Please wait a moment while we activate your account",
-        "membershipReady": "Done, your membership is active, press the button to finish",
-        "finish": "Finish"
     },
     "StreamerProfileEditor": {
         "editCover": "Edit cover",

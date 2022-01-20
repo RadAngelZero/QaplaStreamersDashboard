@@ -74,6 +74,40 @@
         "resume": "Reanudar",
         "cancelStreamRequest": "Cancelar"
     },
+    "NewStream": {
+        "alerts": {
+            "before24h": "Las solicitudes deben ser enviadas al menos 24 horas antes del stream",
+            "missingData": "Verifica que toda la información haya sido llenada correcta mente",
+            "streamsLimit": "Ha alcanzado el límite de streams para su suscripción",
+            "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
+        },
+        "whatAreYouPlaying": "¿Qué vas a jugar?",
+        "selectYourGame": "Selecciona tu juego",
+        "when": "¿Cuando?",
+        "date": "Fecha",
+        "time": "Hora",
+        "confirmDate": "Confirma la fecha y la hora",
+        "confirmDatePlaceholder": "15 de abril 16:00 Hora de Ciudad de Mexico",
+        "streamType": "Tipo de Stream",
+        "streamTypes": {
+            "casual": "Casual (XQ)",
+            "tournamen": "Torneo"
+        },
+        "advanced": "Avanzado (Opcional)",
+        "feelingCreative": "¿Te sientes creativo? Dale un nombre genial a tu stream",
+        "streamTitle": "Título del stream",
+        "streamTitlePlaceholder": "Manqueando en Fall Guys",
+        "streamDescription": "Descripción del stream",
+        "subtitle": "Subtitulo",
+        "descriptionPlaceholder": "Describe lo que tienes planeado para tu stream",
+        "submit": "Enviar",
+        "confirmDialog": {
+            "almostDone": "Ya casi terminamos",
+            "confirmDetails": "Sólo confirma los detalles para continuar",
+            "dateAndHour": "Fecha y hora",
+            "localTime": "Tiempo local"
+        }
+    },
     "CheersSettings": {
         "title": "Recibe mensajes de parte de tu comunidad",
         "description": "Muestra los mensajes de los cheers que tu comunidad te envia en tus streams agregando este link en tu OBS.",
@@ -159,5 +193,10 @@
         "paymentProcessedSuccessfuly": "¡Tu pago se ha procesado de manera exitosa! Recibirás un comprobante con de tu pago en tu correo a nombre de QAPLAGG 🧾",
         "publishStream": "Publica un stream",
         "backToDashboard": "Volver al dashboard"
-    }
+    },
+    "continue": "Continuar",
+    "cancel": "Cancelar",
+    "title": "Título ",
+    "description": "Descripción",
+    "game": "Juego"
 }

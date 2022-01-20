@@ -24,9 +24,8 @@ import Settings from './components/Settings/Settings';
 import PlanPicker from './components/PlanPicker/PlanPicker';
 // import Lottery from './components/Lottery/Lottery';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
-import StreamsPackagesCheckout from './components/StreamsPackagesCheckout/StreamsPackagesCheckout';
-import CustomerPortal from './components/CustomerPortal/CustomerPortal';
 import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
+import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeConfirmationPage';
 
 window.onbeforeunload = function() {
     return true;
@@ -110,17 +109,14 @@ const Router = () => {
                 <Route exact path='/membership'>
                     <PlanPicker user={user} />
                 </Route>
-                <Route exact path='/subscriptions'>
-                    <CustomerPortal user={user} />
-                </Route>
                 <Route exact path='/buyStreams'>
                     <StreamsPackages user={user} games={games} />
                 </Route>
-                <Route exact path='/streamsCheckout/:billingPageId'>
-                    <StreamsPackagesCheckout user={user} games={games} />
-                </Route>
                 <Route exact path='/editProfile'>
                     <StreamerProfileEditor user={user}/>
+                </Route>
+                <Route exact path='/successCheckout'>
+                    <ChargeConfirmationPage user={user}/>
                 </Route>
                 {/* <Route exact path='/lottery'>
                     <Lottery user={user} />

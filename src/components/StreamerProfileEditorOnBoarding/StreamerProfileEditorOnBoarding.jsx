@@ -10,6 +10,7 @@ import MobileProfile from './../../assets/MobileProfile.png';
 import StreamHost from './../../assets/StreamHost.png';
 import ProfileTags from './../../assets/ProfileTags.png';
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
+import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
 
 const QaplaChip = withStyles(() => ({
     root: {
@@ -110,16 +111,18 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                 setBioError(true);
                 return;
             } else {
-                if (showOnlySpecificStep) {
-                    closeOnBoarding();
-                } else {
-                    setCurrentStep(step);
+                if (bio.length >= MIN_BIO_LENGTH) {
+                    if (showOnlySpecificStep) {
+                        closeOnBoarding();
+                    } else {
+                        setCurrentStep(step);
+                    }
+                    return await saveBio();
                 }
-                return await saveBio();
             }
         } else {
             const tagsSelected = tags.filter((tag) => tag.selected);
-            if (tagsSelected.length > 0) {
+            if (tagsSelected.length >= MIN_TAGS) {
                 await updateStreamerPublicProfile(user.uid, { tags: tagsSelected.map((tag) => tag.label) });
                 if (showOnlySpecificStep) {
                     return closeOnBoarding();
@@ -180,6 +183,8 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
         }
     }
 
+    const tagsSelected = tags.filter((tag) => tag.selected);
+    console.log(tagsSelected);
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
@@ -241,7 +246,8 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                         </p>
                         <BioEditorTextArea bio={bio}
                             setBio={setBio}
-                            error={bioError} />
+                            error={bioError}
+                            minLength={MIN_BIO_LENGTH} />
                         {bioError &&
                             <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>La bio no puede quedar vacia</p>
                         }
@@ -255,7 +261,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                             </ContainedButton>
                             </>
                         :
-                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonContinue}>
                                 Continuar
                             </ContainedButton>
                         }
@@ -280,9 +286,9 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                         {tagError &&
                             <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>
                                 {showTagHelper ?
-                                    'Para agregar un tag escribelo y da click en el'
+                                    'Para agregar un tag escribelo y/o da click en el'
                                     :
-                                    'Agrega al menos un tag para continuar'
+                                    `Agrega al menos ${MIN_TAGS} tags para continuar`
                                 }
                             </p>
                         }
@@ -312,6 +318,12 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                         </ul>
                         {showOnlySpecificStep ?
                             <>
+                            <p className={styles.minLengthIndicator}>
+                                Min. Tags
+                                <p style={{ marginLeft: 2, color: tagsSelected.length >= MIN_TAGS ? '#51a05e' : '#FF0000' }}>
+                                    {tagsSelected.length}/{MIN_TAGS}
+                                </p>
+                            </p>
                             <ContainedButton onClick={continueButtonForm} className={styles.modalButtonEditing}>
                                 Guardar
                             </ContainedButton>
@@ -320,9 +332,17 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                             </ContainedButton>
                             </>
                         :
-                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
+                            <>
+                            <p className={styles.minLengthIndicator}>
+                                Min. Tags
+                                <p style={{ marginLeft: 2, color: tagsSelected.length >= MIN_TAGS ? '#51a05e' : '#FF0000' }}>
+                                    {tagsSelected.length}/{MIN_TAGS}
+                                </p>
+                            </p>
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonContinue}>
                                 Ir a mi perfil
                             </ContainedButton>
+                            </>
                         }
                     </>
                 }

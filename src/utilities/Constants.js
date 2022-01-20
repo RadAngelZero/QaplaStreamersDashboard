@@ -118,6 +118,12 @@ export const PROFILE_BACKGROUND_GRADIENTS = [
 ];
 
 /**
+ * Min length for streamer public profile elements
+ */
+export const MIN_BIO_LENGTH = 100;
+export const MIN_TAGS = 3;
+
+/**
  * Streamers Profiles constants
  */
 export const MAX_ROWS_IN_BIO = 5;

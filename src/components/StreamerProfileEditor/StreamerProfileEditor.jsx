@@ -14,7 +14,7 @@ import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
-import { PROFILE_BACKGROUND_GRADIENTS } from '../../utilities/Constants';
+import { MIN_TAGS, PROFILE_BACKGROUND_GRADIENTS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -228,7 +228,7 @@ const StreamerProfileEditor = ({ user }) => {
             listenStreamerPublicProfile(user.uid, async (info) => {
                 if (info.exists()) {
                     const { bio, tags, backgroundUrl, backgroundGradient } = info.val();
-                    if (!tags) {
+                    if (!tags || tags.length < MIN_TAGS) {
                         setOnBoardingDone(false);
                         setOnBoardingStep(4);
                     }
@@ -274,6 +274,7 @@ const StreamerProfileEditor = ({ user }) => {
             displayName: user.displayName,
             photoUrl: user.photoUrl
         });
+
         setOnBoardingDone(true);
     }
 
@@ -323,23 +324,6 @@ const StreamerProfileEditor = ({ user }) => {
     const addTag = async () => {
         setOnBoardingStep(4);
         setAddingTag(true);
-    }
-
-    const updateTag = async (index, currentValue) => {
-        const value = window.prompt('Tag:', currentValue);
-
-        if (value) {
-            let tags = [...streamerTags];
-            tags[index] = value;
-
-            try {
-                await updateStreamerPublicProfile(user.uid, { tags });
-                setStreamerTags(tags);
-            } catch (error) {
-                console.log(error);
-                alert('Hubo un problema al actualizar el tag, intentalo mas tarde o contacta con soporte tecnico');
-            }
-        }
     }
 
     const uploadBackgroundImage = (e) => {
@@ -479,7 +463,6 @@ const StreamerProfileEditor = ({ user }) => {
                                                 <QaplaChip
                                                     label={data}
                                                     onDelete={() => handleTagDelete(index)}
-                                                    onClick={() => updateTag(index, data)}
                                                 />
                                             </li>
                                         )

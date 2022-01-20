@@ -67,6 +67,17 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#57758C',
             boxShadow: 'none'
         }
+    },
+    minLengthIndicator: {
+        marginTop: 8,
+        marginBottom: 'auto',
+        fontSize: 10,
+        fontWeight: '400',
+        width: '90%',
+        color: '#FFF',
+        opacity: .6,
+        display: 'flex',
+        justifyContent: 'flex-end'
     }
 }));
 
@@ -88,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))(Button); */
 
-const BioEditorTextArea = ({ bio, setBio, error }) => {
+const BioEditorTextArea = ({ bio, setBio, error, minLength }) => {
     let textAreaRef = useRef(null);
     /* const [bold, setBold] = useState(false);
     const [italic, setItalic] = useState(false);
@@ -132,14 +143,17 @@ const BioEditorTextArea = ({ bio, setBio, error }) => {
         const updatedBio = e.target.value;
         const numberOfLines = textAreaRef.current.scrollHeight / TEXT_INPUT_LINE_HEIGHT;
 
-        if (updatedBio.split('\n').length <= MAX_ROWS_IN_BIO && numberOfLines === MAX_ROWS_IN_BIO) {
-            setBio(updatedBio);
-        } else if (updatedBio.length < bio.length) {
-            setBio(updatedBio);
+        if (updatedBio[0] !== '\n') {
+            if (updatedBio.split('\n').length <= MAX_ROWS_IN_BIO && numberOfLines === MAX_ROWS_IN_BIO) {
+                setBio(updatedBio);
+            } else if (updatedBio.length < bio.length) {
+                setBio(updatedBio);
+            }
         }
     }
 
     return (
+        <>
         <div className={classes.container} style={error ? { border: '1px solid #FF0000', borderRadius: '15px 15px 15px 15px' } : {}}>
             {/* Currently we don´t have support for text edition */}
             {/* <div className={classes.buttonsContainer}>
@@ -189,6 +203,13 @@ const BioEditorTextArea = ({ bio, setBio, error }) => {
                 placeholder='Pon aqui tu bio (se vale usar emojis ❤️😉)'
                 inputRef={textAreaRef} />
         </div>
+        <p className={classes.minLengthIndicator}>
+            Min. Caracteres
+            <p style={{ marginLeft: 2, color: bio.length >= minLength ? '#51a05e' : '#FF0000' }}>
+                {bio.length}/{minLength}
+            </p>
+        </p>
+        </>
     );
 }
 

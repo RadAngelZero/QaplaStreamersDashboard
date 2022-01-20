@@ -121,7 +121,7 @@ const StreamerSideBar = ({ user }) => {
                 {user && user.stripeCustomerId ?
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post'>
                         <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
-                        <ListItem button type='submit' component='button'>
+                        <ListItem button type='submit' component='button' className={classes.listItem}>
                             <ListItemIcon style={{ minWidth: 40 }}>
                                 <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
                             </ListItemIcon>
@@ -131,7 +131,7 @@ const StreamerSideBar = ({ user }) => {
                         </ListItem>
                     </form>
                     :
-                    <ListItem button onClick={() => history.push('/membership')}>
+                    <ListItem button onClick={() => history.push('/membership')} className={classes.listItem}>
                         <ListItemIcon style={{ minWidth: 40 }}>
                             <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
                         </ListItemIcon>
@@ -140,7 +140,7 @@ const StreamerSideBar = ({ user }) => {
                         </ListItemText>
                     </ListItem>
                 }
-                <ListItem button onClick={goToSettings}>
+                <ListItem button onClick={goToSettings} className={classes.listItem}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>

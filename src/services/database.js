@@ -24,6 +24,7 @@ const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
 const streamsPackagesRef = database.ref('/StreamsPackages');
 const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDetails');
 const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
+const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -803,4 +804,17 @@ export async function getStreamerPublicProfile(uid) {
 
 export async function updateStreamerPublicProfile(uid, dataToUpdate) {
     return await streamersPublicProfilesRef.child(uid).update(dataToUpdate);
+}
+
+/**
+ * Subscription Purchase Details
+ */
+
+/**
+ * Get the details of the given subscription of the specified user
+ * @param {string} uid User identifier
+ * @param {string} subscriptionId Subscription stripe identifier
+ */
+export async function getSubscriptionPurchaseDetails(uid, subscriptionId) {
+    return await subscriptionPurchaseDetailsRef.child(uid).child(subscriptionId).once('value');
 }

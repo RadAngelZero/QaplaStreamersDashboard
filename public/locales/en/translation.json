@@ -152,5 +152,23 @@
         "addTag": "Add tag",
         "showUpcomingStreams": "Show upcoming streams",
         "social": "Social"
+    },
+    "ChargeConfirmationPage": {
+        "plansPeriods": {
+            "monthly": "monthly",
+            "quarterly": "quarterly",
+            "yearly": "yearly"
+        },
+        "intervals": {
+            "monthly": "/ every month",
+            "quarterly": "/ every 3\nmonths",
+            "yearly": "/ every year"
+        },
+        "payment": "Payment",
+        "fullPaymentUntilToday": "Full payment until today",
+        "thanksForSubscribing": "Thanks for your subscription",
+        "paymentProcessedSuccessfuly": "Your payment has been processed successfully! You will receive a proof of your payment in your email in the name of QAPLAGG",
+        "publishStream": "Publish a stream",
+        "backToDashboard": "Back to dashboard"
     }
 }

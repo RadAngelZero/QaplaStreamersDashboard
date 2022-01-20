@@ -200,11 +200,8 @@ const StreamerProfile = ({ user, games }) => {
             {user &&
                 <>
                     <Box display="flex" flexDirection="row" >
-                        <Hidden smUp>
-                            <div style={{ width: '10%' }}></div>
-                        </Hidden>
-                        <Hidden mdUp xsDown>
-                            <div style={{ width: '5%' }}></div>
+                        <Hidden lgUp>
+                            <div style={{ width: '45px' }}></div>
                         </Hidden>
                         <div className={styles.avatarContainer}>
                             <Avatar

@@ -170,13 +170,8 @@
         "noQoinsMinimum": "Sin mínimo de retiro de Qoins",
         "qoinsStore": "Tienda de Qoins",
         "discounts": "Descuento en tienda de Qoins",
-        "subscribeNow": "Suscríbete ahora"
-    },
-    "ProcessingPaymentDialog": {
-        "successfulPayment": "Pago realizado con exito",
-        "activatingAccount": "Por favor espera un momento mientras activamos tu cuenta",
-        "membershipReady": "Listo, tu membresia esta activa, presiona el boton para terminar",
-        "finish": "Terminar"
+        "getVisibility": "Dale visibilidad a tu contenido",
+        "rewardYourCommunity": "Recompensa a tu comunidad"
     },
     "StreamerProfileEditor": {
         "editCover": "Editar cover",
@@ -185,6 +180,19 @@
         "addTag": "Agregar tag",
         "showUpcomingStreams": "Mostar próximos streams",
         "social": "Social"
+    },
+    "ChargeConfirmationPage": {
+        "plansPeriods": {
+            "monthly": "Mensual",
+            "quarterly": "Trimestral",
+            "yearly": "Anual"
+        },
+        "payment": "Pago",
+        "fullPaymentUntilToday": "Pago total al día de hoy",
+        "thanksForSubscribing": "Gracias por tu suscripción",
+        "paymentProcessedSuccessfuly": "¡Tu pago se ha procesado de manera exitosa! Recibirás un comprobante con de tu pago en tu correo a nombre de QAPLAGG 🧾",
+        "publishStream": "Publica un stream",
+        "backToDashboard": "Volver al dashboard"
     },
     "continue": "Continuar",
     "cancel": "Cancelar",

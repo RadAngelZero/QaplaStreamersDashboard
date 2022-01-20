@@ -167,16 +167,11 @@
         "redemptions": "{{numberOfRedemptions}} redemptions of Qoins and XQ per stream",
         "cheers": "Receives cheers of Qoins.",
         "extraPublications": "Extra publications include",
-        "noQoinsMinimum": "No minimum withdrawal of Qoins",
+        "noQoinsMinimum": "No minimum Qoins withdrawal",
         "qoinsStore": "Qoins store",
-        "discounts": "Discount on the Qoins store",
-        "subscribeNow": "Subscribe now"
-    },
-    "ProcessingPaymentDialog": {
-        "successfulPayment": "Successful payment",
-        "activatingAccount": "Please wait a moment while we activate your account",
-        "membershipReady": "Done, your membership is active, press the button to finish",
-        "finish": "Finish"
+        "discounts": "Qoins store discounts",
+        "getVisibility": "Get visibility for your content",
+        "rewardYourCommunity": "Reward your community"
     },
     "StreamerProfileEditor": {
         "editCover": "Edit cover",
@@ -185,6 +180,24 @@
         "addTag": "Add tag",
         "showUpcomingStreams": "Show upcoming streams",
         "social": "Social"
+    },
+    "ChargeConfirmationPage": {
+        "plansPeriods": {
+            "monthly": "monthly",
+            "quarterly": "quarterly",
+            "yearly": "yearly"
+        },
+        "intervals": {
+            "monthly": "/ every month",
+            "quarterly": "/ every 3\nmonths",
+            "yearly": "/ every year"
+        },
+        "payment": "Payment",
+        "fullPaymentUntilToday": "Full payment until today",
+        "thanksForSubscribing": "Thanks for your subscription",
+        "paymentProcessedSuccessfuly": "Your payment has been processed successfully! You will receive a proof of your payment in your email in the name of QAPLAGG",
+        "publishStream": "Publish a stream",
+        "backToDashboard": "Back to dashboard"
     },
     "continue": "Continue",
     "cancel": "Cancel",

@@ -92,6 +92,7 @@ const StreamerSideBar = ({ user }) => {
 
     const currentScreen = history.location.pathname.split('/')[1];
 
+
     const drawer = (
         <Box display='flex' style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap', marginLeft: '21px' }} >
             <div style={{
@@ -117,15 +118,29 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.universalProfile')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => (user.premium && !user.freeTrial) ? history.push('/subscriptions') : history.push('/membership')} className={classes.listItem}>
-                    <ListItemIcon style={{ minWidth: 40 }}>
-                        <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
-                    </ListItemIcon>
-                    <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
-                        {t('SideBar.membership')}
-                    </ListItemText>
-                </ListItem>
-                <ListItem button onClick={goToSettings} className={classes.listItem}>
+                {user && user.stripeCustomerId ?
+                    <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post'>
+                        <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
+                        <ListItem button type='submit' component='button'>
+                            <ListItemIcon style={{ minWidth: 40 }}>
+                                <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
+                            </ListItemIcon>
+                            <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                                {t('SideBar.membership')}
+                            </ListItemText>
+                        </ListItem>
+                    </form>
+                    :
+                    <ListItem button onClick={() => history.push('/membership')}>
+                        <ListItemIcon style={{ minWidth: 40 }}>
+                            <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
+                        </ListItemIcon>
+                        <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                            {t('SideBar.membership')}
+                        </ListItemText>
+                    </ListItem>
+                }
+                <ListItem button onClick={goToSettings}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>

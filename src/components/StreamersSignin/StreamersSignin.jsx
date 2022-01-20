@@ -47,26 +47,32 @@ const StreamersSignin = ({ title }) => {
         localStorage.setItem('twitchPermission', 'channel:read:redemptions');
         localStorage.setItem('termsAndConditions', 'true');
         if (!(await streamerProfileExists(user.firebaseAuthUser.user.uid))) {
-            const invitationCodeSnap = await getInvitationCodeParams(inviteCode);
-            if (inviteCode && invitationCodeSnap.exists()) {
-                await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
-                if (invitationCodeSnap.val().freeTrial && invitationCodeSnap.val().subscriptionDetails) {
-                    const startDate = dayjs.utc().toDate().getTime();
-                    const endDate = dayjs.utc().add(1, 'month').endOf('day').toDate().getTime();
-                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, {
-                        freeTrial: true,
-                        premium: true,
-                        currentPeriod: { startDate, endDate },
-                        subscriptionDetails: invitationCodeSnap.val().subscriptionDetails
-                    });
+            if (inviteCode) {
+                const invitationCodeSnap = await getInvitationCodeParams(inviteCode);
+                if (invitationCodeSnap.exists()) {
+                    await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
+                    if (invitationCodeSnap.val().freeTrial && invitationCodeSnap.val().subscriptionDetails) {
+                        const startDate = dayjs.utc().toDate().getTime();
+                        const endDate = dayjs.utc().add(1, 'month').endOf('day').toDate().getTime();
+                        await updateStreamerProfile(user.firebaseAuthUser.user.uid, {
+                            freeTrial: true,
+                            premium: true,
+                            currentPeriod: { startDate, endDate },
+                            subscriptionDetails: invitationCodeSnap.val().subscriptionDetails
+                        });
+                    }
+                    await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
+                    await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
+                    history.push('/profile');
+                } else {
+                    const user = auth.currentUser;
+                    await user.delete();
+                    alert('Requieres un codigo de invitación valido para acceder');
                 }
-                await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
-                await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
-                history.push('/profile');
-            } else {
+            }  else {
                 const user = auth.currentUser;
                 await user.delete();
-                alert('Requieres un codigo de invitación para acceder');
+                alert('Requieres un codigo de invitación valido para acceder');
             }
         } else {
             await updateStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);

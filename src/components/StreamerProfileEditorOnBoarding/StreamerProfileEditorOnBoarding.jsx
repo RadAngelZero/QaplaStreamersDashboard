@@ -1,69 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
+import React, { useState } from 'react';
+import { withStyles, Chip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditorOnBoarding.module.css';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
-
-import { ReactComponent as BoldIcon } from './../../assets/textFormatting/bold.svg';
-import { ReactComponent as ItalicIcon } from './../../assets/textFormatting/italic.svg';
-import { ReactComponent as UnderlineIcon } from './../../assets/textFormatting/underline.svg';
-import { ReactComponent as StrikeThroughIcon } from './../../assets/textFormatting/strikeThrough.svg';
-import { ReactComponent as EmojiIcon } from './../../assets/textFormatting/smile.svg';
-import { ReactComponent as UnorderedListIcon } from './../../assets/textFormatting/unorderedList.svg';
-import { ReactComponent as OrderedListIcon } from './../../assets/textFormatting/orderedList.svg';
-
+import { updateStreamerPublicProfile } from '../../services/database';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { uploadImage } from '../../services/storage';
-
+import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
+import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
 import ProfilesPresentation1 from './../../assets/ProfilesPresentation1.png';
 import ProfilesPresentation2 from './../../assets/ProfilesPresentation2.png';
 import ProfilesPresentation3 from './../../assets/ProfilesPresentation3.png';
 
-
-const useStyles = makeStyles((theme) => ({
-    gridContainer: {
-        width: '100%',
-        display: 'flex',
-        boxSizing: 'border-box',
-        flexWrap: 'nowrap'
-    },
-    linkPlaceholder: {
-        '&::placeholder': {
-            color: 'rgba(108, 93, 211, 0.4)'
-        }
-    },
-    linkInput: {
-        backgroundColor: '#202750',
-        color: '#FFF',
-        '&.Mui-disabled': {
-            color: '#AAA'
-        }
-    }
-}));
-
-const FormattingButton = withStyles(() => ({
-    root: {
-        display: 'flex',
-        flex: 1,
-        backgroundColor: '#232A54',
-        color: '#FFFFFF99',
-        minWidth: 'auto',
-        '&:hover': {
-            backgroundColor: '#24456680'
-        },
-        '&:disabled': {
-            backgroundColor: '#272D5780',
-            color: '#FFFFFF99',
-        },
-    },
-
-}))(Button);
-
 const QaplaChip = withStyles(() => ({
     root: {
-        backgroundColor: '#272D5780',
+        backgroundColor: 'rgba(64, 64, 255, 0.30859)',
         color: '#FFFFFFA6',
         fontWeight: '600',
         fontSize: '14px',
@@ -125,153 +76,81 @@ const QaplaDots = ({ index, dots, activeWidth = '30px' }) => {
     )
 }
 
-const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
-    const [dotsIndex, setDotsIndex] = useState(0)
-    const [isPresentation, setIsPresentation] = useState(true)
-    const [isBioCreation, setIsBioCreation] = useState(true)
+const createDefaultTag = (label) => ({ label, selected: false, isCustom: false });
+
+const DEFUALT_TAGS = [
+    createDefaultTag('Just Chatting'),
+    createDefaultTag('Musica'),
+    createDefaultTag('IRL'),
+    createDefaultTag('Brawl Stars'),
+    createDefaultTag('Minecraft'),
+    createDefaultTag('CoD'),
+    createDefaultTag('KPop'),
+    createDefaultTag('Ajedrez'),
+    createDefaultTag('Valorant')
+];
+
+const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, user, onBoardingDone, streamerBio = '', streamerTags = [], closeOnBoarding = () => {} }) => {
+    const [currentStep, setCurrentStep] = useState(step)
     const [tagSearch, setTagSearch] = useState('')
     const [tagSearchLimit, setTagSearchLimit] = useState(false)
-    const [tags, setTags] = useState([])
-    const [bio, setBio] = useState('')
-    const [bold, setBold] = useState(false)
-    const [italic, setItalic] = useState(false)
-    const [underline, setUnderline] = useState(false)
-    const [strikeThrough, setStrikeThrough] = useState(false)
-    const [emoji, setEmoji] = useState(false)
-    const [unorderedList, setUnorderedList] = useState(false)
-    const [orderedList, setOrderedList] = useState(false)
-
+    const [tags, setTags] = useState(streamerTags.length === 0 ? DEFUALT_TAGS : streamerTags.map((tag) => ({ label: tag, selected: true, isCustom: true })));
+    const [bio, setBio] = useState(streamerBio);
+    const [bioError, setBioError] = useState(false);
+    const [tagError, setTagError] = useState(false);
+    const [showTagHelper, setShowTagHelper] = useState(true);
     const { t } = useTranslation();
 
-    useEffect(() => {
-        // async function fetchTags() {
-        //     let addTags = []
-        //     addTags.push({
-        //         label: 'Halo',
-        //         selected: false
-        //     })
-        //     addTags.push({
-        //         label: 'LoL',
-        //         selected: false
-        //     })
-        //     setTags(addTags)
-        // }
+    const continueButtonForm = async () => {
+        const step = currentStep + 1;
 
-        if (user && user.uid) {
-            // fetchTags();
+        if (step <= 3) {
+            setCurrentStep(step);
+            return;
+        } else if (step === 4) {
+            if (bio.replace(/\s/g, '').length === 0) {
+                setBioError(true);
+                return;
+            } else {
+                if (bio.length >= MIN_BIO_LENGTH) {
+                    if (showOnlySpecificStep) {
+                        closeOnBoarding();
+                    } else {
+                        setCurrentStep(step);
+                    }
+                    return await saveBio();
+                }
+            }
+        } else {
+            const tagsSelected = tags.filter((tag) => tag.selected);
+            if (tagsSelected.length >= MIN_TAGS) {
+                await updateStreamerPublicProfile(user.uid, { tags: tagsSelected.map((tag) => tag.label) });
+                if (showOnlySpecificStep) {
+                    return closeOnBoarding();
+                } else {
+                    return onBoardingDone();
+                }
+            } else {
+                setTagError(true);
+            }
         }
-    }, [user]);
-
-    const toggleBold = () => {
-        setBold(!bold)
-    }
-
-    const toggleItalic = () => {
-        setItalic(!italic)
-    }
-
-    const toggleUnderline = () => {
-        setUnderline(!underline)
-    }
-
-    const toggleStrikeThrough = () => {
-        setStrikeThrough(!strikeThrough)
-    }
-
-    const toggleEmoji = () => {
-        setEmoji(!emoji)
-    }
-
-    const toggleUnorderedList = () => {
-        setUnorderedList(!unorderedList)
-    }
-
-    const toggleOrderedList = () => {
-        setOrderedList(!orderedList)
-    }
-
-    const continueButtonPresentation = () => {
-        setDotsIndex(dotsIndex + 1)
-        if (dotsIndex === 2) {
-            setIsPresentation(false)
-        }
-    }
-
-    const continueButtonForm = () => {
-        setDotsIndex(dotsIndex + 1)
-        if (isBioCreation) {
-            console.log('Uploading bio')
-            setIsBioCreation(false)
-            return
-        }
-        onBoardingDone()
-    }
-
-    const laterButtonForm = () => {
-        setDotsIndex(dotsIndex + 1)
-        if (isBioCreation) {
-            setIsBioCreation(false)
-            return
-        }
-        onBoardingDone()
     }
 
     const onTagSearchChange = (e) => {
+        setTagError(false);
         let input = e.target.value
         if (input.length > 43) {
             input = input.slice(0, 43)
         }
-        if (tagSearchLimit === false && input.length >= 43) {
-            setTagSearchLimit(true)
-        }
-        else if (tagSearchLimit === true && input.length < 43) {
-            setTagSearchLimit(false)
-        }
+
         setTagSearch(input)
     }
 
-    const onBioChange = (e) => {
-        let reg = /\n/g
-        let input = e.target.value
-        let nl = input.match(reg)
-        if (nl) {
-            if (nl.length >= 10) {
-                let stringArr = input.split('\n')
-                if (stringArr[10].length > 0) {
-                    if (stringArr[9] <= 0) {
-                        stringArr[9] = stringArr[10]
-                    }
-                }
-                while (stringArr.length > 10) {
-                    stringArr.pop()
-                }
-                input = stringArr.join('\n')
-            }
-            // Limit last line, useless if don't limit other lines
-            // if (nl.length >= 9) {
-            //     let stringArr = input.split('\n')
-            //     if (stringArr[9].length > 43) {
-            //         let lastLineArr = stringArr[9].split('')
-            //         lastLineArr.splice(43, lastLineArr.length - 43)
-            //         lastLineArr = lastLineArr.join('')
-            //         stringArr[9] = lastLineArr
-            //         input = stringArr.join('\n')
-            //     }
-            // }
-
-        }
-        if (input.length > 300) {
-            let stringArr = input.split('')
-            stringArr.splice(300, stringArr.length - 300)
-            input = stringArr.join('')
-        }
-
-        setBio(input)
-    }
-
     const addNewTag = () => {
+        setShowTagHelper(false);
+        setTagError(false);
         let tagsArr = [...tags]
-        tagsArr.unshift({
+        tagsArr.push({
             label: tagSearch,
             selected: true,
             isCustom: true
@@ -284,6 +163,7 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
     }
 
     const tagClick = (data, index, e) => {
+        setTagError(false);
         let tagsArr = [...tags]
         tagsArr[index] = {
             ...data,
@@ -293,6 +173,15 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
             tagsArr.splice(index, 1)
         }
         setTags(tagsArr)
+    }
+
+    const saveBio = async () => {
+        try {
+            await updateStreamerPublicProfile(user.uid, { bio });
+        } catch (error) {
+            console.log(error);
+            alert('Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico');
+        }
     }
 
     const renderBackgroundColor = (index) => {
@@ -320,145 +209,154 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
         }
     }
 
+    const updateBio = (bio) => {
+        setBioError(false);
+        setBio(bio);
+    }
+
+    const tagsSelected = tags.filter((tag) => tag.selected);
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
-                {isPresentation ?
+                {currentStep < 3 &&
                     <>
-                        <div className={styles.modalImgContainer} style={{backgroundColor: renderBackgroundColor(dotsIndex)}}>
-                            <img src={renderImage(dotsIndex)} alt='Profile Presentation' />
+                        <div className={styles.modalImgContainer} style={{backgroundColor: renderBackgroundColor(currentStep)}}>
+                            <img src={renderImage(currentStep)} alt='Profile Presentation' />
                         </div>
                         <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
-                            {t(`StreamerProfileEditor.OnBoarding.header${dotsIndex + 1}`)}
+                            {t(`StreamerProfileEditor.OnBoarding.header${currentStep + 1}`)}
                         </p>
                         <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
-                            {t(`StreamerProfileEditor.OnBoarding.body${dotsIndex + 1}`)}
+                            {t(`StreamerProfileEditor.OnBoarding.body${currentStep + 1}`)}
                         </p>
-                        <ContainedButton onClick={continueButtonPresentation} className={styles.modalButtonPresentation}>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
                             {t('continue')}
-                        </ContainedButton>
-                    </>
-                    :
-                    <>
-                        <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            {isBioCreation ? 'Tags' : t('StreamerProfileEditor.OnBoarding.presentYourself')}
-                        </p>
-                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: isBioCreation ? '70%' : '60%' }}>
-                            {isBioCreation ? t('StreamerProfileEditor.OnBoarding.addTags') : t('StreamerProfileEditor.OnBoarding.yourIntro')}
-                        </p>
-                        {isBioCreation ?
-                            <>
-
-                                <div className={styles.modalBioEditorContainer}>
-                                    <div className={styles.modalBioEditorFormatterButtonsContainer}>
-                                        <FormattingButton onClick={toggleBold}>
-                                            <div style={{ backgroundColor: bold ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <BoldIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleItalic}>
-                                            <div style={{ backgroundColor: italic ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <ItalicIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleUnderline}>
-                                            <div style={{ backgroundColor: underline ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <UnderlineIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleStrikeThrough}>
-                                            <div style={{ backgroundColor: strikeThrough ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <StrikeThroughIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleEmoji}>
-                                            <div style={{ backgroundColor: emoji ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <EmojiIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleUnorderedList}>
-                                            <div style={{ backgroundColor: unorderedList ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <UnorderedListIcon />
-                                            </div>
-                                        </FormattingButton>
-                                        <FormattingButton onClick={toggleOrderedList}>
-                                            <div style={{ backgroundColor: orderedList ? '#57758c' : '#0000' }} className={styles.modalButtonActiveIndicator}>
-                                                <OrderedListIcon />
-                                            </div>
-                                        </FormattingButton>
-                                    </div>
-                                    <StreamerTextInput
-                                        containerClassName={styles.modalBioTextInputContainer}
-                                        textInputClassName={styles.modalBioTextInput}
-                                        textInputStyle={{ backgroundColor: '#202750' }}
-                                        rows={10}
-                                        rowsMax={10}
-                                        value={bio}
-                                        onChange={onBioChange}
-                                        fullWidth
-                                        multiline
-                                    />
-                                </div>
-                            </>
-                            :
-                            <>
-                                <StreamerTextInput
-                                    containerClassName={styles.modalTagSearchContainer}
-                                    textInputStyle={{ backgroundColor: tagSearchLimit ? '#802750' : '#202750' }}
-                                    textInputClassName={styles.modalTagSearchTextInput}
-                                    value={tagSearch}
-                                    onChange={onTagSearchChange}
-                                    placeholder={t('StreamerProfileEditor.addTagPlaceholder')}
-                                    fullWidth
-                                />
-                                <ul className={styles.modalTagsList}
-                                    style={{
-                                        width: '100%',
-                                        overflowY: 'auto',
-                                        scrollBehavior: 'smooth',
-                                    }}>
-                                    {tagSearch !== '' &&
-                                        <li className={styles.modalTag}>
-                                            <QaplaChip
-                                                label={tagSearch.length > 20 ? tagSearch.slice(0, 20) + '...' : tagSearch}
-                                                onClick={addNewTag}
-                                            />
-                                        </li>
-                                    }
-                                    {tags.map((data, index) => {
-                                        return (
-                                            <li key={index} className={styles.modalTag}>
-                                                <QaplaChip
-                                                    label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
-                                                    style={{ backgroundColor: data.selected ? '#4040FF' : '#232A54' }}
-                                                    onClick={(e) => tagClick(data, index, e)}
-                                                />
-                                            </li>
-                                        )
-                                    })}
-                                </ul>
-                            </>
-                        }
-
-                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonFormContinue}>
-                            {t('continue')}
-                        </ContainedButton>
-                        <ContainedButton onClick={laterButtonForm} className={styles.modalButtonFormLater}>
-                            {t('later')}
                         </ContainedButton>
                     </>
                 }
+                {currentStep === 3 &&
+                    <>
+                        <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
+                            {t('StreamerProfileEditor.OnBoarding.presentYourself')}
+                        </p>
+                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '70%' }}>
+                            {t('StreamerProfileEditor.OnBoarding.yourIntro')}
+                        </p>
+                        <BioEditorTextArea bio={bio}
+                            setBio={updateBio}
+                            error={bioError}
+                            minLength={MIN_BIO_LENGTH} />
+                        <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10, marginBottom: 'auto' }}>
+                            {bioError && t('StreamerProfileEditor.errors.emptyBioError')}
+                        </p>
+                        {showOnlySpecificStep ?
+                            <>
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonEditing}>
+                                {t('save')}
+                            </ContainedButton>
+                            <ContainedButton onClick={closeOnBoarding} className={styles.modalButtonFormLater}>
+                                {t('cancel')}
+                            </ContainedButton>
+                            </>
+                        :
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonContinue}>
+                                {t('continue')}
+                            </ContainedButton>
+                        }
+                    </>
+                }
+                {currentStep === 4 &&
+                    <>
+                        <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
+                            Tags
+                        </p>
+                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '60%' }}>
+                            {t('StreamerProfileEditor.OnBoarding.addTags')}
+                        </p>
+                        <StreamerTextInput
+                            containerClassName={styles.modalTagSearchContainer}
+                            textInputStyle={{ backgroundColor: (tagSearch.length === 43 || tagError) ? '#802750' : '#202750' }}
+                            textInputClassName={styles.modalTagSearchTextInput}
+                            value={tagSearch}
+                            onChange={onTagSearchChange}
+                            placeholder={t('StreamerProfileEditor.addTagPlaceholder')}
+                            fullWidth />
+                        {tagError &&
+                            <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>
+                                {showTagHelper ?
+                                    'Para agregar un tag escribelo y/o da click en el'
+                                    :
+                                    `Agrega al menos ${MIN_TAGS} tags para continuar`
+                                }
+                            </p>
+                        }
+                        <ul className={styles.modalTagsList}
+                            style={{
+                                width: '100%',
+                                overflowY: 'auto',
+                                scrollBehavior: 'smooth',
+                            }}>
+                            {tags.map((data, index) => (
+                                <li key={index} className={styles.modalTag}>
+                                    <QaplaChip
+                                        label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
+                                        style={{ backgroundColor: data.selected ? '#4040FF' : 'rgba(64, 64, 255, 0.30859)' }}
+                                        onClick={(e) => tagClick(data, index, e)}
+                                    />
+                                </li>
+                            ))}
+                            {tagSearch !== '' &&
+                                <li className={styles.modalTag}>
+                                    <QaplaChip
+                                        label={tagSearch}
+                                        onClick={addNewTag}
+                                    />
+                                </li>
+                            }
+                        </ul>
+                        {showOnlySpecificStep ?
+                            <>
+                            <p className={styles.minLengthIndicator}>
+                                Min. Tags
+                                <p style={{ marginLeft: 2, color: tagsSelected.length >= MIN_TAGS ? '#51a05e' : '#FF0000' }}>
+                                    {tagsSelected.length}/{MIN_TAGS}
+                                </p>
+                            </p>
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonEditing}>
+                                {t('save')}
+                            </ContainedButton>
+                            <ContainedButton onClick={closeOnBoarding} className={styles.modalButtonFormLater}>
+                                {t('cancel')}
+                            </ContainedButton>
+                            </>
+                        :
+                            <>
+                            <p className={styles.minLengthIndicator}>
+                                Min. Tags
+                                <p style={{ marginLeft: 2, color: tagsSelected.length >= MIN_TAGS ? '#51a05e' : '#FF0000' }}>
+                                    {tagsSelected.length}/{MIN_TAGS}
+                                </p>
+                            </p>
+                            <ContainedButton onClick={continueButtonForm} className={styles.modalButtonContinue}>
+                                {t('goToProfile')}
+                            </ContainedButton>
+                            </>
+                        }
+                    </>
+                }
             </div>
-            <div style={{
-                display: 'flex',
-                marginTop: '50px'
-            }}>
-                <QaplaDots
-                    index={dotsIndex}
-                    dots={5}
-                    activeWidth='29px'
-                />
-            </div>
+            {!showOnlySpecificStep &&
+                <div style={{
+                    display: 'flex',
+                    marginTop: '50px'
+                }}>
+                    <QaplaDots
+                        index={currentStep}
+                        dots={5}
+                        activeWidth='29px'
+                    />
+                </div>
+            }
         </div>
     )
 }

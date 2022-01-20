@@ -793,10 +793,20 @@ export async function removeStreamPackageOfStreamer(streamerUid, packageId) {
  * Streamers Public Profiles
  */
 
-export async function getStreamerPublicProfile(uid) {
-    return await streamersPublicProfilesRef.child(uid).once('value');
+/**
+ * Listen to the specified streamer profile
+ * @param {string} uid User identifier
+ * @param {function} callback Handler for firebase snapshot
+ */
+export function listenStreamerPublicProfile(uid, callback) {
+    return streamersPublicProfilesRef.child(uid).on('value', callback);
 }
 
+/**
+ * Updates the specified streamer profile with the given data
+ * @param {string} uid User identifier
+ * @param {object} dataToUpdate Data to update on profile
+ */
 export async function updateStreamerPublicProfile(uid, dataToUpdate) {
     return await streamersPublicProfilesRef.child(uid).update(dataToUpdate);
 }

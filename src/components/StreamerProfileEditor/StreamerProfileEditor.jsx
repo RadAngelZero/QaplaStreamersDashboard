@@ -8,13 +8,13 @@ import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
-
+import { getStreamerLinks, listenStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
+import { MIN_TAGS, PROFILE_BACKGROUND_GRADIENTS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -189,6 +189,10 @@ const StreamerProfileEditor = ({ user }) => {
             socialPage: 'Youtube',
             value: ''
         },
+        /* {
+            socialPage: 'TikTok',
+            value: ''
+        } */
     ];
 
     const socialLinksPlaceholders = {
@@ -197,43 +201,59 @@ const StreamerProfileEditor = ({ user }) => {
         Instagram: `https://instagram.com/${user ? user.displayName : ''}`,
         Discord: `https://discord.gg/inviteCode`,
         Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`,
-        tiktok: '' // ToDo: Add tiktok to list of social media links
+        tiktok: `https://www.tiktok.com/@${user ? user.displayName : ''}`
     };
 
     const classes = useStyles();
     const [dataIsFetched, setDataIsFetched] = useState(false);
     const [selectedTab, setSelectedTab] = useState(0);
     const [editingBio, setEditingBio] = useState(false);
+    const [addingTag, setAddingTag] = useState(false);
     const [streamerBio, setStreamerBio] = useState('');
-    const [backgroundUrl, setBackgroundUrl] = useState('https://wallpaperaccess.com/full/2124973.png');
+    const [backgroundUrl, setBackgroundUrl] = useState('');
+    const [backgroundGradient, setBackgroundGradient] = useState(null);
     const [uploadImageStatus, setUploadImageStatus] = useState(0);
     const [socialLinks, setSocialLinks] = useState(socialLinksInitialValue);
     const [streamerTags, setStreamerTags] = useState([]);
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
     const [openTooltip, setOpenTooltip] = useState(false);
-    const [onBoardingDone, setOnBoardingDone] = useState(false);
+    const [onBoardingDone, setOnBoardingDone] = useState(true);
+    const [onBoardingStep, setOnBoardingStep] = useState(0);
     const { t } = useTranslation();
 
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
 
     useEffect(() => {
         async function getStreamerInfo() {
-            const info = await getStreamerPublicProfile(user.uid);
-            if (info.exists()) {
-                const { bio, tags, backgroundUrl } = info.val();
-                setStreamerBio(bio);
-                setBackgroundUrl(backgroundUrl || 'https://wallpaperaccess.com/full/2124973.png');
-                setStreamerTags(tags);
-            }
+            listenStreamerPublicProfile(user.uid, async (info) => {
+                if (info.exists()) {
+                    const { bio, tags, backgroundUrl, backgroundGradient } = info.val();
+                    if (!tags || tags.length < MIN_TAGS) {
+                        setOnBoardingDone(false);
+                        setOnBoardingStep(4);
+                    }
 
-            const links = await getStreamerLinks(user.uid);
-            if (links.exists()) {
-                setSocialLinks(links.val());
-            } else {
-                setSocialLinks(socialLinksInitialValue);
-            }
+                    if (!bio) {
+                        setOnBoardingDone(false);
+                        setOnBoardingStep(3);
+                    }
+                    setStreamerBio(bio || '');
+                    setBackgroundGradient(backgroundGradient);
+                    setBackgroundUrl(backgroundUrl);
+                    setStreamerTags(tags || []);
+                } else {
+                    setOnBoardingDone(false);
+                }
 
-            setDataIsFetched(true);
+                const links = await getStreamerLinks(user.uid);
+                if (links.exists()) {
+                    setSocialLinks(links.val());
+                } else {
+                    setSocialLinks(socialLinksInitialValue);
+                }
+
+                setDataIsFetched(true);
+            });
         }
 
         if (user && user.uid) {
@@ -241,8 +261,21 @@ const StreamerProfileEditor = ({ user }) => {
         }
     }, [user]);
 
-    const onBoardingDoneByStreamer = () => {
-        setOnBoardingDone(true)
+    const onBoardingDoneByStreamer = async () => {
+        const min = 0;
+        const max = 4;
+        const randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        const backgroundSelected = PROFILE_BACKGROUND_GRADIENTS[randomIndex];
+        setBackgroundGradient(backgroundSelected);
+
+        await updateStreamerPublicProfile(user.uid, {
+            backgroundGradient: backgroundSelected,
+            displayName: user.displayName,
+            photoUrl: user.photoUrl
+        });
+
+        setOnBoardingDone(true);
     }
 
     const handleTabChange = (event, newValue) => {
@@ -288,52 +321,12 @@ const StreamerProfileEditor = ({ user }) => {
         setSocialLinksChanged(false);
     }
 
-    const saveBio = async () => {
-        try {
-            await updateStreamerPublicProfile(user.uid, { bio: streamerBio });
-            setEditingBio(false);
-        } catch (error) {
-            console.log(error);
-            alert(t('StreamerProfileEditor.errors.updateBio'));
-        }
-    }
-
     const addTag = async () => {
-        const value = window.prompt('Tag:');
-
-        if (value) {
-            let tags = [...streamerTags];
-            tags.push(value);
-
-            try {
-                await updateStreamerPublicProfile(user.uid, { tags });
-                setStreamerTags(tags);
-            } catch (error) {
-                console.log(error);
-                alert(t('StreamerProfileEditor.errors.addTag'));
-            }
-        }
-    }
-
-    const updateTag = async (index, currentValue) => {
-        const value = window.prompt('Tag:', currentValue);
-
-        if (value) {
-            let tags = [...streamerTags];
-            tags[index] = value;
-
-            try {
-                await updateStreamerPublicProfile(user.uid, { tags });
-                setStreamerTags(tags);
-            } catch (error) {
-                console.log(error);
-                alert(t('StreamerProfileEditor.errors.updateTag'));
-            }
-        }
+        setOnBoardingStep(4);
+        setAddingTag(true);
     }
 
     const uploadBackgroundImage = (e) => {
-        console.log(e.target.files);
         if (e.target.files[0]) {
             const newBackgroundImage = (e.target.files[0]);
             uploadImage(
@@ -369,14 +362,45 @@ const StreamerProfileEditor = ({ user }) => {
         }, 1250);
     }
 
+    const createLinearGradientCSS = () => {
+        if (backgroundGradient) {
+            let colorsString = '';
+            backgroundGradient.colors.forEach((color, index) => {
+                if (index !== backgroundGradient.colors.length - 1) {
+                    colorsString += `${color},`;
+                } else {
+                    colorsString += color;
+                }
+            });
+
+            return `linear-gradient(${backgroundGradient.angle}deg, ${colorsString})`;
+        }
+
+        return '';
+    }
+
+    const editBio = () => {
+        setOnBoardingStep(3);
+        setEditingBio(true);
+    }
+
+    const cancelEditing = () => {
+        setEditingBio(false);
+        setAddingTag(false);
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
                 <>
-                    {onBoardingDone ?
+                    {onBoardingDone && !editingBio && !addingTag ?
                         <>
                             <div className={styles.coverContainer}>
-                                <img src={backgroundUrl} alt='Cover' className={styles.cover} />
+                                {backgroundUrl ?
+                                    <img src={backgroundUrl} alt='Cover' className={styles.cover} />
+                                    :
+                                    <div className={styles.cover} style={{ background: createLinearGradientCSS() }} />
+                                }
                             </div>
                             <div className={styles.editCoverButtonContainer}>
                                 <input
@@ -408,7 +432,7 @@ const StreamerProfileEditor = ({ user }) => {
                                     </div>
                                     <div className={styles.editBioButtonContainer}>
                                         <EditBioButton variant='contained'
-                                            onClick={() => !editingBio ? setEditingBio(true) : saveBio()}>
+                                            onClick={editBio}>
                                             {!editingBio ?
                                                 <>
                                                     <EditIcon />
@@ -421,26 +445,16 @@ const StreamerProfileEditor = ({ user }) => {
                                         </EditBioButton>
                                     </div>
                                 </div>
-                                <div className={styles.twitchURLContainer}>
+                                {/* <div className={styles.twitchURLContainer}>
                                     <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
                                     <Tooltip placement='top' open={openTooltip} title='Copiado'>
                                         <CopyIcon onClick={copyTwitchURL} />
                                     </Tooltip>
-                                </div>
+                                </div> */}
                                 <div className={styles.bioContainer}>
-                                    {!editingBio ?
-                                        <p className={styles.bioText} onClick={() => setEditingBio(true)}>
-                                            {streamerBio}
-                                        </p>
-                                        :
-                                        <StreamerTextInput multiline
-                                            fullWidth
-                                            rows={5}
-                                            rowsMax={5}
-                                            onChange={(e) => setStreamerBio(e.target.value)}
-                                            value={streamerBio}
-                                            max />
-                                    }
+                                    <p className={styles.bioText} onClick={editBio}>
+                                        {streamerBio}
+                                    </p>
                                 </div>
                                 <ul className={styles.tagsList}>
                                     {streamerTags.map((data, index) => {
@@ -449,7 +463,6 @@ const StreamerProfileEditor = ({ user }) => {
                                                 <QaplaChip
                                                     label={data}
                                                     onDelete={() => handleTagDelete(index)}
-                                                    onClick={() => updateTag(index, data)}
                                                 />
                                             </li>
                                         )
@@ -479,6 +492,7 @@ const StreamerProfileEditor = ({ user }) => {
                                             <>
                                                 {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
                                                 <StreamerTextInput
+                                                    key={`SocialLink-${index}`}
                                                     label={data.socialPage}
                                                     containerClassName={styles.socialLinkContainer}
                                                     labelClassName={styles.socialLinkLabel}
@@ -507,7 +521,13 @@ const StreamerProfileEditor = ({ user }) => {
                             </div>
                         </>
                         :
-                        <StreamerProfileEditorOnBoarding user={user} onBoardingDone={onBoardingDoneByStreamer} />
+                        <StreamerProfileEditorOnBoarding step={onBoardingStep}
+                            user={user}
+                            onBoardingDone={onBoardingDoneByStreamer}
+                            showOnlySpecificStep={editingBio || addingTag}
+                            streamerBio={streamerBio}
+                            streamerTags={streamerTags}
+                            closeOnBoarding={cancelEditing} />
                     }
                 </>
             }

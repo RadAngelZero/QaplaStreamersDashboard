@@ -106,6 +106,28 @@ export const webhookStreamOffline = {
 
 export const HOUR_IN_MILISECONDS = 3600000;
 
+/**
+ * Qapla profiles random backgrounds gradients
+ */
+export const PROFILE_BACKGROUND_GRADIENTS = [
+    { angle: 98, colors: ['#2D07FA', '#A716EE'] },
+    { angle: 262, colors: ['#00FEC1', '#FA00FF'] },
+    { angle: 98, colors: ['#FF2B77', '#E5E91E'] },
+    { angle: 98, colors: ['#00E0FF', '#2E08FB'] },
+    { angle: 98, colors: ['#00FF75', '#7516EF'] },
+];
+
+/**
+ * Min length for streamer public profile elements
+ */
+export const MIN_BIO_LENGTH = 100;
+export const MIN_TAGS = 3;
+
+/**
+ * Streamers Profiles constants
+ */
+export const MAX_ROWS_IN_BIO = 5;
+
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
     DS: DSIIImage,

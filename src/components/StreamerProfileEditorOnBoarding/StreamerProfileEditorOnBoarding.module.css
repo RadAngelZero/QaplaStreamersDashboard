@@ -21,8 +21,8 @@
 
 .modalImgContainer {
     display: flex;
+    justify-content: center;
     width: 100%;
-    height: 254px;
 }
 
 .modalText {
@@ -40,11 +40,15 @@
 }
 
 .modalTextParagraph {
+    font-size: 14px;
+    line-height: 22px;
+    color: #FFF;
     composes: modalText;
     width: 342px;
     font-weight: 500;
     font-size: 14px;
     text-align: center;
+    max-width: 80%;
 }
 
 .modalButton {
@@ -58,23 +62,36 @@
     margin-bottom: 30px !important;
 }
 
+.modalButtonContinue {
+    composes: modalButton;
+    margin-bottom: 30px !important;
+}
+
+.modalButtonEditing {
+    composes: modalButton;
+}
+
 .modalButtonForm {
     composes: modalButton;
     height: 49px;
 }
-
-.modalButtonFormContinue {
-    composes: modalButtonForm;
-    margin-top: auto !important;
-}
-
 .modalButtonFormLater {
+    margin-top: 14px !important;
     composes: modalButtonForm;
-    margin-bottom: 24px !important;
+    margin-bottom: 14px !important;
     width: 220px;
     background-color: #0000 !important;
     box-shadow: none !important;
     color: #FFFFFF99 !important;
+    font-weight: 400 !important;
+    font-size: 16px !important;
+}
+
+.modalButtonFormContinue {
+    composes: modalButtonForm;
+    margin-bottom: 30px;
+    margin-bottom: 24px !important;
+    margin-top: auto !important;
 }
 
 .modalTextSubParagraph {
@@ -166,4 +183,17 @@
 
 ::-webkit-scrollbar-thumb:hover {
     background: #8080FF;
+}
+
+.minLengthIndicator {
+    margin-top: auto !important;
+    margin-bottom: 36px;
+    font-size: 10px;
+    font-weight: 400;
+    width: 90%;
+    color: #FFF;
+    opacity: .6;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
 }

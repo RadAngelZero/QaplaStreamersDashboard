@@ -161,7 +161,8 @@
             "body3": "Drive valuable traffic to all your online content. One place for your schedule streams and your communication channels 🎙",
             "presentYourself": "Introduce yourself to the community",
             "addTags": "Add tags that represent you as the creator, your persona, your content, etc.",
-            "yourIntro": "Your intro is a glimpse of yourself and your content. Make it nice 😉"
+            "yourIntro": "Your intro is a glimpse of yourself and your content. Make it nice 😉",
+            "minChars": "Min. Characters"
         },
         "confirmations": {
             "saveImage": "Image saved successfully"
@@ -172,7 +173,8 @@
             "deleteTag": "There was a problem deleting the tag, try again later or contact technical support",
             "updateLinks": "There was a problem updating the links, try again later or contact technical support",
             "updateBio": "There was a problem updating the bio, try again later or contact technical support",
-            "saveImage": "There was an error saving the image, try again later or contact technical support"
+            "saveImage": "There was an error saving the image, try again later or contact technical support",
+            "emptyBioError": "Bio can't be empty"
         }
     },
     "continue": "Continue",
@@ -180,5 +182,6 @@
     "title": "Title",
     "description": "Description",
     "game": "Game",
-    "later": "I'll do it later"
+    "goToProfile": "Go to my profile",
+    "save": "Save"
 }

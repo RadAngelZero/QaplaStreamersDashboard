@@ -6,39 +6,11 @@ import styles from './StreamerProfileEditorOnBoarding.module.css';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { updateStreamerPublicProfile } from '../../services/database';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import MobileProfile from './../../assets/MobileProfile.png';
-import StreamHost from './../../assets/StreamHost.png';
-import ProfileTags from './../../assets/ProfileTags.png';
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
-
-import { uploadImage } from '../../services/storage';
-
 import ProfilesPresentation1 from './../../assets/ProfilesPresentation1.png';
 import ProfilesPresentation2 from './../../assets/ProfilesPresentation2.png';
 import ProfilesPresentation3 from './../../assets/ProfilesPresentation3.png';
-
-
-const useStyles = makeStyles((theme) => ({
-    gridContainer: {
-        width: '100%',
-        display: 'flex',
-        boxSizing: 'border-box',
-        flexWrap: 'nowrap'
-    },
-    linkPlaceholder: {
-        '&::placeholder': {
-            color: 'rgba(108, 93, 211, 0.4)'
-        }
-    },
-    linkInput: {
-        backgroundColor: '#202750',
-        color: '#FFF',
-        '&.Mui-disabled': {
-            color: '#AAA'
-        }
-    }
-}));
 
 const QaplaChip = withStyles(() => ({
     root: {
@@ -237,22 +209,27 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
         }
     }
 
+    const updateBio = (bio) => {
+        setBioError(false);
+        setBio(bio);
+    }
+
     const tagsSelected = tags.filter((tag) => tag.selected);
     return (
         <div className={styles.profileOnBoardingContainer}>
             <div className={styles.profileOnBoardingModalContainer}>
                 {currentStep < 3 &&
                     <>
-                        <div className={styles.modalImgContainer} style={{backgroundColor: renderBackgroundColor(dotsIndex)}}>
-                            <img src={renderImage(dotsIndex)} alt='Profile Presentation' />
+                        <div className={styles.modalImgContainer} style={{backgroundColor: renderBackgroundColor(currentStep)}}>
+                            <img src={renderImage(currentStep)} alt='Profile Presentation' />
                         </div>
                         <p className={styles.modalTextHeader} style={{ marginTop: '40px' }}>
-                            {t(`StreamerProfileEditor.OnBoarding.header${dotsIndex + 1}`)}
+                            {t(`StreamerProfileEditor.OnBoarding.header${currentStep + 1}`)}
                         </p>
                         <p className={styles.modalTextParagraph} style={{ marginTop: '25px' }}>
-                            {t(`StreamerProfileEditor.OnBoarding.body${dotsIndex + 1}`)}
+                            {t(`StreamerProfileEditor.OnBoarding.body${currentStep + 1}`)}
                         </p>
-                        <ContainedButton onClick={continueButtonPresentation} className={styles.modalButtonPresentation}>
+                        <ContainedButton onClick={continueButtonForm} className={styles.modalButtonPresentation}>
                             {t('continue')}
                         </ContainedButton>
                     </>
@@ -260,30 +237,30 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                 {currentStep === 3 &&
                     <>
                         <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            {isBioCreation ? 'Tags' : t('StreamerProfileEditor.OnBoarding.presentYourself')}
+                            {t('StreamerProfileEditor.OnBoarding.presentYourself')}
                         </p>
-                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: isBioCreation ? '70%' : '60%' }}>
-                            {isBioCreation ? t('StreamerProfileEditor.OnBoarding.addTags') : t('StreamerProfileEditor.OnBoarding.yourIntro')}
+                        <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '70%' }}>
+                            {t('StreamerProfileEditor.OnBoarding.yourIntro')}
                         </p>
                         <BioEditorTextArea bio={bio}
-                            setBio={setBio}
+                            setBio={updateBio}
                             error={bioError}
                             minLength={MIN_BIO_LENGTH} />
-                        {bioError &&
-                            <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>La bio no puede quedar vacia</p>
-                        }
+                        <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10, marginBottom: 'auto' }}>
+                            {bioError && t('StreamerProfileEditor.errors.emptyBioError')}
+                        </p>
                         {showOnlySpecificStep ?
                             <>
                             <ContainedButton onClick={continueButtonForm} className={styles.modalButtonEditing}>
-                                Guardar
+                                {t('save')}
                             </ContainedButton>
                             <ContainedButton onClick={closeOnBoarding} className={styles.modalButtonFormLater}>
-                                Cancelar
+                                {t('cancel')}
                             </ContainedButton>
                             </>
                         :
                             <ContainedButton onClick={continueButtonForm} className={styles.modalButtonContinue}>
-                                Continuar
+                                {t('continue')}
                             </ContainedButton>
                         }
                     </>
@@ -294,7 +271,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                             Tags
                         </p>
                         <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: '60%' }}>
-                            Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.
+                            {t('StreamerProfileEditor.OnBoarding.addTags')}
                         </p>
                         <StreamerTextInput
                             containerClassName={styles.modalTagSearchContainer}
@@ -346,10 +323,10 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                                 </p>
                             </p>
                             <ContainedButton onClick={continueButtonForm} className={styles.modalButtonEditing}>
-                                Guardar
+                                {t('save')}
                             </ContainedButton>
                             <ContainedButton onClick={closeOnBoarding} className={styles.modalButtonFormLater}>
-                                Cancelar
+                                {t('cancel')}
                             </ContainedButton>
                             </>
                         :

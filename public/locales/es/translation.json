@@ -161,7 +161,8 @@
             "body3": "Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y tus diferentes canales de comunicación 🎙",
             "presentYourself": "Preséntate con la comunidad",
             "addTags": "Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.",
-            "yourIntro": "Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉"
+            "yourIntro": "Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉",
+            "minChars": "Min. Caracteres"
         },
         "confirmations": {
             "saveImage": "Imagen guardada correctamente"
@@ -172,7 +173,8 @@
             "deleteTag": "Hubo un problema al eliminar el tag, intentalo mas tarde o contacta con soporte tecnico",
             "updateLinks": "Hubo un problema al actualizar los links, intentalo mas tarde o contacta con soporte tecnico",
             "updateBio": "Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico",
-            "saveImage": "Hubo un error al guardar la imagen, intentalo mas tarde o contacta con soporte tecnico"
+            "saveImage": "Hubo un error al guardar la imagen, intentalo mas tarde o contacta con soporte tecnico",
+            "emptyBioError": "La bio no puede quedar vacia"
         }
     },
     "continue": "Continuar",
@@ -180,5 +182,6 @@
     "title": "Título",
     "description": "Descripción",
     "game": "Juego",
-    "later": "Después lo hago"
+    "goToProfile": "Ir a mi perfil",
+    "save": "Guardar"
 }

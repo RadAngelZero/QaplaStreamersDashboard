@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { makeStyles, TextField } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 
 // Uncomment when uncomment JSX using this icons
 /* import { ReactComponent as BoldIcon } from './../../assets/textFormatting/bold.svg';
@@ -70,7 +71,6 @@ const useStyles = makeStyles((theme) => ({
     },
     minLengthIndicator: {
         marginTop: 8,
-        marginBottom: 'auto',
         fontSize: 10,
         fontWeight: '400',
         width: '90%',
@@ -109,7 +109,7 @@ const BioEditorTextArea = ({ bio, setBio, error, minLength }) => {
     const [unorderedList, setUnorderedList] = useState(false);
     const [orderedList, setOrderedList] = useState(false); */
     const classes = useStyles();
-
+    const { t } = useTranslation();
 
     /* const toggleBold = (e) => {
         setBold(!bold);
@@ -200,11 +200,10 @@ const BioEditorTextArea = ({ bio, setBio, error, minLength }) => {
                 onChange={updateBio}
                 InputProps={{ disableUnderline: true, className: classes.textInputContainer }}
                 fullWidth
-                placeholder='Pon aqui tu bio (se vale usar emojis ❤️😉)'
                 inputRef={textAreaRef} />
         </div>
         <p className={classes.minLengthIndicator}>
-            Min. Caracteres
+            {t('StreamerProfileEditor.OnBoarding.minChars')}
             <p style={{ marginLeft: 2, color: bio.length >= minLength ? '#51a05e' : '#FF0000' }}>
                 {bio.length}/{minLength}
             </p>

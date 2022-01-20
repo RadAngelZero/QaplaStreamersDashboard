@@ -257,7 +257,7 @@ const StreamerProfileEditor = ({ user }) => {
             setStreamerTags(tags);
         } catch (error) {
             console.log(error);
-            alert('Hubo un problema al eliminar el tag, intentalo mas tarde o contacta con soporte tecnico');
+            alert(t('StreamerProfileEditor.errors.deleteTag'));
         }
     }
 
@@ -283,7 +283,7 @@ const StreamerProfileEditor = ({ user }) => {
             await saveStreamerLinks(user.uid, objectToSave);
         } catch (error) {
             console.log(error);
-            alert('Hubo un problema al actualizar los links, intentalo mas tarde o contacta con soporte tecnico');
+            alert(t('StreamerProfileEditor.errors.updateLinks'));
         }
         setSocialLinksChanged(false);
     }
@@ -294,7 +294,7 @@ const StreamerProfileEditor = ({ user }) => {
             setEditingBio(false);
         } catch (error) {
             console.log(error);
-            alert('Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico');
+            alert(t('StreamerProfileEditor.errors.updateBio'));
         }
     }
 
@@ -310,7 +310,7 @@ const StreamerProfileEditor = ({ user }) => {
                 setStreamerTags(tags);
             } catch (error) {
                 console.log(error);
-                alert('Hubo un problema al agregar el tag, intentalo mas tarde o contacta con soporte tecnico');
+                alert(t('StreamerProfileEditor.errors.addTag'));
             }
         }
     }
@@ -327,7 +327,7 @@ const StreamerProfileEditor = ({ user }) => {
                 setStreamerTags(tags);
             } catch (error) {
                 console.log(error);
-                alert('Hubo un problema al actualizar el tag, intentalo mas tarde o contacta con soporte tecnico');
+                alert(t('StreamerProfileEditor.errors.updateTag'));
             }
         }
     }
@@ -344,9 +344,9 @@ const StreamerProfileEditor = ({ user }) => {
                 async (url) => {
                     try {
                         await updateStreamerPublicProfile(user.uid, { backgroundUrl: url });
-                        alert('Imagen guardada correctamente');
+                        alert(t('StreamerProfileEditor.confirmations.saveImage'));
                     } catch (error) {
-                        alert('Hubo un error al guardar la imagen');
+                        alert(t('StreamerProfileEditor.errors.saveImage'));
                         console.log(error);
                     }
                 }

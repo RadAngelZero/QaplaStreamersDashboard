@@ -335,16 +335,16 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
                             {t(`StreamerProfileEditor.OnBoarding.body${dotsIndex + 1}`)}
                         </p>
                         <ContainedButton onClick={continueButtonPresentation} className={styles.modalButtonPresentation}>
-                            Continuar
+                            {t('continue')}
                         </ContainedButton>
                     </>
                     :
                     <>
                         <p className={styles.modalTextHeader} style={{ marginTop: '52px' }}>
-                            {isBioCreation ? 'Tags' : 'Preséntate con la comunidad'}
+                            {isBioCreation ? 'Tags' : t('StreamerProfileEditor.OnBoarding.presentYourself')}
                         </p>
                         <p className={styles.modalTextSubParagraph} style={{ marginTop: '17px', width: isBioCreation ? '70%' : '60%' }}>
-                            {isBioCreation ? 'Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.' : 'Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉'}
+                            {isBioCreation ? t('StreamerProfileEditor.OnBoarding.addTags') : t('StreamerProfileEditor.OnBoarding.yourIntro')}
                         </p>
                         {isBioCreation ?
                             <>
@@ -408,7 +408,7 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
                                     textInputClassName={styles.modalTagSearchTextInput}
                                     value={tagSearch}
                                     onChange={onTagSearchChange}
-                                    placeholder={'Busca o crea un tag'}
+                                    placeholder={t('StreamerProfileEditor.addTagPlaceholder')}
                                     fullWidth
                                 />
                                 <ul className={styles.modalTagsList}
@@ -441,10 +441,10 @@ const StreamerProfileEditorOnBoarding = ({ user, onBoardingDone }) => {
                         }
 
                         <ContainedButton onClick={continueButtonForm} className={styles.modalButtonFormContinue}>
-                            Continuar
+                            {t('continue')}
                         </ContainedButton>
                         <ContainedButton onClick={laterButtonForm} className={styles.modalButtonFormLater}>
-                            Después lo hago
+                            {t('later')}
                         </ContainedButton>
                     </>
                 }

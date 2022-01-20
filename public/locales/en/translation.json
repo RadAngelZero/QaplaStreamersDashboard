@@ -149,6 +149,7 @@
         "editBio": "Edit bio",
         "saveChanges": "Save changes",
         "addTag": "Add tag",
+        "addTagPlaceholder": "Search or create a tag",
         "showUpcomingStreams": "Show upcoming streams",
         "social": "Social",
         "OnBoarding": {
@@ -156,8 +157,28 @@
             "header2": "Improve live interaction",
             "header3": "Amplify your reach",
             "body1": "Welcome to your Qapla profile 😍. Connect with more members of the community by enabling your profile",
-            "body2": "Share what you like, what your content is about, or whatever you want!, to increase the chances of matching with the people who come to your stream 💜",
-            "body3": "Drive traffic to your networks from your Qapla profile. One place for your next streams and your different communication channels 🎙"
+            "body2": "Share what you like, what your content is about, or whatever you want!, to increase the chances of matching with the people who come by your stream 💜",
+            "body3": "Drive valuable traffic to all your online content. One place for your schedule streams and your communication channels 🎙",
+            "presentYourself": "Introduce yourself to the community",
+            "addTags": "Add tags that represent you as the creator, your persona, your content, etc.",
+            "yourIntro": "Your intro is a glimpse of yourself and your content. Make it nice 😉"
+        },
+        "confirmations": {
+            "saveImage": "Image saved successfully"
+        },
+        "errors": {
+            "addTag": "There was a problem adding the tag, try again later or contact technical support",
+            "updateTag": "There was a problem updating the tag, try again later or contact technical support",
+            "deleteTag": "There was a problem deleting the tag, try again later or contact technical support",
+            "updateLinks": "There was a problem updating the links, try again later or contact technical support",
+            "updateBio": "There was a problem updating the bio, try again later or contact technical support",
+            "saveImage": "There was an error saving the image, try again later or contact technical support"
         }
-    }
+    },
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "title": "Title",
+    "description": "Description",
+    "game": "Game",
+    "later": "I'll do it later"
 }

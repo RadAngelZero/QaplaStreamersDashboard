@@ -178,8 +178,33 @@
         "editBio": "Editar bio",
         "saveChanges": "Guardar cambios",
         "addTag": "Agregar tag",
+        "addTagPlaceholder": "Busca o crea un tag",
         "showUpcomingStreams": "Mostar próximos streams",
-        "social": "Social"
+        "social": "Social",
+        "OnBoarding": {
+            "header1": "Incrementa tu visibilidad",
+            "header2": "Mejora la interacción en vivo",
+            "header3": "Amplifica tu alcance",
+            "body1": "Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil",
+            "body2": "Comparte tus gustos, de que trata tu contenido, ó ¡lo que tu quieras!, para incrementar las posibilidades hacer match con la gente que se pasa a tu stream 💜",
+            "body3": "Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y tus diferentes canales de comunicación 🎙",
+            "presentYourself": "Preséntate con la comunidad",
+            "addTags": "Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.",
+            "yourIntro": "Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉",
+            "minChars": "Min. Caracteres"
+        },
+        "confirmations": {
+            "saveImage": "Imagen guardada correctamente"
+        },
+        "errors": {
+            "addTag": "Hubo un problema al agregar el tag, intentalo mas tarde o contacta con soporte tecnico",
+            "updateTag": "Hubo un problema al actualizar el tag, intentalo mas tarde o contacta con soporte tecnico",
+            "deleteTag": "Hubo un problema al eliminar el tag, intentalo mas tarde o contacta con soporte tecnico",
+            "updateLinks": "Hubo un problema al actualizar los links, intentalo mas tarde o contacta con soporte tecnico",
+            "updateBio": "Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico",
+            "saveImage": "Hubo un error al guardar la imagen, intentalo mas tarde o contacta con soporte tecnico",
+            "emptyBioError": "La bio no puede quedar vacia"
+        }
     },
     "ChargeConfirmationPage": {
         "plansPeriods": {
@@ -196,7 +221,9 @@
     },
     "continue": "Continuar",
     "cancel": "Cancelar",
-    "title": "Título ",
+    "title": "Título",
     "description": "Descripción",
-    "game": "Juego"
+    "game": "Juego",
+    "goToProfile": "Ir a mi perfil",
+    "save": "Guardar"
 }

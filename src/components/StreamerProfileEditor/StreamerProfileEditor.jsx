@@ -3,18 +3,20 @@ import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from
 import { useTranslation } from 'react-i18next';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
+import StreamerProfileEditorOnBoarding from '../StreamerProfileEditorOnBoarding/StreamerProfileEditorOnBoarding';
+
 import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getStreamerLinks, getStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
-
-import { ReactComponent as CopyIcon } from './../../assets/Copy.svg';
+import { getStreamerLinks, listenStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
+import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
 import { ReactComponent as XIcon } from './../../assets/xIcon.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
+import { MIN_TAGS, PROFILE_BACKGROUND_GRADIENTS } from '../../utilities/Constants';
 
 const useStyles = makeStyles((theme) => ({
     gridContainer: {
@@ -205,6 +207,10 @@ const StreamerProfileEditor = ({ user }) => {
             socialPage: 'Youtube',
             value: ''
         },
+        /* {
+            socialPage: 'TikTok',
+            value: ''
+        } */
     ];
 
     const socialLinksPlaceholders = {
@@ -213,20 +219,24 @@ const StreamerProfileEditor = ({ user }) => {
         Instagram: `https://instagram.com/${user ? user.displayName : ''}`,
         Discord: `https://discord.gg/inviteCode`,
         Youtube: `https://youtube.com/chanel/Nos3Ns3C0d3`,
-        tiktok: '' // ToDo: Add tiktok to list of social media links
+        tiktok: `https://www.tiktok.com/@${user ? user.displayName : ''}`
     };
 
     const classes = useStyles();
     const [dataIsFetched, setDataIsFetched] = useState(false);
     const [selectedTab, setSelectedTab] = useState(0);
     const [editingBio, setEditingBio] = useState(false);
+    const [addingTag, setAddingTag] = useState(false);
     const [streamerBio, setStreamerBio] = useState('');
-    const [backgroundUrl, setBackgroundUrl] = useState('https://wallpaperaccess.com/full/2124973.png');
+    const [backgroundUrl, setBackgroundUrl] = useState('');
+    const [backgroundGradient, setBackgroundGradient] = useState(null);
     const [uploadImageStatus, setUploadImageStatus] = useState(0);
     const [socialLinks, setSocialLinks] = useState(socialLinksInitialValue);
     const [streamerTags, setStreamerTags] = useState([]);
     const [socialLinksChanged, setSocialLinksChanged] = useState(false);
     const [openTooltip, setOpenTooltip] = useState(false);
+    const [onBoardingDone, setOnBoardingDone] = useState(true);
+    const [onBoardingStep, setOnBoardingStep] = useState(0);
     const [chipHover, setChipHover] = useState({});
     const { t } = useTranslation();
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
@@ -234,28 +244,58 @@ const StreamerProfileEditor = ({ user }) => {
 
     useEffect(() => {
         async function getStreamerInfo() {
-            const info = await getStreamerPublicProfile(user.uid);
-            if (info.exists()) {
-                const { bio, tags, backgroundUrl } = info.val();
-                setStreamerBio(bio);
-                setBackgroundUrl(backgroundUrl || 'https://wallpaperaccess.com/full/2124973.png');
-                setStreamerTags(tags);
-            }
+            listenStreamerPublicProfile(user.uid, async (info) => {
+                if (info.exists()) {
+                    const { bio, tags, backgroundUrl, backgroundGradient } = info.val();
+                    if (!tags || tags.length < MIN_TAGS) {
+                        setOnBoardingDone(false);
+                        setOnBoardingStep(4);
+                    }
 
-            const links = await getStreamerLinks(user.uid);
-            if (links.exists()) {
-                setSocialLinks(links.val());
-            } else {
-                setSocialLinks(socialLinksInitialValue);
-            }
+                    if (!bio) {
+                        setOnBoardingDone(false);
+                        setOnBoardingStep(3);
+                    }
+                    setStreamerBio(bio || '');
+                    setBackgroundGradient(backgroundGradient);
+                    setBackgroundUrl(backgroundUrl);
+                    setStreamerTags(tags || []);
+                } else {
+                    setOnBoardingDone(false);
+                }
 
-            setDataIsFetched(true);
+                const links = await getStreamerLinks(user.uid);
+                if (links.exists()) {
+                    setSocialLinks(links.val());
+                } else {
+                    setSocialLinks(socialLinksInitialValue);
+                }
+
+                setDataIsFetched(true);
+            });
         }
 
         if (user && user.uid) {
             getStreamerInfo();
         }
     }, [user]);
+
+    const onBoardingDoneByStreamer = async () => {
+        const min = 0;
+        const max = 4;
+        const randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        const backgroundSelected = PROFILE_BACKGROUND_GRADIENTS[randomIndex];
+        setBackgroundGradient(backgroundSelected);
+
+        await updateStreamerPublicProfile(user.uid, {
+            backgroundGradient: backgroundSelected,
+            displayName: user.displayName,
+            photoUrl: user.photoUrl
+        });
+
+        setOnBoardingDone(true);
+    }
 
     const handleTabChange = (event, newValue) => {
         setSelectedTab(newValue)
@@ -269,7 +309,7 @@ const StreamerProfileEditor = ({ user }) => {
             setStreamerTags(tags);
         } catch (error) {
             console.log(error);
-            alert('Hubo un problema al eliminar el tag, intentalo mas tarde o contacta con soporte tecnico');
+            alert(t('StreamerProfileEditor.errors.deleteTag'));
         }
     }
 
@@ -295,57 +335,17 @@ const StreamerProfileEditor = ({ user }) => {
             await saveStreamerLinks(user.uid, objectToSave);
         } catch (error) {
             console.log(error);
-            alert('Hubo un problema al actualizar los links, intentalo mas tarde o contacta con soporte tecnico');
+            alert(t('StreamerProfileEditor.errors.updateLinks'));
         }
         setSocialLinksChanged(false);
     }
 
-    const saveBio = async () => {
-        try {
-            await updateStreamerPublicProfile(user.uid, { bio: streamerBio });
-            setEditingBio(false);
-        } catch (error) {
-            console.log(error);
-            alert('Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico');
-        }
-    }
-
     const addTag = async () => {
-        const value = window.prompt('Tag:');
-
-        if (value) {
-            let tags = [...streamerTags];
-            tags.push(value);
-
-            try {
-                await updateStreamerPublicProfile(user.uid, { tags });
-                setStreamerTags(tags);
-            } catch (error) {
-                console.log(error);
-                alert('Hubo un problema al agregar el tag, intentalo mas tarde o contacta con soporte tecnico');
-            }
-        }
-    }
-
-    const updateTag = async (index, currentValue) => {
-        const value = window.prompt('Tag:', currentValue);
-
-        if (value) {
-            let tags = [...streamerTags];
-            tags[index] = value;
-
-            try {
-                await updateStreamerPublicProfile(user.uid, { tags });
-                setStreamerTags(tags);
-            } catch (error) {
-                console.log(error);
-                alert('Hubo un problema al actualizar el tag, intentalo mas tarde o contacta con soporte tecnico');
-            }
-        }
+        setOnBoardingStep(4);
+        setAddingTag(true);
     }
 
     const uploadBackgroundImage = (e) => {
-        console.log(e.target.files);
         if (e.target.files[0]) {
             const newBackgroundImage = (e.target.files[0]);
             uploadImage(
@@ -356,9 +356,9 @@ const StreamerProfileEditor = ({ user }) => {
                 async (url) => {
                     try {
                         await updateStreamerPublicProfile(user.uid, { backgroundUrl: url });
-                        alert('Imagen guardada correctamente');
+                        alert(t('StreamerProfileEditor.confirmations.saveImage'));
                     } catch (error) {
-                        alert('Hubo un error al guardar la imagen');
+                        alert(t('StreamerProfileEditor.errors.saveImage'));
                         console.log(error);
                     }
                 }
@@ -381,6 +381,33 @@ const StreamerProfileEditor = ({ user }) => {
         }, 1250);
     }
 
+    const createLinearGradientCSS = () => {
+        if (backgroundGradient) {
+            let colorsString = '';
+            backgroundGradient.colors.forEach((color, index) => {
+                if (index !== backgroundGradient.colors.length - 1) {
+                    colorsString += `${color},`;
+                } else {
+                    colorsString += color;
+                }
+            });
+
+            return `linear-gradient(${backgroundGradient.angle}deg, ${colorsString})`;
+        }
+
+        return '';
+    }
+
+    const editBio = () => {
+        setOnBoardingStep(3);
+        setEditingBio(true);
+    }
+
+    const cancelEditing = () => {
+        setEditingBio(false);
+        setAddingTag(false);
+    }
+
     const onDragEnd = (result) => {
         console.log(result)
         if (!result.destination) {
@@ -388,7 +415,7 @@ const StreamerProfileEditor = ({ user }) => {
         }
         let source = result.source.index
         let destination = result.destination.index
-        
+
         if (source === destination) {
             return
         }
@@ -401,290 +428,260 @@ const StreamerProfileEditor = ({ user }) => {
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
                 <>
-                    <div className={styles.coverContainer}>
-                        <img src={backgroundUrl} alt='Cover' className={styles.cover} />
-                    </div>
-                    <div className={styles.editCoverButtonContainer}>
-                        <input
-                            accept='image/*'
-                            style={{ display: 'none' }}
-                            type='file'
-                            id='image-input'
-                            onChange={uploadBackgroundImage} />
-                        <label htmlFor='image-input'>
-                            <EditBioButton id='cover' component='span'>
-                                <CameraIcon style={{
-                                    width: '20px',
-                                    height: '18px'
-                                }} />
-                                <div style={{ width: '0.4rem' }} />
-                                {t('StreamerProfileEditor.editCover')}
-                            </EditBioButton>
-                        </label>
-                    </div>
-                    <div className={styles.profileContainer}>
-                        <div className={styles.profilePicContainer}>
-                            <img src={user.photoUrl} alt='User pfp' className={styles.profilePic} />
-                        </div>
-                        <div className={styles.streamerNameAndEditBioButtonContainer}>
-                            <div className={styles.streamerNameContainer}>
-                                <p className={styles.streamerName}>
-                                    {user.displayName}
-                                </p>
-                                <div className={styles.founderBadgeContainer}>
-                                    <FounderBadge className={styles.founderBadge} />
+                    {onBoardingDone && !editingBio && !addingTag ?
+                        <>
+                            <div className={styles.coverContainer}>
+                                {backgroundUrl ?
+                                    <img src={backgroundUrl} alt='Cover' className={styles.cover} />
+                                    :
+                                    <div className={styles.cover} style={{ background: createLinearGradientCSS() }} />
+                                }
+                            </div>
+                            <div className={styles.editCoverButtonContainer}>
+                                <input
+                                    accept='image/*'
+                                    style={{ display: 'none' }}
+                                    type='file'
+                                    id='image-input'
+                                    onChange={uploadBackgroundImage} />
+                                <label htmlFor='image-input'>
+                                    <EditBioButton id='cover' component='span'>
+                                        <CameraIcon />
+                                        <div style={{ width: '0.4rem' }} />
+                                        {t('StreamerProfileEditor.editCover')}
+                                    </EditBioButton>
+                                </label>
+                            </div>
+                            <div className={styles.profileContainer}>
+                                <div className={styles.profilePicContainer}>
+                                    <img src={user.photoUrl} alt='User pfp' className={styles.profilePic} />
                                 </div>
-                            </div>
-                            <div className={styles.editBioButtonContainer}>
-                                <EditBioButton variant='contained'
-                                    onClick={() => !editingBio ? setEditingBio(true) : saveBio()}>
-                                    {!editingBio ?
-                                        <>
-                                            <EditIcon style={{
-                                                width: '18px',
-                                                height: '18px'
-                                            }} />
-                                            <div style={{ width: '0.4rem' }} />
-                                            {t('StreamerProfileEditor.editBio')}
-                                        </>
-                                        :
-                                        t('StreamerProfileEditor.saveChanges')
-                                    }
-                                </EditBioButton>
-                            </div>
-                        </div>
-                        <div className={styles.twitchURLContainer}>
-                            <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{shortTwitchURL}</a>
-                            <div className={styles.copyIconContainer} onClick={copyTwitchURL}>
-                                <Tooltip placement='top' open={openTooltip} title='Copiado'>
-                                    <CopyIcon style={{
-                                        width: '15px',
-                                        height: '15px'
-                                    }} />
-                                </Tooltip>
-                            </div>
-                        </div>
-                        <div className={styles.bioContainer}>
-                            {!editingBio ?
-                                <p className={styles.bioText} onClick={() => setEditingBio(true)}>
-                                    {streamerBio}
-                                </p>
-                                :
-                                <StreamerTextInput multiline
-                                    fullWidth
-                                    rows={5}
-                                    rowsMax={5}
-                                    onChange={(e) => setStreamerBio(e.target.value)}
-                                    value={streamerBio}
-                                    max />
-                            }
-                        </div>
-                        <ul className={styles.tagsList}>
-                            {streamerTags.map((data, index) => {
-                                const id = `chip-${data}-${index}`  
-                                return (
-                                    <li key={`chip-${data}-${index}`} className={styles.tag}>
-                                        <QaplaChip
-                                            label={data}
-                                            deleteIcon={<div style={{
-                                                width: chipHover[id] ? '32px' : '0px',
-                                                height: chipHover[id] ? '32px' : '0px',
-                                            }}>
-                                                <XIcon style={{
-                                                    width: '12px',
-                                                    height: '12px'
-                                                }} />
-                                            </div>}
-                                            id={id}
-                                            onMouseEnter={(e) => {
-                                                setChipHover({
-                                                    ...chipHover,
-                                                    [id]: true
-                                                })
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                setChipHover({
-                                                    ...chipHover,
-                                                    [id]: false
-                                                })
-                                            }}
-                                            onDelete={() => handleTagDelete(index)}
-                                            onClick={() => updateTag(index, data)}
+                                <div className={styles.streamerNameAndEditBioButtonContainer}>
+                                    <div className={styles.streamerNameContainer}>
+                                        <p className={styles.streamerName}>
+                                            {user.displayName}
+                                        </p>
+                                        <div className={styles.founderBadgeContainer}>
+                                            <FounderBadge className={styles.founderBadge} />
+                                        </div>
+                                    </div>
+                                    <div className={styles.editBioButtonContainer}>
+                                        <EditBioButton variant='contained'
+                                            onClick={editBio}>
+                                            {!editingBio ?
+                                                <>
+                                                    <EditIcon />
+                                                    <div style={{ width: '0.4rem' }} />
+                                                    {t('StreamerProfileEditor.editBio')}
+                                                </>
+                                                :
+                                                t('StreamerProfileEditor.saveChanges')
+                                            }
+                                        </EditBioButton>
+                                    </div>
+                                </div>
+                                {/* <div className={styles.twitchURLContainer}>
+                                    <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
+                                    <Tooltip placement='top' open={openTooltip} title='Copiado'>
+                                        <CopyIcon onClick={copyTwitchURL} />
+                                    </Tooltip>
+                                </div> */}
+                                <div className={styles.bioContainer}>
+                                    <p className={styles.bioText} onClick={editBio}>
+                                        {streamerBio}
+                                    </p>
+                                </div>
+                                <ul className={styles.tagsList}>
+                                    {streamerTags.map((data, index) => {
+                                        return (
+                                            <li key={`chip-${data}-${index}`} className={styles.tag}>
+                                                <QaplaChip
+                                                    label={data}
+                                                    onDelete={() => handleTagDelete(index)}
+                                                />
+                                            </li>
+                                        )
+                                    })}
+                                    <li key='new' className={styles.tag}>
+                                        <QaplaChip onClick={addTag}
+                                            label={t('StreamerProfileEditor.addTag')}
                                         />
                                     </li>
-                                )
-                            })}
-                            <li key='new' className={styles.tag}>
-                                <QaplaChip onClick={addTag}
-                                    label={t('StreamerProfileEditor.addTag')}
-                                />
-                            </li>
-                        </ul>
-                        <div className={styles.showNextStreamsContainer}>
-                            <p className={styles.showNextStreamsText}>
-                                {t('StreamerProfileEditor.showUpcomingStreams')}
-                            </p>
-                            <QaplaSwitch
-                                name='showNextStreams'
-                            /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
-                            />
-                        </div>
-                        <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
-                            <QaplaTab wid label={t('StreamerProfileEditor.social')} {...a11yProps(0)} />
-                            {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
-                        </QaplaTabs>
-                        <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
-                            <DragDropContext onDragEnd={onDragEnd}>
-                                <Droppable droppableId='links-droppable'>
-                                    {(provided, snapshot) => (
-                                        <div style={{ width: '100%' }}
-                                            {...provided.droppableProps}
-                                            ref={provided.innerRef}
-                                        >
-                                            {socialLinks.map((data, index) => (
-                                                <Draggable key={`draggable-link-${index}`} draggableId={`draggable-link-${index}`} index={index}>
-                                                    {(provided, snapshot) => (
-                                                        <div
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                        >
-                                                            <div
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    flexDirection: 'row',
-                                                                    alignItems: 'center',
-                                                                    width: '100%'
-                                                                }}>
-                                                                <div style={{ display: 'flex', width: '100%' }}>
-                                                                    <StreamerTextInput
-                                                                        label={data.socialPage}
-                                                                        containerClassName={styles.socialLinkContainer}
-                                                                        labelClassName={styles.socialLinkLabel}
-                                                                        // textInputClassName={styles.socialLinkTextInput}
-                                                                        value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
-                                                                        disabled={data.socialPage.toLowerCase() === 'twitch'}
-                                                                        placeholder={socialLinksPlaceholders[data.socialPage]}
-                                                                        classes={{ input: classes.linkPlaceholder }}
-                                                                        textInputClassName={classes.linkInput}
-                                                                        fullWidth
-                                                                        onChange={(e) => updateSocialLinks(e.target.value, index)}
-                                                                    />
-                                                                </div>
-                                                                <div style={{
-                                                                    display: 'flex',
-                                                                    backgroundColor: '#141833',
-                                                                    width: '30px',
-                                                                    minWidth: '30px',
-                                                                    height: '45px',
-                                                                    marginBottom: '12px',
-                                                                    alignSelf: 'flex-end',
-                                                                    borderRadius: '8px'
-
-                                                                }} >
-                                                                    <div style={{
-                                                                        display: 'flex',
-                                                                        flex: 1,
-                                                                        padding: '14px 10px',
-                                                                    }}>
+                                </ul>
+                                <div className={styles.showNextStreamsContainer}>
+                                    <p className={styles.showNextStreamsText}>
+                                        {t('StreamerProfileEditor.showUpcomingStreams')}
+                                    </p>
+                                    <QaplaSwitch
+                                        name='showNextStreams'
+                                    /** ToDo: Show streams in profile. Also show twitch status (online or offline) <= more of this on cloud function */
+                                    />
+                                </div>
+                                <QaplaTabs value={selectedTab} onChange={handleTabChange} aria-label='profile editor tabs' >
+                                    <QaplaTab wid label={t('StreamerProfileEditor.social')} {...a11yProps(0)} />
+                                    {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
+                                </QaplaTabs>
+                                <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
+                                    <DragDropContext onDragEnd={onDragEnd}>
+                                        <Droppable droppableId='links-droppable'>
+                                            {(provided, snapshot) => (
+                                                <div style={{ width: '100%' }}
+                                                    {...provided.droppableProps}
+                                                    ref={provided.innerRef}
+                                                >
+                                                    {socialLinks.map((data, index) => (
+                                                        <Draggable key={`draggable-link-${index}`} draggableId={`draggable-link-${index}`} index={index}>
+                                                            {(provided, snapshot) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                >
+                                                                    <div
+                                                                        style={{
+                                                                            display: 'flex',
+                                                                            flexDirection: 'row',
+                                                                            alignItems: 'center',
+                                                                            width: '100%'
+                                                                        }}>
+                                                                        <div style={{ display: 'flex', width: '100%' }}>
+                                                                            <StreamerTextInput
+                                                                                label={data.socialPage}
+                                                                                containerClassName={styles.socialLinkContainer}
+                                                                                labelClassName={styles.socialLinkLabel}
+                                                                                // textInputClassName={styles.socialLinkTextInput}
+                                                                                value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
+                                                                                disabled={data.socialPage.toLowerCase() === 'twitch'}
+                                                                                placeholder={socialLinksPlaceholders[data.socialPage]}
+                                                                                classes={{ input: classes.linkPlaceholder }}
+                                                                                textInputClassName={classes.linkInput}
+                                                                                fullWidth
+                                                                                onChange={(e) => updateSocialLinks(e.target.value, index)}
+                                                                            />
+                                                                        </div>
                                                                         <div style={{
                                                                             display: 'flex',
-                                                                            flex: 1,
-                                                                            flexDirection: 'column',
-                                                                            justifyContent: 'space-between',
-                                                                        }}>
+                                                                            backgroundColor: '#141833',
+                                                                            width: '30px',
+                                                                            minWidth: '30px',
+                                                                            height: '45px',
+                                                                            marginBottom: '12px',
+                                                                            alignSelf: 'flex-end',
+                                                                            borderRadius: '8px'
+
+                                                                        }} >
                                                                             <div style={{
                                                                                 display: 'flex',
                                                                                 flex: 1,
-                                                                                flexDirection: 'row',
-                                                                                justifyContent: 'space-between',
-                                                                                maxHeight: '3px'
+                                                                                padding: '14px 10px',
                                                                             }}>
                                                                                 <div style={{
                                                                                     display: 'flex',
-                                                                                    backgroundColor: '#C4C4C4',
-                                                                                    width: '3px',
-                                                                                    height: '3px',
-                                                                                    borderRadius: '100px'
-                                                                                }} />
-                                                                                <div style={{
-                                                                                    display: 'flex',
-                                                                                    backgroundColor: '#C4C4C4',
-                                                                                    width: '3px',
-                                                                                    height: '3px',
-                                                                                    borderRadius: '100px'
-                                                                                }} />
-                                                                            </div>
-                                                                            <div style={{
-                                                                                display: 'flex',
-                                                                                flex: 1,
-                                                                                flexDirection: 'row',
-                                                                                justifyContent: 'space-between',
-                                                                                maxHeight: '3px'
-                                                                            }}>
-                                                                                <div style={{
-                                                                                    display: 'flex',
-                                                                                    backgroundColor: '#C4C4C4',
-                                                                                    width: '3px',
-                                                                                    height: '3px',
-                                                                                    borderRadius: '100px'
-                                                                                }} />
-                                                                                <div style={{
-                                                                                    display: 'flex',
-                                                                                    backgroundColor: '#C4C4C4',
-                                                                                    width: '3px',
-                                                                                    height: '3px',
-                                                                                    borderRadius: '100px'
-                                                                                }} />
-                                                                            </div>
-                                                                            <div style={{
-                                                                                display: 'flex',
-                                                                                flex: 1,
-                                                                                flexDirection: 'row',
-                                                                                justifyContent: 'space-between',
-                                                                                maxHeight: '3px'
-                                                                            }}>
-                                                                                <div style={{
-                                                                                    display: 'flex',
-                                                                                    backgroundColor: '#C4C4C4',
-                                                                                    width: '3px',
-                                                                                    height: '3px',
-                                                                                    borderRadius: '100px'
-                                                                                }} />
-                                                                                <div style={{
-                                                                                    display: 'flex',
-                                                                                    backgroundColor: '#C4C4C4',
-                                                                                    width: '3px',
-                                                                                    height: '3px',
-                                                                                    borderRadius: '100px'
-                                                                                }} />
+                                                                                    flex: 1,
+                                                                                    flexDirection: 'column',
+                                                                                    justifyContent: 'space-between',
+                                                                                }}>
+                                                                                    <div style={{
+                                                                                        display: 'flex',
+                                                                                        flex: 1,
+                                                                                        flexDirection: 'row',
+                                                                                        justifyContent: 'space-between',
+                                                                                        maxHeight: '3px'
+                                                                                    }}>
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                    </div>
+                                                                                    <div style={{
+                                                                                        display: 'flex',
+                                                                                        flex: 1,
+                                                                                        flexDirection: 'row',
+                                                                                        justifyContent: 'space-between',
+                                                                                        maxHeight: '3px'
+                                                                                    }}>
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                    </div>
+                                                                                    <div style={{
+                                                                                        display: 'flex',
+                                                                                        flex: 1,
+                                                                                        flexDirection: 'row',
+                                                                                        justifyContent: 'space-between',
+                                                                                        maxHeight: '3px'
+                                                                                    }}>
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                    </div>
+                                                                                </div>
+
                                                                             </div>
                                                                         </div>
-
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </div>
-                                    )}
-                                </Droppable>
-                            </DragDropContext>
-
-                            <br />
-                            {socialLinksChanged &&
-                                <ContainedButton onClick={saveLinks}>
-                                    {t('StreamerProfileEditor.saveChanges')}
-                                </ContainedButton>
-                            }
-                        </TabPanel>
-                        <TabPanel value={selectedTab} index={1}>
-                            <p>b</p>
-                        </TabPanel>
-                    </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
+                                    <br />
+                                    {socialLinksChanged &&
+                                        <ContainedButton onClick={saveLinks}>
+                                            {t('StreamerProfileEditor.saveChanges')}
+                                        </ContainedButton>
+                                    }
+                                </TabPanel>
+                                <TabPanel value={selectedTab} index={1}>
+                                    <p>b</p>
+                                </TabPanel>
+                            </div>
+                        </>
+                        :
+                        <StreamerProfileEditorOnBoarding step={onBoardingStep}
+                            user={user}
+                            onBoardingDone={onBoardingDoneByStreamer}
+                            showOnlySpecificStep={editingBio || addingTag}
+                            streamerBio={streamerBio}
+                            streamerTags={streamerTags}
+                            closeOnBoarding={cancelEditing} />
+                    }
                 </>
             }
         </StreamerDashboardContainer>

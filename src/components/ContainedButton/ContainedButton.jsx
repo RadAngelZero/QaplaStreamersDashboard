@@ -12,7 +12,7 @@ const useStyles = makeStyles({
     }
 });
 
-const ContainedButton = ({ children, onClick, size = 'medium', className = {}, startIcon, endIcon, disabled = false, type='button' }) => {
+const ContainedButton = ({ children, onClick, size = 'medium', className = {}, style, startIcon, endIcon, disabled = false, type='button' }) => {
     const classes = useStyles();
 
     return (
@@ -29,7 +29,8 @@ const ContainedButton = ({ children, onClick, size = 'medium', className = {}, s
                 endIcon
                 :
                 null}
-            onClick={onClick}>
+            onClick={onClick}
+            style={style}>
             {children}
         </Button>
     );

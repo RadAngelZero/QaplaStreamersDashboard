@@ -6,13 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 import { signOut } from './../../services/auth';
 import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';
+import { ReactComponent as QaplaLongLogo } from './../../assets/QaplaLongLogo.svg';
 import LanguageSelect from '../LanguageSelect/LanguageSelect';
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     drawer: {
-        [theme.breakpoints.up('sm')]: {
+        [theme.breakpoints.up('lg')]: {
             width: drawerWidth,
             flexShrink: 0,
         },
@@ -24,7 +25,13 @@ const useStyles = makeStyles((theme) => ({
     listItemsText: {
         color: '#FFF',
         fontSize: 14,
-        fontWeight: 500
+        fontWeight: 500,
+        fontFamily: 'Inter'
+    },
+    listItem: {
+        height: '30px',
+        margin: '20px 0px',
+        padding: '0px'
     }
 }));
 
@@ -39,8 +46,8 @@ const DashboardIcon = ({ active }) => (
 
 const ProfileIcon = ({ active }) => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill={active ? "#4040FF" : '#FFF'} d="M4 18.575C4 21.295 7.66237 22 12 22C16.3146 22 20 21.32 20 18.599C20 15.879 16.3386 15.174 12 15.174C7.68538 15.174 4 15.854 4 18.575Z" />
-        <path fill={active ? "#0AFFD2" : 'rgba(255, 255, 255, .25)'} d="M12 12.5831C14.9391 12.5831 17.294 10.2281 17.294 7.29105C17.294 4.35402 14.9391 2 12 2C9.06194 2 6.70605 4.35402 6.70605 7.29105C6.70605 10.2281 9.06194 12.5831 12 12.5831Z" />
+        <path fill={active ? "#4040FF" : 'rgba(255, 255, 255, .25)'} d="M4 18.575C4 21.295 7.66237 22 12 22C16.3146 22 20 21.32 20 18.599C20 15.879 16.3386 15.174 12 15.174C7.68538 15.174 4 15.854 4 18.575Z" />
+        <path fill={active ? "#0AFFD2" : '#FFF'} d="M12 12.5831C14.9391 12.5831 17.294 10.2281 17.294 7.29105C17.294 4.35402 14.9391 2 12 2C9.06194 2 6.70605 4.35402 6.70605 7.29105C6.70605 10.2281 9.06194 12.5831 12 12.5831Z" />
     </svg>
 );
 
@@ -76,7 +83,7 @@ const StreamerSideBar = ({ user }) => {
         setMobileOpen(!mobileOpen);
     };
 
-	const goToSettings = () => {
+    const goToSettings = () => {
         localStorage.setItem('HasVisitedSettings', 'true');
         history.push('/settings');
     }
@@ -85,14 +92,17 @@ const StreamerSideBar = ({ user }) => {
 
     const currentScreen = history.location.pathname.split('/')[1];
 
+
     const drawer = (
-        <Box display='flex' style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap' }} >
-            {/**
-             * ToDo:
-             * Add Qapla Image (see Figma for details)
-             */}
-            <List style={{ marginTop: '1rem' }}>
-                <ListItem button onClick={() => history.push('/profile')}>
+        <Box display='flex' style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap', marginLeft: '21px' }} >
+            <div style={{
+                marginTop: '40px',
+            }}>
+                <QaplaLongLogo />
+
+            </div>
+            <List style={{ marginTop: '50px', padding: '0px' }}>
+                <ListItem button onClick={() => history.push('/profile')} className={classes.listItem}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <DashboardIcon active={currentScreen === 'profile' || currentScreen === 'create' || currentScreen === 'edit' || currentScreen === 'stream'} />
                     </ListItemIcon>
@@ -100,7 +110,7 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => history.push('/editProfile')}>
+                <ListItem button onClick={() => history.push('/editProfile')} className={classes.listItem}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <ProfileIcon active={currentScreen === 'editProfile'} />
                     </ListItemIcon>
@@ -108,15 +118,29 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.universalProfile')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => (user.premium && !user.freeTrial) ? history.push('/subscriptions') : history.push('/membership')}>
-                    <ListItemIcon style={{ minWidth: 40 }}>
-                        <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
-                    </ListItemIcon>
-                    <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
-                        {t('SideBar.membership')}
-                    </ListItemText>
-                </ListItem>
-                <ListItem button onClick={goToSettings}>
+                {user && user.stripeCustomerId ?
+                    <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post'>
+                        <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
+                        <ListItem button type='submit' component='button' className={classes.listItem}>
+                            <ListItemIcon style={{ minWidth: 40 }}>
+                                <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
+                            </ListItemIcon>
+                            <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                                {t('SideBar.membership')}
+                            </ListItemText>
+                        </ListItem>
+                    </form>
+                    :
+                    <ListItem button onClick={() => history.push('/membership')} className={classes.listItem}>
+                        <ListItemIcon style={{ minWidth: 40 }}>
+                            <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
+                        </ListItemIcon>
+                        <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                            {t('SideBar.membership')}
+                        </ListItemText>
+                    </ListItem>
+                }
+                <ListItem button onClick={goToSettings} className={classes.listItem}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <CogIcon active={currentScreen === 'settings'} />
                     </ListItemIcon>
@@ -133,13 +157,14 @@ const StreamerSideBar = ({ user }) => {
                 </ListItem>
             </List>
             <div style={{ flexGrow: 1 }} />
-            <List>
-                <Hidden smUp>
-                    <ListItem style={{ marginTop: '.5rem' }}>
-                        <LanguageSelect />
-                    </ListItem>
-                </Hidden>
-                <ListItem button style={{ marginTop: '.5rem' }} onClick={closeSession}>
+            <List style={{
+                marginBottom: '95px',
+                padding: '0px'
+            }}>
+                <ListItem className={classes.listItem}>
+                    <LanguageSelect />
+                </ListItem>
+                <ListItem button className={classes.listItem} onClick={closeSession}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <LogoutIcon height={32} width={32} />
                     </ListItemIcon>
@@ -156,7 +181,7 @@ const StreamerSideBar = ({ user }) => {
     return (
         <Box display='flex'>
             <nav className={classes.drawer}>
-                <Hidden xsDown>
+                <Hidden mdDown>
                     <Drawer container={container}
                         variant='permanent'
                         anchor={theme.direction === 'rtl' ? 'right' : 'left'}
@@ -171,26 +196,26 @@ const StreamerSideBar = ({ user }) => {
                     </Drawer>
                 </Hidden>
                 {history.location.pathname === '/create' ?
-                <></>
-                :
-                <Hidden smUp>
-                    <IconButton
-                        onClick={handleDrawerToggle}
-                        style={{ position: 'absolute', top: 24, left: 24 }}>
-                        <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
-                    </IconButton>
-                    <Drawer
-                        className={classes.drawer}
-                        classes={{
-                            paper: classes.drawerPaper
-                        }}
-                        open={mobileOpen}
-                        onClose={handleDrawerToggle}
-                        variant='temporary'
-                        anchor={theme.direction === 'rtl' ? 'right' : 'left'}>
-                        {drawer}
-                    </Drawer>
-                </Hidden>
+                    <></>
+                    :
+                    <Hidden lgUp>
+                        <IconButton
+                            onClick={handleDrawerToggle}
+                            style={{ position: 'absolute', top: 24, left: 24 }}>
+                            <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
+                        </IconButton>
+                        <Drawer
+                            className={classes.drawer}
+                            classes={{
+                                paper: classes.drawerPaper
+                            }}
+                            open={mobileOpen}
+                            onClose={handleDrawerToggle}
+                            variant='temporary'
+                            anchor={theme.direction === 'rtl' ? 'right' : 'left'}>
+                            {drawer}
+                        </Drawer>
+                    </Hidden>
                 }
             </nav>
         </Box>

@@ -60,7 +60,6 @@ const StreamerDashboardContainer = ({ children, user, containerStyle = {} }) => 
                     }
                     <div className={`${classes.content} ${containerStyle}`}>
                         {children}
-                        <LanguageHandler />
                     </div>
                 </>
             }

@@ -44,6 +44,12 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#141833',
         borderRadius: '.5rem',
         fontSize: '14px',
+        '& .MuiInputAdornment-root': {
+            width: '20px',
+            marginLeft: '-6px',
+            marginRight: '18px',
+            zIndex: '10'
+        }
     },
     popover: {
         backgroundColor: '#141833',
@@ -54,7 +60,9 @@ const useStyles = makeStyles((theme) => ({
                 backgroundColor: '#707070'
             }
         },
-
+        '& .MuiPickersToolbar-toolbar': {
+            borderRadius: '20px'
+        },
         '& .MuiButtonBase-root:hover:not(.MuiPickersDay-daySelected)': {
             backgroundColor: '#3f51b5',
         },
@@ -178,14 +186,22 @@ const NewStream = ({ user, games }) => {
 
     // The default date is the minDate + 15 minutes, to avoid show the error feedback when the streamer open the screen
     const [selectedDate, setSelectedDate] = useState(new Date(minDate.getTime() + 900000));
+    const [displayDate, setDisplayDate] = useState(new Date(minDate.getTime() + 900000));
     const [selectedGame, setSelectedGame] = useState();
     const [selectedEvent, setSelectedEvent] = useState('exp');
     const [stringDate, setStringDate] = useState('');
+    const [clockOpen, setClockOpen] = useState(false);
+    const [calendarOpen, setCalendarOpen] = useState(false);
     const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
 
 
     const handleDateChange = (date) => {
-        setSelectedDate(date.$d);
+        try {
+            setSelectedDate(date.$d);
+
+        } catch (e) { console.log(e) }
+
+        setDisplayDate(date)
     };
     const handleGameChange = (game) => {
         setSelectedGame(game.target.value);
@@ -227,7 +243,7 @@ const NewStream = ({ user, games }) => {
                      * Check for packages of streams bought by the streamer, if some package has not expired and has not used the total amount of streams bought
                      * the user can create the stream, this function will also remove expired packages or packages that has been already used
                      */
-                     userCanCreateStream = Object.keys(user.boughtStreams).some((streamsPackageId) => {
+                    userCanCreateStream = Object.keys(user.boughtStreams).some((streamsPackageId) => {
                         if (selectedDate.getTime() <= user.boughtStreams[streamsPackageId].expirationTimestamp && (!user.boughtStreams[streamsPackageId].streamsRequested || user.boughtStreams[streamsPackageId].streamsRequested + 1 <= user.boughtStreams[streamsPackageId].boughtStreams)) {
                             addToStreamsRequestedOnStreamsPackage(user.uid, streamsPackageId);
                             return true;
@@ -314,16 +330,20 @@ const NewStream = ({ user, games }) => {
                     </h1>
                     <MuiPickersUtilsProvider utils={DayJsUtils}>
                         <Grid container spacing={4}>
-                            <Grid item sm={4}>
+                            <Grid item sm={4} style={{minWidth: '175px'}}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.date')}
                                 </InputLabel>
                                 <KeyboardDatePicker
+                                    open={calendarOpen}
+                                    onClick={() => setCalendarOpen(true)}
+                                    onOpen={() => {}}
+                                    onClose={() => setCalendarOpen(false)}
                                     clearable
                                     disablePast
                                     disableToolbar
                                     autoOk
-                                    value={selectedDate}
+                                    value={displayDate}
                                     placeholder='10-10-2021'
                                     onChange={handleDateChange}
                                     defaultValue={new Date()}
@@ -347,21 +367,22 @@ const NewStream = ({ user, games }) => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item sm={4}>
+                            <Grid item sm={4} style={{minWidth: '175px'}}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.time')}
                                 </InputLabel>
                                 <KeyboardTimePicker
-                                    ampm={false}
-                                    disableToolbar
+                                    open={clockOpen}
+                                    onClick={() => setClockOpen(true)}
+                                    onOpen={() => {}}
+                                    onClose={() => setClockOpen(false)}
                                     autoOk
                                     error={selectedDate <= minDate}
                                     helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.before24h')}
-                                    value={selectedDate}
+                                    value={displayDate}
                                     placeholder='08:00 AM'
                                     onChange={handleDateChange}
-                                    min
-                                    mask='__:__'
+                                    // mask='__:__ _M'
                                     keyboardIcon={
                                         <InputAdornment position='end' >
                                             <TimeIcon />
@@ -379,7 +400,7 @@ const NewStream = ({ user, games }) => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item sm={8}>
+                            <Grid item sm={8} style={{width: '90%', minWidth: '330px'}}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.confirmDate')}
                                 </InputLabel>
@@ -434,7 +455,7 @@ const NewStream = ({ user, games }) => {
                                     className={classes.label}
                                 >
                                     {t('NewStream.advanced')}
-                            </InputLabel>
+                                </InputLabel>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Grid container direction={'column'} className={classes.accordionGridRoot}>

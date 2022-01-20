@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, makeStyles, Button, Chip, Switch, Tabs, Tab, Tooltip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import StreamerProfileEditorOnBoarding from '../StreamerProfileEditorOnBoarding/StreamerProfileEditorOnBoarding';
 
@@ -12,6 +13,7 @@ import { getStreamerLinks, listenStreamerPublicProfile, saveStreamerLinks, updat
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
+import { ReactComponent as XIcon } from './../../assets/xIcon.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
 import { MIN_TAGS, PROFILE_BACKGROUND_GRADIENTS } from '../../utilities/Constants';
@@ -41,7 +43,13 @@ const EditBioButton = withStyles(() => ({
     root: {
         backgroundColor: '#272D5780',
         color: '#FFFFFF99',
-        padding: '0.6rem 1rem',
+        justifyItems: 'center',
+        padding: '0.8rem 1rem',
+        borderRadius: '0.8rem',
+        maxHeight: '46px',
+        textTransform: 'capitalize',
+        fontSize: '14px',
+        fontWeight: 600,
         '&:hover': {
             backgroundColor: '#24456680'
         },
@@ -60,7 +68,10 @@ const QaplaChip = withStyles(() => ({
     root: {
         backgroundColor: '#272D5780',
         color: '#FFFFFFA6',
-        padding: '0 0.4rem',
+        minHeight: '41px',
+        borderRadius: '100rem',
+        padding: '1.2rem 0.4rem',
+        fontWeight: 600,
         '&:focus': {
             backgroundColor: '#4040FF4F',
         },
@@ -72,18 +83,24 @@ const QaplaChip = withStyles(() => ({
     deletable: {
         backgroundColor: '#4040FF4F',
         color: '#FFFFFFA6',
-        padding: '0 0.4rem',
         '&:focus': {
             backgroundColor: '#4040FF4F',
+        },
+        '&:hover': {
+
         }
     },
     deleteIcon: {
-        color: '#FFFD',
+        display: 'flex',
+        backgroundColor: '#FFFD',
+        borderRadius: '100px',
+        alignItems: 'center',
+        justifyContent: 'center',
         '&:hover': {
-            color: '#F00D'
+            backgroundColor: '#F00D'
         },
         '&:active': {
-            color: '#A00D'
+            backgroundColor: '#A00D'
         }
     }
 }))(Chip)
@@ -108,7 +125,8 @@ const QaplaSwitch = withStyles(() => ({
 
 const QaplaTabs = withStyles({
     root: {
-        minHeight: 0
+        minHeight: 0,
+        marginTop: '3rem'
     },
     indicator: {
         display: 'flex',
@@ -219,9 +237,10 @@ const StreamerProfileEditor = ({ user }) => {
     const [openTooltip, setOpenTooltip] = useState(false);
     const [onBoardingDone, setOnBoardingDone] = useState(true);
     const [onBoardingStep, setOnBoardingStep] = useState(0);
+    const [chipHover, setChipHover] = useState({});
     const { t } = useTranslation();
-
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
+    const shortTwitchURL = `twitch.tv/${user && user.login ? user.login : ''}`;
 
     useEffect(() => {
         async function getStreamerInfo() {
@@ -389,6 +408,22 @@ const StreamerProfileEditor = ({ user }) => {
         setAddingTag(false);
     }
 
+    const onDragEnd = (result) => {
+        console.log(result)
+        if (!result.destination) {
+            return
+        }
+        let source = result.source.index
+        let destination = result.destination.index
+
+        if (source === destination) {
+            return
+        }
+        //check for change to setState
+        socialLinks.splice(destination, 0, socialLinks.splice(source, 1)[0])
+        setSocialLinksChanged(true)
+    }
+
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.profileEditorContainer}>
             {dataIsFetched &&
@@ -487,27 +522,145 @@ const StreamerProfileEditor = ({ user }) => {
                                     {/* <QaplaTab label='Códigos de creador' {...a11yProps(1)} /> */}
                                 </QaplaTabs>
                                 <TabPanel value={selectedTab} index={0} className={styles.socialLinksContainer}>
-                                    {socialLinks.map((data, index) => {
-                                        return (
-                                            <>
-                                                {/* <p className={styles.socialLinkLabel}>{data.socialPage}</p> */}
-                                                <StreamerTextInput
-                                                    key={`SocialLink-${index}`}
-                                                    label={data.socialPage}
-                                                    containerClassName={styles.socialLinkContainer}
-                                                    labelClassName={styles.socialLinkLabel}
-                                                    // textInputClassName={styles.socialLinkTextInput}
-                                                    value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
-                                                    disabled={data.socialPage.toLowerCase() === 'twitch'}
-                                                    placeholder={socialLinksPlaceholders[data.socialPage]}
-                                                    classes={{ input: classes.linkPlaceholder }}
-                                                    textInputClassName={classes.linkInput}
-                                                    fullWidth
-                                                    onChange={(e) => updateSocialLinks(e.target.value, index)}
-                                                />
-                                            </>
-                                        )
-                                    })}
+                                    <DragDropContext onDragEnd={onDragEnd}>
+                                        <Droppable droppableId='links-droppable'>
+                                            {(provided, snapshot) => (
+                                                <div style={{ width: '100%' }}
+                                                    {...provided.droppableProps}
+                                                    ref={provided.innerRef}
+                                                >
+                                                    {socialLinks.map((data, index) => (
+                                                        <Draggable key={`draggable-link-${index}`} draggableId={`draggable-link-${index}`} index={index}>
+                                                            {(provided, snapshot) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                >
+                                                                    <div
+                                                                        style={{
+                                                                            display: 'flex',
+                                                                            flexDirection: 'row',
+                                                                            alignItems: 'center',
+                                                                            width: '100%'
+                                                                        }}>
+                                                                        <div style={{ display: 'flex', width: '100%' }}>
+                                                                            <StreamerTextInput
+                                                                                label={data.socialPage}
+                                                                                containerClassName={styles.socialLinkContainer}
+                                                                                labelClassName={styles.socialLinkLabel}
+                                                                                // textInputClassName={styles.socialLinkTextInput}
+                                                                                value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
+                                                                                disabled={data.socialPage.toLowerCase() === 'twitch'}
+                                                                                placeholder={socialLinksPlaceholders[data.socialPage]}
+                                                                                classes={{ input: classes.linkPlaceholder }}
+                                                                                textInputClassName={classes.linkInput}
+                                                                                fullWidth
+                                                                                onChange={(e) => updateSocialLinks(e.target.value, index)}
+                                                                            />
+                                                                        </div>
+                                                                        <div style={{
+                                                                            display: 'flex',
+                                                                            backgroundColor: '#141833',
+                                                                            width: '30px',
+                                                                            minWidth: '30px',
+                                                                            height: '45px',
+                                                                            marginBottom: '12px',
+                                                                            alignSelf: 'flex-end',
+                                                                            borderRadius: '8px'
+
+                                                                        }} >
+                                                                            <div style={{
+                                                                                display: 'flex',
+                                                                                flex: 1,
+                                                                                padding: '14px 10px',
+                                                                            }}>
+                                                                                <div style={{
+                                                                                    display: 'flex',
+                                                                                    flex: 1,
+                                                                                    flexDirection: 'column',
+                                                                                    justifyContent: 'space-between',
+                                                                                }}>
+                                                                                    <div style={{
+                                                                                        display: 'flex',
+                                                                                        flex: 1,
+                                                                                        flexDirection: 'row',
+                                                                                        justifyContent: 'space-between',
+                                                                                        maxHeight: '3px'
+                                                                                    }}>
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                    </div>
+                                                                                    <div style={{
+                                                                                        display: 'flex',
+                                                                                        flex: 1,
+                                                                                        flexDirection: 'row',
+                                                                                        justifyContent: 'space-between',
+                                                                                        maxHeight: '3px'
+                                                                                    }}>
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                    </div>
+                                                                                    <div style={{
+                                                                                        display: 'flex',
+                                                                                        flex: 1,
+                                                                                        flexDirection: 'row',
+                                                                                        justifyContent: 'space-between',
+                                                                                        maxHeight: '3px'
+                                                                                    }}>
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                        <div style={{
+                                                                                            display: 'flex',
+                                                                                            backgroundColor: '#C4C4C4',
+                                                                                            width: '3px',
+                                                                                            height: '3px',
+                                                                                            borderRadius: '100px'
+                                                                                        }} />
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
                                     <br />
                                     {socialLinksChanged &&
                                         <ContainedButton onClick={saveLinks}>

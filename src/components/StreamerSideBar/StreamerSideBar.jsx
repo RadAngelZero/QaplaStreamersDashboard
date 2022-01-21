@@ -84,7 +84,6 @@ const StreamerSideBar = ({ user }) => {
     };
 
     const goToSettings = () => {
-        localStorage.setItem('HasVisitedSettings', 'true');
         history.push('/settings');
     }
 
@@ -98,9 +97,7 @@ const StreamerSideBar = ({ user }) => {
     }
 
     const showNewLabelOnUniversalProfile = localStorage.getItem('HasVisitedUniversalProfile') === null;
-
     const currentScreen = history.location.pathname.split('/')[1];
-
 
     const drawer = (
         <Box display='flex' style={{ flex: 1, flexDirection: 'column', flexWrap: 'wrap', marginLeft: '21px' }} >

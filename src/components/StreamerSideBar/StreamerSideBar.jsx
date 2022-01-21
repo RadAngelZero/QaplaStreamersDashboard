@@ -88,7 +88,16 @@ const StreamerSideBar = ({ user }) => {
         history.push('/settings');
     }
 
-    const showNewLabelOnSettings = localStorage.getItem('HasVisitedSettings') === null;
+    const goToUniversalProfile = () => {
+        if (localStorage.getItem('HasVisitedSettings')) {
+            localStorage.removeItem('HasVisitedSettings');
+        }
+
+        localStorage.setItem('HasVisitedUniversalProfile', 'true');
+        history.push('/editProfile');
+    }
+
+    const showNewLabelOnUniversalProfile = localStorage.getItem('HasVisitedUniversalProfile') === null;
 
     const currentScreen = history.location.pathname.split('/')[1];
 
@@ -110,13 +119,20 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => history.push('/editProfile')} className={classes.listItem}>
+                <ListItem button onClick={goToUniversalProfile} className={classes.listItem}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <ProfileIcon active={currentScreen === 'editProfile'} />
                     </ListItemIcon>
                     <ListItemText style={{ opacity: currentScreen === 'editProfile' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                         {t('SideBar.universalProfile')}
                     </ListItemText>
+                    {showNewLabelOnUniversalProfile &&
+                        <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)', marginRight: 8 }}>
+                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 12, marginLeft: 12, marginTop: 6, marginBottom: 6 }}>
+                                {t('SideBar.new')}
+                            </p>
+                        </div>
+                    }
                 </ListItem>
                 {user && user.stripeCustomerId ?
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post'>
@@ -147,13 +163,6 @@ const StreamerSideBar = ({ user }) => {
                     <ListItemText style={{ opacity: currentScreen === 'settings' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                         {t('SideBar.settings')}
                     </ListItemText>
-                    {showNewLabelOnSettings &&
-                        <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)' }}>
-                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 24, marginLeft: 24, marginTop: 8, marginBottom: 8 }}>
-                                {t('SideBar.new')}
-                            </p>
-                        </div>
-                    }
                 </ListItem>
             </List>
             <div style={{ flexGrow: 1 }} />

@@ -218,10 +218,10 @@
             "yearly": "/ every year"
         },
         "payment": "Payment",
-        "fullPaymentUntilToday": "Full payment until today",
-        "thanksForSubscribing": "Thanks for your subscription",
-        "paymentProcessedSuccessfuly": "Your payment has been processed successfully! You will receive a proof of your payment in your email in the name of QAPLAGG",
-        "publishStream": "Publish a stream",
+        "fullPaymentUntilToday": "Total paid today",
+        "thanksForSubscribing": "Thanks for subscribing",
+        "paymentProcessedSuccessfuly": "Your payment has been processed successfully! A receipt from QAPLAGG will be sent to your email",
+        "publishStream": "Post a stream",
         "backToDashboard": "Back to dashboard"
     },
     "continue": "Continue",

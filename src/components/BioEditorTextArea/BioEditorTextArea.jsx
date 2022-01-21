@@ -141,10 +141,10 @@ const BioEditorTextArea = ({ bio, setBio, error, minLength }) => {
 
     const updateBio = (e) => {
         const updatedBio = e.target.value;
-        const numberOfLines = textAreaRef.current.scrollHeight / TEXT_INPUT_LINE_HEIGHT;
+        const numberOfLines = Math.floor(textAreaRef.current.scrollHeight / TEXT_INPUT_LINE_HEIGHT);
 
         if (updatedBio[0] !== '\n') {
-            if (updatedBio.split('\n').length <= MAX_ROWS_IN_BIO && numberOfLines === MAX_ROWS_IN_BIO) {
+            if (updatedBio.split('\n').length <= MAX_ROWS_IN_BIO && numberOfLines <= MAX_ROWS_IN_BIO) {
                 setBio(updatedBio);
             } else if (updatedBio.length < bio.length) {
                 setBio(updatedBio);
@@ -194,8 +194,8 @@ const BioEditorTextArea = ({ bio, setBio, error, minLength }) => {
                 </FormattingButton>
             </div> */}
             <TextField multiline
-                maxRows={5}
-                rows={5}
+                maxRows={MAX_ROWS_IN_BIO}
+                rows={MAX_ROWS_IN_BIO}
                 value={bio}
                 onChange={updateBio}
                 InputProps={{ disableUnderline: true, className: classes.textInputContainer }}

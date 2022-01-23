@@ -333,9 +333,7 @@ const StreamerProfileEditor = ({ user }) => {
         // Creates an array without the placeholder value
         const objectToSave = {};
         socialLinks.forEach((link, index) => {
-            if (link.value !== '') {
-                objectToSave[index] = { socialPage: link.socialPage, value: link.value };
-            }
+            objectToSave[index] = { socialPage: link.socialPage, value: link.value };
         });
 
         try {

@@ -191,7 +191,9 @@
             "presentYourself": "Introduce yourself to the community",
             "addTags": "Add tags that represent you as the creator, your persona, your content, etc.",
             "yourIntro": "Your intro is a glimpse of yourself and your content. Make it nice 😉",
-            "minChars": "Min. Characters"
+            "minChars": "Min. Characters",
+            "tagErrorNotSelected": "To add a tag write and/or click on it",
+            "minTags": "Add at least {{minTags}} tags to continue"
         },
         "confirmations": {
             "saveImage": "Image saved successfully"

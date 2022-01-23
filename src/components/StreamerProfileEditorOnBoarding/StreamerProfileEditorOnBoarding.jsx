@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditorOnBoarding.module.css';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { updateStreamerPublicProfile } from '../../services/database';
+import { saveTags, updateStreamerPublicProfile } from '../../services/database';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
@@ -55,7 +55,8 @@ const QaplaDots = ({ index, dots, activeWidth = '30px' }) => {
 
     for (let i = 0; i < dots; i++) {
         dotsRender.push(
-            <div style={{
+            <div key={`dot-${i}`}
+            style={{
                 backgroundColor: index === i ? '#00FEDF' : '#00FEDF8A',
                 width: index === i ? activeWidth : '8px',
                 height: '8px',
@@ -124,7 +125,16 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
         } else {
             const tagsSelected = tags.filter((tag) => tag.selected);
             if (tagsSelected.length >= MIN_TAGS) {
-                await updateStreamerPublicProfile(user.uid, { tags: tagsSelected.map((tag) => tag.label) });
+                const tagsLabels = tagsSelected.map((tag) => tag.label);
+                await updateStreamerPublicProfile(user.uid, { tags: tagsLabels });
+
+                // We don´t know how we are going to use this information but we want to save it
+                const tagObject = {};
+                tagsLabels.forEach((tag) => {
+                    tagObject[tag] = true;
+                });
+
+                saveTags(tagObject);
                 if (showOnlySpecificStep) {
                     return closeOnBoarding();
                 } else {
@@ -163,6 +173,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
     }
 
     const tagClick = (data, index, e) => {
+        setShowTagHelper(false);
         setTagError(false);
         let tagsArr = [...tags]
         tagsArr[index] = {
@@ -284,9 +295,9 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                         {tagError &&
                             <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>
                                 {showTagHelper ?
-                                    'Para agregar un tag escribelo y/o da click en el'
+                                    t('StreamerProfileEditor.OnBoarding.tagErrorNotSelected')
                                     :
-                                    `Agrega al menos ${MIN_TAGS} tags para continuar`
+                                    t('StreamerProfileEditor.OnBoarding.minTags', { minTags: MIN_TAGS })
                                 }
                             </p>
                         }

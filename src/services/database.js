@@ -25,6 +25,7 @@ const streamsPackagesRef = database.ref('/StreamsPackages');
 const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDetails');
 const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
 const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
+const tagsRef = database.ref('/Tags');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -829,4 +830,12 @@ export async function updateStreamerPublicProfile(uid, dataToUpdate) {
  */
 export async function getSubscriptionPurchaseDetails(uid, subscriptionId) {
     return await subscriptionPurchaseDetailsRef.child(uid).child(subscriptionId).once('value');
+}
+
+/**
+ * Save all the tags on te Tags node
+ * @param {object} tags Object of tags in format { tag1: true, tag2: true }
+ */
+export async function saveTags(tags) {
+    await tagsRef.update(tags);
 }

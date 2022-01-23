@@ -191,7 +191,9 @@
             "presentYourself": "Preséntate con la comunidad",
             "addTags": "Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.",
             "yourIntro": "Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉",
-            "minChars": "Min. Caracteres"
+            "minChars": "Min. Caracteres",
+            "tagErrorNotSelected": "Para agregar un tag escribelo y/o da click en el",
+            "minTags": "Agrega al menos {{minTags}} tags para continuar"
         },
         "confirmations": {
             "saveImage": "Imagen guardada correctamente"

@@ -240,7 +240,6 @@ const StreamerProfileEditor = ({ user }) => {
     const [chipHover, setChipHover] = useState({});
     const { t } = useTranslation();
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
-    const shortTwitchURL = `twitch.tv/${user && user.login ? user.login : ''}`;
 
     useEffect(() => {
         async function getStreamerInfo() {
@@ -268,6 +267,12 @@ const StreamerProfileEditor = ({ user }) => {
                 if (links.exists()) {
                     setSocialLinks(links.val());
                 } else {
+                    /**
+                     * Set Twitch Link by default (we already know this link)
+                     */
+                    const socialLinksWithTwitchAdded = socialLinksInitialValue;
+                    socialLinksWithTwitchAdded[0].value = twitchURL;
+
                     setSocialLinks(socialLinksInitialValue);
                 }
 
@@ -328,7 +333,9 @@ const StreamerProfileEditor = ({ user }) => {
         // Creates an array without the placeholder value
         const objectToSave = {};
         socialLinks.forEach((link, index) => {
-            objectToSave[index] = { socialPage: link.socialPage, value: link.value };
+            if (link.value !== '') {
+                objectToSave[index] = { socialPage: link.socialPage, value: link.value };
+            }
         });
 
         try {
@@ -409,7 +416,6 @@ const StreamerProfileEditor = ({ user }) => {
     }
 
     const onDragEnd = (result) => {
-        console.log(result)
         if (!result.destination) {
             return
         }
@@ -419,9 +425,12 @@ const StreamerProfileEditor = ({ user }) => {
         if (source === destination) {
             return
         }
-        //check for change to setState
-        socialLinks.splice(destination, 0, socialLinks.splice(source, 1)[0])
-        setSocialLinksChanged(true)
+
+        const socialLinksCopy = [...socialLinks];
+        socialLinksCopy.splice(destination, 0, socialLinksCopy.splice(source, 1)[0]);
+
+        setSocialLinks(socialLinksCopy);
+        setSocialLinksChanged(true);
     }
 
     return (
@@ -549,8 +558,7 @@ const StreamerProfileEditor = ({ user }) => {
                                                                                 label={data.socialPage}
                                                                                 containerClassName={styles.socialLinkContainer}
                                                                                 labelClassName={styles.socialLinkLabel}
-                                                                                // textInputClassName={styles.socialLinkTextInput}
-                                                                                value={data.socialPage.toLowerCase() === 'twitch' ? twitchURL : data.value}
+                                                                                value={data.value}
                                                                                 disabled={data.socialPage.toLowerCase() === 'twitch'}
                                                                                 placeholder={socialLinksPlaceholders[data.socialPage]}
                                                                                 classes={{ input: classes.linkPlaceholder }}

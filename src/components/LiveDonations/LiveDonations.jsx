@@ -102,8 +102,9 @@ const LiveDonations = () => {
 
     document.body.style.backgroundColor = 'transparent';
 
+
     return (
-        <div style={{ backgroundColor: 'transparent', height: '200px', width: '400px', flex: 1 }}>
+        <div style={{ display: 'flex', backgroundColor: 'transparent', height: '500px', width: '1920px', placeItems: 'flex-end' }}>
             {donationToShow &&
                 <>
                     <DonationHandler donationToShow={donationToShow} />
@@ -116,47 +117,76 @@ const LiveDonations = () => {
 const DonationHandler = (donationToShow) => {
     const donation = donationToShow.donationToShow;
     return (
-        <div style={{ display: 'flex', flex: 1, flexDirection: 'column', fontFamily: 'Montserrat', backgroundColor: '#f0f0' }}>
+        <div style={{
+            display: 'flex',
+            flex: 1,
+            flexDirection: 'column',
+            backgroundColor: '#f0f0',
+            padding: '0px 40px',
+            marginBottom: '30px',
+            marginLeft: donation.isRightSide ? '0px' : '20px',
+            marginRight: donation.isRightSide ? '20px' : '0px'
+        }}>
+            <img src='https://pbs.twimg.com/profile_images/1377794552677949440/AA4l5bPZ_400x400.jpg' alt='Imagen' style={{
+                display: 'flex',
+                alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                maxHeight: '250px',
+                objectFit: 'scale-down'
+            }} />
             <div
-                className={styles.donationBubble}
                 style={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-around',
+                    marginTop: '20px',
                     width: 'fit-content',
-                    minWidth: '340px',
-                    height: '60px',
-                    borderRadius: '18px',
-                    padding: '0 18px',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start'
+                    backgroundColor: '#4D00FB',
+                    marginLeft: donation.isRightSide ? '0px' : '-30px',
+                    marginRight: donation.isRightSide ? '-30px' : '0px',
+                    borderRadius: '30px',
+                    padding: '24px 24px',
+                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    zIndex: 10
                 }}
             >
                 <div style={{ display: 'flex', alignSelf: 'center' }}>
-                    <p style={{ display: 'flex', color: 'white', fontSize: '1.05rem', textAlign: 'center' }}>
-                        <b style={{ color: '#09ffd2' }}>{donation.twitchUserName}</b>
+                    <p style={{
+                        display: 'flex',
+                        color: 'white',
+                        fontSize: '26px',
+                        textAlign: 'center'
+                    }}>
+                        <b style={{ color: '#0AFFD2' }}>{donation.twitchUserName}</b>
                         <div style={{ margin: '0 6px' }}>ha enviado</div>
-                        <b style={{ color: '#09ffd2' }}>{donation.amountQoins} Qoins</b>
+                        <b style={{ color: '#0AFFD2', fontWeight: '700', }}>{donation.amountQoins} Qoins</b>
                     </p>
                 </div>
                 <div style={{ width: '10px' }}></div>
-                <div style={{ display: 'flex', flex: 1, alignSelf: 'center' }}>
-                    <DonatedQoin style={{ display: 'flex', flex: 1 }} />
+                <div style={{ display: 'flex', alignSelf: 'center' }}>
+                    <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
                 </div>
             </div>
             {donation.message !== '' &&
                 <>
-                    <div style={{ display: 'flex', height: '6px' }}></div>
                     <div style={{
                         display: 'flex',
                         width: 'fit-content',
-                        backgroundColor: '#4D00FB',
-                        borderRadius: '18px',
-                        borderBottomLeftRadius: donation.isRightSide ? '18px' : '4px',
-                        borderBottomRightRadius: donation.isRightSide ? '4px' : '18px',
-                        padding: '16.3px 20.4px',
-                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start'
+                        backgroundColor: '#FFFFFF',
+                        marginTop: '-20px',
+                        borderRadius: '30px',
+                        borderTopLeftRadius: donation.isRightSide ? '30px' : '0px',
+                        borderTopRightRadius: donation.isRightSide ? '0px' : '30px',
+                        padding: '30px',
+                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
                     }}>
-                        <p style={{ display: 'flex', color: 'white', fontSize: '1rem' }}>{donation.message}</p>
+                        <p style={{
+                            display: 'flex',
+                            color: '#0D1021',
+                            fontSize: '24px',
+                            fontWeight: '600',
+                            lineHeight: '36px',
+                            letterSpacing: '0.6px'
+                        }}>{donation.message}</p>
                     </div>
                 </>
             }

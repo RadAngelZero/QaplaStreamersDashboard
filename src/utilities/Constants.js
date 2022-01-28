@@ -74,8 +74,8 @@ export const TWITCH_REDIRECT_URI = !process.env.NODE_ENV || process.env.NODE_ENV
 /**
  * Alert Side Selection
  */
-export const LEFT = false;
-export const RIGHT = true;
+export const LEFT = 'LEFT';
+export const RIGHT = 'RIGHT';
 
 /**
  * Streams Status

@@ -17,7 +17,7 @@ import Step3 from './../../assets/addCheersTutorial3.jpg';
 import Step4 from './../../assets/addCheersTutorial4.jpg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
-import { writeTestCheer } from './../../services/database';
+import { setAlertSetting, writeTestCheer } from './../../services/database';
 
 const useStyles = makeStyles(() => ({
     instructionsMargin: {
@@ -101,7 +101,10 @@ const CheersSettings = ({ uid, twitchId }) => {
         writeTestCheer(uid, t('CheersSettings.testCheerSuccess'), t('CheersSettings.testCheerError'));
     }
 
-    const changeSide = (e) => setSide(e.target.value);
+    const changeSide = (e) => {
+        setSide(e.target.value);
+        setAlertSetting(uid, 'alertSideRight', e.target.value === RIGHT);
+    }
 
     return (
         <div className={classes.container}>

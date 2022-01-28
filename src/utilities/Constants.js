@@ -72,6 +72,12 @@ export const TWITCH_SECRET_ID = 'xt2ed1xz00cwglz34fu2m95k77xnj6';
 export const TWITCH_REDIRECT_URI = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://dashboard.qapla.gg/';
 
 /**
+ * Alert Side Selection
+ */
+export const LEFT = false;
+export const RIGHT = true;
+
+/**
  * Streams Status
  */
 export const PENDING_APPROVAL_EVENT_TYPE = 1;

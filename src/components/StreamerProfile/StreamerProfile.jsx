@@ -8,6 +8,12 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
+import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
+import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
+import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
+import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
+import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
+
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import { loadStreamsByStatus } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
@@ -16,10 +22,6 @@ import {
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE
 } from '../../utilities/Constants';
-import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
-import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
-import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
-import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 
 const BalanceInfoTooltip = withStyles(() => ({

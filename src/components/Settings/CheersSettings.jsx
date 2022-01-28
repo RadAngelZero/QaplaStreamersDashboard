@@ -2,16 +2,24 @@ import React, { useState } from 'react';
 import { makeStyles, Grid, Card, CardMedia, Tooltip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
+import {
+    LEFT,
+    RIGHT
+} from '../../utilities/Constants';
+
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
+import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
+
 import Step1 from './../../assets/addCheersTutorial1.jpg';
 import Step2 from './../../assets/addCheersTutorial2.jpg';
 import Step3 from './../../assets/addCheersTutorial3.jpg';
 import Step4 from './../../assets/addCheersTutorial4.jpg';
 import ContainedButton from '../ContainedButton/ContainedButton';
+import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import { writeTestCheer } from './../../services/database';
 
-const useStyles = makeStyles(() =>({
+const useStyles = makeStyles(() => ({
     instructionsMargin: {
         marginTop: 50
     },
@@ -78,6 +86,7 @@ const CheersSettings = ({ uid, twitchId }) => {
     const classes = useStyles();
     const cheersURL = `https://dashboard.qapla.gg/liveDonations/${twitchId}`;
     const [openTooltip, setOpenTooltip] = useState(false);
+    const [side, setSide] = useState(LEFT);
     const { t } = useTranslation();
 
     const copyCheersURL = () => {
@@ -92,6 +101,8 @@ const CheersSettings = ({ uid, twitchId }) => {
         writeTestCheer(uid, t('CheersSettings.testCheerSuccess'), t('CheersSettings.testCheerError'));
     }
 
+    const changeSide = (e) => setSide(e.target.value);
+
     return (
         <div className={classes.container}>
             <p className={classes.instructionTitle}>
@@ -101,16 +112,38 @@ const CheersSettings = ({ uid, twitchId }) => {
                 {t('CheersSettings.description')}
             </p>
             <Grid container className={classes.instructionsMargin}>
-                <Grid sm={6} xs={12}>
-                    <StreamerTextInput
-                        Icon={
-                            <Tooltip placement='top' open={openTooltip} title='Copiado'>
-                                <CopyIcon className={classes.cursorPointer} onClick={copyCheersURL} />
-                            </Tooltip>
-                        }
-                        textInputClassName={classes.link}
-                        fullWidth
-                        value={cheersURL} />
+                <Grid container xs={10} style={{ alignItems: 'center', gap: '20px'}} >
+                    <Grid item xs={4} style={{
+                        display: 'flex',
+                        minWidth: '230px',
+                        maxWidth: '240px'
+                    }}>
+                        <StreamerSelect
+                            style={{ height: '58px', width: '230px', margin: '0px' }}
+                            value={side}
+                            onChange={changeSide}
+                            Icon={ArrowIcon}>
+                            <option value={LEFT}>
+                                {t('Left')}
+                            </option>
+                            <option value={RIGHT}>
+                                {t('Right')}
+                            </option>
+                        </StreamerSelect>
+                    </Grid>
+                    <Grid item xs={8} style={{ display: 'flex' }}>
+                        <StreamerTextInput
+                            textInputStyle={{ margin: '0px' }}
+                            containerStyle={{ minWidth: '500px' }}
+                            Icon={
+                                <Tooltip placement='top' open={openTooltip} title='Copiado'>
+                                    <CopyIcon className={classes.cursorPointer} onClick={copyCheersURL} />
+                                </Tooltip>
+                            }
+                            textInputClassName={classes.link}
+                            fullWidth
+                            value={cheersURL} />
+                    </Grid>
                 </Grid>
             </Grid>
             <InstructionSection title={t('CheersSettings.instruction0.title')}

@@ -76,7 +76,7 @@ const LiveDonations = () => {
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         audio = new Audio(TEST_MESSAGE_SPEECH_URL);
                     } else {
-                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, donation.message, 'pt-BR-Standard-B', 'es-MX');
+                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, donation.message, 'es-US-Standard-A', 'es-MX');
                         audio = new Audio(cheerMessageUrl.data);
                     }
                 }

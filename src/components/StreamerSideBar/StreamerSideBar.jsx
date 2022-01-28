@@ -207,7 +207,7 @@ const StreamerSideBar = ({ user }) => {
                     <Hidden lgUp>
                         <IconButton
                             onClick={handleDrawerToggle}
-                            style={{ position: 'absolute', top: 24, left: 24 }}>
+                            style={{ position: 'absolute', top: 28, left: 24 }}>
                             <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
                         </IconButton>
                         <Drawer

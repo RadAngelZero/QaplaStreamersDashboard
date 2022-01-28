@@ -8,6 +8,9 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
+import { ReactComponent as QoinBN } from './../../assets/QoinBN.svg';
+import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
+
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import { loadStreamsByStatus } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
@@ -166,7 +169,7 @@ const StreamerProfile = ({ user, games }) => {
         }
     }
 
-    const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType }});
+    const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType } });
 
     const changestreamType = (e) => setStreamType(parseInt(e.target.value));
 
@@ -190,7 +193,7 @@ const StreamerProfile = ({ user, games }) => {
     }
 
     const onRemoveStream = (streamId) => {
-        const streamsCopy = {...streams};
+        const streamsCopy = { ...streams };
         delete streamsCopy[streamId];
         setStreams(streamsCopy);
     }
@@ -199,9 +202,9 @@ const StreamerProfile = ({ user, games }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <Box display="flex" flexDirection="row" >
+                    <Box display="flex" flexDirection="row" flexWrap={"wrap"} gridGap={"20px"} height={"48px"} className={styles.header} >
                         <Hidden lgUp>
-                            <div style={{ width: '45px' }}></div>
+                            <div style={{ width: '30px' }}></div>
                         </Hidden>
                         <div className={styles.avatarContainer}>
                             <Avatar
@@ -209,37 +212,61 @@ const StreamerProfile = ({ user, games }) => {
                                 src={user.photoUrl} />
                             <span className={styles.streamerName}>{user.displayName}</span>
                         </div>
+                        <Button variant='contained'
+                            className={styles.twitchButton}
+                            onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
+                            startIcon={<TwitchIcon style={{ width: '20px', height: '20px' }} />}>
+                            {user.displayName}
+                        </Button>
                     </Box>
                     <Grid container>
                         <Grid item xs={12}>
-                            <Grid container>
-                                <Grid xs={12} sm={7}>
-                                    <Grid item xs={12}>
-                                        <Button variant='contained'
-                                            className={styles.twitchButton}
-                                            onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
-                                            startIcon={<TwitchIcon />}>
-                                            {user.displayName}
-                                        </Button>
+                            <Grid container xs={12}>
+                                <Grid xs={12}>
+                                    <Grid container xs={11} style={{}}>
+                                        <Grid item xs={12}>
+                                            <h1 className={styles.title}>
+                                                {t('StreamerProfile.balance')}
+                                            </h1>
+                                        </Grid>
+                                        <Grid container xs={12} style={{ gap: '24px' }} >
+                                            <Grid item xs={8} className={styles.balanceContainers}>
+                                                <QoinBN style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                <div className={styles.balanceInnerContainer}>
+                                                    <p>Cheers</p>
+                                                    <p className={styles.balanceDataText}>{user.qoinsBalance || 0}</p>
+                                                </div>
+                                            </Grid>
+                                            <Grid item xs={8} className={styles.balanceContainers}>
+                                                <DonatedQoin style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                <div className={styles.balanceInnerContainer}>
+                                                    <p>Qlan</p>
+                                                    <p className={styles.balanceDataText}>{user.qoinsBalance || 0}</p>
+                                                </div>
+                                            </Grid>
+                                            <Grid item xs={8} className={styles.balanceContainers}>
+                                                <BitsIcon style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                <div className={styles.balanceInnerContainer}>
+                                                    <p>{t('StreamerProfile.stimatedBits')}</p>
+                                                    <p className={styles.balanceDataText}>{user.bitsBalance || 0}</p>
+
+                                                </div>
+                                            </Grid>
+                                        </Grid>
+
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <Grid container style={{ marginTop: '6rem' }}>
-                                            <Hidden xsDown>
-                                                <div style={{ position: 'absolute', top: 48, right: 32, widt: 360, maxWidth: 420 }}>
-                                                    <CheersBalanceCard user={user} />
-                                                </div>
-                                            </Hidden>
-                                            <Hidden smUp>
-                                                <Grid item xs={12}>
-                                                    <CheersBalanceCard user={user} />
-                                                </Grid>
-                                            </Hidden>
-                                            <Grid item xs={12} sm={3}>
+                                        <Grid container className={styles.myStreamsContainer}>
+                                            <Grid item xs={12} sm={6} style={{ minWidth: '240px', maxWidth: '250px' }}>
                                                 <h1 className={styles.title}>
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={12} sm={9}>
+                                            <Grid item xs={12} sm={6} style={{
+                                                marginBottom: '10px',
+                                                minWidth: '230px',
+                                                maxWidth: '240px'
+                                            }}>
                                                 <StreamerSelect
                                                     value={streamType}
                                                     onChange={changestreamType}
@@ -264,7 +291,7 @@ const StreamerProfile = ({ user, games }) => {
                         <Grid item xs={12}>
                             <Grid container spacing={4}>
                                 <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
-                                    <Card className={styles.createEventCard} onClick={createStream}>
+                                    <Card className={styles.createEventCard} onClick={createStream} style={{ maxWidth: '255px', minWidth: '255px' }}>
                                         <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
                                             {t('StreamerProfile.postStream')}
                                         </h1>
@@ -280,6 +307,7 @@ const StreamerProfile = ({ user, games }) => {
                                 {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId}>
                                         <StreamCard
+                                            style={{ maxWidth: '255px', minWidth: '255px' }}
                                             streamType={streamType}
                                             streamId={streamId}
                                             user={user}
@@ -297,7 +325,7 @@ const StreamerProfile = ({ user, games }) => {
                     </Grid>
                 </>
             }
-        </StreamerDashboardContainer>
+        </StreamerDashboardContainer >
     );
 }
 

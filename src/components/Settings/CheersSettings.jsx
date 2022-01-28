@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, Grid, Card, CardMedia, Tooltip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +17,7 @@ import Step3 from './../../assets/addCheersTutorial3.jpg';
 import Step4 from './../../assets/addCheersTutorial4.jpg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
-import { setAlertSetting, writeTestCheer } from './../../services/database';
+import { getStreamerAlertsSettings, setAlertSetting, writeTestCheer } from './../../services/database';
 
 const useStyles = makeStyles(() => ({
     instructionsMargin: {
@@ -88,6 +88,19 @@ const CheersSettings = ({ uid, twitchId }) => {
     const [openTooltip, setOpenTooltip] = useState(false);
     const [side, setSide] = useState(LEFT);
     const { t } = useTranslation();
+
+    useEffect(() => {
+        async function getSettings() {
+            const settings = await getStreamerAlertsSettings(uid);
+            if (settings.exists()) {
+                setSide(settings.val().alertSideRight ? RIGHT : LEFT);
+            }
+        }
+
+        if (uid) {
+            getSettings();
+        }
+    }, [uid]);
 
     const copyCheersURL = () => {
         navigator.clipboard.writeText(cheersURL);

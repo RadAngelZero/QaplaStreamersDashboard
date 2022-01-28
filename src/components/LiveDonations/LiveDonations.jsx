@@ -137,12 +137,12 @@ const DonationHandler = (donationToShow) => {
             marginLeft: donation.isRightSide ? '0px' : '20px',
             marginRight: donation.isRightSide ? '20px' : '0px'
         }}>
-            <img src='https://pbs.twimg.com/profile_images/1377794552677949440/AA4l5bPZ_400x400.jpg' alt='Imagen' style={{
+            {/* <img src='https://pbs.twimg.com/profile_images/1377794552677949440/AA4l5bPZ_400x400.jpg' alt='Imagen' style={{
                 display: 'flex',
                 alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
                 maxHeight: '250px',
                 objectFit: 'scale-down'
-            }} />
+            }} /> */}
             <div
                 style={{
                     display: 'flex',

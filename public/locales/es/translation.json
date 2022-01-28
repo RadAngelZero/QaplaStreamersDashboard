@@ -227,5 +227,7 @@
     "description": "Descripción",
     "game": "Juego",
     "goToProfile": "Ir a mi perfil",
-    "save": "Guardar"
+    "save": "Guardar",
+    "Left": "Izquierda",
+    "Right": "Derecha"
 }

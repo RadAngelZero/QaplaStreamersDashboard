@@ -64,3 +64,20 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
         console.log(error);
     }
 }
+
+/**
+ * Call the cheerMessageTextToSpeech to convert the message in audio
+ * @param {string} streamerId Streamer uid
+ * @param {string} donationId Donation id
+ * @param {string} message Message to convert in audio
+ * @param {string} voiceName Selected voice from: https://cloud.google.com/text-to-speech/docs/voices
+ * @param {string} languageCode Language code selected
+ */
+ export async function speakCheerMessage(streamerId, donationId, message, voiceName, languageCode) {
+    const cheerMessageTextToSpeech = functions.httpsCallable('cheerMessageTextToSpeech');
+    try {
+        return await cheerMessageTextToSpeech({ streamerId, donationId, message, voiceName, languageCode });
+    } catch (error) {
+        console.log(error);
+    }
+}

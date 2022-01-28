@@ -26,6 +26,7 @@ const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDe
 const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
 const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
 const tagsRef = database.ref('/Tags');
+const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -593,14 +594,14 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  * @param {string} errorMessage Message to show if the write operation fails
  */
 export function writeTestCheer(streamerUid, completeMessage, errorMessage) {
-    streamersDonationsTestRef.child(streamerUid).push({
+    streamersDonationsTestRef.child(streamerUid).child('Test').set({
         amountQoins: 0,
-        message: 'Test',
+        message: 'Algun otro mensaje con algun otro texto',
         timestamp: (new Date()).getTime(),
         uid: '',
         read: false,
-        twitchUserName: 'QAPLA',
-        userName: 'QAPLA',
+        twitchUserName: 'QAPLAd',
+        userName: 'QAPLAd',
         photoURL: ''
     }, (error) => {
         if (error) {
@@ -838,4 +839,26 @@ export async function getSubscriptionPurchaseDetails(uid, subscriptionId) {
  */
 export async function saveTags(tags) {
     await tagsRef.update(tags);
+}
+
+/**
+ * Streamer Alerts Settings
+ */
+
+/**
+ * Set a setting on the Streamer Alert Settings
+ * @param {string} uid User identifier
+ * @param {string} settingKey Setting to set
+ * @param {*} value Value to set
+ */
+export async function setAlertSetting(uid, settingKey, value) {
+    await streamerAlertsSettingsRef.child(uid).child(settingKey).set(value);
+}
+
+/**
+ * Get the alerts settings of the given streamer
+ * @param {string} uid User identifier
+ */
+ export async function getStreamerAlertsSettings(uid) {
+    return await streamerAlertsSettingsRef.child(uid).once('value');
 }

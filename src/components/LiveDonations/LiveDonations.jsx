@@ -3,15 +3,18 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
+import { speakCheerMessage } from '../../services/functions';
+import { TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
     const [donationQueue, setDonationQueue] = useState([]);
     const [donationToShow, setDonationToShow] = useState(null);
     const [listenersAreSetted, setListenersAreSetted] = useState(false);
-    const [alertSideRight, setAlertSideRight] = useState(false)
+    const [alertSideRight, setAlertSideRight] = useState(false);
+    const [isPlayingAudio, setIsPlayingAudio] = useState(false);
     const { streamerId } = useParams();
 
     useEffect(() => {
@@ -31,6 +34,12 @@ const LiveDonations = () => {
             if (streamerId) {
                 const uid = await getStreamerUidWithTwitchId(streamerId);
                 setStreamerUid(uid);
+
+                const streamerSettings = await getStreamerAlertsSettings(uid);
+                if (streamerSettings.exists()) {
+                    setAlertSideRight(streamerSettings.val().alertSideRight);
+                }
+
                 listenForTestCheers(uid, (donation) => {
                     pushDonation({ ...donation.val(), id: donation.key });
                 });
@@ -57,54 +66,55 @@ const LiveDonations = () => {
             });
         }
 
-        if (donationQueue.length > 0) {
-            setTimeout(() => {
-                const donation = popDonation();
-                if (donation) {
-                    const audio = new Audio(donationAudio);
-                    audio.play();
+        if (donationQueue.length > 0 && !isPlayingAudio) {
+            setIsPlayingAudio(true);
+            const donation = popDonation();
+
+            async function showCheer() {
+                let audio = new Audio(donationAudio);
+                if (donation.message) {
+                    if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
+                        audio = new Audio(TEST_MESSAGE_SPEECH_URL);
+                    } else {
+                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, donation.message, 'pt-BR-Standard-B', 'es-MX');
+                        audio = new Audio(cheerMessageUrl.data);
+                    }
+                }
+
+                donation.isRightSide = alertSideRight;
+
+                setDonationToShow(donation);
+                audio.onended = () => {
                     setTimeout(() => {
-                        if ('speechSynthesis' in window && donation.message) {
-                            readMessage(donation.message);
-                        }
-                    }, 500);
-                    donation.isRightSide = alertSideRight
-                    setDonationToShow(donation);
+                        setDonationToShow(null);
+                    }, 1500);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         removeTestDonation(streamerUid, donation.id);
                     } else {
                         markDonationAsRead(streamerUid, donation.id);
                     }
+
+                    setTimeout(() => {
+                        setIsPlayingAudio(false);
+                    }, 3000);
                 }
-            }, 10000);
-        } else {
-            if (listenersAreSetted) {
-                setTimeout(() => {
-                    setDonationToShow(null);
-                }, 10000);
+
+                audio.play();
             }
+
+            showCheer();
         }
 
         if (!streamerUid) {
             getStreamerUid();
         }
-    }, [streamerId, streamerUid, donationQueue, listenersAreSetted]);
-
-    const readMessage = (message) => {
-        const availableVoices = window.speechSynthesis.getVoices();
-        let utterThis = new SpeechSynthesisUtterance(message);
-        const spanishVoice = availableVoices.find((voice) => voice.lang.substring(0, 2) === 'es');
-        utterThis.voice = spanishVoice || availableVoices[0];
-        utterThis.pitch = 1;
-        utterThis.rate = 1;
-        window.speechSynthesis.speak(utterThis);
-    }
+    }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio]);
 
     document.body.style.backgroundColor = 'transparent';
 
 
     return (
-        <div style={{ display: 'flex', backgroundColor: 'transparent', height: '500px', width: '1920px', placeItems: 'flex-end' }}>
+        <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100%', width: '100%', placeItems: 'flex-end' }}>
             {donationToShow &&
                 <>
                     <DonationHandler donationToShow={donationToShow} />

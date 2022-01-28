@@ -594,14 +594,14 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  * @param {string} errorMessage Message to show if the write operation fails
  */
 export function writeTestCheer(streamerUid, completeMessage, errorMessage) {
-    streamersDonationsTestRef.child(streamerUid).child('Test').set({
+    streamersDonationsTestRef.child(streamerUid).push({
         amountQoins: 0,
-        message: 'Algun otro mensaje con algun otro texto',
+        message: 'Test',
         timestamp: (new Date()).getTime(),
         uid: '',
         read: false,
-        twitchUserName: 'QAPLAd',
-        userName: 'QAPLAd',
+        twitchUserName: 'QAPLA',
+        userName: 'QAPLA',
         photoURL: ''
     }, (error) => {
         if (error) {

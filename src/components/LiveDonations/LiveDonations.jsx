@@ -114,7 +114,7 @@ const LiveDonations = () => {
 
 
     return (
-        <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100%', width: '100%', placeItems: 'flex-end' }}>
+        <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100vh', width: '100%', placeItems: 'flex-end' }}>
             {donationToShow &&
                 <>
                     <DonationHandler donationToShow={donationToShow} />

@@ -1,8 +1,4 @@
-.donationBubble {
-    background: linear-gradient(170deg, #D800FF -20%, #4D00FB 120%);
-}
-
 p {
-    font-family: 'Montserrat', sans-serif;
+    /* IDK why the page put a margin to all p */
     margin: 0
 }

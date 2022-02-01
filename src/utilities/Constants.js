@@ -74,8 +74,8 @@ export const TWITCH_REDIRECT_URI = !process.env.NODE_ENV || process.env.NODE_ENV
 /**
  * Alert Side Selection
  */
-export const LEFT = false;
-export const RIGHT = true;
+export const LEFT = 'LEFT';
+export const RIGHT = 'RIGHT';
 
 /**
  * Streams Status
@@ -133,6 +133,8 @@ export const MIN_TAGS = 3;
  * Streamers Profiles constants
  */
 export const MAX_ROWS_IN_BIO = 5;
+
+export const TEST_MESSAGE_SPEECH_URL = 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/CheersTestAudios%2FTest.mp3?alt=media&token=3a77f0c1-e5ce-445a-a848-cd5a00a4c361';
 
 export const streamsPlaceholderImages = {
     DBD: DBDImage,

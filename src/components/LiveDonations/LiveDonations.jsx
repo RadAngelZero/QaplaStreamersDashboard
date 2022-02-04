@@ -3,10 +3,10 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
-import { TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
@@ -15,6 +15,7 @@ const LiveDonations = () => {
     const [listenersAreSetted, setListenersAreSetted] = useState(false);
     const [alertSideRight, setAlertSideRight] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+    const [mediaContent, setMediaContent] = useState({ videos: [], images: [] });
     const { streamerId } = useParams();
 
     useEffect(() => {
@@ -43,6 +44,9 @@ const LiveDonations = () => {
                 listenForTestCheers(uid, (donation) => {
                     pushDonation({ ...donation.val(), id: donation.key });
                 });
+
+                const streamerMedia = await getStreamerMediaContent(uid);
+                setMediaContent(streamerMedia.val());
             }
         }
 
@@ -71,6 +75,12 @@ const LiveDonations = () => {
             const donation = popDonation();
 
             async function showCheer() {
+                if (mediaContent && mediaContent['images'] && mediaContent['images'].length > 0) {
+                    const maxLength = mediaContent['images'].length - 1;
+                    const mediaToShow = mediaContent['images'][Math.floor(Math.random() * (maxLength - 0 + 1)) + 0];
+                    donation.media = { type: IMAGE, source: mediaToShow };
+                }
+
                 let audio = new Audio(donationAudio);
                 if (donation.message) {
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
@@ -137,12 +147,13 @@ const DonationHandler = (donationToShow) => {
             marginLeft: donation.isRightSide ? '0px' : '20px',
             marginRight: donation.isRightSide ? '20px' : '0px'
         }}>
-            {/* <img src='https://pbs.twimg.com/profile_images/1377794552677949440/AA4l5bPZ_400x400.jpg' alt='Imagen' style={{
+            {donation.media && donation.media.type === IMAGE &&
+                <img src={donation.media.source} alt='' style={{
                 display: 'flex',
                 alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
                 maxHeight: '250px',
                 objectFit: 'scale-down'
-            }} /> */}
+            }} />}
             <div
                 style={{
                     display: 'flex',

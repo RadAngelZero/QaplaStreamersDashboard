@@ -27,6 +27,7 @@ const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
 const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
 const tagsRef = database.ref('/Tags');
 const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
+const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -861,4 +862,12 @@ export async function setAlertSetting(uid, settingKey, value) {
  */
  export async function getStreamerAlertsSettings(uid) {
     return await streamerAlertsSettingsRef.child(uid).once('value');
+}
+
+/**
+ * 
+ * @param {string} uid User identifier
+ */
+export async function getStreamerMediaContent(uid) {
+    return await streamerCustomMediaForCheers.child(uid).once('value');
 }

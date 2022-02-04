@@ -78,6 +78,11 @@ export const LEFT = 'LEFT';
 export const RIGHT = 'RIGHT';
 
 /**
+ * Valid media type for cheers
+ */
+export const IMAGE = 'IMAGE';
+
+/**
  * Streams Status
  */
 export const PENDING_APPROVAL_EVENT_TYPE = 1;

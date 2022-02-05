@@ -10,6 +10,11 @@ import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as QoinBN } from './../../assets/QoinBN.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
+import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
+import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
+import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
+import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
+import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg'
 
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import { loadStreamsByStatus } from '../../services/database';
@@ -19,10 +24,6 @@ import {
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE
 } from '../../utilities/Constants';
-import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
-import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
-import { ReactComponent as InfoSquare } from './../../assets/InfoSquare.svg';
-import { ReactComponent as Arrow } from './../../assets/Arrow.svg';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 
 const BalanceInfoTooltip = withStyles(() => ({
@@ -42,6 +43,25 @@ const BalanceInfoTooltip = withStyles(() => ({
         color: '#3B4BF9'
     }
 }))(Tooltip);
+
+const BalanceButtonContainer = withStyles(() => ({
+    root: {
+        display: 'flex',
+        backgroundColor: '#141735',
+        width: '100%',
+        padding: '22px 24px',
+        height: '100px',
+        minWidth: '180px !important',
+        maxWidth: '230px !important',
+        borderRadius: '20px',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        textTransform: 'none'
+    },
+    label: {
+        display: 'flex'
+    }
+}))(Button);
 
 const useStyles = makeStyles(() => ({
     accordionSummary: {
@@ -141,6 +161,9 @@ const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
+    const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
+    const [buttonPressed, setButtonPressed] = useState('Qoins');
+    const [pendingMessages, setPendingMessages] = useState(0)
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -202,7 +225,7 @@ const StreamerProfile = ({ user, games }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <Box display="flex" flexDirection="row" flexWrap={"wrap"} gridGap={"20px"} height={"48px"} className={styles.header} >
+                    <div className={styles.header} >
                         <Hidden lgUp>
                             <div style={{ width: '30px' }}></div>
                         </Hidden>
@@ -213,12 +236,54 @@ const StreamerProfile = ({ user, games }) => {
                             <span className={styles.streamerName}>{user.displayName}</span>
                         </div>
                         <Button variant='contained'
+                            style={{ height: '48px', }}
                             className={styles.twitchButton}
                             onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
                             startIcon={<TwitchIcon style={{ width: '20px', height: '20px' }} />}>
                             {user.displayName}
                         </Button>
-                    </Box>
+                        <Button variant='contained'
+                            className={styles.messagesButton}
+                            style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735' }}
+                            onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
+                            endIcon={
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <MessageIcon style={{ width: '32px', height: '32px' }} />
+                                    {pendingMessages > 0 &&
+                                        <div style={{
+                                            display: 'flex',
+                                            marginLeft: '12px',
+                                            backgroundColor: '#FF007A',
+                                            width: '27px',
+                                            height: '27px',
+                                            borderRadius: '30px',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <p style={{
+                                                display: 'flex',
+                                                fontSize: '11px',
+                                                lineHeight: '24px',
+                                                fontWeight: '600',
+                                                marginTop: '2px'
+                                            }}>
+                                                {pendingMessages}
+                                            </p>
+                                        </div>
+
+                                    }
+
+                                </div>
+                            }>
+                            {pendingMessages > 0 &&
+                                <>
+                                    <p>{`New `}</p>
+                                    <div style={{ width: '6px' }}></div>
+                                </>
+                            }
+
+                            <p>{'Messages'}</p>
+                        </Button>
+                    </div>
                     <Grid container>
                         <Grid item xs={12}>
                             <Grid container xs={12}>
@@ -229,28 +294,34 @@ const StreamerProfile = ({ user, games }) => {
                                                 {t('StreamerProfile.balance')}
                                             </h1>
                                         </Grid>
-                                        <Grid container xs={12} style={{ gap: '24px' }} >
-                                            <Grid item xs={8} className={styles.balanceContainers}>
-                                                <QoinBN style={{ display: 'flex', width: '35px', height: '35px' }} />
-                                                <div className={styles.balanceInnerContainer}>
-                                                    <p>Cheers</p>
-                                                    <p className={styles.balanceDataText}>{user.qoinsBalance || 0}</p>
-                                                </div>
+                                        <Grid container xs={12} style={{ gap: '20px' }} >
+                                            <Grid item xs={12} className={styles.balanceContainers}>
+                                                <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
+                                                    <QoinBN style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <div className={styles.balanceInnerContainer}>
+                                                        <p className={styles.balanceDataTextTitle}>Cheers</p>
+                                                        <p className={styles.balanceDataText}>{user.qoinsBalance || 0}</p>
+                                                    </div>
+                                                </BalanceButtonContainer>
                                             </Grid>
-                                            <Grid item xs={8} className={styles.balanceContainers}>
-                                                <DonatedQoin style={{ display: 'flex', width: '35px', height: '35px' }} />
-                                                <div className={styles.balanceInnerContainer}>
-                                                    <p>Qlan</p>
-                                                    <p className={styles.balanceDataText}>{user.qoinsBalance || 0}</p>
-                                                </div>
+                                            <Grid item xs={12} className={styles.balanceContainers}>
+                                                <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
+                                                    <DonatedQoin style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <div className={styles.balanceInnerContainer}>
+                                                        <p className={styles.balanceDataTextTitle}>Qlan</p>
+                                                        <p className={styles.balanceDataText}>{user.qoinsBalance || 0}</p>
+                                                    </div>
+                                                </BalanceButtonContainer>
                                             </Grid>
-                                            <Grid item xs={8} className={styles.balanceContainers}>
-                                                <BitsIcon style={{ display: 'flex', width: '35px', height: '35px' }} />
-                                                <div className={styles.balanceInnerContainer}>
-                                                    <p>{t('StreamerProfile.stimatedBits')}</p>
-                                                    <p className={styles.balanceDataText}>{user.bitsBalance || 0}</p>
+                                            <Grid item xs={12} className={styles.balanceContainers}>
+                                                <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Bits') }}>
+                                                    <BitsIcon style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <div className={styles.balanceInnerContainer}>
+                                                        <p className={styles.balanceDataTextTitle}>{t('StreamerProfile.stimatedBits')}</p>
+                                                        <p className={styles.balanceDataText}>{user.bitsBalance || 0}</p>
 
-                                                </div>
+                                                    </div>
+                                                </BalanceButtonContainer>
                                             </Grid>
                                         </Grid>
 
@@ -323,6 +394,11 @@ const StreamerProfile = ({ user, games }) => {
                             </Grid>
                         </Grid>
                     </Grid>
+                    <CheersBitsRecordDialog open={openRecordsDialog}
+                        onClose={() => setOpenRecordsDialog(false)}
+                        user={user}
+                        pressed={buttonPressed}
+                        setPendingMessages={setPendingMessages} />
                 </>
             }
         </StreamerDashboardContainer >

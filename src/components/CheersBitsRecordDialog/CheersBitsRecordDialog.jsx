@@ -20,8 +20,10 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 600,
         paddingLeft: 16,
         paddingRight: 16,
+        textTransform: 'none',
         '&:hover': {
-            opacity: '.80'
+            opacity: '.80',
+            background: '#29326B44 !important'
         }
     },
     scrollPaper: {
@@ -32,32 +34,60 @@ const useStyles = makeStyles((theme) => ({
         height: '100vh',
         background: 'linear-gradient(0deg, #0D1021, #0D1021), #141735',
         borderRadius: 20,
-        paddingLeft: 16,
-        paddingTop: 8,
-        [theme.breakpoints.down("sm")]: {
-            width: '100vw'
+        paddingBottom: '5px',
+        padding: '28px 40px',
+        maxWidth: '100%',
+        width: '100%',
+        margin: '21px 17px 0px 0px',
+        [theme.breakpoints.down("xs")]: {
+            width: '100%',
+            margin: '0px',
+            borderRadius: '0px',
+            maxHeight: '100%'
         },
-        [theme.breakpoints.up("md")]: {
-            width: '33vw'
+        [theme.breakpoints.up("sm")]: {
+            width: '440px'
+        }
+    },
+    dialogRoot: {
+        zIndex: '0 !important',
+        '& .MuiBackdrop-root': {
+            backgroundColor: '#02071E80',
+            backdropFilter: 'blur(5px)',
+            width: '200wh',
+            height: '200vh'
+
         }
     },
     dialogHeaderContainer: {
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        overflow: ''
     },
     balanceCurrencyContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 16
+        marginTop: '23px',
+        minWidth: '200px'
     },
     balanceCurrencyValue: {
+        display: 'flex',
         color: '#FFF',
-        fontSize: 30,
-        lineHeight: 0,
+        fontSize: '48px',
+        lineHeight: '52px',
         fontWeight: 600,
-        marginRight: 8
+        letterSpacing: '-0.86',
+        marginLeft: '12px',
+    },
+    subDataContainer: {
+        marginTop: '30px',
+        color: '#8692FF',
+        fontWeight: '500',
+        fontSize: '14px',
+        lineHeight: '17px',
+        letterSpacing: '0.35px'
     },
     periodText: {
         color: 'rgba(134, 146, 255, 0.65)',
@@ -90,7 +120,10 @@ const useStyles = makeStyles((theme) => ({
         marginRight: 4
     },
     list: {
-        maxHeight: '60vh',
+        display: 'flex',
+        flexDirection: 'column',
+        paddingRight: '20px',
+        marginRight: '-20px',
         position: 'relative',
         overflow: 'auto'
     },
@@ -145,7 +178,7 @@ const DialoogTransaction = React.forwardRef(function Transition(props, ref) {
     return <Slide direction='left' ref={ref} {...props} />;
 });
 
-const ToggleButton = ({ currentValue, value, onChange }) => {
+const ToggleButton = ({ currentValue, value, onChange, label }) => {
     const classes = useStyles();
     const active = currentValue === value;
 
@@ -154,7 +187,7 @@ const ToggleButton = ({ currentValue, value, onChange }) => {
             className={classes.toggleButton}
             style={{ background: active ? '#29326B' : 'rgba(41, 50, 107, 0)', color: active ? '#FFF' : 'rgba(255, 255, 255, .6)' }}
             onClick={() => onChange(value)}>
-            {value}
+            {label || value}
         </Button>
     );
 };
@@ -177,12 +210,15 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
 
     return (
         <>
-            <div className={classes.balanceCurrencyContainer}>
-                <p className={classes.balanceCurrencyValue}>
-                    {value || 0}
-                </p>
-                <Icon />
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: '200px' }}>
+                <div className={classes.balanceCurrencyContainer}>
+                    <Icon />
+                    <p className={classes.balanceCurrencyValue}>
+                        {value || 0}
+                    </p>
+                </div>
             </div>
+
             {showPeriod &&
                 <MuiPickersUtilsProvider utils={DayJsUtils}>
                     {/**
@@ -214,40 +250,76 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
     );
 }
 
-const QoinsCheers = ({ qoinsBalance, cheers }) => {
+const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanBalance }) => {
     const classes = useStyles();
+    const [balance, setBalance] = useState(qoinsBalance)
+
+    useEffect(() => {
+        if (setPendingMessages !== undefined) {
+            setPendingMessages(0)
+        }
+        if (qlanBalance) {
+            setBalance(qoinsBalance + qlanBalance)
+        }
+    }, [setPendingMessages, qlanBalance, qoinsBalance])
 
     return (
         <>
-            <RecordsHeader value={qoinsBalance} Icon={QoinsIcon} />
-            <List className={classes.list}>
+            {!messages &&
+                <>
+                    <RecordsHeader value={balance} Icon={QoinsIcon} />
+                    <div className={classes.subDataContainer}>
+                        <div style={{ display: 'flex' }}>
+                            <p style={{ display: 'flex', width: '62px' }}> Cheers </p>
+                            <p style={{ display: 'flex', }}> {qoinsBalance} </p>
+                        </div>
+                        <div style={{ display: 'flex', marginTop: '30px' }}>
+                            <p style={{ display: 'flex', width: '62px' }}> Qlan </p>
+                            <p style={{ display: 'flex', }}> {qlanBalance || 0} </p>
+                        </div>
+                        <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>Cheers recibidos al dd/mm/aa</p>
+                    </div>
+                </>
+            }
+            <List className={classes.list} style={{ maxHeight: messages ? '82vh' : '60vh', marginTop: '20px', paddingTop: '0px' }}>
                 {Object.keys(cheers).reverse().map((cheerId) => (
                     <>
-                        <ListItem disableGutters>
-                            <ListItemAvatar>
-                                <Avatar alt={cheers[cheerId].twitchUserName}
-                                    src={cheers[cheerId].photoURL} />
-                            </ListItemAvatar>
-                            <ListItemText primary={cheers[cheerId].twitchUserName}
-                                secondary={formatDate(cheers[cheerId].timestamp)}
-                                classes={{
-                                    primary: classes.qoinsDonationPrimaryText,
-                                    secondary: classes.qoinsCheersecondaryText
-                                }} />
-                            <div className={classes.qoinDonationValueContainer}>
-                                <div className={classes.qoinDonationValueText}>
-                                    {cheers[cheerId].amountQoins}
+                        {((messages && cheers[cheerId].message) || (!messages)) &&
+                            <ListItem disableGutters style={{ display: 'flex', flexDirection: 'column', padding: '0px', marginBottom: '40px' }}>
+                                <div style={{ display: 'flex', width: '100%' }}>
+                                    <ListItemAvatar style={{ alignSelf: 'center' }} >
+                                        <Avatar alt={cheers[cheerId].twitchUserName}
+                                            src={cheers[cheerId].photoURL} />
+                                    </ListItemAvatar>
+                                    <ListItemText primary={
+                                        <div style={{ display: 'flex' }}>
+                                            <p>{cheers[cheerId].twitchUserName}</p>
+                                            {!cheers[cheerId].read && <div style={{ backgroundColor: '#8DEBFF', alignSelf: 'center', marginLeft: '8px', width: '8px', height: '8px', borderRadius: '8px' }}>
+                                            </div>}
+                                        </div>
+                                    }
+                                        secondary={formatDate(cheers[cheerId].timestamp)}
+                                        classes={{
+                                            primary: classes.qoinsDonationPrimaryText,
+                                            secondary: classes.qoinsCheersecondaryText
+                                        }} />
+
+                                    <div className={classes.qoinDonationValueContainer}>
+                                        <div className={classes.qoinDonationValueText}>
+                                            {cheers[cheerId].amountQoins}
+                                        </div>
+                                        <DonatedQoinIcon />
+                                    </div>
                                 </div>
-                                <DonatedQoinIcon />
-                            </div>
-                        </ListItem>
-                        {cheers[cheerId].message &&
-                            <div style={{ background: '#3B4BF9', borderRadius: '20px 20px 20px 2px', padding: '16px 20px 16px 20px' }}>
-                                <p style={{ color: '#FFF', fontSize: 14, fontWeight: 500, letterSpacing: .35 }}>
-                                    {cheers[cheerId].message}
-                                </p>
-                            </div>
-                        }
+
+                                {messages && cheers[cheerId].message &&
+                                    <div style={{ background: '#3B4BF9', borderRadius: '2px 20px 20px 20px', padding: '16px 20px 16px 20px' }}>
+                                        <p style={{ color: '#FFF', fontSize: 14, fontWeight: 500, letterSpacing: .35 }}>
+                                            {cheers[cheerId].message}
+                                        </p>
+                                    </div>
+                                }
+                            </ListItem>}
                     </>
                 ))}
             </List>
@@ -264,7 +336,13 @@ const PaidBits = ({ bitsBalance, payments, onPeriodChange }) => {
                 Icon={BitsIcon}
                 showPeriod
                 onPeriodChange={onPeriodChange} />
-            <List className={classes.list}>
+            <div className={classes.subDataContainer}>
+                <p style={{ display: 'flex' }}> 200 Qoins = 10 Bits </p>
+                <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>Bits estimados a entregar con subscripción activa</p>
+                <p style={{ display: 'flex', color: '#FFFFFFA6', marginTop: '45px', lineHeight: '17px', fontWeight: '400' }}>Cheers entregados</p>
+            </div>
+
+            <List className={classes.list} style={{ maxHeight: '54vh', marginTop: '20px', paddingTop: '0px' }}>
                 {Object.keys(payments).reverse().map((paymentId) => (
                     <ListItem disableGutters>
                         <ListItemText primary={payments[paymentId].currency}
@@ -285,7 +363,7 @@ const PaidBits = ({ bitsBalance, payments, onPeriodChange }) => {
     );
 }
 
-const CheersBitsRecordDialog = ({ user, open, onClose }) => {
+const CheersBitsRecordDialog = ({ user, open, onClose, pressed, setPendingMessages }) => {
     const [value, setValue] = useState('Qoins');
     const [qoinsCheers, setQoinsCheers] = useState({});
     const [paymentsHistory, setPaymentsHistory] = useState({});
@@ -305,9 +383,16 @@ const CheersBitsRecordDialog = ({ user, open, onClose }) => {
             listenForLastStreamerCheers(user.uid, 20, (cheers) => {
                 if (cheers.exists()) {
                     setQoinsCheers(cheers.val());
+                    let seekUnread = Object.values(cheers.val());
+                    let unreadCount = 0;
+                    seekUnread.forEach(e => {
+                        if (!e.read && e.message) {
+                            unreadCount++
+                        }
+                    });
+                    setPendingMessages(unreadCount)
                 }
             });
-
             loadDefaultPayments();
         }
 
@@ -335,9 +420,15 @@ const CheersBitsRecordDialog = ({ user, open, onClose }) => {
             TransitionComponent={DialoogTransaction}
             classes={{
                 scrollPaper: classes.scrollPaper,
-                paper: classes.paper
+                paper: classes.paper,
+                root: classes.dialogRoot
+            }}
+            TransitionProps={{
+                onEnter: () => {
+                    setValue(pressed)
+                }
             }}>
-            <DialogContent>
+            <DialogContent style={{ padding: '0px', overflow: 'visible' }}>
                 <div className={classes.dialogHeaderContainer}>
                     <div style={{ marginRight: 96 }}>
                         <ToggleButton currentValue={value}
@@ -346,20 +437,33 @@ const CheersBitsRecordDialog = ({ user, open, onClose }) => {
                         <ToggleButton currentValue={value}
                             value='Bits'
                             onChange={setValue} />
+                        <ToggleButton currentValue={value}
+                            value='Messages'
+                            label='Mensajes'
+                            onChange={setValue} />
                     </div>
-                    <IconButton onClick={onClose}>
-                        <CloseIcon style={{ alignSelf: 'flex-end' }} />
+                    <IconButton onClick={onClose} style={{ zIndex: '10', alignSelf: 'flex-start', width: '40px', height: '40px', padding: '0px', marginTop: '-4px', marginRight: '-16px' }} >
+                        <CloseIcon style={{ width: '40px', height: '40px' }} />
                     </IconButton>
                 </div>
                 {value === 'Qoins' &&
                     <QoinsCheers qoinsBalance={user.qoinsBalance || 0}
-                    cheers={qoinsCheers} />
+                        cheers={qoinsCheers}
+                        qlanBalance={user.qlanBalance} />
                 }
                 {value === 'Bits' &&
                     <PaidBits bitsBalance={user.bitsBalance || 0}
-                    payments={paymentsHistory}
-                    onPeriodChange={loadPaymentsByTimestamp} />
+                        payments={paymentsHistory}
+                        onPeriodChange={loadPaymentsByTimestamp} />
                 }
+                {value === 'Messages' &&
+                    <QoinsCheers qoinsBalance={user.qoinsBalance || 0}
+                        messages={true}
+                        cheers={qoinsCheers}
+                        setPendingMessages={setPendingMessages}
+                    />
+                }
+
             </DialogContent>
         </Dialog>
     );

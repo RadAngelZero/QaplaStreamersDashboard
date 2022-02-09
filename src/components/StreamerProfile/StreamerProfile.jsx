@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
-import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
@@ -18,7 +17,7 @@ import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import { loadStreamsByStatus } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
-    SCEHDULED_EVENT_TYPE,
+    SCHEDULED_EVENT_TYPE,
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE
 } from '../../utilities/Constants';
@@ -138,7 +137,7 @@ const CheersBalanceCard = ({ user }) => {
 
 const StreamerProfile = ({ user, games }) => {
     const history = useHistory();
-    const [streamType, setStreamType] = useState(SCEHDULED_EVENT_TYPE);
+    const [streamType, setStreamType] = useState(SCHEDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
     const { t } = useTranslation();
 
@@ -168,9 +167,9 @@ const StreamerProfile = ({ user, games }) => {
         }
     }
 
-    const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType }});
+    const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType } });
 
-    const changestreamType = (e) => setStreamType(parseInt(e.target.value));
+    const changestreamType = (val) => setStreamType(val);
 
     /**
      * Format the date to show in the card
@@ -192,7 +191,7 @@ const StreamerProfile = ({ user, games }) => {
     }
 
     const onRemoveStream = (streamId) => {
-        const streamsCopy = {...streams};
+        const streamsCopy = { ...streams };
         delete streamsCopy[streamId];
         setStreams(streamsCopy);
     }
@@ -241,21 +240,26 @@ const StreamerProfile = ({ user, games }) => {
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={12} sm={9}>
+                                            <Grid item xs={12} sm={9} style={{minHeight: '58px'}}>
                                                 <StreamerSelect
+                                                    data={[
+                                                        {
+                                                            value: SCHEDULED_EVENT_TYPE,
+                                                            label: t('StreamerProfile.scheduled')
+                                                        },
+                                                        {
+                                                            value: PENDING_APPROVAL_EVENT_TYPE,
+                                                            label: t('StreamerProfile.pendingApproval')
+                                                        },
+                                                        {
+                                                            value: PAST_STREAMS_EVENT_TYPE,
+                                                            label: t('StreamerProfile.pastStreams')
+                                                        }
+                                                    ]}
                                                     value={streamType}
                                                     onChange={changestreamType}
-                                                    Icon={ArrowIcon}>
-                                                    <option value={SCEHDULED_EVENT_TYPE}>
-                                                        {t('StreamerProfile.scheduled')}
-                                                    </option>
-                                                    <option value={PENDING_APPROVAL_EVENT_TYPE}>
-                                                        {t('StreamerProfile.pendingApproval')}
-                                                    </option>
-                                                    <option value={PAST_STREAMS_EVENT_TYPE}>
-                                                        {t('StreamerProfile.pastStreams')}
-                                                    </option>
-                                                </StreamerSelect>
+                                                    overflowY='hidden'
+                                                    overflowX='hidden'/>
                                             </Grid>
                                         </Grid>
                                     </Grid>

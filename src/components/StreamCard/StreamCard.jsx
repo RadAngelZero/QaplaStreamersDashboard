@@ -7,7 +7,7 @@ import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg'
 import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
 import {
     streamsPlaceholderImages,
-    SCEHDULED_EVENT_TYPE,
+    SCHEDULED_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE,
     PENDING_APPROVAL_EVENT_TYPE
 } from '../../utilities/Constants';
@@ -117,7 +117,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
 
     useEffect(() => {
         async function getParticipantsNumber() {
-            if (streamType === SCEHDULED_EVENT_TYPE) {
+            if (streamType === SCHEDULED_EVENT_TYPE) {
                 const participants = await getStreamParticipantsNumber(streamId);
                 let participantsNumber = participants.exists() ? participants.val() : 0;
                 setParticipantsNumber(participantsNumber);
@@ -226,7 +226,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                             {date}
                         </p>
                     </div>
-                    {streamType === SCEHDULED_EVENT_TYPE ?
+                    {streamType === SCHEDULED_EVENT_TYPE ?
                         <>
                             {closedStream === null ?
                             <Button size='medium' className={classes.streamButton} onClick={startStream}>

@@ -113,18 +113,45 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const NewStream = ({ user, games }) => {
-    useEffect(() => {
-        if (user && !user.premium) {
-            history.push('/profile');
-        }
-    }, [user]);
-
     const userLang = navigator.language || navigator.userLanguage;
-
     const classes = useStyles();
     const history = useHistory();
     const { t } = useTranslation();
     const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+    const [selectedGame, setSelectedGame] = useState();
+    const [selectedEvent, setSelectedEvent] = useState('exp');
+    const [stringDate, setStringDate] = useState('');
+    const [clockOpen, setClockOpen] = useState(false);
+    const [calendarOpen, setCalendarOpen] = useState(false);
+    const [gamesData, setGamesData] = useState([]);
+
+    useEffect(() => {
+        if (user && !user.premium) {
+            history.push('/profile');
+        }
+        let gameList = [];
+
+        if (games.allGames) {
+            gameList = Object.keys(games.allGames).map((gameKey) => ({ gameKey, ...games.allGames[gameKey] })).sort((a, b) => {
+                if (a.gameName < b.gameName) {
+                    return -1;
+                }
+                if (a.gameName > b.gameName) {
+                    return 1;
+                }
+
+                return 0;
+            });
+            let tempGamesData = []
+            gameList.forEach(game => {
+                tempGamesData.push({
+                    value: game.gameKey,
+                    label: game.gameName
+                })
+            });
+            setGamesData(tempGamesData)
+        }
+    }, [games.allGames, user]);
 
     const optionalDataReducer = (state, action) => {
         switch (action.target.id) {
@@ -181,19 +208,14 @@ const NewStream = ({ user, games }) => {
         }
     }
 
+    const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
+
     // Minimum valid date is 24 hours since the current date
     const minDate = new Date((new Date()).getTime() + 86400000);
 
     // The default date is the minDate + 15 minutes, to avoid show the error feedback when the streamer open the screen
     const [selectedDate, setSelectedDate] = useState(new Date(minDate.getTime() + 900000));
     const [displayDate, setDisplayDate] = useState(new Date(minDate.getTime() + 900000));
-    const [selectedGame, setSelectedGame] = useState();
-    const [selectedEvent, setSelectedEvent] = useState('exp');
-    const [stringDate, setStringDate] = useState('');
-    const [clockOpen, setClockOpen] = useState(false);
-    const [calendarOpen, setCalendarOpen] = useState(false);
-    const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
-
 
     const handleDateChange = (date) => {
         try {
@@ -204,7 +226,7 @@ const NewStream = ({ user, games }) => {
         setDisplayDate(date)
     };
     const handleGameChange = (game) => {
-        setSelectedGame(game.target.value);
+        setSelectedGame(game);
     };
     const handleEventTypeChange = (event) => {
         setSelectedEvent(event.target.value);
@@ -280,21 +302,6 @@ const NewStream = ({ user, games }) => {
         }
     }
 
-    let gameList = [];
-
-    if (games.allGames) {
-        gameList = Object.keys(games.allGames).map((gameKey) => ({ gameKey, ...games.allGames[gameKey] })).sort((a, b) => {
-            if (a.gameName < b.gameName) {
-                return -1;
-            }
-            if (a.gameName > b.gameName) {
-                return 1;
-            }
-
-            return 0;
-        });
-    }
-
     return (
         <StreamerDashboardContainer user={user}>
             <Grid container>
@@ -305,39 +312,35 @@ const NewStream = ({ user, games }) => {
                     <h1 className={styles.title}>
                         {t('NewStream.whatAreYouPlaying')}
                     </h1>
-                    <StreamerSelect
-                        value={selectedGame}
-                        onChange={handleGameChange}
-                        Icon={ArrowIcon}
-                        label={t('NewStream.selectYourGame')}>
-                        <option style={{
-                            backgroundColor: '#141833',
-                            fontSize: '14px'
-                        }} value={null}></option>
-                        {games.allGames && gameList.map((game) => {
-                            if (!game.gameName.toLowerCase().includes('twitch')) {
-                                return <option style={{
-                                    backgroundColor: '#141833',
-                                    fontSize: '14px'
-                                }} value={game.gameKey}>{game.gameName}</option>
-                            }
+                    <div style={{
+                        display: 'flex',
+                        height: '58px'
+                    }}>
+                        <StreamerSelect
+                            data={gamesData}
+                            value={selectedGame}
+                            onChange={handleGameChange}
+                            initialLabel={t('NewStream.selectYourGame')}
+                            maxHeightOpen={'200px'}
+                            overflowX={'hidden'}
+                            style={{
+                                minHeight: '58px'
+                            }}/>
+                    </div>
 
-                            return null;
-                        })}
-                    </StreamerSelect>
                     <h1 className={styles.title}>
                         {t('NewStream.when')}
                     </h1>
                     <MuiPickersUtilsProvider utils={DayJsUtils}>
                         <Grid container spacing={4}>
-                            <Grid item sm={4} style={{minWidth: '175px'}}>
+                            <Grid item sm={4} style={{ minWidth: '175px' }}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.date')}
                                 </InputLabel>
                                 <KeyboardDatePicker
                                     open={calendarOpen}
                                     onClick={() => setCalendarOpen(true)}
-                                    onOpen={() => {}}
+                                    onOpen={() => { }}
                                     onClose={() => setCalendarOpen(false)}
                                     clearable
                                     disablePast
@@ -367,14 +370,14 @@ const NewStream = ({ user, games }) => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item sm={4} style={{minWidth: '175px'}}>
+                            <Grid item sm={4} style={{ minWidth: '175px' }}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.time')}
                                 </InputLabel>
                                 <KeyboardTimePicker
                                     open={clockOpen}
                                     onClick={() => setClockOpen(true)}
-                                    onOpen={() => {}}
+                                    onOpen={() => { }}
                                     onClose={() => setClockOpen(false)}
                                     autoOk
                                     error={selectedDate <= minDate}
@@ -400,7 +403,7 @@ const NewStream = ({ user, games }) => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item sm={8} style={{width: '90%', minWidth: '330px'}}>
+                            <Grid item sm={8} style={{ width: '90%', minWidth: '330px' }}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.confirmDate')}
                                 </InputLabel>

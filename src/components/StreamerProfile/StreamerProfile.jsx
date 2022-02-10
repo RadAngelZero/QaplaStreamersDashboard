@@ -163,7 +163,7 @@ const StreamerProfile = ({ user, games }) => {
     const [streams, setStreams] = useState({});
     const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
     const [buttonPressed, setButtonPressed] = useState('Qoins');
-    const [pendingMessages, setPendingMessages] = useState(0)
+    const [pendingMessages, setPendingMessages] = useState(0);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -271,7 +271,6 @@ const StreamerProfile = ({ user, games }) => {
                                         </div>
 
                                     }
-
                                 </div>
                             }>
                             {pendingMessages > 0 &&
@@ -280,7 +279,6 @@ const StreamerProfile = ({ user, games }) => {
                                     <div style={{ width: '6px' }}></div>
                                 </>
                             }
-
                             <p>{'Messages'}</p>
                         </Button>
                     </div>
@@ -309,7 +307,7 @@ const StreamerProfile = ({ user, games }) => {
                                                     <DonatedQoin style={{ display: 'flex', width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>Qlan</p>
-                                                        <p className={styles.balanceDataText}>{user.qoinsBalance || 0}</p>
+                                                        <p className={styles.balanceDataText}>{user.qlanBalance || 0}</p>
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
@@ -319,12 +317,10 @@ const StreamerProfile = ({ user, games }) => {
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>{t('StreamerProfile.stimatedBits')}</p>
                                                         <p className={styles.balanceDataText}>{user.bitsBalance || 0}</p>
-
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
                                         </Grid>
-
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Grid container className={styles.myStreamsContainer}>

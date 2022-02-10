@@ -313,7 +313,7 @@ const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanB
                                 </div>
 
                                 {messages && cheers[cheerId].message &&
-                                    <div style={{ background: '#3B4BF9', borderRadius: '2px 20px 20px 20px', padding: '16px 20px 16px 20px' }}>
+                                    <div style={{ background: '#3B4BF9', borderRadius: '2px 20px 20px 20px', padding: '16px 20px 16px 20px', alignSelf: 'flex-start' }}>
                                         <p style={{ color: '#FFF', fontSize: 14, fontWeight: 500, letterSpacing: .35 }}>
                                             {cheers[cheerId].message}
                                         </p>

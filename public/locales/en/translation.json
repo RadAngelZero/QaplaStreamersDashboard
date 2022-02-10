@@ -234,5 +234,7 @@
     "description": "Description",
     "game": "Game",
     "goToProfile": "Go to my profile",
-    "save": "Save"
+    "save": "Save",
+    "Left": "Left",
+    "Right": "Right"
 }

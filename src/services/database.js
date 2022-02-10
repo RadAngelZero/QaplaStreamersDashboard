@@ -26,6 +26,8 @@ const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDe
 const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
 const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
 const tagsRef = database.ref('/Tags');
+const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
+const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -838,4 +840,34 @@ export async function getSubscriptionPurchaseDetails(uid, subscriptionId) {
  */
 export async function saveTags(tags) {
     await tagsRef.update(tags);
+}
+
+/**
+ * Streamer Alerts Settings
+ */
+
+/**
+ * Set a setting on the Streamer Alert Settings
+ * @param {string} uid User identifier
+ * @param {string} settingKey Setting to set
+ * @param {*} value Value to set
+ */
+export async function setAlertSetting(uid, settingKey, value) {
+    await streamerAlertsSettingsRef.child(uid).child(settingKey).set(value);
+}
+
+/**
+ * Get the alerts settings of the given streamer
+ * @param {string} uid User identifier
+ */
+ export async function getStreamerAlertsSettings(uid) {
+    return await streamerAlertsSettingsRef.child(uid).once('value');
+}
+
+/**
+ * 
+ * @param {string} uid User identifier
+ */
+export async function getStreamerMediaContent(uid) {
+    return await streamerCustomMediaForCheers.child(uid).once('value');
 }

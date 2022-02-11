@@ -86,9 +86,14 @@ const LiveDonations = () => {
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         audio = new Audio(TEST_MESSAGE_SPEECH_URL);
                     } else {
-                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, donation.message, 'es-US-Standard-A', 'es-MX');
+                        const messageToRead = `${donation.twitchUserName} dice: ${donation.message}`;
+                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
                         audio = new Audio(cheerMessageUrl.data);
                     }
+                } else {
+                    const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Qoins`;
+                    const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
+                    audio = new Audio(cheerMessageUrl.data);
                 }
 
                 donation.isRightSide = alertSideRight;

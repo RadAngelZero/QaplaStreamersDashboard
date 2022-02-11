@@ -53,6 +53,8 @@
         }
     },
     "StreamerProfile": {
+        "balance": "Balance",
+        "stimatedBits": "Bits estimados",
         "myStreams": "Mis Streams",
         "scheduled": "Programados",
         "pendingApproval": "Pendientes de aprobación",

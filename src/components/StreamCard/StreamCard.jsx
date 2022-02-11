@@ -106,7 +106,7 @@ const StyledMenuItem = withStyles(() => ({
     },
   }))(MenuItem);
 
-const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream }) => {
+const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream, style = {} }) => {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
@@ -193,7 +193,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
     }
 
     return (
-        <Card className={classes.eventCard} onClick={onClickCard}>
+        <Card className={classes.eventCard} onClick={onClickCard} style={style}>
             <div className={classes.relativeContainer}>
                 <div className={classes.hourContainer}>
                     <p className={classes.hourText}>

@@ -865,7 +865,7 @@ export async function setAlertSetting(uid, settingKey, value) {
 }
 
 /**
- * 
+ * Get the media selected by the streamer to show in their cheers
  * @param {string} uid User identifier
  */
 export async function getStreamerMediaContent(uid) {

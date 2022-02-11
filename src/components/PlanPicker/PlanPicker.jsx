@@ -127,7 +127,7 @@ const PlanPicker = ({ user }) => {
             </Box>
             <Grid container spacing={0} className={styles.plansContainer} justify='center'>
                 {subscriptions[period] && Object.entries(subscriptions[period].packages).map((plan) => (
-                    <form action='http://localhost:5001/qapplaapp/us-central1/streamerSubscriptionCheckoutIntent' method='post'>
+                    <form action='https://us-central1-qapplaapp.cloudfunctions.net/streamerSubscriptionCheckoutIntent' method='post'>
                         <Grid item sm={12} md={6} className={classes.cardGridItem} key={`${plan[0]}-${period}`}>
                             <h1 className={styles.planTypeTitle}>
                                 {plan[0] === 'essential' ?

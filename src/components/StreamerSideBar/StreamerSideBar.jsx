@@ -1,5 +1,5 @@
-import React from 'react';
-import { makeStyles, useTheme, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText } from '@material-ui/core';
+import React, { useState } from 'react';
+import { makeStyles, useTheme, Drawer, List, ListItem, ListItemIcon, Box, Hidden, IconButton, ListItemText, CircularProgress } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import BurguerMenu from '@material-ui/icons/Menu';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +32,10 @@ const useStyles = makeStyles((theme) => ({
         height: '30px',
         margin: '20px 0px',
         padding: '0px'
+    },
+    circularProgress: {
+        color: '#0AFFD2',
+        alignSelf: 'center'
     }
 }));
 
@@ -69,7 +73,8 @@ const StreamerSideBar = ({ user }) => {
     const history = useHistory();
     const classes = useStyles();
     const theme = useTheme();
-    const [mobileOpen, setMobileOpen] = React.useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [loadingStripeCustomerPortal, setLoadingStripeCustomerPortal] = useState(false);
     const { t } = useTranslation();
 
     const closeSession = () => {
@@ -132,23 +137,27 @@ const StreamerSideBar = ({ user }) => {
                     }
                 </ListItem>
                 {user && user.stripeCustomerId ?
-                    <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post'>
+                    <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post' onSubmit={() => setLoadingStripeCustomerPortal(true)}>
                         <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
                         <ListItem button type='submit' component='button' className={classes.listItem}>
                             <ListItemIcon style={{ minWidth: 40 }}>
-                                <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
+                                <MembershipIcon active={currentScreen === 'membership'} />
                             </ListItemIcon>
-                            <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
-                                {t('SideBar.membership')}
+                            <ListItemText style={{ opacity: currentScreen === 'membership' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                                {!loadingStripeCustomerPortal ?
+                                    t('SideBar.membership')
+                                    :
+                                    <CircularProgress className={classes.circularProgress} size={25} />
+                                }
                             </ListItemText>
                         </ListItem>
                     </form>
                     :
                     <ListItem button onClick={() => history.push('/membership')} className={classes.listItem}>
                         <ListItemIcon style={{ minWidth: 40 }}>
-                            <MembershipIcon active={currentScreen === 'membership' || currentScreen === 'subscriptions'} />
+                            <MembershipIcon active={currentScreen === 'membership'} />
                         </ListItemIcon>
-                        <ListItemText style={{ opacity: currentScreen === 'membership' || currentScreen === 'subscriptions' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                        <ListItemText style={{ opacity: currentScreen === 'membership' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                             {t('SideBar.membership')}
                         </ListItemText>
                     </ListItem>
@@ -207,7 +216,7 @@ const StreamerSideBar = ({ user }) => {
                     <Hidden lgUp>
                         <IconButton
                             onClick={handleDrawerToggle}
-                            style={{ position: 'absolute', top: 24, left: 24 }}>
+                            style={{ position: 'absolute', top: 37, left: 24 }}>
                             <BurguerMenu style={{ color: '#FFF', fontSize: 35, }} />
                         </IconButton>
                         <Drawer

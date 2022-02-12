@@ -6,6 +6,7 @@ import styles from './PlanPicker.module.css';
 import { getSubscriptionsDetails } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import ContainedButton from '../ContainedButton/ContainedButton';
+import { QUARTERLY, YEARLY } from '../../utilities/Constants';
 
 const useStyles = makeStyles(() => ({
     toggleButton: {
@@ -66,7 +67,7 @@ const ToggleButton = ({ currentValue, value, label, onChange }) => {
 
 const PlanPicker = ({ user }) => {
     const [subscriptions, setSubscriptions] = useState({});
-    const [period, setPeriod] = useState('quarterly');
+    const [period, setPeriod] = useState(QUARTERLY);
     const { t } = useTranslation();
     const classes = useStyles();
 
@@ -86,9 +87,9 @@ const PlanPicker = ({ user }) => {
 
     const renderTotalPayment = (period, monthlyAmount) => {
         let totalPayment = 0;
-        if (period === 'quarterly') {
+        if (period === QUARTERLY) {
             totalPayment = monthlyAmount * 3;
-        } else if (period === 'yearly') {
+        } else if (period === YEARLY) {
             totalPayment = monthlyAmount * 12;
         }
 

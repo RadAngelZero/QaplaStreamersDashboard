@@ -78,6 +78,13 @@ export const LEFT = 'LEFT';
 export const RIGHT = 'RIGHT';
 
 /**
+ * Subscription Types
+ */
+export const MONTHLY = 'monthly';
+export const QUARTERLY = 'quarterly';
+export const YEARLY = 'yearly';
+
+/**
  * Valid media type for cheers
  */
 export const IMAGE = 'IMAGE';

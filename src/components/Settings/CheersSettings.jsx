@@ -136,7 +136,7 @@ const CheersSettings = ({ uid, twitchId }) => {
                     }}>
                         <div style={{
                             display: 'flex',
-                            marginTop: '-25px',
+                            marginTop: '-8px',
                             maxWidth: '230px',
                             minHeight: '50.5px'
                         }}>

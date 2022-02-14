@@ -314,7 +314,8 @@ const NewStream = ({ user, games }) => {
                     </h1>
                     <div style={{
                         display: 'flex',
-                        height: '58px'
+                        height: '58px',
+                        marginTop: '20px'
                     }}>
                         <StreamerSelect
                             data={gamesData}

@@ -106,6 +106,7 @@ body {
     display: flex;
     justify-content: flex-end;
     width: 80%;
+    color: #6C5DD3;
 }
 
 .balanceDataText {
@@ -258,7 +259,7 @@ body {
     font-weight: 500;
     line-height: 48.5px;
     letter-spacing: -1px;
-    margin-bottom: 70px;
+    margin-bottom: 40px;
 }
 
 @media (max-width: 528.18px) {

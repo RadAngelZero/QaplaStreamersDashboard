@@ -79,7 +79,7 @@
     "NewStream": {
         "alerts": {
             "before24h": "Las solicitudes deben ser enviadas al menos 24 horas antes del stream",
-            "missingData": "Verifica que toda la información haya sido llenada correcta mente",
+            "missingData": "Verifica que toda la información haya sido llenada correctamente",
             "streamsLimit": "Ha alcanzado el límite de streams para su suscripción",
             "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
         },

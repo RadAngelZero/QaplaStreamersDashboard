@@ -311,6 +311,9 @@ const StreamerProfile = ({ user, games }) => {
                     <CheersBitsRecordDialog open={openRecordsDialog}
                         onClose={() => setOpenRecordsDialog(false)}
                         user={user}
+                        cheersQoins={cheersQoins}
+                        qlanQoins={qlanQoins}
+                        estimatedBits={estimatedBits}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />
                 </>

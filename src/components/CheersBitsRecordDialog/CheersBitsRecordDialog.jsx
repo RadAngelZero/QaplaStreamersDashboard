@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     dialogRoot: {
-        zIndex: '0 !important',
+        zIndex: '100 !important',
         '& .MuiBackdrop-root': {
             backgroundColor: '#02071E80',
             backdropFilter: 'blur(5px)',

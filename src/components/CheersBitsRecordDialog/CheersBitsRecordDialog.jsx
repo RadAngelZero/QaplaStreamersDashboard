@@ -252,16 +252,29 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
 
 const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanBalance }) => {
     const classes = useStyles();
-    const [balance, setBalance] = useState(qoinsBalance)
+    const [balance, setBalance] = useState(qoinsBalance);
 
     useEffect(() => {
         if (setPendingMessages !== undefined) {
-            setPendingMessages(0)
+            setPendingMessages(0);
         }
         if (qlanBalance) {
-            setBalance(qoinsBalance + qlanBalance)
+            setBalance(qoinsBalance + qlanBalance);
         }
-    }, [setPendingMessages, qlanBalance, qoinsBalance])
+    }, [setPendingMessages, qlanBalance, qoinsBalance]);
+
+    const showDate = () => {
+        const today = new Date();
+        /**
+         * Not all the browsers supports the parameter "locales" from the function toLocaleDateString
+         * https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+         */
+        try {
+            return today.toLocaleDateString('es-MX');
+        } catch (error) {
+            return today.toLocaleDateString();
+        }
+    }
 
     return (
         <>
@@ -277,7 +290,9 @@ const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanB
                             <p style={{ display: 'flex', width: '62px' }}> Qlan </p>
                             <p style={{ display: 'flex', }}> {qlanBalance || 0} </p>
                         </div>
-                        <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>Cheers recibidos al dd/mm/aa</p>
+                        <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>
+                            Cheers recibidos al {showDate()}
+                        </p>
                     </div>
                 </>
             }

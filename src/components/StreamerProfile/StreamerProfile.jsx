@@ -7,7 +7,6 @@ import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
-import { ReactComponent as QoinBN } from './../../assets/QoinBN.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg'
@@ -206,7 +205,7 @@ const StreamerProfile = ({ user, games }) => {
                                         <Grid container xs={12} style={{ gap: '20px' }} >
                                             <Grid item xs={12} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
-                                                    <QoinBN style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <DonatedQoin style={{ display: 'flex', width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>Cheers</p>
                                                         <p className={styles.balanceDataText}>

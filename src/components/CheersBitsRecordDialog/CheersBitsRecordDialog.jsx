@@ -214,7 +214,7 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
                 <div className={classes.balanceCurrencyContainer}>
                     <Icon />
                     <p className={classes.balanceCurrencyValue}>
-                        {(value || 0).toLocaleString()}
+                        {parseInt(value || 0).toLocaleString()}
                     </p>
                 </div>
             </div>

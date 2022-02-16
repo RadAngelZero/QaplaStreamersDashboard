@@ -114,9 +114,9 @@ const CheersSettings = ({ uid, twitchId }) => {
         writeTestCheer(uid, t('CheersSettings.testCheerSuccess'), t('CheersSettings.testCheerError'));
     }
 
-    const changeSide = (e) => {
-        setSide(e.target.value);
-        setAlertSetting(uid, 'alertSideRight', e.target.value === RIGHT);
+    const changeSide = (side) => {
+        setSide(side);
+        setAlertSetting(uid, 'alertSideRight', side === RIGHT);
     }
 
     return (
@@ -128,24 +128,35 @@ const CheersSettings = ({ uid, twitchId }) => {
                 {t('CheersSettings.description')}
             </p>
             <Grid container className={classes.instructionsMargin}>
-                <Grid container xs={10} style={{ alignItems: 'center', gap: '20px'}} >
+                <Grid container xs={10} style={{ alignItems: 'center', gap: '20px' }} >
                     <Grid item xs={4} style={{
                         display: 'flex',
                         minWidth: '230px',
                         maxWidth: '240px'
                     }}>
-                        <StreamerSelect
-                            style={{ height: '58px', width: '230px', margin: '0px' }}
-                            value={side}
-                            onChange={changeSide}
-                            Icon={ArrowIcon}>
-                            <option value={LEFT}>
-                                {t('Left')}
-                            </option>
-                            <option value={RIGHT}>
-                                {t('Right')}
-                            </option>
-                        </StreamerSelect>
+                        <div style={{
+                            display: 'flex',
+                            marginTop: '-8px',
+                            maxWidth: '230px',
+                            minHeight: '50.5px'
+                        }}>
+                            <StreamerSelect
+                                data={[
+                                    {
+                                        value: LEFT,
+                                        label: t('Left')
+                                    },
+                                    {
+                                        value: RIGHT,
+                                        label: t('Right')
+                                    }
+                                ]}
+                                style={{ minHeight: '50.5px', width: '230px', margin: '0px' }}
+                                value={side}
+                                onChange={changeSide}
+                                overflowY='hidden'
+                                overflowX='hidden' />
+                        </div>
                     </Grid>
                     <Grid item xs={8} style={{ display: 'flex' }}>
                         <StreamerTextInput

@@ -29,7 +29,7 @@ import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg'
 
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
-import { SCEHDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
+import { SCHEDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
 import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate } from '../../services/database';
 import { sednPushNotificationToTopic } from '../../services/functions';
 import { notifyUpdateToQaplaAdmins } from '../../services/discord';
@@ -184,7 +184,7 @@ const EditStreamerEvent = ({ user }) => {
 
     useEffect(() => {
         async function setStreamData() {
-            if (streamType === SCEHDULED_EVENT_TYPE) {
+            if (streamType === SCHEDULED_EVENT_TYPE) {
                 const timeStamp = await loadApprovedStreamTimeStamp(streamId);
                 if (timeStamp.exists()) {
                     setDate(new Date(timeStamp.val()));
@@ -201,7 +201,7 @@ const EditStreamerEvent = ({ user }) => {
         }
 
         async function setStreamTitle() {
-            if (streamType === SCEHDULED_EVENT_TYPE) {
+            if (streamType === SCHEDULED_EVENT_TYPE) {
                 const title = await getStreamTitle(streamId);
                 setTitle(title.val());
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
@@ -281,7 +281,7 @@ const EditStreamerEvent = ({ user }) => {
                             onClick={history.goBack} />
                     </Grid>
                 </Hidden>
-                {streamType === SCEHDULED_EVENT_TYPE &&
+                {streamType === SCHEDULED_EVENT_TYPE &&
                     <>
                         <Grid xs={6}>
                             <SectionHeader title='Edit'

@@ -20,7 +20,7 @@ const useStyles = makeStyles({
     input: {
         display: 'flex',
         position: 'absolute',
-        zIndex: 50,
+        zIndex: 90,
         overflow: 'hidden',
         fontWeight: 'bold',
         backgroundColor: '#141833',

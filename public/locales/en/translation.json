@@ -53,6 +53,8 @@
         }
     },
     "StreamerProfile": {
+        "balance": "Balance",
+        "stimatedBits": "Estimated bits",
         "myStreams": "My Streams",
         "scheduled": "Scheduled",
         "pendingApproval": "Pending Approval",
@@ -73,6 +75,40 @@
         "start": "Start",
         "resume": "Resume",
         "cancelStreamRequest": "Cancel"
+    },
+    "NewStream": {
+        "alerts": {
+            "before24h": "All requests must be sent at least 24 hours before the stream",
+            "missingData": "Verify that all fields have been filled correctly",
+            "streamsLimit": "You have reached the limit of streams for your subscription",
+            "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
+        },
+        "whatAreYouPlaying": "What are you playing?",
+        "selectYourGame": "Select your game",
+        "when": "When?",
+        "date": "Date",
+        "time": "Time",
+        "confirmDate": "Confirm your date",
+        "confirmDatePlaceholder": "April 15 16:00 Mexico City Time",
+        "streamType": "Stream type",
+        "streamTypes": {
+            "casual": "Casual (XQ)",
+            "tournamen": "Tournament"
+        },
+        "advanced": "Advenced (Optional)",
+        "feelingCreative": "Feeling creative? Give your stream a cool name",
+        "streamTitle": "Stream title",
+        "streamTitlePlaceholder": "Trolling on Apex Arena",
+        "streamDescription": "Stream description",
+        "subtitle": "Subtitle",
+        "descriptionPlaceholder": "Share what your stream is going to be about",
+        "submit": "Submit",
+        "confirmDialog": {
+            "almostDone": "We are almost done",
+            "confirmDetails": "Just confirm the details to continue",
+            "dateAndHour": "Date and hour",
+            "localTime": "Local time"
+        }
     },
     "CheersSettings": {
         "title": "Receive messages from your community",
@@ -133,23 +169,72 @@
         "redemptions": "{{numberOfRedemptions}} redemptions of Qoins and XQ per stream",
         "cheers": "Receives cheers of Qoins.",
         "extraPublications": "Extra publications include",
-        "noQoinsMinimum": "No minimum withdrawal of Qoins",
+        "noQoinsMinimum": "No minimum Qoins withdrawal",
         "qoinsStore": "Qoins store",
-        "discounts": "Discount on the Qoins store",
-        "subscribeNow": "Subscribe now"
-    },
-    "ProcessingPaymentDialog": {
-        "successfulPayment": "Successful payment",
-        "activatingAccount": "Please wait a moment while we activate your account",
-        "membershipReady": "Done, your membership is active, press the button to finish",
-        "finish": "Finish"
+        "discounts": "Qoins store discounts",
+        "getVisibility": "Get visibility for your content",
+        "rewardYourCommunity": "Reward your community"
     },
     "StreamerProfileEditor": {
         "editCover": "Edit cover",
         "editBio": "Edit bio",
         "saveChanges": "Save changes",
         "addTag": "Add tag",
+        "addTagPlaceholder": "Search or create a tag",
         "showUpcomingStreams": "Show upcoming streams",
-        "social": "Social"
-    }
+        "social": "Social",
+        "OnBoarding": {
+            "header1": "Increase your visibility",
+            "header2": "Improve live interaction",
+            "header3": "Amplify your reach",
+            "body1": "Welcome to your Qapla profile 😍. Connect with more members of the community by enabling your profile",
+            "body2": "Share what you like, what your content is about, or whatever you want!, to increase the chances of matching with the people who come by your stream 💜",
+            "body3": "Drive valuable traffic to all your online content. One place for your schedule streams and your communication channels 🎙",
+            "presentYourself": "Introduce yourself to the community",
+            "addTags": "Add tags that represent you as the creator, your persona, your content, etc.",
+            "yourIntro": "Your intro is a glimpse of yourself and your content. Make it nice 😉",
+            "minChars": "Min. Characters",
+            "tagErrorNotSelected": "To add a tag write and/or click on it",
+            "minTags": "Add at least {{minTags}} tags to continue"
+        },
+        "confirmations": {
+            "saveImage": "Image saved successfully"
+        },
+        "errors": {
+            "addTag": "There was a problem adding the tag, try again later or contact technical support",
+            "updateTag": "There was a problem updating the tag, try again later or contact technical support",
+            "deleteTag": "There was a problem deleting the tag, try again later or contact technical support",
+            "updateLinks": "There was a problem updating the links, try again later or contact technical support",
+            "updateBio": "There was a problem updating the bio, try again later or contact technical support",
+            "saveImage": "There was an error saving the image, try again later or contact technical support",
+            "emptyBioError": "Bio can't be empty"
+        }
+    },
+    "ChargeConfirmationPage": {
+        "plansPeriods": {
+            "monthly": "monthly",
+            "quarterly": "quarterly",
+            "yearly": "yearly"
+        },
+        "intervals": {
+            "monthly": "/ every month",
+            "quarterly": "/ every 3\nmonths",
+            "yearly": "/ every year"
+        },
+        "payment": "Payment",
+        "fullPaymentUntilToday": "Total paid today",
+        "thanksForSubscribing": "Thanks for subscribing",
+        "paymentProcessedSuccessfuly": "Your payment has been processed successfully! A receipt from QAPLAGG will be sent to your email",
+        "publishStream": "Post a stream",
+        "backToDashboard": "Back to dashboard"
+    },
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "title": "Title",
+    "description": "Description",
+    "game": "Game",
+    "goToProfile": "Go to my profile",
+    "save": "Save",
+    "Left": "Left",
+    "Right": "Right"
 }

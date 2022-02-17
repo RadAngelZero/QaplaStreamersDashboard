@@ -24,6 +24,11 @@ const qaplaLevelsRequirementsRef = database.ref('QaplaLevelsRequirements');
 const streamsPackagesRef = database.ref('/StreamsPackages');
 const streamersSubscriptionsDetailsRef = database.ref('/StreamersSubscriptionsDetails');
 const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
+const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
+const tagsRef = database.ref('/Tags');
+const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
+const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers');
+const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -76,7 +81,9 @@ export async function streamerProfileExists(uid) {
  * @param {string} inviteCode Invitation code used
  */
 export async function createStreamerProfile(uid, userData, inviteCode) {
-    InvitationCodeRef.child(inviteCode).remove();
+    if (inviteCode) {
+        InvitationCodeRef.child(inviteCode).remove();
+    }
     return await userStreamersRef.child(uid).update(userData);
 }
 
@@ -797,10 +804,83 @@ export async function removeStreamPackageOfStreamer(streamerUid, packageId) {
  * Streamers Public Profiles
  */
 
-export async function getStreamerPublicProfile(uid) {
-    return await streamersPublicProfilesRef.child(uid).once('value');
+/**
+ * Listen to the specified streamer profile
+ * @param {string} uid User identifier
+ * @param {function} callback Handler for firebase snapshot
+ */
+export function listenStreamerPublicProfile(uid, callback) {
+    return streamersPublicProfilesRef.child(uid).on('value', callback);
 }
 
+/**
+ * Updates the specified streamer profile with the given data
+ * @param {string} uid User identifier
+ * @param {object} dataToUpdate Data to update on profile
+ */
 export async function updateStreamerPublicProfile(uid, dataToUpdate) {
     return await streamersPublicProfilesRef.child(uid).update(dataToUpdate);
+}
+
+/**
+ * Subscription Purchase Details
+ */
+
+/**
+ * Get the details of the given subscription of the specified user
+ * @param {string} uid User identifier
+ * @param {string} subscriptionId Subscription stripe identifier
+ */
+export async function getSubscriptionPurchaseDetails(uid, subscriptionId) {
+    return await subscriptionPurchaseDetailsRef.child(uid).child(subscriptionId).once('value');
+}
+
+/**
+ * Save all the tags on te Tags node
+ * @param {object} tags Object of tags in format { tag1: true, tag2: true }
+ */
+export async function saveTags(tags) {
+    await tagsRef.update(tags);
+}
+
+/**
+ * Streamer Alerts Settings
+ */
+
+/**
+ * Set a setting on the Streamer Alert Settings
+ * @param {string} uid User identifier
+ * @param {string} settingKey Setting to set
+ * @param {*} value Value to set
+ */
+export async function setAlertSetting(uid, settingKey, value) {
+    await streamerAlertsSettingsRef.child(uid).child(settingKey).set(value);
+}
+
+/**
+ * Get the alerts settings of the given streamer
+ * @param {string} uid User identifier
+ */
+ export async function getStreamerAlertsSettings(uid) {
+    return await streamerAlertsSettingsRef.child(uid).once('value');
+}
+
+/**
+ * Get the media selected by the streamer to show in their cheers
+ * @param {string} uid User identifier
+ */
+export async function getStreamerMediaContent(uid) {
+    return await streamerCustomMediaForCheers.child(uid).once('value');
+}
+
+/**
+ * QoinsToBitForStreamers
+ */
+
+/**
+ * Get the value of Qoins in bit for the given type of user
+ * @param {string} type Type of user (one of premium or freeUser)
+ */
+export async function getStreamerValueOfQoins(type) {
+    return qoinsToBitForStreamersRef.child(type).once('value');
 }

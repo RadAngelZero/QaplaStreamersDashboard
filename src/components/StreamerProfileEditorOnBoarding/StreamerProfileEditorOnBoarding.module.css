@@ -1,0 +1,199 @@
+.profileOnBoardingContainer {
+    background: conic-gradient(from 134.88deg at 50.55% 49.24%, #5600E1 -61.47deg, #373FFF 26.68deg, #A534FE 167.74deg, #B518FF 197.3deg, #5600E1 298.53deg, #373FFF 386.68deg), linear-gradient(0deg, rgba(3, 7, 34, 0.95), rgba(3, 7, 34, 0.95));
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.profileOnBoardingModalContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #141833;
+    width: 450px;
+    height: 570px;
+    border-radius: 35px;
+    overflow: hidden;
+    align-items: center;
+}
+
+.modalImgContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.modalText {
+    display: flex;
+    color: #FFF;
+    text-align: center;
+    font-size: 18px;
+    line-height: 22px;
+}
+
+.modalTextHeader {
+    composes: modalText;
+    font-weight: 700;
+    line-height: 32px;
+}
+
+.modalTextParagraph {
+    font-size: 14px;
+    line-height: 22px;
+    color: #FFF;
+    composes: modalText;
+    width: 342px;
+    font-weight: 500;
+    font-size: 14px;
+    text-align: center;
+    max-width: 80%;
+}
+
+.modalButton {
+    display: flex;
+    width: 390px;
+}
+
+.modalButtonPresentation {
+    composes: modalButton;
+    margin-top: auto !important;
+    margin-bottom: 30px !important;
+}
+
+.modalButtonContinue {
+    composes: modalButton;
+    margin-bottom: 30px !important;
+}
+
+.modalButtonEditing {
+    composes: modalButton;
+}
+
+.modalButtonForm {
+    composes: modalButton;
+    height: 49px;
+}
+.modalButtonFormLater {
+    margin-top: 14px !important;
+    composes: modalButtonForm;
+    margin-bottom: 14px !important;
+    width: 220px;
+    background-color: #0000 !important;
+    box-shadow: none !important;
+    color: #FFFFFF99 !important;
+    font-weight: 400 !important;
+    font-size: 16px !important;
+}
+
+.modalButtonFormContinue {
+    composes: modalButtonForm;
+    margin-bottom: 30px;
+    margin-bottom: 24px !important;
+    margin-top: auto !important;
+}
+
+.modalTextSubParagraph {
+    composes: modalText;
+    color: #FFFFFF99;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.modalButtonActiveIndicator {
+    display: flex;
+    border-radius: 100px;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+}
+
+.modalBioTextInputContainer {
+    display: flex;
+    flex: 1;
+}
+
+.modalBioEditorContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #202750;
+    border-radius: 15px;
+    width: 390px;
+    height: 234px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+.modalBioTextInput {
+    background-color: #202750;
+    margin-top: 0 !important;
+    padding-right: 16px !important;
+    align-items: flex-start !important;
+}
+
+.modalBioEditorFormatterButtonsContainer {
+    display: flex;
+    height: 46px;
+    width: 100%;
+}
+
+.modalTagSearchContainer {
+    composes: modalBioEditorContainer;
+    height: 45px;
+    min-height: 45px;
+    border-radius: 8px;
+}
+
+.modalTagSearchTextInput {
+    composes: modalBioTextInput;
+    color: #6C5DD3 !important;
+}
+
+.modalTagsList {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin-left: -0.25rem;
+    width: fit-content;
+    max-width: 390px;
+    align-content: flex-start;
+    justify-content: flex-start;
+}
+
+.modalTag {
+    display: flex;
+    margin: 0.3rem 0.2rem;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #202750;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4040FF;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #8080FF;
+}
+
+.minLengthIndicator {
+    margin-top: auto !important;
+    margin-bottom: 36px;
+    font-size: 10px;
+    font-weight: 400;
+    width: 90%;
+    color: #FFF;
+    opacity: .6;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+}

@@ -13,10 +13,10 @@ const useStyles = makeStyles(() => ({
         alignItems: 'center'
     },
     backButton: {
-        backgroundColor: '#242731',
-        height: 48,
-        width: 48,
-        marginRight: 16,
+        backgroundColor: '#141833',
+        height: '40px',
+        width: '40px',
+        marginRight: '16px',
         "&:hover": {
             backgroundColor: '#242731'
         }
@@ -34,7 +34,7 @@ const BackButton = ({ onClick, label }) => {
         <div className={classes.container}>
             <IconButton className={classes.backButton}
                 onClick={onClick}>
-                <LeftArrowIcon />
+                <LeftArrowIcon style={{height: '18px', width: '11px', marginLeft: '-2px'}} />
             </IconButton>
             <p className={classes.label}>
                 {label}

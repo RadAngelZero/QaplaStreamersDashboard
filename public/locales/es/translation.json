@@ -53,6 +53,8 @@
         }
     },
     "StreamerProfile": {
+        "balance": "Balance",
+        "stimatedBits": "Bits estimados",
         "myStreams": "Mis Streams",
         "scheduled": "Programados",
         "pendingApproval": "Pendientes de aprobación",
@@ -73,6 +75,40 @@
         "start": "Iniciar",
         "resume": "Reanudar",
         "cancelStreamRequest": "Cancelar"
+    },
+    "NewStream": {
+        "alerts": {
+            "before24h": "Las solicitudes deben ser enviadas al menos 24 horas antes del stream",
+            "missingData": "Verifica que toda la información haya sido llenada correctamente",
+            "streamsLimit": "Ha alcanzado el límite de streams para su suscripción",
+            "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
+        },
+        "whatAreYouPlaying": "¿Qué vas a jugar?",
+        "selectYourGame": "Selecciona tu juego",
+        "when": "¿Cuando?",
+        "date": "Fecha",
+        "time": "Hora",
+        "confirmDate": "Confirma la fecha y la hora",
+        "confirmDatePlaceholder": "15 de abril 16:00 Hora de Ciudad de Mexico",
+        "streamType": "Tipo de Stream",
+        "streamTypes": {
+            "casual": "Casual (XQ)",
+            "tournamen": "Torneo"
+        },
+        "advanced": "Avanzado (Opcional)",
+        "feelingCreative": "¿Te sientes creativo? Dale un nombre genial a tu stream",
+        "streamTitle": "Título del stream",
+        "streamTitlePlaceholder": "Manqueando en Fall Guys",
+        "streamDescription": "Descripción del stream",
+        "subtitle": "Subtitulo",
+        "descriptionPlaceholder": "Describe lo que tienes planeado para tu stream",
+        "submit": "Enviar",
+        "confirmDialog": {
+            "almostDone": "Ya casi terminamos",
+            "confirmDetails": "Sólo confirma los detalles para continuar",
+            "dateAndHour": "Fecha y hora",
+            "localTime": "Tiempo local"
+        }
     },
     "CheersSettings": {
         "title": "Recibe mensajes de parte de tu comunidad",
@@ -136,20 +172,64 @@
         "noQoinsMinimum": "Sin mínimo de retiro de Qoins",
         "qoinsStore": "Tienda de Qoins",
         "discounts": "Descuento en tienda de Qoins",
-        "subscribeNow": "Suscríbete ahora"
-    },
-    "ProcessingPaymentDialog": {
-        "successfulPayment": "Pago realizado con exito",
-        "activatingAccount": "Por favor espera un momento mientras activamos tu cuenta",
-        "membershipReady": "Listo, tu membresia esta activa, presiona el boton para terminar",
-        "finish": "Terminar"
+        "getVisibility": "Dale visibilidad a tu contenido",
+        "rewardYourCommunity": "Recompensa a tu comunidad"
     },
     "StreamerProfileEditor": {
         "editCover": "Editar cover",
         "editBio": "Editar bio",
         "saveChanges": "Guardar cambios",
         "addTag": "Agregar tag",
+        "addTagPlaceholder": "Busca o crea un tag",
         "showUpcomingStreams": "Mostar próximos streams",
-        "social": "Social"
-    }
+        "social": "Social",
+        "OnBoarding": {
+            "header1": "Incrementa tu visibilidad",
+            "header2": "Mejora la interacción en vivo",
+            "header3": "Amplifica tu alcance",
+            "body1": "Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil",
+            "body2": "Comparte tus gustos, de que trata tu contenido, ó ¡lo que tu quieras!, para incrementar las posibilidades hacer match con la gente que se pasa a tu stream 💜",
+            "body3": "Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y tus diferentes canales de comunicación 🎙",
+            "presentYourself": "Preséntate con la comunidad",
+            "addTags": "Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.",
+            "yourIntro": "Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉",
+            "minChars": "Min. Caracteres",
+            "tagErrorNotSelected": "Para agregar un tag escribelo y/o da click en el",
+            "minTags": "Agrega al menos {{minTags}} tags para continuar"
+        },
+        "confirmations": {
+            "saveImage": "Imagen guardada correctamente"
+        },
+        "errors": {
+            "addTag": "Hubo un problema al agregar el tag, intentalo mas tarde o contacta con soporte tecnico",
+            "updateTag": "Hubo un problema al actualizar el tag, intentalo mas tarde o contacta con soporte tecnico",
+            "deleteTag": "Hubo un problema al eliminar el tag, intentalo mas tarde o contacta con soporte tecnico",
+            "updateLinks": "Hubo un problema al actualizar los links, intentalo mas tarde o contacta con soporte tecnico",
+            "updateBio": "Hubo un problema al actualizar la bio, intentalo mas tarde o contacta con soporte tecnico",
+            "saveImage": "Hubo un error al guardar la imagen, intentalo mas tarde o contacta con soporte tecnico",
+            "emptyBioError": "La bio no puede quedar vacia"
+        }
+    },
+    "ChargeConfirmationPage": {
+        "plansPeriods": {
+            "monthly": "Mensual",
+            "quarterly": "Trimestral",
+            "yearly": "Anual"
+        },
+        "payment": "Pago",
+        "fullPaymentUntilToday": "Pago total al día de hoy",
+        "thanksForSubscribing": "Gracias por tu suscripción",
+        "paymentProcessedSuccessfuly": "¡Tu pago se ha procesado de manera exitosa! Recibirás el comprobante de tu pago en tu correo a nombre de QAPLAGG 🧾",
+        "publishStream": "Publica un stream",
+        "backToDashboard": "Volver al dashboard"
+    },
+    "continue": "Continuar",
+    "cancel": "Cancelar",
+    "title": "Título",
+    "description": "Descripción",
+    "game": "Juego",
+    "goToProfile": "Ir a mi perfil",
+    "save": "Guardar",
+    "Left": "Izquierda",
+    "Right": "Derecha"
 }

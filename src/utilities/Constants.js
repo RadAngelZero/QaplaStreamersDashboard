@@ -72,10 +72,28 @@ export const TWITCH_SECRET_ID = 'xt2ed1xz00cwglz34fu2m95k77xnj6';
 export const TWITCH_REDIRECT_URI = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://dashboard.qapla.gg/';
 
 /**
+ * Alert Side Selection
+ */
+export const LEFT = 'LEFT';
+export const RIGHT = 'RIGHT';
+
+/**
+ * Subscription Types
+ */
+export const MONTHLY = 'monthly';
+export const QUARTERLY = 'quarterly';
+export const YEARLY = 'yearly';
+
+/**
+ * Valid media type for cheers
+ */
+export const IMAGE = 'IMAGE';
+
+/**
  * Streams Status
  */
 export const PENDING_APPROVAL_EVENT_TYPE = 1;
-export const SCEHDULED_EVENT_TYPE = 2;
+export const SCHEDULED_EVENT_TYPE = 2;
 export const PAST_STREAMS_EVENT_TYPE = 3;
 
 /**
@@ -83,6 +101,12 @@ export const PAST_STREAMS_EVENT_TYPE = 3;
  */
 export const XQ = 'xq';
 export const QOINS = 'qoins';
+
+/**
+ * Type of users
+ */
+export const PREMIUM = 'premium';
+export const FREE_USER = 'freeUser';
 
 /**
  * Twitch PubSub connections status
@@ -105,6 +129,30 @@ export const webhookStreamOffline = {
 };
 
 export const HOUR_IN_MILISECONDS = 3600000;
+
+/**
+ * Qapla profiles random backgrounds gradients
+ */
+export const PROFILE_BACKGROUND_GRADIENTS = [
+    { angle: 98, colors: ['#2D07FA', '#A716EE'] },
+    { angle: 262, colors: ['#00FEC1', '#FA00FF'] },
+    { angle: 98, colors: ['#FF2B77', '#E5E91E'] },
+    { angle: 98, colors: ['#00E0FF', '#2E08FB'] },
+    { angle: 98, colors: ['#00FF75', '#7516EF'] },
+];
+
+/**
+ * Min length for streamer public profile elements
+ */
+export const MIN_BIO_LENGTH = 100;
+export const MIN_TAGS = 3;
+
+/**
+ * Streamers Profiles constants
+ */
+export const MAX_ROWS_IN_BIO = 5;
+
+export const TEST_MESSAGE_SPEECH_URL = 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/CheersTestAudios%2FTest.mp3?alt=media&token=3a77f0c1-e5ce-445a-a848-cd5a00a4c361';
 
 export const streamsPlaceholderImages = {
     DBD: DBDImage,

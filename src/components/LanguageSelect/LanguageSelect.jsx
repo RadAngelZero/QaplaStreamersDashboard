@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
@@ -17,26 +17,47 @@ const useStyles = makeStyles(() => ({
 
 const LanguageSelect = () => {
     const [currentLanguageCode, setCurrentLanguageCode] = useState(getCurrentLanguage());
+    const [langData, setLangData] = useState([])
     const classes = useStyles();
     const { t } = useTranslation();
 
+    useEffect(() => {
+        let tempLangArr = []
+        getAvailableLanguages().map((languageCode) => (
+            tempLangArr.push({
+                value: languageCode,
+                label: t(`LanguageHandler.languages.${languageCode}`)
+            })
+        ))
+        setLangData(tempLangArr)
+    }, [t])
+
     const onLanguageChanged = (languageCode) => {
-        changeLanguage(languageCode.target.value);
-        setCurrentLanguageCode(languageCode.target.value);
+        changeLanguage(languageCode);
+        setCurrentLanguageCode(languageCode);
     }
 
     return (
-        <>
-            <TranslateIcon />
+        <div style={{
+            display: 'flex'
+        }}>
+            <TranslateIcon style={{
+                display: 'flex'
+            }} />
             {/* The style of this select needs to be implemented inline */}
-            <StreamerSelect style={{ marginRight: 8, backgroundColor: 'transparent' }} value={currentLanguageCode} onChange={onLanguageChanged} Icon={ArrowIcon}>
-                {getAvailableLanguages().map((languageCode) => (
-                    <option className={classes.languageLabel} value={languageCode}>
-                        {t(`LanguageHandler.languages.${languageCode}`)}
-                    </option>
-                ))}
-            </StreamerSelect>
-        </>
+            <div style={{
+                marginTop: '-10px',
+            }}>
+                <StreamerSelect
+                    style={{ backgroundColor: '#141833' }}
+                    data={langData}
+                    value={currentLanguageCode}
+                    onChange={onLanguageChanged}
+                    overflowY='hidden'
+                    overflowX='hidden'
+                />
+            </div>
+        </div>
     );
 }
 

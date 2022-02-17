@@ -25,11 +25,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerTextInput = ({ label, classes, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, rowsMax, containerClassName = {}, labelClassName = {}, textInputClassName = {}, id = '', disabled = false, onBlur }) => {
+const StreamerTextInput = ({ label, classes, placeholder, value, onChange, fullWidth = false, Icon, type, multiline = false, rows = 1, maxRows, rowsMax, containerClassName = {}, labelClassName = {}, textInputClassName = {}, containerStyle = {}, textInputStyle = {}, id = '', disabled = false, onBlur }) => {
     const classesMaterial = useStyles();
 
     return (
-        <div className={containerClassName}>
+        <div className={containerClassName} style={containerStyle}>
             <InputLabel className={[labelClassName, classesMaterial.label]}>
                 {label}
             </InputLabel>
@@ -37,7 +37,8 @@ const StreamerTextInput = ({ label, classes, placeholder, value, onChange, fullW
                 disabled={disabled}
                 id={id}
                 rows={rows}
-                maxRows={rowsMax}
+                maxRows={maxRows}
+                rowsMax={rowsMax}
                 multiline={multiline}
                 type={type}
                 endAdornment={Icon ?
@@ -50,6 +51,7 @@ const StreamerTextInput = ({ label, classes, placeholder, value, onChange, fullW
                 variant='outlined'
                 label={label}
                 className={[textInputClassName, classesMaterial.textInput]}
+                style={textInputStyle}
                 classes={classes}
                 fullWidth={fullWidth}
                 placeholder={placeholder}

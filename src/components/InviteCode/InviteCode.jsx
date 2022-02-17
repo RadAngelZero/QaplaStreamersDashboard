@@ -42,55 +42,70 @@ const InviteCode = ({ user }) => {
         return console.log('No Continue');
     }
 
-    return (
-        <StreamerDashboardContainer>
-            <Grid item md='4' style={{
-                    backgroundImage: `url(${RoomGame})`,
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'cover',
-                    height: '100%',
-                }}>
-                <div style={{
-                        display: 'flex',
-                        flexGrow: 1,
-                        justifyContent: 'center',
-                        height: '100vh',
-                        alignItems: 'flex-end'
+    /**
+     * user has 3 states: null, undefined and object. When null it means we have not yet checked if the user exists so we
+     * don´t know yet what to render, so we don´t render nothing.
+     * undefined means the user is not authenticated and object means it exists and we have their data so again we should
+     * not show this screen
+     */
+    if (user === null || user instanceof Object) {
+        return null;
+    }
+
+    /**
+     * If is undefined then we show the InviteCoide screen
+     */
+    if (user === undefined) {
+        return (
+            <StreamerDashboardContainer>
+                <Grid item md='4' style={{
+                        backgroundImage: `url(${RoomGame})`,
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'cover',
+                        height: '100%',
                     }}>
-                <QaplaIcon style={{ marginBottom: 32 }} />
-                </div>
-            </Grid>
-            <Grid item md='1' />
-            <Grid item md='4'>
-                <p className={styles.getStarted}>
-                    Start growing your community.
-                </p>
-                <div className={styles.formContainer}>
-                    <p className={styles.instruction}>
-                        Enter your free trial invite code to sign up.
+                    <div style={{
+                            display: 'flex',
+                            flexGrow: 1,
+                            justifyContent: 'center',
+                            height: '100vh',
+                            alignItems: 'flex-end'
+                        }}>
+                    <QaplaIcon style={{ marginBottom: 32 }} />
+                    </div>
+                </Grid>
+                <Grid item md='1' />
+                <Grid item md='4'>
+                    <p className={styles.getStarted}>
+                        Start growing your community.
                     </p>
-                    <form onSubmit={continueToSignUp}>
-                        <InputBase
-                            variant='outlined'
-                            label='Invite Code'
-                            className={[classes.margin, styles.inviteCodeInput]}
-                            fullWidth
-                            placeholder='Invite Code'
-                            value={invitationCode}
-                            onChange={(e) => setInvitationCode(e.target.value)}
-                            onSubmit={() => continueToSignUp} />
-                        <Button variant='contained'
-                            className={styles.continueButton}
-                            type='submit'>
-                            Continue
-                        </Button>
-                    </form>
-                </div>
-            </Grid>
-            <Grid item md='3' />
-        </StreamerDashboardContainer>
-    );
+                    <div className={styles.formContainer}>
+                        <p className={styles.instruction}>
+                            Enter your free trial invite code to sign up.
+                        </p>
+                        <form onSubmit={continueToSignUp}>
+                            <InputBase
+                                variant='outlined'
+                                label='Invite Code'
+                                className={[classes.margin, styles.inviteCodeInput]}
+                                fullWidth
+                                placeholder='Invite Code'
+                                value={invitationCode}
+                                onChange={(e) => setInvitationCode(e.target.value)}
+                                onSubmit={() => continueToSignUp} />
+                            <Button variant='contained'
+                                className={styles.continueButton}
+                                type='submit'>
+                                Continue
+                            </Button>
+                        </form>
+                    </div>
+                </Grid>
+                <Grid item md='3' />
+            </StreamerDashboardContainer>
+        );
+    }
 }
 
 export default InviteCode;

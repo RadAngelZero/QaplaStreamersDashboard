@@ -67,14 +67,17 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
 }
 
 /**
- * Returns the hash necessary to show the authenticate with billflow (necessary
- * for show the customer portal for example)
- * @param {string} stripeCustomerId Streamer customer id of stripe
+ * Call the cheerMessageTextToSpeech to convert the message in audio
+ * @param {string} streamerId Streamer uid
+ * @param {string} donationId Donation id
+ * @param {string} message Message to convert in audio
+ * @param {string} voiceName Selected voice from: https://cloud.google.com/text-to-speech/docs/voices
+ * @param {string} languageCode Language code selected
  */
-export async function getBillflowHMAC(stripeCustomerId) {
-    const getHMAC = functions.httpsCallable('getBillflowAuthHMAC');
+ export async function speakCheerMessage(streamerId, donationId, message, voiceName, languageCode) {
+    const cheerMessageTextToSpeech = functions.httpsCallable('cheerMessageTextToSpeech');
     try {
-        return await getHMAC({ stripeCustomerId });
+        return await cheerMessageTextToSpeech({ streamerId, donationId, message, voiceName, languageCode });
     } catch (error) {
         console.log(error);
     }

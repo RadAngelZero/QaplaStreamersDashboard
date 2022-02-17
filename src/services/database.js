@@ -28,6 +28,7 @@ const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetail
 const tagsRef = database.ref('/Tags');
 const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
 const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers');
+const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -870,4 +871,16 @@ export async function setAlertSetting(uid, settingKey, value) {
  */
 export async function getStreamerMediaContent(uid) {
     return await streamerCustomMediaForCheers.child(uid).once('value');
+}
+
+/**
+ * QoinsToBitForStreamers
+ */
+
+/**
+ * Get the value of Qoins in bit for the given type of user
+ * @param {string} type Type of user (one of premium or freeUser)
+ */
+export async function getStreamerValueOfQoins(type) {
+    return qoinsToBitForStreamersRef.child(type).once('value');
 }

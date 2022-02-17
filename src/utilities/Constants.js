@@ -103,6 +103,12 @@ export const XQ = 'xq';
 export const QOINS = 'qoins';
 
 /**
+ * Type of users
+ */
+export const PREMIUM = 'premium';
+export const FREE_USER = 'freeUser';
+
+/**
  * Twitch PubSub connections status
  */
 export const TWITCH_PUBSUB_UNCONNECTED = 0;

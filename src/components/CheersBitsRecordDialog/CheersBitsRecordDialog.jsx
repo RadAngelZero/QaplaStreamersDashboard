@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     dialogRoot: {
-        zIndex: '0 !important',
+        zIndex: '100 !important',
         '& .MuiBackdrop-root': {
             backgroundColor: '#02071E80',
             backdropFilter: 'blur(5px)',
@@ -214,7 +214,7 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
                 <div className={classes.balanceCurrencyContainer}>
                     <Icon />
                     <p className={classes.balanceCurrencyValue}>
-                        {value || 0}
+                        {parseInt(value || 0).toLocaleString()}
                     </p>
                 </div>
             </div>
@@ -252,16 +252,26 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
 
 const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanBalance }) => {
     const classes = useStyles();
-    const [balance, setBalance] = useState(qoinsBalance)
+    const [balance, setBalance] = useState(qoinsBalance + qlanBalance);
 
     useEffect(() => {
         if (setPendingMessages !== undefined) {
-            setPendingMessages(0)
+            setPendingMessages(0);
         }
-        if (qlanBalance) {
-            setBalance(qoinsBalance + qlanBalance)
+    }, [setPendingMessages]);
+
+    const showDate = () => {
+        const today = new Date();
+        /**
+         * Not all the browsers supports the parameter "locales" from the function toLocaleDateString
+         * https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+         */
+        try {
+            return today.toLocaleDateString('es-MX');
+        } catch (error) {
+            return today.toLocaleDateString();
         }
-    }, [setPendingMessages, qlanBalance, qoinsBalance])
+    }
 
     return (
         <>
@@ -271,13 +281,15 @@ const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanB
                     <div className={classes.subDataContainer}>
                         <div style={{ display: 'flex' }}>
                             <p style={{ display: 'flex', width: '62px' }}> Cheers </p>
-                            <p style={{ display: 'flex', }}> {qoinsBalance} </p>
+                            <p style={{ display: 'flex', }}> {qoinsBalance.toLocaleString()} </p>
                         </div>
                         <div style={{ display: 'flex', marginTop: '30px' }}>
                             <p style={{ display: 'flex', width: '62px' }}> Qlan </p>
-                            <p style={{ display: 'flex', }}> {qlanBalance || 0} </p>
+                            <p style={{ display: 'flex', }}> {qlanBalance.toLocaleString()} </p>
                         </div>
-                        <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>Cheers recibidos al dd/mm/aa</p>
+                        <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>
+                            Cheers recibidos al {showDate()}
+                        </p>
                     </div>
                 </>
             }
@@ -363,7 +375,7 @@ const PaidBits = ({ bitsBalance, payments, onPeriodChange }) => {
     );
 }
 
-const CheersBitsRecordDialog = ({ user, open, onClose, pressed, setPendingMessages }) => {
+const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, open, onClose, pressed, setPendingMessages }) => {
     const [value, setValue] = useState('Qoins');
     const [qoinsCheers, setQoinsCheers] = useState({});
     const [paymentsHistory, setPaymentsHistory] = useState({});
@@ -447,17 +459,17 @@ const CheersBitsRecordDialog = ({ user, open, onClose, pressed, setPendingMessag
                     </IconButton>
                 </div>
                 {value === 'Qoins' &&
-                    <QoinsCheers qoinsBalance={user.qoinsBalance || 0}
+                    <QoinsCheers qoinsBalance={cheersQoins}
                         cheers={qoinsCheers}
-                        qlanBalance={user.qlanBalance} />
+                        qlanBalance={qlanQoins} />
                 }
                 {value === 'Bits' &&
-                    <PaidBits bitsBalance={user.bitsBalance || 0}
+                    <PaidBits bitsBalance={estimatedBits}
                         payments={paymentsHistory}
                         onPeriodChange={loadPaymentsByTimestamp} />
                 }
                 {value === 'Messages' &&
-                    <QoinsCheers qoinsBalance={user.qoinsBalance || 0}
+                    <QoinsCheers qoinsBalance={cheersQoins}
                         messages={true}
                         cheers={qoinsCheers}
                         setPendingMessages={setPendingMessages}

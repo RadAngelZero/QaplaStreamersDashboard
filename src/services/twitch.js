@@ -244,25 +244,15 @@ function nonce(length) {
  * @param {string} uid User identifier
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
- * @param {string} refreshToken Twitch refresh token
  * @param {string} title Title of the reward
  * @param {number} cost Cost for redeem the reward
  * @param {boolean} enabled true if the reward must be enable when created
- * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  * @param {string} streamId Id of the stream event
  * @param {boolean} isMaxPerStreamEnabled Whether a maximum per stream is enabled
  * @param {number} maxPerStream The maximum number per stream if enabled
  */
-export async function createCustomReward(uid, twitchId, accessToken, refreshToken, title, cost, enabled, onInvalidRefreshToken, isMaxPerStreamEnabled = false, maxPerStream = 0, isMaxPerUserPerStreamEnabled = true, maxPerUserPerStream = 0) {
+export async function createCustomReward(twitchId, accessToken, title, cost, enabled, isMaxPerUserPerStreamEnabled = true, maxPerUserPerStream = 0, isMaxPerStreamEnabled = false, maxPerStream = 0) {
     try {
-        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-        if (twitchAccessTokenStatus === 401) {
-            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
-            if (newCredentials) {
-                return await createCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, title, cost, enabled, onInvalidRefreshToken, isMaxPerStreamEnabled, maxPerStream, isMaxPerUserPerStreamEnabled, maxPerUserPerStream);
-            }
-        }
-
         let res = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}`, {
             method: 'POST',
             headers: {
@@ -277,7 +267,8 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
                 max_per_user_per_stream: maxPerUserPerStream,
                 is_max_per_stream_enabled: isMaxPerStreamEnabled,
                 max_per_stream: maxPerStream,
-                is_enabled: enabled
+                is_enabled: enabled,
+                should_redemptions_skip_request_queue: true
             })
         });
 
@@ -299,23 +290,12 @@ export async function createCustomReward(uid, twitchId, accessToken, refreshToke
 
 /**
  * Update a custom reward in the user´s twitch
- * @param {string} uid User identifier
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
- * @param {string} refreshToken Twitch refresh token
  * @param {string} rewardId Id of the reward to delete
- * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export async function enableCustomReward(uid, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
+export async function enableCustomReward(twitchId, accessToken, rewardId) {
     try {
-        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-        if (twitchAccessTokenStatus === 401) {
-            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
-            if (newCredentials) {
-                return await enableCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
-            }
-        }
-
         let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
             method: 'PATCH',
             headers: {
@@ -365,23 +345,12 @@ export async function enableCustomReward(uid, twitchId, accessToken, refreshToke
 
 /**
  * Delete a custom reward in the user´s twitch
- * @param {string} uid User identifier
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
- * @param {string} refreshToken Twitch refresh token
  * @param {string} rewardId Id of the reward to delete
- * @param {function} onInvalidRefreshToken Callback for invalid twitch refresh token
  */
-export async function deleteCustomReward(uid, twitchId, accessToken, refreshToken, rewardId, onInvalidRefreshToken) {
+export async function deleteCustomReward(twitchId, accessToken, rewardId) {
     try {
-        const twitchAccessTokenStatus = await getTwitchAccessTokenStatus(accessToken);
-        if (twitchAccessTokenStatus === 401) {
-            const newCredentials = await refreshTwitchToken(uid, refreshToken, onInvalidRefreshToken);
-            if (newCredentials) {
-                return await deleteCustomReward(uid, twitchId, newCredentials.access_token, newCredentials.refresh_token, rewardId, onInvalidRefreshToken);
-            }
-        }
-
         let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
             method: 'DELETE',
             headers: {
@@ -449,7 +418,7 @@ export async function getAllRewardRedemptions(twitchId, accessToken, rewardId) {
     let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
     `broadcaster_id=${twitchId}` +
     `&reward_id=${rewardId}` +
-    '&status=UNFULFILLED' +
+    '&status=FULFILLED' +
     '&first=50', {
         method: 'GET',
         headers: {
@@ -482,7 +451,7 @@ async function getRewardRedemptionsWithCursor(cursor, twitchId, accessToken, rew
     let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
     `&broadcaster_id=${twitchId}` +
     `&reward_id=${rewardId}` +
-    '&status=UNFULFILLED' +
+    '&status=FULFILLED' +
     `&after=${cursor}` +
     '&first=50', {
         method: 'GET',

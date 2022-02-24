@@ -288,6 +288,20 @@ const StreamerProfile = ({ user, games }) => {
                                         </CardContent>
                                     </Card>
                                 </Grid>
+                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
+                                    <StreamCard
+                                        style={{ maxWidth: '255px', minWidth: '255px' }}
+                                        streamType={streamType}
+                                        streamId={'testEvent'}
+                                        user={user}
+                                        game={'aClash'}
+                                        games={games}
+                                        date={formatDate(1645487256919)}
+                                        hour={formatHour(1645487256919)}
+                                        enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
+                                        onClick={() => goToStreamDetails('testEvent')}
+                                        onRemoveStream={onRemoveStream} />
+                                    </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId}>
                                         <StreamCard

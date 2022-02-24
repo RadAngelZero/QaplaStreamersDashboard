@@ -40,9 +40,18 @@ export async function sednPushNotificationToTopic(topic, titles, bodys, extraDat
  * @param {object} condition Conditions to apply to twitch webhook (broadcaster_user_id is added automatically, DONT add broadcaster_user_id here)
  */
 export async function subscribeStreamerToTwitchWebhook(streamerId, type, callback, condition = {}) {
-    const authWithTwitch = functions.httpsCallable('subscribeStreamerToTwitchWebhook');
+    const subscribeToWebhook = functions.httpsCallable('subscribeStreamerToTwitchWebhook');
     try {
-        return await authWithTwitch({ streamerId, type, callback, condition });
+        return await subscribeToWebhook({ streamerId, type, callback, condition });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function unsubscribeStreamerToTwitchWebhook(webhookId) {
+    const unsubscribeToWebhook = functions.httpsCallable('unsubscribeStreamerToTwitchWebhook');
+    try {
+        return await unsubscribeToWebhook({ webhookId });
     } catch (error) {
         console.log(error);
     }

@@ -124,9 +124,19 @@ export async function getStreamerUidWithTwitchId(twitchId) {
  * @param {number} cost Cost (in bits) of the new reward
  * @param {string} streamId Id of the stream event
  */
-export async function saveStreamerTwitchCustomReward(uid, rewardName, rewardId, title, cost, streamId) {
-    userStreamersRef.child(uid).child('customRewards').child(streamId).update({ closedStream: false, [rewardName]: { title, cost, rewardId } });
-    activeCustomRewardsRef.child(streamId).update({ streamerUid: uid, [rewardName]: { title, cost, rewardId, timestamp: (new Date()).getTime() } });
+export async function saveStreamerTwitchCustomReward(uid, rewardName, rewardId, streamId, webhookId) {
+    const webhookIdKey = `${rewardName}WebhookId`;
+
+    // Timestamp will be overwritten because we used it as a "last reward created" record
+    activeCustomRewardsRef.child(streamId).update({ streamerUid: uid, [rewardName]: rewardId, timestamp: (new Date()).getTime(), [webhookIdKey]: webhookId });
+}
+
+/**
+ * Gets the information about the given active event
+ * @param {string} streamId Stream identifier
+ */
+export function listenToActiveCustomReward(streamId, callback) {
+    return activeCustomRewardsRef.child(streamId).on('value', callback);
 }
 
 /**
@@ -235,6 +245,29 @@ export async function cancelStreamRequest(uid, streamId) {
             return numberOfRequests - 1;
         }
     });
+}
+
+/**
+ * Update the status in the StreamersEventsData node
+ * @param {string} uid User identifier
+ * @param {string} streamId Streamer identifier
+ * @param {number} status New status value
+ */
+export async function updateStreamStatus(uid, streamId, status) {
+    return await streamersEventsDataRef.child(uid).child(streamId).update({ status });
+}
+
+/**
+ * Save a copy of the event in the StreamersHistoryEventsData and remove the event from eventosEspeciales/eventsData
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream identifier
+ */
+export async function removeStreamFromEventsData(uid, streamId) {
+    const streamData = await streamsRef.child(streamId).once('value');
+
+    // Save a copy in the streamer event history
+    await streamersHistoryEventsDataRef.child(uid).child(streamId).update(streamData.val());
+    return await streamsRef.child(streamId).remove();
 }
 
 /**
@@ -534,7 +567,7 @@ export async function saveCustomRewardNonRedemption(uid, photoUrl, twitchIdThatR
 }
 
 export async function removeActiveCustomRewardFromList(streamId) {
-    activeCustomRewardsRef.child(streamId).remove();
+    return await activeCustomRewardsRef.child(streamId).remove();
 }
 
 export async function setStreamInRedemptionsLists(streamId) {

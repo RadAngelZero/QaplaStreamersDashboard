@@ -201,12 +201,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
     const startStream = async (e) => {
         e.stopPropagation();
         const userCredentialsUpdated = await handleTwitchSignIn();
-        const xqReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'XQ Qapla', 1, false, false, 1);
+        const xqReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'XQ Qapla', 500, false, true, 1);
         if (xqReward.status !== 200) {
             // Problem creating reward
         }
 
-        const qoinsReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'Qoins Qapla', 1, false, false, 1, false, user.subscriptionDetails.redemptionsPerStream);
+        const qoinsReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'Qoins Qapla', 500, false, true, 1, true, user.subscriptionDetails.redemptionsPerStream);
         if (qoinsReward.status !== 200) {
             // Problem creating reward
             // Delete XQ reward

@@ -245,7 +245,7 @@ const StreamerProfile = ({ user, games }) => {
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={12} sm={9} style={{minHeight: '58px'}}>
+                                            <Grid item xs={12} sm={9} style={{ minHeight: '58px' }}>
                                                 <StreamerSelect
                                                     data={[
                                                         {
@@ -264,7 +264,7 @@ const StreamerProfile = ({ user, games }) => {
                                                     value={streamType}
                                                     onChange={changestreamType}
                                                     overflowY='hidden'
-                                                    overflowX='hidden'/>
+                                                    overflowX='hidden' />
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -272,10 +272,10 @@ const StreamerProfile = ({ user, games }) => {
                                 <Grid xs={1} />
                             </Grid>
                         </Grid>
-                        <Grid item xs={12}>
-                            <Grid container spacing={4}>
-                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
-                                    <Card className={styles.createEventCard} onClick={createStream} style={{ maxWidth: '255px', minWidth: '255px' }}>
+                        <Grid item xs={12} className={styles.streamsCardContainer}>
+                            <Grid container spacing={4} className={styles.innerStreamsCardContainer}>
+                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
+                                    <Card className={styles.createEventCard} onClick={createStream}>
                                         <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
                                             {t('StreamerProfile.postStream')}
                                         </h1>
@@ -289,9 +289,8 @@ const StreamerProfile = ({ user, games }) => {
                                     </Card>
                                 </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (
-                                    <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId}>
+                                    <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard
-                                            style={{ maxWidth: '255px', minWidth: '255px' }}
                                             streamType={streamType}
                                             streamId={streamId}
                                             user={user}
@@ -304,6 +303,19 @@ const StreamerProfile = ({ user, games }) => {
                                             onRemoveStream={onRemoveStream} />
                                     </Grid>
                                 ))}
+                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={2554232} className={styles.cardContainer}>
+                                    <StreamCard
+                                        streamType={SCHEDULED_EVENT_TYPE}
+                                        streamId={2554232}
+                                        user={user}
+                                        game={'justChat'}
+                                        games={games}
+                                        date={formatDate(1646350200000)}
+                                        hour={formatHour(1646350200000)}
+                                        enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
+                                        onClick={() => { }}
+                                        onRemoveStream={() => { }} />
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>

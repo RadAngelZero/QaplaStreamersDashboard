@@ -22,10 +22,14 @@ import {
 
 const useStyles = makeStyles(() => ({
     eventCard: {
+        display: 'flex',
+        flexDirection: 'column',
         backgroundColor: '#141833',
         borderRadius: '1.5rem',
         boxShadow: '0 6px 15px 0 rgba(0,0,0,0.31)',
-        height: '100%'
+        height: '100%',
+        maxWidth: '250px',
+        minWidth: '250px',
     },
     relativeContainer: {
         position: 'relative'
@@ -34,7 +38,7 @@ const useStyles = makeStyles(() => ({
         position: 'absolute',
         right: '1rem',
         top: '1rem',
-        background: 'rgba(27, 29, 33, .7)',
+        background: '#1B1D2159',
         borderRadius: '.5rem'
     },
     hourText: {
@@ -45,20 +49,44 @@ const useStyles = makeStyles(() => ({
         marginRight: '.5rem',
         fontWeight: '700'
     },
+    dateContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        position: 'absolute',
+        right: '1rem',
+        bottom: '1rem',
+        padding: '6px 10px',
+        background: '#1B1D21',
+        height: '32px',
+        borderRadius: '6px'
+    },
+    dateText: {
+        color: '#FFF',
+        lineHeight: '20px',
+        fontWeight: '700',
+        marginLeft: '10px'
+    },
     eventImage: {
         objectFit: 'cover',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center'
+        backgroundPosition: 'center',
+        borderRadius: '24px'
     },
     eventCardContent: {
-        paddingLeft: '.7rem',
-        paddingRight: '.7rem',
-        justifyContent: 'space-between'
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '24px 16px',
+        height: '100%'
     },
     eventCardTitle: {
-        fontSize: '18px',
-        color: '#FFFFFF'
+        color: '#FFFFFF',
+        fontSize: '16px',
+        lineHeight: '24px',
+        fontWeight: '500',
+        height: '48px',
+
     },
     rowContainer: {
         display: 'flex',
@@ -75,20 +103,23 @@ const useStyles = makeStyles(() => ({
         textAlign: 'right',
         lineHeight: '16px'
     },
-    dateContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-    },
-    date: {
-        color: '#FFF',
-        fontSize: '13px',
-        lineHeight: '20px',
-        marginLeft: '.625rem'
-    },
     streamButton: {
         backgroundColor: '#6C5DD3 !important',
         color: '#FFF'
+    },
+    buttonsContainer: {
+        marginTop: 'auto'
+    },
+    startButton: {
+        color: '#0D1021',
+        width: '100%',
+        borderRadius: '8px',
+    },
+    manageButton: {
+        backgroundColor: '#272D5780',
+        color: '#FFFFFF99',
+        width: '100%',
+        borderRadius: '8px',
     }
 }));
 
@@ -102,15 +133,16 @@ const StyledMenu = withStyles({
 
 const StyledMenuItem = withStyles(() => ({
     root: {
-      color: '#FFF'
+        color: '#FFF'
     },
-  }))(MenuItem);
+}))(MenuItem);
 
 const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream, style = {} }) => {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
     const [title, setTitle] = useState({ en: '', es: '' });
+    const [revStatus, setRevStatus] = useState(3);
     const [closedStream, setClosedStream] = useState(null);
     const classes = useStyles();
     const { t } = useTranslation();
@@ -200,44 +232,42 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                         {hour}
                     </p>
                 </div>
+                <div className={classes.dateContainer}>
+                    <CalendarIcon />
+                    <p className={classes.dateText}>
+                        {date}
+                    </p>
+                </div>
                 <img
                     alt='Game'
                     src={streamsPlaceholderImages[game] || games.allGames[game].fallbackImageUrl}
                     width='100%'
-                    height='160'
+                    height='180'
                     className={classes.eventImage} />
             </div>
-            <CardContent>
-                <div className={classes.eventCardContent}>
-                    <p className={classes.eventCardTitle}>
-                        {title && title['en'] ? title['en'] : ''}
-                    </p>
-                    <div className={classes.rowContainer}>
+            <div className={classes.eventCardContent}>
+                <p className={classes.eventCardTitle}>
+                    {title && title['en'] ? title['en'] : ''}
+                </p>
+                {/* <div className={classes.rowContainer}>
                         <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />
                         <p className={classes.participantsNumber} style={{ color: participantsNumber !== null ? '#808191' : 'transparent' }}>
                             {participantsNumber} {t('StreamCard.participants')}
                         </p>
-                    </div>
-                </div>
-                <div className={classes.dateContainer}>
-                    <div className={classes.rowContainer}>
-                        <CalendarIcon />
-                        <p className={classes.date}>
-                            {date}
-                        </p>
-                    </div>
+                    </div> */}
+                {/* <div className={classes.dateContainer}>
                     {streamType === SCHEDULED_EVENT_TYPE ?
                         <>
                             {closedStream === null ?
-                            <Button size='medium' className={classes.streamButton} onClick={startStream}>
-                                {t('StreamCard.start')}
-                            </Button>
-                            :
-                            closedStream === false &&
-                            <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
-                                {t('StreamCard.resume')}
-                            </Button>
-                        }
+                                <Button size='medium' className={classes.streamButton} onClick={startStream}>
+                                    {t('StreamCard.start')}
+                                </Button>
+                                :
+                                closedStream === false &&
+                                <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={resumeStream}>
+                                    {t('StreamCard.resume')}
+                                </Button>
+                            }
                         </>
                         :
                         <IconButton size='small' disabled={!enableOptionsIcon} onClick={onOptionsIconClick}>
@@ -255,8 +285,32 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                             </StyledMenuItem>
                         }
                     </StyledMenu>
+                </div> */}
+                {revStatus !== 3 &&
+                    <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
+                        <div style={{
+                            backgroundColor: revStatus === 1 ? '#C6B200' : '#00FFDD',
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%'
+                        }} />
+                        <div style={{ width: '6px' }} />
+                        <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>{revStatus === 1 ? 'Pending for review' : 'Posted'}</p>
+                    </div>
+                }
+                <div className={classes.buttonsContainer}>
+                    {revStatus === 3 &&
+                        <Button size='medium' className={classes.startButton} style={{ backgroundColor: revStatus === 4 ? '#3B4BF9' : '#00FFDD', }} onClick={/*startStream*/ () => { }}>
+                            {revStatus === 4 ? 'End Stream' ? t('StreamCard.start')}
+                        </Button>
+                    }
+                    <div style={{ height: '11px' }} />
+                    <Button size='medium' className={classes.manageButton} onClick={/*startStream*/ () => { }}>
+                        {/* {t('StreamCard.start')} */}
+                        {'Manage stream'}
+                    </Button>
                 </div>
-            </CardContent>
+            </div>
         </Card>
     );
 }

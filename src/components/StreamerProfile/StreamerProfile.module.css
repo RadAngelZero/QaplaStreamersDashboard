@@ -253,6 +253,14 @@ body {
     }
 }
 
+.streamsCardContainer {
+    height: 400px;
+}
+.innerStreamsCardContainer {
+    height: 400px;
+    margin: 0px -16px !important;
+}
+
 .title {
     color: #FFFFFF;
     font-size: 40px;
@@ -277,6 +285,12 @@ h1 {
     border-radius: 1.5rem !important;
     box-shadow: 0 6px 15px 0 rgba(0, 0, 0, 0.31) !important;
     height: 100%;
+    max-width: '250px';
+    min-width: '250px';
+}
+
+.cardContainer {
+    padding: 0px 16px !important;
 }
 
 .newStream {

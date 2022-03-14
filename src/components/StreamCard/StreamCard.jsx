@@ -301,7 +301,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                 <div className={classes.buttonsContainer}>
                     {revStatus === 3 &&
                         <Button size='medium' className={classes.startButton} style={{ backgroundColor: revStatus === 4 ? '#3B4BF9' : '#00FFDD', }} onClick={/*startStream*/ () => { }}>
-                            {revStatus === 4 ? 'End Stream' ? t('StreamCard.start')}
+                            {revStatus === 4 ? 'End Stream' : t('StreamCard.start')}
                         </Button>
                     }
                     <div style={{ height: '11px' }} />

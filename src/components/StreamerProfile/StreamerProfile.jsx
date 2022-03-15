@@ -288,9 +288,8 @@ const StreamerProfile = ({ user, games }) => {
                                         </CardContent>
                                     </Card>
                                 </Grid>
-                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
+                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
                                     <StreamCard
-                                        style={{ maxWidth: '255px', minWidth: '255px' }}
                                         streamType={streamType}
                                         streamId={'testEvent'}
                                         user={user}

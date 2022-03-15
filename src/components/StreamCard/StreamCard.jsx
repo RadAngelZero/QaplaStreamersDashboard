@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton, Button } from '@material-ui/core';
+import { makeStyles, Card, Button } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
-import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
 import {
     streamsPlaceholderImages,
     SCHEDULED_EVENT_TYPE,
@@ -20,7 +19,6 @@ import {
     getPastStreamParticipantsNumber,
     getStreamTitle,
     getPastStreamTitle,
-    saveRedemptionsLists,
     saveStreamTwitchCustomReward,
     updateStreamerProfile,
     checkActiveCustomReward,
@@ -138,25 +136,10 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const StyledMenu = withStyles({
-    paper: {
-        backgroundColor: '#141833',
-    },
-})((props) => (
-    <Menu {...props} />
-));
-
-const StyledMenuItem = withStyles(() => ({
-    root: {
-        color: '#FFF'
-    },
-}))(MenuItem);
-
-const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onClick, enableOptionsIcon, closeOptionsMenu, onRemoveStream, style = {} }) => {
+const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onClick, onRemoveStream, style = {} }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
     const [title, setTitle] = useState({ en: '', es: '' });
-    const [revStatus, setRevStatus] = useState(3);
     const [stream, setStream] = useState(null);
     const classes = useStyles();
     const { t } = useTranslation();
@@ -203,19 +186,6 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
 
         // stream is not in this array intentionally, cause it causes a loop because of the checkActiveCustomReward function
     }, [game, games, streamId, streamType, user]);
-
-    const onOptionsIconClick = (e) => {
-        e.stopPropagation();
-        setAnchorEl(e.currentTarget);
-    }
-
-    const closeMenu = (e) => {
-        e.stopPropagation();
-        if (closeOptionsMenu) {
-            closeOptionsMenu();
-        }
-        setAnchorEl(null);
-    }
 
     const cancelStream = (e) => {
         e.stopPropagation();
@@ -310,7 +280,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
         await removeActiveCustomRewardFromList(stream.key);
 
         // Update status and remove event from main events node
-        await updateStreamStatus(user.uid, stream.key, PAST_STREAMS_EVENT_TYPE);
+        // await updateStreamStatus(user.uid, stream.key, PAST_STREAMS_EVENT_TYPE);
         await removeStreamFromEventsData(user.uid, stream.key);
 
         // Remove stream from the UI
@@ -351,64 +321,30 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                 <p className={classes.eventCardTitle}>
                     {title && title['en'] ? title['en'] : ''}
                 </p>
-                {/* <div className={classes.rowContainer}>
-                        <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />
-                        <p className={classes.participantsNumber} style={{ color: participantsNumber !== null ? '#808191' : 'transparent' }}>
-                            {participantsNumber} {t('StreamCard.participants')}
-                        </p>
-                    </div> */}
-                {/* <div className={classes.dateContainer}>
-                    {streamType === SCHEDULED_EVENT_TYPE ?
-                        <>
-                            {!stream ?
-                            <Button size='medium' className={classes.streamButton} onClick={startStream}>
-                                {t('StreamCard.start')}
-                            </Button>
-                            :
-                            <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={closeStream}>
-                                {t('StreamCard.resume')}
-                            </Button>
-                        }
-                        </>
-                        :
-                        <IconButton size='small' disabled={!enableOptionsIcon} onClick={onOptionsIconClick}>
-                            <OptionsIcon />
-                        </IconButton>
-                    }
-                    <StyledMenu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        keepMounted
-                        onClose={closeMenu}>
-                        {streamType === PENDING_APPROVAL_EVENT_TYPE &&
-                            <StyledMenuItem onClick={cancelStream}>
-                                {t('StreamCard.cancelStreamRequest')}
-                            </StyledMenuItem>
-                        }
-                    </StyledMenu>
-                </div> */}
-                {revStatus !== 3 &&
+                {streamType !== PAST_STREAMS_EVENT_TYPE &&
                     <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
                         <div style={{
-                            backgroundColor: revStatus === 1 ? '#C6B200' : '#00FFDD',
+                            backgroundColor: streamType === PENDING_APPROVAL_EVENT_TYPE ? '#C6B200' : '#00FFDD',
                             width: '8px',
                             height: '8px',
                             borderRadius: '50%'
                         }} />
                         <div style={{ width: '6px' }} />
-                        <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>{revStatus === 1 ? 'Pending for review' : 'Posted'}</p>
+                        <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>
+                            {streamType === PENDING_APPROVAL_EVENT_TYPE ? 'Pending for review' : 'Posted'}
+                        </p>
                     </div>
                 }
                 <div className={classes.buttonsContainer}>
-                    {revStatus === 3 &&
-                        <Button size='medium' className={classes.startButton} style={{ backgroundColor: revStatus === 4 ? '#3B4BF9' : '#00FFDD', }} onClick={/*startStream*/ () => { }}>
-                            {revStatus === 4 ? 'End Stream' : t('StreamCard.start')}
+                    {streamType === SCHEDULED_EVENT_TYPE &&
+                        <Button size='medium' className={classes.startButton} style={{ backgroundColor: stream ? '#3B4BF9' : '#00FFDD' }}
+                            onClick={stream ? closeStream : startStream }>
+                            {stream ? 'End Stream' : t('StreamCard.start')}
                         </Button>
                     }
                     <div style={{ height: '11px' }} />
-                    <Button size='medium' className={classes.manageButton} onClick={/*startStream*/ () => { }}>
-                        {/* {t('StreamCard.start')} */}
-                        {'Manage stream'}
+                    <Button size='medium' className={classes.manageButton} onClick={startStream}>
+                        Manage stream
                     </Button>
                 </div>
             </div>

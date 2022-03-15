@@ -18,7 +18,6 @@ import StreamerProfile from './components/StreamerProfile/StreamerProfile';
 import NewStream from './components/NewStream/NewStream';
 import EventSent from './components/EventSent/EventSent';
 import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent';
-import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
 import PlanPicker from './components/PlanPicker/PlanPicker';
@@ -96,9 +95,6 @@ const Router = () => {
                 </Route>
                 <Route exact path='/success'>
                     <EventSent user={user} />
-                </Route>
-                <Route exact path='/stream/:streamId'>
-                    <PubSubTest user={user} />
                 </Route>
                 <Route exact path='/liveDonations/:streamerId'>
                     <LiveDonations user={user} />

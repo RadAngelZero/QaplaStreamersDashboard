@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton, Button } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
@@ -22,9 +21,9 @@ import {
     getStreamTitle,
     getPastStreamTitle,
     saveRedemptionsLists,
-    saveStreamerTwitchCustomReward,
+    saveStreamTwitchCustomReward,
     updateStreamerProfile,
-    listenToActiveCustomReward,
+    checkActiveCustomReward,
     removeActiveCustomRewardFromList,
     setStreamInRedemptionsLists,
     addListToStreamRedemptionList,
@@ -157,18 +156,20 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
             }
         }
 
-
-        getParticipantsNumber();
-        listenToActiveCustomReward(streamId, (stream) => {
-            console.log('Get');
-            if (stream.exists()) {
-                setStream({ key: stream.key, ...stream.val()});
+        async function checkStreamStatus() {
+            const streamStatus = await checkActiveCustomReward(streamId);
+            if (streamStatus.exists()) {
+                setStream({ key: streamStatus.key, ...streamStatus.val()});
             } else {
                 setStream(null);
             }
-        });
+        }
 
-        // stream is not in this array intentionally, as it causes a loop because of the listenToActiveCustomReward function
+
+        getParticipantsNumber();
+        checkStreamStatus();
+
+        // stream is not in this array intentionally, cause it causes a loop because of the checkActiveCustomReward function
     }, [game, games, streamId, streamType, user]);
 
     const onOptionsIconClick = (e) => {
@@ -201,12 +202,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
     const startStream = async (e) => {
         e.stopPropagation();
         const userCredentialsUpdated = await handleTwitchSignIn();
-        const xqReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'XQ Qapla', 500, false, true, 1);
+        const xqReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'XQ Qapla', 1, false, false, 1);
         if (xqReward.status !== 200) {
             // Problem creating reward
         }
 
-        const qoinsReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'Qoins Qapla', 500, false, true, 1, true, user.subscriptionDetails.redemptionsPerStream);
+        const qoinsReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'Qoins Qapla', 1, false, false, 1, false, user.subscriptionDetails.redemptionsPerStream);
         if (qoinsReward.status !== 200) {
             // Problem creating reward
             // Delete XQ reward
@@ -226,8 +227,14 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
 
         if (xqWebhookSubscription.data.id && qoinsWebhookSubscription.data.id) {
             // Save webhook id on database
-            await saveStreamerTwitchCustomReward(user.uid, XQ_REWARD, xqReward.data.id, streamId, xqWebhookSubscription.data.id);
-            await saveStreamerTwitchCustomReward(user.uid, QOINS_REWARD, qoinsReward.data.id, streamId, qoinsWebhookSubscription.data.id);
+            await saveStreamTwitchCustomReward(user.uid, XQ_REWARD, xqReward.data.id, streamId, xqWebhookSubscription.data.id);
+            await saveStreamTwitchCustomReward(user.uid, QOINS_REWARD, qoinsReward.data.id, streamId, qoinsWebhookSubscription.data.id);
+
+            // Get the recently created ActiveCustomReward node
+            const streamStatus = await checkActiveCustomReward(streamId);
+
+            // Set stream as active, so the UI change and we have the necessary data in the state
+            setStream({ key: streamId, ...streamStatus.val() });
 
             // Enable XQ reward
             await enableCustomReward(user.id, userCredentialsUpdated.access_token, xqReward.data.id);

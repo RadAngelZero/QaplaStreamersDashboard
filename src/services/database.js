@@ -120,7 +120,7 @@ export async function getStreamerUidWithTwitchId(twitchId) {
  * @param {number} cost Cost (in bits) of the new reward
  * @param {string} streamId Id of the stream event
  */
-export async function saveStreamerTwitchCustomReward(uid, rewardName, rewardId, streamId, webhookId) {
+export async function saveStreamTwitchCustomReward(uid, rewardName, rewardId, streamId, webhookId) {
     const webhookIdKey = `${rewardName}WebhookId`;
 
     // Timestamp will be overwritten because we used it as a "last reward created" record
@@ -131,8 +131,8 @@ export async function saveStreamerTwitchCustomReward(uid, rewardName, rewardId, 
  * Gets the information about the given active event
  * @param {string} streamId Stream identifier
  */
-export function listenToActiveCustomReward(streamId, callback) {
-    return activeCustomRewardsRef.child(streamId).on('value', callback);
+export function checkActiveCustomReward(streamId) {
+    return activeCustomRewardsRef.child(streamId).once('value');
 }
 
 /**
@@ -229,6 +229,9 @@ export async function removeStreamFromEventsData(uid, streamId) {
 
     // Save a copy in the streamer event history
     await streamersHistoryEventsDataRef.child(uid).child(streamId).update(streamData.val());
+
+    // Admin copy while we test if everything is working
+    database.ref('EventsDataAdmin').child(streamId).update(streamData.val());
     return await streamsRef.child(streamId).remove();
 }
 

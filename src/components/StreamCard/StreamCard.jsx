@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { makeStyles, Card, Button } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
@@ -11,7 +12,8 @@ import {
     XQRewardRedemption,
     QoinsRewardRedemption,
     XQ_REWARD,
-    QOINS_REWARD
+    QOINS_REWARD,
+    HOUR_IN_MILISECONDS
 } from '../../utilities/Constants';
 import {
     cancelStreamRequest,
@@ -136,11 +138,13 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onClick, onRemoveStream, style = {} }) => {
+const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [participantsNumber, setParticipantsNumber] = useState(null);
     const [title, setTitle] = useState({ en: '', es: '' });
     const [stream, setStream] = useState(null);
+    const [showRewardsOptions, setShowRewardsOptions] = useState(false);
+    const history = useHistory();
     const classes = useStyles();
     const { t } = useTranslation();
 
@@ -184,6 +188,14 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
         getParticipantsNumber();
         checkStreamStatus();
 
+        if (streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions) {
+            const fifteenMinutesInMilliseconds = HOUR_IN_MILISECONDS / 4;
+            const currentTimestamp = (new Date()).getTime();
+            if ((currentTimestamp + fifteenMinutesInMilliseconds) >= timestamp && (currentTimestamp + fifteenMinutesInMilliseconds) < (timestamp + HOUR_IN_MILISECONDS * 2)) {
+                setShowRewardsOptions(true);
+            }
+        }
+
         // stream is not in this array intentionally, cause it causes a loop because of the checkActiveCustomReward function
     }, [game, games, streamId, streamType, user]);
 
@@ -192,12 +204,6 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
         if (window.confirm(t('StreamCard.deleteConfirmation'))) {
             cancelStreamRequest(user.uid, streamId);
             onRemoveStream(streamId);
-        }
-    }
-
-    const onClickCard = () => {
-        if (streamType !== PENDING_APPROVAL_EVENT_TYPE && !Boolean(anchorEl)) {
-            onClick();
         }
     }
 
@@ -280,7 +286,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
         await removeActiveCustomRewardFromList(stream.key);
 
         // Update status and remove event from main events node
-        // await updateStreamStatus(user.uid, stream.key, PAST_STREAMS_EVENT_TYPE);
+        await updateStreamStatus(user.uid, stream.key, PAST_STREAMS_EVENT_TYPE);
         await removeStreamFromEventsData(user.uid, stream.key);
 
         // Remove stream from the UI
@@ -296,8 +302,10 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
         return user;
     }
 
+    const manageStream = () => history.push({ pathname: `/edit/${streamId}`, state: { streamType } });
+
     return (
-        <Card className={classes.eventCard} onClick={onClickCard} style={style}>
+        <Card className={classes.eventCard} style={style}>
             <div className={classes.relativeContainer}>
                 <div className={classes.hourContainer}>
                     <p className={classes.hourText}>
@@ -336,15 +344,19 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                     </div>
                 }
                 <div className={classes.buttonsContainer}>
-                    {streamType === SCHEDULED_EVENT_TYPE &&
+                    {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
                         <Button size='medium' className={classes.startButton} style={{ backgroundColor: stream ? '#3B4BF9' : '#00FFDD' }}
                             onClick={stream ? closeStream : startStream }>
                             {stream ? 'End Stream' : t('StreamCard.start')}
                         </Button>
                     }
                     <div style={{ height: '11px' }} />
-                    <Button size='medium' className={classes.manageButton} onClick={startStream}>
-                        Manage stream
+                    <Button size='medium' className={classes.manageButton} onClick={showRewardsOptions ? () => console.log('Open Dialog') : manageStream}>
+                        {showRewardsOptions ?
+                            'Manage rewards'
+                            :
+                            'Manage stream'
+                        }
                     </Button>
                 </div>
             </div>

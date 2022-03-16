@@ -93,8 +93,6 @@ const StreamerProfile = ({ user, games }) => {
         }
     }
 
-    const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType } });
-
     const changestreamType = (val) => setStreamType(val);
 
     /**
@@ -297,8 +295,7 @@ const StreamerProfile = ({ user, games }) => {
                                         games={games}
                                         date={formatDate(1645487256919)}
                                         hour={formatHour(1645487256919)}
-                                        enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
-                                        onClick={() => goToStreamDetails('testEvent')}
+                                        timestamp={1645487256919}
                                         onRemoveStream={onRemoveStream} />
                                     </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (
@@ -311,24 +308,10 @@ const StreamerProfile = ({ user, games }) => {
                                             games={games}
                                             date={formatDate(streams[streamId].timestamp)}
                                             hour={formatHour(streams[streamId].timestamp)}
-                                            enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
-                                            onClick={() => goToStreamDetails(streamId)}
+                                            timestamp={streams[streamId].timestamp}
                                             onRemoveStream={onRemoveStream} />
                                     </Grid>
                                 ))}
-                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={2554232} className={styles.cardContainer}>
-                                    <StreamCard
-                                        streamType={SCHEDULED_EVENT_TYPE}
-                                        streamId={2554232}
-                                        user={user}
-                                        game={'justChat'}
-                                        games={games}
-                                        date={formatDate(1646350200000)}
-                                        hour={formatHour(1646350200000)}
-                                        enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
-                                        onClick={() => { }}
-                                        onRemoveStream={() => { }} />
-                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>

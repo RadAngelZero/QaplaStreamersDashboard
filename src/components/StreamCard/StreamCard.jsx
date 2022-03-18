@@ -351,42 +351,6 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                 <p className={classes.eventCardTitle}>
                     {title && title['en'] ? title['en'] : ''}
                 </p>
-                {/* <div className={classes.rowContainer}>
-                        <div className={classes.circle} style={{ backgroundColor: participantsNumber !== null ? '#0049C6' : 'transparent' }} />
-                        <p className={classes.participantsNumber} style={{ color: participantsNumber !== null ? '#808191' : 'transparent' }}>
-                            {participantsNumber} {t('StreamCard.participants')}
-                        </p>
-                    </div> */}
-                {/* <div className={classes.dateContainer}>
-                    {streamType === SCHEDULED_EVENT_TYPE ?
-                        <>
-                            {!stream ?
-                            <Button size='medium' className={classes.streamButton} onClick={startStream}>
-                                {t('StreamCard.start')}
-                            </Button>
-                            :
-                            <Button style={{ marginBottom: 16 }} size='medium' className={classes.streamButton} onClick={closeStream}>
-                                {t('StreamCard.resume')}
-                            </Button>
-                        }
-                        </>
-                        :
-                        <IconButton size='small' disabled={!enableOptionsIcon} onClick={onOptionsIconClick}>
-                            <OptionsIcon />
-                        </IconButton>
-                    }
-                    <StyledMenu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        keepMounted
-                        onClose={closeMenu}>
-                        {streamType === PENDING_APPROVAL_EVENT_TYPE &&
-                            <StyledMenuItem onClick={cancelStream}>
-                                {t('StreamCard.cancelStreamRequest')}
-                            </StyledMenuItem>
-                        }
-                    </StyledMenu>
-                </div> */}
                 {revStatus !== 3 &&
                     <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
                         <div style={{

@@ -91,3 +91,21 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
         console.log(error);
     }
 }
+
+export async function getUserToken(code) {
+    const getTwitchUserToken = functions.httpsCallable('getTwitchUserToken');
+    try {
+        return await getTwitchUserToken({ code });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function refreshUserAccessToken(refreshToken) {
+    const refreshTwitchAccessToken = functions.httpsCallable('refreshTwitchAccessToken');
+    try {
+        return await refreshTwitchAccessToken({ refreshToken });
+    } catch (error) {
+        console.log(error);
+    }
+}

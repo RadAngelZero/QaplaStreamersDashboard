@@ -32,7 +32,7 @@ import {
 } from '../../services/database';
 import { createCustomReward, deleteCustomReward, disableCustomReward, enableCustomReward, getAllRewardRedemptions } from '../../services/twitch';
 import { notifyBugToDevelopTeam } from '../../services/discord';
-import { subscribeStreamerToTwitchWebhook, unsubscribeStreamerToTwitchWebhook } from '../../services/functions';
+import { refreshUserAccessToken, subscribeStreamerToTwitchWebhook, unsubscribeStreamerToTwitchWebhook } from '../../services/functions';
 import { signInWithTwitch } from '../../services/auth';
 
 const useStyles = makeStyles(() => ({
@@ -209,97 +209,106 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
 
     const startStream = async (e) => {
         e.stopPropagation();
-        const userCredentialsUpdated = await handleTwitchSignIn();
-        const xqReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'XQ Qapla', 1, false, false, 1);
-        if (xqReward.status !== 200) {
-            // Problem creating reward
-        }
+        const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
 
-        const qoinsReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'Qoins Qapla', 1, false, false, 1, false, user.subscriptionDetails.redemptionsPerStream);
-        if (qoinsReward.status !== 200) {
-            // Problem creating reward
-            // Delete XQ reward
-            await deleteCustomReward(user.id, userCredentialsUpdated.access_token, xqReward.data.id);
-
-            let errorMessage = `Error creating Qoins Reward\nStatus: ${qoinsReward.status}`;
-            if (qoinsReward.error) {
-                errorMessage += `\nError: ${qoinsReward.error}\nMessage: ${qoinsReward.message}\nStreamer: ${user.displayName}\nStream Id: ${streamId}`;
+        if (userTokensUpdated.data.status === 200) {
+            const userCredentialsUpdated = userTokensUpdated.data;
+            updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+            const xqReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'XQ Qapla', 500, false, true, 1);
+            if (xqReward.status !== 200) {
+                // Problem creating reward
             }
-            // Abort and notify Qapla developers
-            notifyBugToDevelopTeam(errorMessage);
-        }
 
-        // Set the webhooks
-        const xqWebhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, XQRewardRedemption.type, XQRewardRedemption.callback, { reward_id: xqReward.data.id });
-        const qoinsWebhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, QoinsRewardRedemption.type, QoinsRewardRedemption.callback, { reward_id: qoinsReward.data.id });
+            const qoinsReward = await createCustomReward(user.id, userCredentialsUpdated.access_token, 'Qoins Qapla', 500, false, true, 1, true, user.subscriptionDetails.redemptionsPerStream);
+            if (qoinsReward.status !== 200) {
+                // Problem creating reward
+                // Delete XQ reward
+                await deleteCustomReward(user.id, userCredentialsUpdated.access_token, xqReward.data.id);
 
-        if (xqWebhookSubscription.data.id && qoinsWebhookSubscription.data.id) {
-            // Save webhook id on database
-            await saveStreamTwitchCustomReward(user.uid, XQ_REWARD, xqReward.data.id, streamId, xqWebhookSubscription.data.id);
-            await saveStreamTwitchCustomReward(user.uid, QOINS_REWARD, qoinsReward.data.id, streamId, qoinsWebhookSubscription.data.id);
+                let errorMessage = `Error creating Qoins Reward\nStatus: ${qoinsReward.status}`;
+                if (qoinsReward.error) {
+                    errorMessage += `\nError: ${qoinsReward.error}\nMessage: ${qoinsReward.message}\nStreamer: ${user.displayName}\nStream Id: ${streamId}`;
+                }
+                // Abort and notify Qapla developers
+                notifyBugToDevelopTeam(errorMessage);
+            }
 
-            // Get the recently created ActiveCustomReward node
-            const streamStatus = await checkActiveCustomReward(streamId);
+            // Set the webhooks
+            const xqWebhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, XQRewardRedemption.type, XQRewardRedemption.callback, { reward_id: xqReward.data.id });
+            const qoinsWebhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, QoinsRewardRedemption.type, QoinsRewardRedemption.callback, { reward_id: qoinsReward.data.id });
 
-            // Set stream as active, so the UI change and we have the necessary data in the state
-            setStream({ key: streamId, ...streamStatus.val() });
+            if (xqWebhookSubscription.data.id && qoinsWebhookSubscription.data.id) {
+                // Save webhook id on database
+                await saveStreamTwitchCustomReward(user.uid, XQ_REWARD, xqReward.data.id, streamId, xqWebhookSubscription.data.id);
+                await saveStreamTwitchCustomReward(user.uid, QOINS_REWARD, qoinsReward.data.id, streamId, qoinsWebhookSubscription.data.id);
 
-            // Enable XQ reward
-            await enableCustomReward(user.id, userCredentialsUpdated.access_token, xqReward.data.id);
-        } else {
-            await deleteCustomReward(user.id, userCredentialsUpdated.access_token, xqReward.data.id);
-            await deleteCustomReward(user.id, userCredentialsUpdated.access_token, qoinsReward.data.id);
+                // Get the recently created ActiveCustomReward node
+                const streamStatus = await checkActiveCustomReward(streamId);
 
-            let errorMessage = `Error creating Webhooks for rewards\nInfo: \n${JSON.stringify(xqWebhookSubscription)}\n${JSON.stringify(qoinsWebhookSubscription)}`;
-            // Abort and notify Qapla developers
-            notifyBugToDevelopTeam(errorMessage);
+                // Set stream as active, so the UI change and we have the necessary data in the state
+                setStream({ key: streamId, ...streamStatus.val() });
+
+                // Enable XQ reward
+                await enableCustomReward(user.id, userCredentialsUpdated.access_token, xqReward.data.id);
+
+                console.log('Finished');
+            } else {
+                await deleteCustomReward(user.id, userCredentialsUpdated.access_token, xqReward.data.id);
+                await deleteCustomReward(user.id, userCredentialsUpdated.access_token, qoinsReward.data.id);
+
+                let errorMessage = `Error creating Webhooks for rewards\nInfo: \n${JSON.stringify(xqWebhookSubscription)}\n${JSON.stringify(qoinsWebhookSubscription)}`;
+                // Abort and notify Qapla developers
+                notifyBugToDevelopTeam(errorMessage);
+            }
+        } else if (userTokensUpdated.data.status === 400) {
+            // Notify to user
+            // Log out
         }
     }
 
     const closeStream = async (e) => {
         e.stopPropagation();
-        const userCredentialsUpdated = await handleTwitchSignIn();
+        const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
 
-        /** This fragment will be used temporary */
+        if (userTokensUpdated.data.status === 200) {
+            const userCredentialsUpdated = userTokensUpdated.data;
+            updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
 
-            // Set timestamp of end of stream
-            await setStreamInRedemptionsLists(stream.key);
+            /** This fragment will be used temporary */
 
-            // Get and save redemptions lists
-            const XQRedemptions = await getAllRewardRedemptions(user.id, userCredentialsUpdated.access_token, stream.xqReward);
-            await addListToStreamRedemptionList(stream.key, XQ_REWARD, XQRedemptions);
-            const QoinsRedemptions = await getAllRewardRedemptions(user.id, userCredentialsUpdated.access_token, stream.qoinsReward);
-            await addListToStreamRedemptionList(stream.key, QOINS_REWARD, QoinsRedemptions);
+                // Set timestamp of end of stream
+                await setStreamInRedemptionsLists(stream.key);
 
-        /** End of temporary fragment */
+                // Get and save redemptions lists
+                const XQRedemptions = await getAllRewardRedemptions(user.id, userCredentialsUpdated.access_token, stream.xqReward);
+                await addListToStreamRedemptionList(stream.key, XQ_REWARD, XQRedemptions);
+                const QoinsRedemptions = await getAllRewardRedemptions(user.id, userCredentialsUpdated.access_token, stream.qoinsReward);
+                await addListToStreamRedemptionList(stream.key, QOINS_REWARD, QoinsRedemptions);
 
-        // Disable XQ reward remove their webhook and delete it
-        await disableCustomReward(user.id, userCredentialsUpdated.access_token, stream.xqReward);
-        await unsubscribeStreamerToTwitchWebhook(stream.xqRewardWebhookId);
-        await deleteCustomReward(user.id, userCredentialsUpdated.access_token, stream.xqReward);
+            /** End of temporary fragment */
 
-        // Disable Qoins reward remove their webhook and delete it
-        await disableCustomReward(user.id, userCredentialsUpdated.access_token, stream.qoinsReward);
-        await unsubscribeStreamerToTwitchWebhook(stream.qoinsRewardWebhookId);
-        await deleteCustomReward(user.id, userCredentialsUpdated.access_token, stream.qoinsReward);
+            // Disable XQ reward remove their webhook and delete it
+            await disableCustomReward(user.id, userCredentialsUpdated.access_token, stream.xqReward);
+            await unsubscribeStreamerToTwitchWebhook(stream.xqRewardWebhookId);
+            await deleteCustomReward(user.id, userCredentialsUpdated.access_token, stream.xqReward);
 
-        await removeActiveCustomRewardFromList(stream.key);
+            // Disable Qoins reward remove their webhook and delete it
+            await disableCustomReward(user.id, userCredentialsUpdated.access_token, stream.qoinsReward);
+            await unsubscribeStreamerToTwitchWebhook(stream.qoinsRewardWebhookId);
+            await deleteCustomReward(user.id, userCredentialsUpdated.access_token, stream.qoinsReward);
 
-        // Update status and remove event from main events node
-        await updateStreamStatus(user.uid, stream.key, PAST_STREAMS_EVENT_TYPE);
-        await removeStreamFromEventsData(user.uid, stream.key);
+            await removeActiveCustomRewardFromList(stream.key);
 
-        // Remove stream from the UI
-        onRemoveStream();
-    }
+            // Update status and remove event from main events node
+            // await updateStreamStatus(user.uid, stream.key, PAST_STREAMS_EVENT_TYPE);
+            await removeStreamFromEventsData(user.uid, stream.key);
 
-    const handleTwitchSignIn = async () => {
-        let user = await signInWithTwitch();
-        await updateStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
-
-        user.access_token = user.userData.twitchAccessToken;
-        user.refresh_token = user.userData.refreshToken;
-        return user;
+            // Remove stream from the UI
+            onRemoveStream();
+        } else if (userTokensUpdated.data.status === 400) {
+            // Notify to user
+            // Log out
+        }
     }
 
     const manageStream = () => history.push({ pathname: `/edit/${streamId}`, state: { streamType } });

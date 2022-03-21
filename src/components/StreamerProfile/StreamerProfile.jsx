@@ -78,8 +78,6 @@ const StreamerProfile = ({ user, games }) => {
         async function loadStreams() {
             if (user) {
                 setStreamLoaded(await loadStreamsByStatus(user.uid, streamType));
-            } else {
-                history.push('/');
             }
         }
 

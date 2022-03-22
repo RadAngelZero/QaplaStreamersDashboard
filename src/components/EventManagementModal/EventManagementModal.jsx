@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as TickSquare } from './../../assets/TickSquare.svg';
 
-
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
         backdropFilter: 'blur(10px)'
@@ -134,48 +133,44 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const EventManagementModal = ({ open }) => {
+const EventManagementModal = ({ open, stream = null, onClose, startStream, enableQoins, closeStream }) => {
     const classes = useStyles();
     const [message, setMessage] = useState('');
     const [streamStarted, setStreamStarted] = useState(false);
     const [dots, setDots] = useState('')
-    const [enabledXQ, setEnabledXQ] = useState(false);
-    const [enablingQoins, setEnablingdQoins] = useState(false);
-    const [enabledQoins, setEnabledQoins] = useState(false);
-
-
+    const [enablingQoins, setEnablingQoins] = useState(false);
 
     useEffect(() => {
-        if ((streamStarted && !enabledXQ) || (enablingQoins && !enabledQoins)) {
+        if ((streamStarted && !stream) || (enablingQoins && !stream.qoinsEnabled)) {
             setTimeout(() => {
-                console.log('timeout')
                 if (dots.length > 2) {
-                    console.log('reset')
-                    setDots('')
+                    setDots('');
                 } else {
-                    console.log('increase')
-                    setDots(dots + '.')
+                    setDots(dots + '.');
                 }
             }, 500);
         }
-        if ((streamStarted && enabledXQ) && !enablingQoins && dots.length > 0) {
-            console.log('reset all dots')
-            setDots('')
+        if ((streamStarted && stream) && !enablingQoins && dots.length > 0) {
+            setDots('');
         }
-    }, [streamStarted, enabledXQ, dots, enablingQoins, enabledQoins])
+    }, [streamStarted, dots, enablingQoins])
 
-    const startStreamHandler = () => {
+    const startStreamHandler = async () => {
         setStreamStarted(true);
-        setTimeout(() => {
-            setEnabledXQ(true)
-        }, 2000);
+        await startStream();
+        setStreamStarted(false);
     }
 
-    const enableQoinsHandler = () => {
-        setEnablingdQoins(true);
-        setTimeout(() => {
-            setEnabledQoins(true)
-        }, 2000);
+    const enableQoinsHandler = async () => {
+        setEnablingQoins(true);
+        await enableQoins();
+        setEnablingQoins(false);
+    }
+
+    const closeStreamHandler = async () => {
+        // Show are you sure? Dialog
+        await closeStream();
+        console.log('Stream closed');
     }
 
     const sendNotificationHandler = () => {
@@ -183,7 +178,7 @@ const EventManagementModal = ({ open }) => {
     }
 
     return (
-        <Dialog open={open} classes={{
+        <Dialog open={open} onClose={onClose} classes={{
             container: classes.dialogContainer,
             root: classes.dialogRoot,
             paper: classes.paper
@@ -194,42 +189,56 @@ const EventManagementModal = ({ open }) => {
                         <p className={classes.title}>⚡️ Acciones de stream</p>
                         <p className={classes.subtitle}>Gestiona las recompensas de tu stream.</p>
                         <div style={{ height: '20px' }} />
-                        {!streamStarted &&
+                        {(!stream && !streamStarted) &&
                             <Button
                                 onClick={startStreamHandler}
                                 classes={{
                                     root: classes.startButtonRoot
-                                }}>Iniciar stream</Button>
+                                }}>
+                                Iniciar stream
+                            </Button>
                         }
-                        {streamStarted && !enabledXQ &&
+                        {streamStarted && !stream &&
                             <p className={classes.startText}>Creando recompensas{dots}</p>
                         }
-                        {streamStarted && enabledXQ &&
+                        {stream && !stream.qoinsEnabled &&
                             <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                 <TickSquare style={{ marginTop: '7.5px' }} />
                                 <p className={classes.enabledXQText}>XQ habilitados</p>
                             </div>
                         }
                         <div style={{ height: '6px' }} />
-                        {!enablingQoins &&
+                        {(!stream || (!stream.qoinsEnabled && !enablingQoins)) &&
                             <Button
                                 onClick={enableQoinsHandler}
                                 classes={{
                                     root: classes.qoinsButtonRoot,
                                     disabled: classes.qoinsButtonRootDisabled
                                 }}
-                                style={!streamStarted ? { backgroundColor: '#0000' } : {}}
-                                disabled={!(streamStarted && enabledXQ)}
-                            >Habilitar Qoins</Button>
+                                style={!stream ? { backgroundColor: '#0000' } : {}}
+                                disabled={!stream || enablingQoins}>
+                                Habilitar Qoins
+                            </Button>
                         }
-                        {enablingQoins && !enabledQoins &&
+                        {enablingQoins &&
                             <p className={classes.startText}>Habilitando Qoins{dots}</p>
                         }
-                        {enablingQoins && enabledQoins &&
+                        {stream && stream.qoinsEnabled &&
                             <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                 <TickSquare style={{ marginTop: '7.5px' }} />
                                 <p className={classes.enabledXQText}>Qoins habilitados</p>
                             </div>
+                        }
+                        {stream && stream.qoinsEnabled &&
+                            <Button
+                                onClick={closeStreamHandler}
+                                classes={{
+                                    root: classes.qoinsButtonRoot,
+                                    disabled: classes.qoinsButtonRootDisabled
+                                }}
+                                disabled={!stream || enablingQoins}>
+                                Finish stream
+                            </Button>
                         }
                     </div>
                     <div style={{ width: '60px' }} />

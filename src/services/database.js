@@ -124,15 +124,24 @@ export async function saveStreamTwitchCustomReward(uid, rewardName, rewardId, st
     const webhookIdKey = `${rewardName}WebhookId`;
 
     // Timestamp will be overwritten because we used it as a "last reward created" record
-    activeCustomRewardsRef.child(streamId).update({ streamerUid: uid, [rewardName]: rewardId, timestamp: (new Date()).getTime(), [webhookIdKey]: webhookId });
+    await activeCustomRewardsRef.child(streamId).update({ streamerUid: uid, [rewardName]: rewardId, timestamp: (new Date()).getTime(), [webhookIdKey]: webhookId });
+}
+
+/**
+ * Updates an Active Custom Reward node with given rewardsData object
+ * @param {string} streamId Stream identifier
+ * @param {object} rewardsData Data to update
+ */
+export async function updateActiveCustomReward(streamId, rewardsData) {
+    return await activeCustomRewardsRef.child(streamId).update(rewardsData);
 }
 
 /**
  * Gets the information about the given active event
  * @param {string} streamId Stream identifier
  */
-export function checkActiveCustomReward(streamId) {
-    return activeCustomRewardsRef.child(streamId).once('value');
+export async function checkActiveCustomReward(streamId) {
+    return await activeCustomRewardsRef.child(streamId).once('value');
 }
 
 /**

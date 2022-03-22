@@ -238,7 +238,7 @@ const EventManagementModal = ({ open, stream = null, onClose, startStream, enabl
                                     disabled: classes.qoinsButtonRootDisabled
                                 }}
                                 style={!stream ? { backgroundColor: '#0000' } : { boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                                disabled={!stream || (stream && !stream.qoinsEnabled)}
+                                disabled={!stream || (stream && enablingQoins)}
                             >{(stream && stream.qoinsEnabled) ? 'Terminar stream' : 'Habilitar Qoins'}</Button>
                         </div>
                         <div style={{ width: '70px' }} />

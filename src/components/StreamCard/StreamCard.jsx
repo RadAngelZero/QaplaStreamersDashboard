@@ -19,8 +19,8 @@ import {
     getPastStreamTitle,
     checkActiveCustomReward
 } from '../../services/database';
-import EventManagementModal from '../EventManagementModal/EventManagementModal';
 import { closeQaplaStream, enableStreamQoinsReward, startQaplaStream } from '../../services/streamQapla';
+import EventManagementModal from '../EventsModals/EventManagementModal';
 
 const useStyles = makeStyles(() => ({
     eventCard: {

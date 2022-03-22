@@ -140,50 +140,44 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const EventManagementModal = ({ open, onClose }) => {
+const EventManagementModal = ({ open, stream = null, onClose, startStream, enableQoins, closeStream }) => {
     const classes = useStyles();
     const [message, setMessage] = useState('');
     const [streamStarted, setStreamStarted] = useState(false);
     const [dots, setDots] = useState('')
-    const [enabledXQ, setEnabledXQ] = useState(false);
-    const [enablingQoins, setEnablingdQoins] = useState(false);
-    const [enabledQoins, setEnabledQoins] = useState(false);
+    const [enablingQoins, setEnablingQoins] = useState(false);
 
     useEffect(() => {
-        if ((streamStarted && !enabledXQ) || (enablingQoins && !enabledQoins)) {
+        if ((streamStarted && !stream) || (enablingQoins && !stream.qoinsEnabled)) {
             setTimeout(() => {
-                console.log('timeout')
                 if (dots.length > 2) {
-                    console.log('reset')
-                    setDots('')
+                    setDots('');
                 } else {
-                    console.log('increase')
-                    setDots(dots + '.')
+                    setDots(dots + '.');
                 }
             }, 500);
         }
-        if ((streamStarted && enabledXQ) && !enablingQoins && dots.length > 0) {
-            console.log('reset all dots')
-            setDots('')
+        if ((streamStarted && stream) && !enablingQoins && dots.length > 0) {
+            setDots('');
         }
-    }, [streamStarted, enabledXQ, dots, enablingQoins, enabledQoins])
+    }, [streamStarted, dots, enablingQoins]);
 
-    const startStreamHandler = () => {
+    const startStreamHandler = async () => {
         setStreamStarted(true);
-        setTimeout(() => {
-            setEnabledXQ(true)
-        }, 5000);
+        await startStream();
+        setStreamStarted(false);
     }
 
-    const enableQoinsHandler = () => {
-        setEnablingdQoins(true);
-        setTimeout(() => {
-            setEnabledQoins(true)
-        }, 2000);
+    const enableQoinsHandler = async () => {
+        setEnablingQoins(true);
+        await enableQoins();
+        setEnablingQoins(false);
     }
 
-    const endStreamHandler = () => {
-
+    const closeStreamHandler = async () => {
+        // Show are you sure? Dialog
+        await closeStream();
+        console.log('Stream closed');
     }
 
     const sendNotificationHandler = () => {
@@ -206,31 +200,31 @@ const EventManagementModal = ({ open, onClose }) => {
                             <p className={classes.title}>⚡️ Acciones de stream</p>
                             <p className={classes.subtitle}>Gestiona las recompensas de tu stream.</p>
                             <div style={{ height: '20px' }} />
-                            {!(enablingQoins || enabledQoins) &&
-                                <>
-                                    {!streamStarted &&
-                                        <Button
-                                            style={{ boxShadow: '0px 20px 40px -10px rgba(0, 255, 221, 0.2)' }}
-                                            onClick={startStreamHandler}
-                                            classes={{
-                                                root: classes.startButtonRoot
-                                            }}>Iniciar stream</Button>
-                                    }
-                                    {streamStarted && !enabledXQ &&
-                                        <p className={classes.startText}>Creando recompensas{dots}</p>
-                                    }
-                                    {streamStarted && enabledXQ &&
-                                        <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
-                                            <TickSquare style={{ marginTop: '7.5px' }} />
-                                            <p className={classes.enabledXQText}>XQ habilitados</p>
-                                        </div>
-                                    }
-                                </>
+                            {(!stream && !streamStarted) &&
+                                <Button
+                                    style={{ boxShadow: '0px 20px 40px -10px rgba(0, 255, 221, 0.2)' }}
+                                    onClick={startStreamHandler}
+                                    classes={{ root: classes.startButtonRoot }}>
+                                    Iniciar stream
+                                </Button>
                             }
-                            {enablingQoins && !enabledQoins &&
+
+                            {!stream && streamStarted &&
+                                <p className={classes.startText}>Creando recompensas{dots}</p>
+                            }
+
+                            {stream && !stream.qoinsEnabled &&
+                                <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
+                                    <TickSquare style={{ marginTop: '7.5px' }} />
+                                    <p className={classes.enabledXQText}>XQ habilitados</p>
+                                </div>
+                            }
+
+                            {stream && enablingQoins &&
                                 <p className={classes.startText}>Habilitando Qoins{dots}</p>
                             }
-                            {enablingQoins && enabledQoins &&
+
+                            {stream && stream.qoinsEnabled &&
                                 <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                     <TickSquare style={{ marginTop: '7.5px' }} />
                                     <p className={classes.enabledXQText}>Qoins habilitados</p>
@@ -238,14 +232,14 @@ const EventManagementModal = ({ open, onClose }) => {
                             }
                             <div style={{ height: '6px' }} />
                             <Button
-                                onClick={(enablingQoins && enabledQoins) ? endStreamHandler : enableQoinsHandler}
+                                onClick={(stream && stream.qoinsEnabled) ? closeStreamHandler : enableQoinsHandler}
                                 classes={{
                                     root: classes.qoinsButtonRoot,
                                     disabled: classes.qoinsButtonRootDisabled
                                 }}
-                                style={!streamStarted ? { backgroundColor: '#0000' } : (streamStarted && enabledXQ) ? { boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' } : {}}
-                                disabled={!(streamStarted && enabledXQ) || (enablingQoins && !enabledQoins)}
-                            >{(enablingQoins && enabledQoins) ? 'Terminar stream' : 'Habilitar Qoins'}</Button>
+                                style={!stream ? { backgroundColor: '#0000' } : { boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
+                                disabled={!stream || (stream && !stream.qoinsEnabled)}
+                            >{(stream && stream.qoinsEnabled) ? 'Terminar stream' : 'Habilitar Qoins'}</Button>
                         </div>
                         <div style={{ width: '70px' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>

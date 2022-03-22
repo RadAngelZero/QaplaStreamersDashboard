@@ -45,11 +45,14 @@ const useStyles = makeStyles(() => ({
     },
     hourText: {
         color: '#FFF',
-        marginTop: '.25rem',
-        marginBottom: '.25rem',
-        marginLeft: '.5rem',
-        marginRight: '.5rem',
-        fontWeight: '700'
+        padding: '2px 8px',
+        fontSize: '11px',
+        fontStyle: 'normal',
+        fontWeight: '700',
+        lineHeight: '20px',
+        letterSpacing: '-0.5px',
+        textAlign: 'center'
+
     },
     dateContainer: {
         display: 'flex',
@@ -65,8 +68,9 @@ const useStyles = makeStyles(() => ({
     },
     dateText: {
         color: '#FFF',
-        lineHeight: '20px',
+        fontSize: '13px',
         fontWeight: '700',
+        lineHeight: '20px',
         marginLeft: '10px'
     },
     eventImage: {
@@ -116,12 +120,14 @@ const useStyles = makeStyles(() => ({
         color: '#0D1021',
         width: '100%',
         borderRadius: '8px',
+        textTransform: 'none'
     },
     manageButton: {
         backgroundColor: '#272D5780',
         color: '#FFFFFF99',
         width: '100%',
         borderRadius: '8px',
+        textTransform: 'none'
     }
 }));
 
@@ -167,7 +173,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         async function checkStreamStatus() {
             const streamStatus = await checkActiveCustomReward(streamId);
             if (streamStatus.exists()) {
-                setStream({ key: streamStatus.key, ...streamStatus.val()});
+                setStream({ key: streamStatus.key, ...streamStatus.val() });
             } else {
                 setStream(null);
             }
@@ -239,13 +245,13 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             <div className={classes.relativeContainer}>
                 <div className={classes.hourContainer}>
                     <p className={classes.hourText}>
-                        {hour}
+                    {hour.split(':')[0] > 12 ? (hour.split(':')[0] - 12).toString().padStart(2, '0') : hour.split(':')[0]}:{hour.split(':')[1]} {hour.split(':')[0] > 12 ? 'p.m.' : 'a.m.'}
                     </p>
                 </div>
                 <div className={classes.dateContainer}>
                     <CalendarIcon />
                     <p className={classes.dateText}>
-                        {date}
+                        {date.slice(0, -5)}
                     </p>
                 </div>
                 <img

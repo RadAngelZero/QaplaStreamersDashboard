@@ -59,6 +59,7 @@ body {
     .messagesButton {
         margin-left: 0px !important;
     }
+
     .header {
         margin-top: 12px;
     }
@@ -256,6 +257,7 @@ body {
 .streamsCardContainer {
     height: 400px;
 }
+
 .innerStreamsCardContainer {
     height: 400px;
     margin: 0px -16px !important;
@@ -281,6 +283,8 @@ h1 {
 }
 
 .createEventCard {
+    display: flex;
+    flex-direction: column;
     background-color: #141833 !important;
     border-radius: 1.5rem !important;
     box-shadow: 0 6px 15px 0 rgba(0, 0, 0, 0.31) !important;
@@ -294,20 +298,31 @@ h1 {
 }
 
 .newStream {
-    font-weight: normal;
+    margin-left: 24px;
+    margin-top: 24px; 
     color: #FFF;
-    font-size: 24px;
-    line-height: 32px;
-    margin-left: 1rem;
-    margin-top: 1.25rem;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: left;
+
 }
 
 .createButton {
-    margin-top: 1rem !important;
+    margin-top: 5rem !important;
     margin-bottom: 7rem !important;
     padding: 1.5rem !important;
+    width: 60px;
+    height: 60px;
     background-color: #141833;
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.29);
+}
+
+.createButton>.MuiIconButton-label {
+    width: 18px;
+    height: 18px;
 }
 
 .eventCard {

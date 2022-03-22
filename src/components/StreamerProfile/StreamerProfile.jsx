@@ -101,15 +101,21 @@ const StreamerProfile = ({ user, games }) => {
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
         const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sept', 'Oct', 'Nov', 'Dic'];
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        return `${date.getDate()} ${months[date.getMonth()]}`;
     }
 
     const formatHour = (timestamp) => {
         const date = new Date(timestamp);
-        const hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+        let hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
         const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
 
-        return `${hour}:${minutes}`;
+        const amPm = hour >= 12 ? 'p.m.' : 'a.m.';
+        hour = hour % 12;
+        hour = hour ? hour : 12;
+
+        hour = hour < 10 ? `0${hour}`: hour;
+
+        return `${hour}:${minutes} ${amPm}`;
     }
 
     const onRemoveStream = (streamId) => {
@@ -291,9 +297,9 @@ const StreamerProfile = ({ user, games }) => {
                                         user={user}
                                         game={'aClash'}
                                         games={games}
-                                        date={formatDate(1645487256919)}
-                                        hour={formatHour(1645487256919)}
-                                        timestamp={1645487256919}
+                                        date={formatDate(1647964800000)}
+                                        hour={formatHour(1647964800000)}
+                                        timestamp={1647964800000}
                                         onRemoveStream={onRemoveStream} />
                                     </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (

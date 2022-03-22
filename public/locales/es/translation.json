@@ -72,9 +72,46 @@
     "StreamCard": {
         "deleteConfirmation": "¿Estas seguro que deseas eliminar este stream?",
         "participants": "participantes",
-        "start": "Iniciar",
-        "resume": "Reanudar",
+        "pendingReview": "Pendiente de revisión",
+        "posted": "Publicado",
+        "start": "Iniciar stream",
+        "finish": "Terminar stream",
+        "creatingRewards": "Creando recompensas",
+        "manageRewards": "Gestionar recompensas",
+        "manageStream": "Gestionar stream",
         "cancelStreamRequest": "Cancelar"
+    },
+    "QaplaStreamDialogs": {
+        "EventConfirmStartDialog": {
+            "xqAvailable": "¡Ya se puede minar XQ en tu stream!",
+            "manageRewards": "Gestionar recompensas"
+        },
+        "EventManagementDialog": {
+            "streamActions": "⚡️ Acciones de stream",
+            "manageRewards": "Gestiona las recompensas de tu stream.",
+            "start": "Iniciar stream",
+            "creatingRewards": "Creando recompensas",
+            "xqEnabled": "XQ habilitados",
+            "enablingQoins": "Habilitando Qoins",
+            "qoinsEnabled": "Qoins habilitados",
+            "finish": "Terminar stream",
+            "enableQoins": "Habilitar Qoins",
+            "sendMessage": "Enviar mensaje",
+            "sendMessageDetails": "Avisa a tu gente algo relevante sobre tu stream, crea hype o lo que tu quieras! Tus seguidores recibirán una notificación móvil con tu mensaje.",
+            "send": "Enviar"
+        },
+        "EventWarningQoinsDialog": {
+            "enableQoins": "Habilita los Qoins",
+            "description": "Habilita los Qoins para la audiencia antes de terminar un stream 🙌",
+            "manageRewards": "Gestionar recompensas"
+        },
+        "EventEndStreamConfirmDialog": {
+            "title": "Termina tu stream para eliminar las recompensas",
+            "description": "Si aún no quieres eliminar las recompensas vuelve al dashboard",
+            "finish": "Terminar stream",
+            "back": "Volver atras",
+            "dontShowThisMessageAgain": "No volver a mostrar este mensaje"
+        }
     },
     "NewStream": {
         "alerts": {

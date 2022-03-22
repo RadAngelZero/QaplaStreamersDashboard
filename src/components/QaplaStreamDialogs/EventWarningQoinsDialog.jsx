@@ -1,7 +1,9 @@
-import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
+
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
-import { ReactComponent as TickCircle } from './../../assets/TickCircle.svg';
+import { ReactComponent as InfoCircle } from './../../assets/InfoCircle.svg';
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
@@ -38,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#7581fa'
         }
     },
-    miniModalTitle: {
+    miniDialogTitle: {
         fontSize: '18px',
         fontStyle: 'normal',
         fontWeight: '600',
@@ -47,14 +49,21 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         maxWidth: '220px'
     },
+    miniDialogSubTitle: {
+        fontSize: '12px',
+        fontStyle: 'normal',
+        fontWeight: '400',
+        lineHeight: '16px',
+        letterSpacing: '0em',
+        textAlign: 'center',
+        color: 'darkgrey',
+        maxWidth: '220px'
+    },
 }));
 
-const EventConfirmStartModal = ({ open, onClose }) => {
+const EventWarningQoinsDialog = ({ open, onClose, manageRewards }) => {
     const classes = useStyles();
-
-    const goToManageRewards = () => {
-
-    }
+    const { t } = useTranslation();
 
     return (
         <>
@@ -69,20 +78,27 @@ const EventConfirmStartModal = ({ open, onClose }) => {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <div style={{ display: 'flex', width: '90px', height: '90px' }}>
-                            <div style={{ position: 'absolute', backgroundColor: 'rgba(0, 255, 221, 0.3)', width: '90px', height: '45px', marginTop: '50px', borderRadius: '40%', filter: 'blur(20px)' }} />
-                            <TickCircle style={{ width: '90px', height: '90px' }} />
+                            <div style={{ position: 'absolute', backgroundColor: 'rgba(252, 255, 107, 0.3)', width: '90px', height: '45px', marginTop: '50px', borderRadius: '40%', filter: 'blur(20px)' }} />
+                            <InfoCircle style={{ width: '90px', height: '90px' }} />
                         </div>
                         <div style={{ height: '34px' }} />
-                        <p className={classes.miniModalTitle} >¡Ya se puede minar XQ en tu stream!</p>
+                        <p className={classes.miniDialogTitle}>
+                            {t('QaplaStreamDialogs.EventWarningQoinsDialog.enableQoins')}
+                        </p>
+                        <div style={{ height: '10px' }} />
+                        <p className={classes.miniDialogSubTitle}>
+                            {t('QaplaStreamDialogs.EventWarningQoinsDialog.description')}
+                        </p>
                         <div style={{ height: '28px' }} />
 
                         <Button
-                            onClick={goToManageRewards}
+                            onClick={manageRewards}
                             classes={{
                                 root: classes.manageRewardsButtons,
                             }}
-                            style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                        >Gestionar recompensas</Button>
+                            style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
+                            {t('QaplaStreamDialogs.EventWarningQoinsDialog.manageRewards')}
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -90,4 +106,4 @@ const EventConfirmStartModal = ({ open, onClose }) => {
     )
 }
 
-export default EventConfirmStartModal;
+export default EventWarningQoinsDialog;

@@ -1,9 +1,9 @@
-import { Button, Dialog, DialogContent, Checkbox, makeStyles } from '@material-ui/core';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, Dialog, DialogContent, Checkbox, makeStyles } from '@material-ui/core';
+
 import { ReactComponent as Unchecked } from './../../assets/Unchecked.svg';
 import { ReactComponent as Checked } from './../../assets/Checked.svg';
-
-
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#7581fa'
         }
     },
-    miniModalTitle: {
+    miniDialogTitle: {
         fontSize: '18px',
         fontStyle: 'normal',
         fontWeight: '600',
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         maxWidth: '220px'
     },
-    miniModalSubTitle: {
+    miniDialogSubTitle: {
         fontSize: '12px',
         fontStyle: 'normal',
         fontWeight: '400',
@@ -77,15 +77,22 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const EventEndStreamConfirmModal = ({ open, onClose }) => {
+const EventEndStreamConfirmDialog = ({ open, onClose, closeStream, closingStream }) => {
     const classes = useStyles();
-    const [notShowEndStreamAgain, setNotShowEndStreamAgain] = useState(false)
-
-    const endStreamHandler = () => {
-    }
+    const [notShowEndStreamAgain, setNotShowEndStreamAgain] = useState(false);
+    const { t } = useTranslation();
 
     const notShowAgainHandler = () => {
-        setNotShowEndStreamAgain(!notShowEndStreamAgain)
+        setNotShowEndStreamAgain(!notShowEndStreamAgain);
+    }
+
+    const closeStreamHandler = async () => {
+        if (notShowEndStreamAgain) {
+            localStorage.setItem('dontShowCloseStreamDialog', 'true');
+        }
+
+        await closeStream();
+        onClose();
     }
 
     return (
@@ -97,23 +104,30 @@ const EventEndStreamConfirmModal = ({ open, onClose }) => {
             }}>
                 <DialogContent style={{ padding: '0px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <p className={classes.miniModalTitle}>Termina tu stream para eliminar las recompensas</p>
+                        <p className={classes.miniDialogTitle}>
+                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.title')}
+                        </p>
                         <div style={{ height: '20px' }} />
-                        <p className={classes.miniModalSubTitle}>Si aún no quieres eliminar las recompensas vuelve al dashboard</p>
+                        <p className={classes.miniDialogSubTitle}>
+                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.description')}
+                        </p>
                         <div style={{ height: '30px' }} />
                         <Button
-                            onClick={endStreamHandler}
+                            onClick={closeStreamHandler}
                             classes={{
                                 root: classes.endStreamButtonRoot,
                             }}
-                            style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                        >Terminar stream</Button>
+                            disabled={closingStream}
+                            style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
+                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.end')}
+                        </Button>
                         <Button
                             onClick={onClose}
                             classes={{
                                 root: classes.goToDashboardButton,
-                            }}
-                        >Volver atras</Button>
+                            }}>
+                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.back')}
+                        </Button>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Checkbox
                                 icon={<Unchecked />}
@@ -129,8 +143,9 @@ const EventEndStreamConfirmModal = ({ open, onClose }) => {
                                 disableRipple
                                 style={{ color: notShowEndStreamAgain ? '#fff' : 'darkgrey', paddingLeft: '6px' }}
                                 className={classes.notShowAgain}
-                                onClick={notShowAgainHandler}
-                            >No volver a mostrar este mensaje</Button>
+                                onClick={notShowAgainHandler}>
+                                {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.dontShowThisMessageAgain')}
+                            </Button>
                         </div>
 
                     </div>
@@ -140,4 +155,4 @@ const EventEndStreamConfirmModal = ({ open, onClose }) => {
     )
 }
 
-export default EventEndStreamConfirmModal;
+export default EventEndStreamConfirmDialog;

@@ -1,5 +1,7 @@
-import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
+
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as TickSquare } from './../../assets/TickSquare.svg';
@@ -140,12 +142,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const EventManagementModal = ({ open, stream = null, onClose, startStream, enableQoins, closeStream }) => {
+const EventManagementDialog = ({ open, stream = null, streamTitle, date, hour, onClose, startStream, enableQoins, closeStream, closingStream }) => {
     const classes = useStyles();
     const [message, setMessage] = useState('');
     const [streamStarted, setStreamStarted] = useState(false);
     const [dots, setDots] = useState('')
     const [enablingQoins, setEnablingQoins] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if ((streamStarted && !stream) || (enablingQoins && !stream.qoinsEnabled)) {
@@ -175,9 +178,8 @@ const EventManagementModal = ({ open, stream = null, onClose, startStream, enabl
     }
 
     const closeStreamHandler = async () => {
-        // Show are you sure? Dialog
         await closeStream();
-        console.log('Stream closed');
+        onClose();
     }
 
     const sendNotificationHandler = () => {
@@ -197,54 +199,77 @@ const EventManagementModal = ({ open, stream = null, onClose, startStream, enabl
                     </div>
                     <div style={{ display: 'flex' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '205px', maxWidth: '210px' }}>
-                            <p className={classes.title}>⚡️ Acciones de stream</p>
-                            <p className={classes.subtitle}>Gestiona las recompensas de tu stream.</p>
+                            <p className={classes.title}>
+                                {t('QaplaStreamDialogs.EventManagementDialog.streamActions')}
+                            </p>
+                            <p className={classes.subtitle}>
+                                {t('QaplaStreamDialogs.EventManagementDialog.manageRewards')}
+                            </p>
                             <div style={{ height: '20px' }} />
                             {(!stream && !streamStarted) &&
                                 <Button
                                     style={{ boxShadow: '0px 20px 40px -10px rgba(0, 255, 221, 0.2)' }}
                                     onClick={startStreamHandler}
                                     classes={{ root: classes.startButtonRoot }}>
-                                    Iniciar stream
+                                    {t('QaplaStreamDialogs.EventManagementDialog.start')}
                                 </Button>
                             }
 
                             {!stream && streamStarted &&
-                                <p className={classes.startText}>Creando recompensas{dots}</p>
+                                <p className={classes.startText}>
+                                    {`${t('QaplaStreamDialogs.EventManagementDialog.creatingRewards')}${dots}`}
+                                </p>
                             }
 
                             {stream && !stream.qoinsEnabled &&
                                 <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                     <TickSquare style={{ marginTop: '7.5px' }} />
-                                    <p className={classes.enabledXQText}>XQ habilitados</p>
+                                    <p className={classes.enabledXQText}>
+                                        {t('QaplaStreamDialogs.EventManagementDialog.xqEnabled')}
+                                    </p>
                                 </div>
                             }
 
                             {stream && enablingQoins &&
-                                <p className={classes.startText}>Habilitando Qoins{dots}</p>
+                                <p className={classes.startText}>
+                                    {`${t('QaplaStreamDialogs.EventManagementDialog.enablingQoins')}${dots}`}
+                                </p>
                             }
 
                             {stream && stream.qoinsEnabled &&
                                 <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                     <TickSquare style={{ marginTop: '7.5px' }} />
-                                    <p className={classes.enabledXQText}>Qoins habilitados</p>
+                                    <p className={classes.enabledXQText}>
+                                        {t('QaplaStreamDialogs.EventManagementDialog.qoinsEnabled')}
+                                    </p>
                                 </div>
                             }
                             <div style={{ height: '6px' }} />
-                            <Button
-                                onClick={(stream && stream.qoinsEnabled) ? closeStreamHandler : enableQoinsHandler}
-                                classes={{
-                                    root: classes.qoinsButtonRoot,
-                                    disabled: classes.qoinsButtonRootDisabled
-                                }}
-                                style={!stream ? { backgroundColor: '#0000' } : { boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                                disabled={!stream || (stream && enablingQoins)}
-                            >{(stream && stream.qoinsEnabled) ? 'Terminar stream' : 'Habilitar Qoins'}</Button>
+                            {!enablingQoins &&
+                                <Button
+                                    onClick={(stream && stream.qoinsEnabled) ? closeStreamHandler : enableQoinsHandler}
+                                    classes={{
+                                        root: classes.qoinsButtonRoot,
+                                        disabled: classes.qoinsButtonRootDisabled
+                                    }}
+                                    style={!stream ? { backgroundColor: '#0000' } : { boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
+                                    disabled={!stream || (stream && enablingQoins) || closingStream}>
+                                    {(stream && stream.qoinsEnabled) ?
+                                        t('QaplaStreamDialogs.EventManagementDialog.end')
+                                        :
+                                        t('QaplaStreamDialogs.EventManagementDialog.enableQoins')
+                                    }
+                                </Button>
+                            }
                         </div>
                         <div style={{ width: '70px' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
-                            <p className={classes.title}>💬 Enviar mensaje</p>
-                            <p className={classes.subtitle}>Avisa a tu gente algo relevante sobre tu stream, crea hype o lo que tu quieras! Tus seguidores recibirán una notificación móvil con tu mensaje. </p>
+                            <p className={classes.title}>
+                                💬 {t('QaplaStreamDialogs.EventManagementDialog.sendMessage')}
+                            </p>
+                            <p className={classes.subtitle}>
+                                {t('QaplaStreamDialogs.EventManagementDialog.sendMessageDetails')}
+                            </p>
                             <div style={{ height: '20px' }} />
                             <StreamerTextInput
                                 value={message}
@@ -262,15 +287,18 @@ const EventManagementModal = ({ open, stream = null, onClose, startStream, enabl
                                 onClick={sendNotificationHandler}
                                 classes={{
                                     root: classes.sendButtonRoot
-                                }}
-                            >Enviar</Button>
+                                }}>
+                                    {t('QaplaStreamDialogs.EventManagementDialog.send')}
+                                </Button>
                         </div>
                     </div>
                 </DialogContent>
-                <p style={{ position: 'absolute', right: '30px', bottom: '-40px', }} className={classes.eventName}>Exploring Astraland 🌙 / 30 Apr / 10:30 p.m.</p>
+                <p style={{ position: 'absolute', right: '30px', bottom: '-40px', }} className={classes.eventName}>
+                    {`${streamTitle} / ${date} / ${hour}`}
+                </p>
             </Dialog>
         </>
     )
 }
 
-export default EventManagementModal;
+export default EventManagementDialog;

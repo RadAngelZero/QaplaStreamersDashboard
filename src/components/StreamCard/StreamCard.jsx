@@ -24,6 +24,8 @@ import EventWarningQoinsDialog from '../QaplaStreamDialogs/EventWarningQoinsDial
 import EventEndStreamConfirmDialog from '../QaplaStreamDialogs/EventEndStreamConfirmDialog';
 import EventRewardsRemovedConfirmation from '../QaplaStreamDialogs/EventRewardsRemovedConfirmation';
 import { auth } from '../../services/firebase';
+import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
+import { sendCustomMessage } from '../../services/functions';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -169,6 +171,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const [startingStream, setStartingStream] = useState(false);
     const [closingStream, setClosingStream] = useState(false);
     const [openRewardsRemovedDialog, setOpenRewardsRemovedDialog] = useState(false);
+    const [openCustomMessageSentDialog, setOpenCustomMessageSentDialog] = useState(false);
     const [loadingDots, setLoadingDots] = useState('');
     const history = useHistory();
     const classes = useStyles();
@@ -323,6 +326,13 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         setOpenStreamDialog(true);
     }
 
+    const sendMessage = async (message) => {
+        if (message) {
+            await sendCustomMessage(user.uid, title && title['en'] ? title['en'] : '', message);
+            setOpenCustomMessageSentDialog(true);
+        }
+    }
+
     return (
         <Card className={classes.eventCard} style={style}>
             <div className={classes.relativeContainer}>
@@ -408,6 +418,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             </div>
             <EventManagementModal open={openStreamDialog}
                 user={user}
+                sendMessage={sendMessage}
                 streamId={streamId}
                 stream={stream}
                 streamStarted={startingStream}
@@ -431,6 +442,8 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 closeStream={closeStream} />
             <EventRewardsRemovedConfirmation open={openRewardsRemovedDialog}
                 onClose={() => setOpenRewardsRemovedDialog(false)}  />
+            <EventCustomMessageSentConfirmation open={openCustomMessageSentDialog}
+                onClose={() => setOpenCustomMessageSentDialog(false)} />
         </Card>
     );
 }

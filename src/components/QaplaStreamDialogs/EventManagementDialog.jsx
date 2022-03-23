@@ -157,7 +157,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const EventManagementDialog = ({ user, open, stream = null, streamStarted, streamTitle, date, hour, onClose, startStream, enableQoins, closeStream, closingStream }) => {
+const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle, date, hour, onClose, startStream, enableQoins, closeStream, closingStream, sendMessage }) => {
     const classes = useStyles();
     const [message, setMessage] = useState('');
     const [dots, setDots] = useState('')
@@ -193,9 +193,10 @@ const EventManagementDialog = ({ user, open, stream = null, streamStarted, strea
         closeStream();
     }
 
-    const sendNotificationHandler = () => {
+    const sendNotificationHandler = async () => {
         // We need to add validations, check BioEditorTextArea to get an idea for a possible implementation
-        sendCustomMessage(user.uid, streamTitle, message);
+        await sendMessage(message);
+        setMessage('');
     }
 
     return (

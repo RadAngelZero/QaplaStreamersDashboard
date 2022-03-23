@@ -116,6 +116,10 @@
         "EventRewardsRemovedConfirmation": {
             "title": "The rewards were successfully removed 👌",
             "back": "Back to dashboard"
+        },
+        "EventCustomMessageSentConfirmation": {
+            "title": "Message sent!",
+            "manageRewards": "Manage rewards"
         }
     },
     "NewStream": {

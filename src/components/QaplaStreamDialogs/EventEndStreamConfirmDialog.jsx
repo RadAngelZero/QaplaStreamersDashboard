@@ -96,62 +96,60 @@ const EventEndStreamConfirmDialog = ({ open, onClose, closeStream, closingStream
     }
 
     return (
-        <>
-            <Dialog onClose={onClose} open={open} classes={{
-                container: classes.dialogContainer,
-                root: classes.dialogRoot,
-                paper: classes.paper
-            }}>
-                <DialogContent style={{ padding: '0px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <p className={classes.miniDialogTitle}>
-                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.title')}
-                        </p>
-                        <div style={{ height: '20px' }} />
-                        <p className={classes.miniDialogSubTitle}>
-                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.description')}
-                        </p>
-                        <div style={{ height: '30px' }} />
+        <Dialog onClose={onClose} open={open} classes={{
+            container: classes.dialogContainer,
+            root: classes.dialogRoot,
+            paper: classes.paper
+        }}>
+            <DialogContent style={{ padding: '0px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <p className={classes.miniDialogTitle}>
+                        {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.title')}
+                    </p>
+                    <div style={{ height: '20px' }} />
+                    <p className={classes.miniDialogSubTitle}>
+                        {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.description')}
+                    </p>
+                    <div style={{ height: '30px' }} />
+                    <Button
+                        onClick={closeStreamHandler}
+                        classes={{
+                            root: classes.endStreamButtonRoot,
+                        }}
+                        disabled={closingStream}
+                        style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
+                        {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.end')}
+                    </Button>
+                    <Button
+                        onClick={onClose}
+                        classes={{
+                            root: classes.goToDashboardButton,
+                        }}>
+                        {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.back')}
+                    </Button>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Checkbox
+                            icon={<Unchecked />}
+                            checkedIcon={<Checked />}
+                            onChange={notShowAgainHandler}
+                            checked={notShowEndStreamAgain}
+                            style={{ paddingRight: '0px' }}
+                        />
                         <Button
-                            onClick={closeStreamHandler}
                             classes={{
-                                root: classes.endStreamButtonRoot,
+                                label: classes.notShowAgainTextButton
                             }}
-                            disabled={closingStream}
-                            style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
-                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.end')}
+                            disableRipple
+                            style={{ color: notShowEndStreamAgain ? '#fff' : 'darkgrey', paddingLeft: '6px' }}
+                            className={classes.notShowAgain}
+                            onClick={notShowAgainHandler}>
+                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.dontShowThisMessageAgain')}
                         </Button>
-                        <Button
-                            onClick={onClose}
-                            classes={{
-                                root: classes.goToDashboardButton,
-                            }}>
-                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.back')}
-                        </Button>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Checkbox
-                                icon={<Unchecked />}
-                                checkedIcon={<Checked />}
-                                onChange={notShowAgainHandler}
-                                checked={notShowEndStreamAgain}
-                                style={{ paddingRight: '0px' }}
-                            />
-                            <Button
-                                classes={{
-                                    label: classes.notShowAgainTextButton
-                                }}
-                                disableRipple
-                                style={{ color: notShowEndStreamAgain ? '#fff' : 'darkgrey', paddingLeft: '6px' }}
-                                className={classes.notShowAgain}
-                                onClick={notShowAgainHandler}>
-                                {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.dontShowThisMessageAgain')}
-                            </Button>
-                        </div>
-
                     </div>
-                </DialogContent>
-            </Dialog>
-        </>
+
+                </div>
+            </DialogContent>
+        </Dialog>
     )
 }
 

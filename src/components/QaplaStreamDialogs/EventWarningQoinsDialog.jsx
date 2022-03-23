@@ -66,43 +66,41 @@ const EventWarningQoinsDialog = ({ open, onClose, manageRewards }) => {
     const { t } = useTranslation();
 
     return (
-        <>
-            <Dialog onClose={onClose} open={open} classes={{
-                container: classes.dialogContainer,
-                root: classes.dialogRoot,
-                paper: classes.paper
-            }}>
-                <DialogContent style={{ padding: '0px' }}>
-                    <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
-                        <CloseIcon onClick={onClose} className={classes.closeButton} />
+        <Dialog onClose={onClose} open={open} classes={{
+            container: classes.dialogContainer,
+            root: classes.dialogRoot,
+            paper: classes.paper
+        }}>
+            <DialogContent style={{ padding: '0px' }}>
+                <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
+                    <CloseIcon onClick={onClose} className={classes.closeButton} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', width: '90px', height: '90px' }}>
+                        <div style={{ position: 'absolute', backgroundColor: 'rgba(252, 255, 107, 0.3)', width: '90px', height: '45px', marginTop: '50px', borderRadius: '40%', filter: 'blur(20px)' }} />
+                        <InfoCircle style={{ width: '90px', height: '90px' }} />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', width: '90px', height: '90px' }}>
-                            <div style={{ position: 'absolute', backgroundColor: 'rgba(252, 255, 107, 0.3)', width: '90px', height: '45px', marginTop: '50px', borderRadius: '40%', filter: 'blur(20px)' }} />
-                            <InfoCircle style={{ width: '90px', height: '90px' }} />
-                        </div>
-                        <div style={{ height: '34px' }} />
-                        <p className={classes.miniDialogTitle}>
-                            {t('QaplaStreamDialogs.EventWarningQoinsDialog.enableQoins')}
-                        </p>
-                        <div style={{ height: '10px' }} />
-                        <p className={classes.miniDialogSubTitle}>
-                            {t('QaplaStreamDialogs.EventWarningQoinsDialog.description')}
-                        </p>
-                        <div style={{ height: '28px' }} />
+                    <div style={{ height: '34px' }} />
+                    <p className={classes.miniDialogTitle}>
+                        {t('QaplaStreamDialogs.EventWarningQoinsDialog.enableQoins')}
+                    </p>
+                    <div style={{ height: '10px' }} />
+                    <p className={classes.miniDialogSubTitle}>
+                        {t('QaplaStreamDialogs.EventWarningQoinsDialog.description')}
+                    </p>
+                    <div style={{ height: '28px' }} />
 
-                        <Button
-                            onClick={manageRewards}
-                            classes={{
-                                root: classes.manageRewardsButtons,
-                            }}
-                            style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
-                            {t('QaplaStreamDialogs.EventWarningQoinsDialog.manageRewards')}
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </>
+                    <Button
+                        onClick={manageRewards}
+                        classes={{
+                            root: classes.manageRewardsButtons,
+                        }}
+                        style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
+                        {t('QaplaStreamDialogs.EventWarningQoinsDialog.manageRewards')}
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
     )
 }
 

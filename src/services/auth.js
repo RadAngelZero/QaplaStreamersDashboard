@@ -42,6 +42,7 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
         const twitchId = twitchUserData.id;
 
         const streamerUid = await getStreamerUidWithTwitchId(twitchId);
+        let isNewUser = false;
 
         // If a registered user has the given twitchId then we save on the object this uid
         if (streamerUid) {
@@ -49,6 +50,7 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
         } else {
             // Otherwise we create a new uid for the new user
             twitchUserData.id = `${twitchUserData.id}-${twitchUserData.display_name}`;
+            isNewUser = true;
         }
 
         const userToken = (await createUserWithTwitch(
@@ -69,7 +71,8 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
                 email: twitchUserData.email,
                 twitchAccessToken: tokensData.access_token,
                 refreshToken: tokensData.refresh_token,
-                scope: tokensData.scope
+                scope: tokensData.scope,
+                isNewUser
             }
         };
 
@@ -99,6 +102,6 @@ export async function getTwitchUserData(access_token) {
 /**
  * Close the current session
  */
-export function signOut() {
-    auth.signOut();
+export async function signOut() {
+    await auth.signOut();
 }

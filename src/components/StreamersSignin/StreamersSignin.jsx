@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import {
     withStyles,
     Grid,
@@ -18,11 +18,9 @@ import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { signInWithTwitch } from '../../services/auth';
-import { streamerProfileExists, createStreamerProfile, updateStreamerProfile, getInvitationCodeParams } from '../../services/database';
-import { auth } from '../../services/firebase';
-import { subscribeStreamerToTwitchWebhook } from '../../services/functions';
-import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
+import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
+import { getUserToken } from '../../services/functions';
+import { createStreamerProfile } from '../../services/database';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -34,50 +32,48 @@ const CustomDialog = withStyles((theme) => ({
     }
 }))(Dialog);
 
-const StreamersSignin = ({ title }) => {
+function useQuery() {
+    const { search } = useLocation();
+
+    return useMemo(() => new URLSearchParams(search), [search]);
+}
+
+const StreamersSignin = ({ user, title }) => {
     const [isLoadingAuth, setIsLoadingAuth] = useState(false);
     const [openTermsAndConditionsDialog, setOpenTermsAndConditionsDialog] = useState(false);
     const history = useHistory();
-    const { inviteCode } = useParams();
+    const query = useQuery();
+
+    useEffect(() => {
+        async function checkIfUsersIsSigningIn() {
+            const twitchClientCode = query.get('code');
+
+            if (!isLoadingAuth && !user && twitchClientCode) {
+                setIsLoadingAuth(true);
+                const tokenData = await getUserToken(twitchClientCode);
+                if (tokenData && tokenData.data && tokenData.data.access_token) {
+                    const userData = await getTwitchUserData(tokenData.data.access_token);
+                    const user = await signUpOrSignInTwitchUser(userData, tokenData.data);
+                    if (user.userData.isNewUser) {
+                        await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
+                    }
+                } else {
+                    alert('Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico');
+                }
+            }
+        }
+
+        checkIfUsersIsSigningIn();
+
+        if (user) {
+            history.push('/profile');
+        }
+    }, [user, history, isLoadingAuth]);
 
     const signIn = async () => {
         closeTermsAndConditionsModal();
         setIsLoadingAuth(true);
-        const user = await signInWithTwitch();
-        localStorage.setItem('twitchPermission', 'channel:read:redemptions');
-        localStorage.setItem('termsAndConditions', 'true');
-        if (!(await streamerProfileExists(user.firebaseAuthUser.user.uid))) {
-            if (inviteCode) {
-                const invitationCodeSnap = await getInvitationCodeParams(inviteCode);
-                if (invitationCodeSnap.exists()) {
-                    await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData, inviteCode);
-                    if (invitationCodeSnap.val().freeTrial && invitationCodeSnap.val().subscriptionDetails) {
-                        const startDate = dayjs.utc().toDate().getTime();
-                        const endDate = dayjs.utc().add(1, 'month').endOf('day').toDate().getTime();
-                        await updateStreamerProfile(user.firebaseAuthUser.user.uid, {
-                            freeTrial: true,
-                            premium: true,
-                            currentPeriod: { startDate, endDate },
-                            subscriptionDetails: invitationCodeSnap.val().subscriptionDetails
-                        });
-                    }
-                    await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
-                    await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
-                    history.push('/profile');
-                } else {
-                    const user = auth.currentUser;
-                    await user.delete();
-                    alert('Requieres un codigo de invitación valido para acceder');
-                }
-            }  else {
-                const user = auth.currentUser;
-                await user.delete();
-                alert('Requieres un codigo de invitación valido para acceder');
-            }
-        } else {
-            await updateStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
-            history.push('/profile');
-        }
+        signInWithTwitch();
         setIsLoadingAuth(false);
     }
 
@@ -85,6 +81,8 @@ const StreamersSignin = ({ title }) => {
         const userHasAcceptedTerms = localStorage.getItem('termsAndConditions');
 
         if (userHasAcceptedTerms) {
+            localStorage.setItem('twitchPermission', 'channel:read:redemptions');
+            localStorage.setItem('termsAndConditions', 'true');
             signIn();
         } else {
             setOpenTermsAndConditionsDialog(true);

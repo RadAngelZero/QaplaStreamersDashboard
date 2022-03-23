@@ -5,6 +5,7 @@ import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as TickSquare } from './../../assets/TickSquare.svg';
+import { sednPushNotificationToTopic, sendCustomMessage } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
@@ -54,11 +55,16 @@ const useStyles = makeStyles((theme) => ({
         color: '#0D1021',
         textTransform: 'none',
         '&:hover': {
-            backgroundColor: '#7fffee'
+            backgroundColor: '#00EACB'
+        },
+        '&:active': {
+            backgroundColor: '#00EACB',
+            opacity: '0.9'
         }
     },
     startText: {
         display: 'flex',
+        justifyContent: 'center',
         alignItems: 'center',
         fontSize: '14px',
         fontStyle: 'normal',
@@ -93,7 +99,11 @@ const useStyles = makeStyles((theme) => ({
         color: '#FFF',
         textTransform: 'none',
         '&:hover': {
-            backgroundColor: '#7581fa'
+            background: '#2E3AC1',
+        },
+        '&:active': {
+            background: '#2E3AC1',
+            opacity: '0.9'
         }
     },
     qoinsButtonRootDisabled: {
@@ -130,7 +140,12 @@ const useStyles = makeStyles((theme) => ({
         color: '#FFF',
         textTransform: 'none',
         '&:hover': {
-            backgroundColor: '#897ddb',
+            backgroundColor: '#6C5DD3',
+            opacity: '0.9'
+        },
+        '&:active': {
+            backgroundColor: '#6C5DD3',
+            opacity: '0.8'
         }
     },
     eventName: {
@@ -142,10 +157,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const EventManagementDialog = ({ open, stream = null, streamTitle, date, hour, onClose, startStream, enableQoins, closeStream, closingStream }) => {
+const EventManagementDialog = ({ user, open, stream = null, streamStarted, streamTitle, date, hour, onClose, startStream, enableQoins, closeStream, closingStream }) => {
     const classes = useStyles();
     const [message, setMessage] = useState('');
-    const [streamStarted, setStreamStarted] = useState(false);
     const [dots, setDots] = useState('')
     const [enablingQoins, setEnablingQoins] = useState(false);
     const { t } = useTranslation();
@@ -166,9 +180,7 @@ const EventManagementDialog = ({ open, stream = null, streamTitle, date, hour, o
     }, [streamStarted, dots, enablingQoins]);
 
     const startStreamHandler = async () => {
-        setStreamStarted(true);
         await startStream();
-        setStreamStarted(false);
     }
 
     const enableQoinsHandler = async () => {
@@ -178,20 +190,22 @@ const EventManagementDialog = ({ open, stream = null, streamTitle, date, hour, o
     }
 
     const closeStreamHandler = async () => {
-        await closeStream();
-        onClose();
+        closeStream();
     }
 
     const sendNotificationHandler = () => {
-        console.log(message)
+        // We need to add validations, check BioEditorTextArea to get an idea for a possible implementation
+        sendCustomMessage(user.uid, streamTitle, message);
     }
 
     return (
         <Dialog onClose={onClose} open={open} classes={{
-            container: classes.dialogContainer,
-            root: classes.dialogRoot,
-            paper: classes.paper
-        }}>
+                container: classes.dialogContainer,
+                root: classes.dialogRoot,
+                paper: classes.paper
+            }}
+            maxWidth='sm'
+            fullWidth>
             <DialogContent style={{ padding: '0px' }}>
                 <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
                     <CloseIcon onClick={onClose} className={classes.closeButton} />
@@ -272,7 +286,7 @@ const EventManagementDialog = ({ open, stream = null, streamTitle, date, hour, o
                         <div style={{ height: '20px' }} />
                         <StreamerTextInput
                             value={message}
-                            onChange={(e) => { setMessage(e.target.value) }}
+                            onChange={(e) => setMessage(e.target.value)}
                             textInputStyle={{ marginTop: '0px' }}
                             textInputClassName={classes.textInputContainer}
                             fullWidth
@@ -287,8 +301,8 @@ const EventManagementDialog = ({ open, stream = null, streamTitle, date, hour, o
                             classes={{
                                 root: classes.sendButtonRoot
                             }}>
-                                {t('QaplaStreamDialogs.EventManagementDialog.send')}
-                            </Button>
+                            {t('QaplaStreamDialogs.EventManagementDialog.send')}
+                        </Button>
                     </div>
                 </div>
             </DialogContent>

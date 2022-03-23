@@ -79,7 +79,8 @@
         "creatingRewards": "Creando recompensas",
         "manageRewards": "Gestionar recompensas",
         "manageStream": "Gestionar stream",
-        "cancelStreamRequest": "Cancelar"
+        "cancelStreamRequest": "Cancelar",
+        "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo para continuar"
     },
     "QaplaStreamDialogs": {
         "EventConfirmStartDialog": {
@@ -111,6 +112,10 @@
             "finish": "Terminar stream",
             "back": "Volver atras",
             "dontShowThisMessageAgain": "No volver a mostrar este mensaje"
+        },
+        "EventRewardsRemovedConfirmation": {
+            "title": "Las recompensas se eliminaron correctamente 👌",
+            "back": "Volver al dashboard"
         }
     },
     "NewStream": {

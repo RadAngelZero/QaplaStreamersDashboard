@@ -94,7 +94,7 @@ export async function closeQaplaStream(uid, twitchId, refreshToken, streamId, xq
 
         // Update status and remove event from main events node
         await updateStreamStatus(uid, streamId, PAST_STREAMS_EVENT_TYPE);
-        await removeStreamFromEventsData(uid, streamId);
+        // await removeStreamFromEventsData(uid, streamId);
     } else if (userTokensUpdated.data.status === 400) {
         Promise.reject();
     }
@@ -112,7 +112,6 @@ export async function enableStreamQoinsReward(uid, twitchId, refreshToken, strea
                 updateActiveCustomReward(streamId, { qoinsEnabled: true });
             }
         } else if (userTokensUpdated.data.status === 400) {
-            // Notify user
-            // Log out
+            Promise.reject();
         }
 }

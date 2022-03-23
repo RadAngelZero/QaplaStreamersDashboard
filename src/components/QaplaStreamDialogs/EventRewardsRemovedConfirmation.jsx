@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
-import { ReactComponent as InfoCircle } from './../../assets/InfoCircle.svg';
+import { ReactComponent as TickCircle } from './../../assets/TickCircle.svg';
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
             cursor: 'pointer'
         }
     },
-    manageRewardsButtons: {
+    goBackButton: {
         backgroundColor: '#3B4BF9',
         width: '200px',
         height: '56px',
@@ -53,21 +53,11 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         maxWidth: '220px'
     },
-    miniDialogSubTitle: {
-        fontSize: '12px',
-        fontStyle: 'normal',
-        fontWeight: '400',
-        lineHeight: '16px',
-        letterSpacing: '0em',
-        textAlign: 'center',
-        color: 'darkgrey',
-        maxWidth: '220px'
-    },
 }));
 
-const EventWarningQoinsDialog = ({ open, onClose, manageRewards }) => {
-    const classes = useStyles();
+const EventRewardsRemovedConfirmation = ({ open, onClose }) => {
     const { t } = useTranslation();
+    const classes = useStyles();
 
     return (
         <Dialog onClose={onClose} open={open} classes={{
@@ -81,31 +71,26 @@ const EventWarningQoinsDialog = ({ open, onClose, manageRewards }) => {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ display: 'flex', width: '90px', height: '90px' }}>
-                        <div style={{ position: 'absolute', backgroundColor: 'rgba(252, 255, 107, 0.3)', width: '90px', height: '45px', marginTop: '50px', borderRadius: '40%', filter: 'blur(20px)' }} />
-                        <InfoCircle style={{ width: '90px', height: '90px' }} />
+                        <div style={{ position: 'absolute', backgroundColor: 'rgba(0, 255, 221, 0.3)', width: '90px', height: '45px', marginTop: '50px', borderRadius: '40%', filter: 'blur(20px)' }} />
+                        <TickCircle style={{ width: '90px', height: '90px' }} />
                     </div>
                     <div style={{ height: '34px' }} />
                     <p className={classes.miniDialogTitle}>
-                        {t('QaplaStreamDialogs.EventWarningQoinsDialog.enableQoins')}
-                    </p>
-                    <div style={{ height: '10px' }} />
-                    <p className={classes.miniDialogSubTitle}>
-                        {t('QaplaStreamDialogs.EventWarningQoinsDialog.description')}
+                        {t('QaplaStreamDialogs.EventRewardsRemovedConfirmation.title')}
                     </p>
                     <div style={{ height: '28px' }} />
-
                     <Button
-                        onClick={manageRewards}
+                        onClick={onClose}
                         classes={{
-                            root: classes.manageRewardsButtons,
+                            root: classes.goBackButton,
                         }}
                         style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
-                        {t('QaplaStreamDialogs.EventWarningQoinsDialog.manageRewards')}
+                        {t('QaplaStreamDialogs.EventRewardsRemovedConfirmation.back')}
                     </Button>
                 </div>
             </DialogContent>
         </Dialog>
-    )
+    );
 }
 
-export default EventWarningQoinsDialog;
+export default EventRewardsRemovedConfirmation;

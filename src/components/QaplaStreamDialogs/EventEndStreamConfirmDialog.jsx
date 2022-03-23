@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Dialog, DialogContent, Checkbox, makeStyles } from '@material-ui/core';
+import { Button, Dialog, DialogContent, Checkbox, makeStyles, CircularProgress } from '@material-ui/core';
 
 import { ReactComponent as Unchecked } from './../../assets/Unchecked.svg';
 import { ReactComponent as Checked } from './../../assets/Checked.svg';
@@ -32,7 +32,11 @@ const useStyles = makeStyles((theme) => ({
         color: '#FFF',
         textTransform: 'none',
         '&:hover': {
-            backgroundColor: '#7581fa'
+            background: '#2E3AC1',
+        },
+        '&:active': {
+            background: '#2E3AC1',
+            opacity: '0.9'
         }
     },
     miniDialogTitle: {
@@ -111,15 +115,18 @@ const EventEndStreamConfirmDialog = ({ open, onClose, closeStream, closingStream
                         {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.description')}
                     </p>
                     <div style={{ height: '30px' }} />
-                    <Button
-                        onClick={closeStreamHandler}
-                        classes={{
-                            root: classes.endStreamButtonRoot,
-                        }}
-                        disabled={closingStream}
-                        style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
-                        {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.end')}
-                    </Button>
+                    {!closingStream ?
+                        <Button
+                            onClick={closeStreamHandler}
+                            classes={{
+                                root: classes.endStreamButtonRoot,
+                            }}
+                            style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}>
+                            {t('QaplaStreamDialogs.EventEndStreamConfirmDialog.end')}
+                        </Button>
+                        :
+                        <CircularProgress style={{ color: '#3B4BF9' }} />
+                    }
                     <Button
                         onClick={onClose}
                         classes={{

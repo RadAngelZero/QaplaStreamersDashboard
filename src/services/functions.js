@@ -109,3 +109,12 @@ export async function refreshUserAccessToken(refreshToken) {
         console.log(error);
     }
 }
+
+export async function sendCustomMessage(uid, title, body) {
+    const sendCustomPushNotification = functions.httpsCallable('sendStreamerCustomMessage');
+    try {
+        return await sendCustomPushNotification({ uid, title, body });
+    } catch (error) {
+        console.log(error);
+    }
+}

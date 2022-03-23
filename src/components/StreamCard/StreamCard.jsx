@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { makeStyles, Card, Button } from '@material-ui/core';
+import { makeStyles, Card, Button, CircularProgress } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
@@ -22,6 +22,8 @@ import EventManagementModal from '../QaplaStreamDialogs/EventManagementDialog';
 import EventConfirmStartModal from '../QaplaStreamDialogs/EventConfirmStartDialog';
 import EventWarningQoinsDialog from '../QaplaStreamDialogs/EventWarningQoinsDialog';
 import EventEndStreamConfirmDialog from '../QaplaStreamDialogs/EventEndStreamConfirmDialog';
+import EventRewardsRemovedConfirmation from '../QaplaStreamDialogs/EventRewardsRemovedConfirmation';
+import { auth } from '../../services/firebase';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -62,10 +64,10 @@ const useStyles = makeStyles(() => ({
         position: 'absolute',
         right: '1rem',
         bottom: '1rem',
-        padding: '6px 10px',
+        padding: '2px 10px',
         background: '#1B1D21',
         height: '32px',
-        borderRadius: '6px'
+        borderRadius: '10px'
     },
     dateText: {
         color: '#FFF',
@@ -118,9 +120,32 @@ const useStyles = makeStyles(() => ({
         marginTop: 'auto'
     },
     startButton: {
+        backgroundColor: '#00FFDD',
+        color: '#0D1021',
         width: '100%',
         borderRadius: '8px',
-        textTransform: 'none'
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#00EACB'
+        },
+        '&:active': {
+            backgroundColor: '#00EACB',
+            opacity: '0.9'
+        }
+    },
+    endButton: {
+        backgroundColor: '#3B4BF9',
+        color: '#FFF',
+        width: '100%',
+        borderRadius: '8px',
+        textTransform: 'none',
+        '&:hover': {
+            background: '#2E3AC1',
+        },
+        '&:active': {
+            background: '#2E3AC1',
+            opacity: '0.9'
+        }
     },
     manageButton: {
         backgroundColor: '#272D5780',
@@ -143,6 +168,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const [openEndStreamDialog, setOpenEndStreamDialog] = useState(false);
     const [startingStream, setStartingStream] = useState(false);
     const [closingStream, setClosingStream] = useState(false);
+    const [openRewardsRemovedDialog, setOpenRewardsRemovedDialog] = useState(false);
     const [loadingDots, setLoadingDots] = useState('');
     const history = useHistory();
     const classes = useStyles();
@@ -228,11 +254,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             setStartingStream(true);
             const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, user.subscriptionDetails.redemptionsPerStream);
             setStream(streamData);
-            setOpenStreamStartedDialog(true);
+            if (!openStreamDialog) {
+                setOpenStreamStartedDialog(true);
+            }
             setStartingStream(false);
         } catch (error) {
-            // Notify user
-            // Log out
+            handleExpiredSession();
         }
     }
 
@@ -244,10 +271,15 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         try {
             setClosingStream(true);
             await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.xqReward, stream.xqRewardWebhookId, stream.qoinsReward, stream.qoinsRewardWebhookId);
+            setOpenRewardsRemovedDialog(true);
+
+            // Close the rest of Dialogs just in case
+            setOpenStreamStartedDialog(false);
+            setOpenQoinsWarningDialog(false);
+            setOpenStreamDialog(false);
             onRemoveStream();
         } catch (error) {
-            // Notify user
-            // Log out
+            handleExpiredSession();
         }
     }
 
@@ -269,8 +301,18 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     }
 
     const enableQoinsReward = async () => {
-        await enableStreamQoinsReward(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward);
-        setStream({ ...stream, qoinsEnabled: true });
+        try {
+            await enableStreamQoinsReward(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward);
+            setStream({ ...stream, qoinsEnabled: true });
+        } catch (error) {
+            handleExpiredSession();
+        }
+    }
+
+    const handleExpiredSession = async () => {
+        alert(t('StreamCard.sessionExpired'));
+        await auth.signOut();
+        history.push('/');
     }
 
     const manageStream = () => history.push({ pathname: `/edit/${streamId}`, state: { streamType } });
@@ -306,7 +348,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 <p className={classes.eventCardTitle}>
                     {title && title['en'] ? title['en'] : ''}
                 </p>
-                {streamType !== PAST_STREAMS_EVENT_TYPE &&
+                {streamType !== PAST_STREAMS_EVENT_TYPE && !showRewardsOptions &&
                     <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
                         <div style={{
                             backgroundColor: streamType === PENDING_APPROVAL_EVENT_TYPE ? '#C6B200' : '#00FFDD',
@@ -323,11 +365,24 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 <div className={classes.buttonsContainer}>
                     {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
                         (!startingStream ?
-                            <Button size='medium' className={classes.startButton} style={{ backgroundColor: stream ? '#3B4BF9' : '#00FFDD', color: stream ? '#FFF' : '#0D1021' }}
-                                disabled={closingStream}
-                                onClick={stream ? checkIfCloseStreamDialogMustBeShown : startStream }>
-                                {stream ? t('StreamCard.end') : t('StreamCard.start')}
-                            </Button>
+                            (stream ?
+                                (!closingStream ?
+                                    <Button size='medium' className={classes.endButton}
+                                        disabled={closingStream}
+                                        onClick={checkIfCloseStreamDialogMustBeShown}>
+                                        {t('StreamCard.end')}
+                                    </Button>
+                                    :
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                        <CircularProgress style={{ color: '#3B4BF9' }} />
+                                    </div>
+                                )
+                                :
+                                <Button size='medium' className={classes.startButton}
+                                    onClick={startStream }>
+                                    {t('StreamCard.start')}
+                                </Button>
+                            )
                             :
                             <p style={{ fontSize: 11, fontWeight: '600', textAlign: 'center', color: '#FFF', marginBottom: 16 }}>
                                 {`${t('StreamCard.creatingRewards')}${loadingDots}`}
@@ -355,6 +410,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 user={user}
                 streamId={streamId}
                 stream={stream}
+                streamStarted={startingStream}
                 closingStream={closingStream}
                 onClose={() => setOpenStreamDialog(false)}
                 startStream={startStream}
@@ -373,6 +429,8 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 closingStream={closingStream}
                 onClose={() => setOpenEndStreamDialog(false)}
                 closeStream={closeStream} />
+            <EventRewardsRemovedConfirmation open={openRewardsRemovedDialog}
+                onClose={() => setOpenRewardsRemovedDialog(false)}  />
         </Card>
     );
 }

@@ -37,7 +37,11 @@ const useStyles = makeStyles((theme) => ({
         color: '#FFF',
         textTransform: 'none',
         '&:hover': {
-            backgroundColor: '#7581fa'
+            background: '#2E3AC1',
+        },
+        '&:active': {
+            background: '#2E3AC1',
+            opacity: '0.9'
         }
     },
     miniDialogTitle: {

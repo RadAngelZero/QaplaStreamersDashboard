@@ -92,6 +92,10 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
     }
 }
 
+/**
+ * Generate access and refresh token for Twitch API
+ * @param {string} code Twitch code to generate user tokens
+ */
 export async function getUserToken(code) {
     const getTwitchUserToken = functions.httpsCallable('getTwitchUserToken');
     try {
@@ -101,6 +105,10 @@ export async function getUserToken(code) {
     }
 }
 
+/**
+ * Refresh the access token of the user by using their refresh token
+ * @param {string} refreshToken refreshToken for Twitch access token
+ */
 export async function refreshUserAccessToken(refreshToken) {
     const refreshTwitchAccessToken = functions.httpsCallable('refreshTwitchAccessToken');
     try {
@@ -110,6 +118,12 @@ export async function refreshUserAccessToken(refreshToken) {
     }
 }
 
+/**
+ * Send a message through FCM for the ${uid}_custom_messages channel
+ * @param {string} uid User identifier
+ * @param {string} title Title for the push notification
+ * @param {string} body Body of the push notification
+ */
 export async function sendCustomMessage(uid, title, body) {
     const sendCustomPushNotification = functions.httpsCallable('sendStreamerCustomMessage');
     try {

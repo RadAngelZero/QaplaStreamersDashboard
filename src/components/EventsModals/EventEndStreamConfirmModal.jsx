@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogContent, Checkbox, makeStyles } from '@material-ui/core';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ReactComponent as Unchecked } from './../../assets/Unchecked.svg';
 import { ReactComponent as Checked } from './../../assets/Checked.svg';
 
@@ -79,6 +80,7 @@ const useStyles = makeStyles((theme) => ({
 
 const EventEndStreamConfirmModal = ({ open, onClose }) => {
     const classes = useStyles();
+    const { t } = useTranslation();
     const [notShowEndStreamAgain, setNotShowEndStreamAgain] = useState(false)
 
     const endStreamHandler = () => {
@@ -97,9 +99,9 @@ const EventEndStreamConfirmModal = ({ open, onClose }) => {
             }}>
                 <DialogContent style={{ padding: '0px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <p className={classes.miniModalTitle}>Termina tu stream para eliminar las recompensas</p>
+                        <p className={classes.miniModalTitle}>{t('StreamModal.endYourStream')}</p>
                         <div style={{ height: '20px' }} />
-                        <p className={classes.miniModalSubTitle}>Si aún no quieres eliminar las recompensas vuelve al dashboard</p>
+                        <p className={classes.miniModalSubTitle}>{t('StreamModal.ifYouDontWant')}</p>
                         <div style={{ height: '30px' }} />
                         <Button
                             onClick={endStreamHandler}
@@ -107,13 +109,13 @@ const EventEndStreamConfirmModal = ({ open, onClose }) => {
                                 root: classes.endStreamButtonRoot,
                             }}
                             style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                        >Terminar stream</Button>
+                        >{t('StreamCard.endStream')}</Button>
                         <Button
                             onClick={onClose}
                             classes={{
                                 root: classes.goToDashboardButton,
                             }}
-                        >Volver atras</Button>
+                        >{t('StreamModal.goBack')}</Button>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Checkbox
                                 icon={<Unchecked />}
@@ -130,7 +132,7 @@ const EventEndStreamConfirmModal = ({ open, onClose }) => {
                                 style={{ color: notShowEndStreamAgain ? '#fff' : 'darkgrey', paddingLeft: '6px' }}
                                 className={classes.notShowAgain}
                                 onClick={notShowAgainHandler}
-                            >No volver a mostrar este mensaje</Button>
+                            >{t('StreamModal.dontShowAgain')}</Button>
                         </div>
 
                     </div>

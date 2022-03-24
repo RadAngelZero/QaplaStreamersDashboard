@@ -74,7 +74,35 @@
         "participants": "participants",
         "start": "Start",
         "resume": "Resume",
-        "cancelStreamRequest": "Cancel"
+        "cancelStreamRequest": "Cancel",
+
+        "manageStream": "Manage stream",
+        "manageRewards": "Manage recompensas",
+        "startStream": "Start stream",
+        "endStream": "End stream",
+        "prendingReview": "Pending for review",
+        "posted": "Posted"
+    },
+    "StreamModal": {
+        "streamActions": "⚡️ Stream actions",
+        "manageRewards": "Manage your stream rewards",
+        "creatingRewards": "Creating rewards",
+        "XQEnabled": "XQ enabled",
+        "enablingQoins": "Enabling Qoins",
+        "qoinsEnabled": "Qoins enabled",
+        "sendMessage": "💬 Send message",
+        "sendMessageDescription": "Tell your people something relevant about your stream, create hype or whatever you want! Your followers will receive a mobile notification with your message",
+        "send": "Send",
+
+        "mintActivated": "XQ can now be mined on your stream!",
+
+        "enableQoins": "Enable the Qoins",
+        "enableQoinsForEndStream": "Enable Qoins for the audience before ending a stream 🙌",
+
+        "endYourStream": "End your stream to remove rewards",
+        "ifYouDontWant": "If you still don't want to delete the rewards, go back to the dashboard",
+        "goBack": "Go back",
+        "dontShowAgain": "Do not show this message again"
     },
     "NewStream": {
         "alerts": {

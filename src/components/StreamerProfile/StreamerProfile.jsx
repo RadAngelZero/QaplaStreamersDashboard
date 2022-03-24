@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -39,10 +39,23 @@ const BalanceButtonContainer = withStyles(() => ({
     },
     label: {
         display: 'flex'
-    }
+    },
 }))(Button);
 
+const useStyles = makeStyles((theme) => ({
+    createCardContentRoot: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%'
+    },
+    createCardButtonIconLabel: {
+        width: '18px',
+        height: '18px'
+    }
+}));
+
 const StreamerProfile = ({ user, games }) => {
+    const classes = useStyles();
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCHEDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
@@ -279,29 +292,19 @@ const StreamerProfile = ({ user, games }) => {
                                         <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
                                             {t('StreamerProfile.postStream')}
                                         </h1>
-                                        <CardContent>
+                                        <CardContent classes={{
+                                            root: classes.createCardContentRoot,
+                                        }}>
                                             <Box display='flex' justifyContent='center'>
-                                                <IconButton className={styles.createButton}>
+                                                <IconButton className={styles.createButton} classes={{
+                                                    label: classes.buttonIconLabel
+                                                }}>
                                                     <AddIcon />
                                                 </IconButton>
                                             </Box>
                                         </CardContent>
                                     </Card>
                                 </Grid>
-                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10}>
-                                    <StreamCard
-                                        style={{ maxWidth: '255px', minWidth: '255px' }}
-                                        streamType={streamType}
-                                        streamId={'testEvent'}
-                                        user={user}
-                                        game={'aClash'}
-                                        games={games}
-                                        date={formatDate(1645487256919)}
-                                        hour={formatHour(1645487256919)}
-                                        enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
-                                        onClick={() => goToStreamDetails('testEvent')}
-                                        onRemoveStream={onRemoveStream} />
-                                    </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard
@@ -317,19 +320,6 @@ const StreamerProfile = ({ user, games }) => {
                                             onRemoveStream={onRemoveStream} />
                                     </Grid>
                                 ))}
-                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={2554232} className={styles.cardContainer}>
-                                    <StreamCard
-                                        streamType={SCHEDULED_EVENT_TYPE}
-                                        streamId={2554232}
-                                        user={user}
-                                        game={'justChat'}
-                                        games={games}
-                                        date={formatDate(1646350200000)}
-                                        hour={formatHour(1646350200000)}
-                                        enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
-                                        onClick={() => { }}
-                                        onRemoveStream={() => { }} />
-                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>

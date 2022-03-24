@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as TickSquare } from './../../assets/TickSquare.svg';
@@ -140,8 +141,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const EventManagementModal = ({ open, onClose }) => {
+const EventManagementModal = ({ open, onClose, date, hour, eventName }) => {
+    // date and hour must be the same as we use on utils
     const classes = useStyles();
+    const { t } = useTranslation();
     const [message, setMessage] = useState('');
     const [streamStarted, setStreamStarted] = useState(false);
     const [dots, setDots] = useState('')
@@ -203,8 +206,8 @@ const EventManagementModal = ({ open, onClose }) => {
                     </div>
                     <div style={{ display: 'flex' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '205px', maxWidth: '210px' }}>
-                            <p className={classes.title}>⚡️ Acciones de stream</p>
-                            <p className={classes.subtitle}>Gestiona las recompensas de tu stream.</p>
+                            <p className={classes.title}>{t('StreamModal.streamActions')}</p>
+                            <p className={classes.subtitle}>{t('StreamModal.manageRewards')}</p>
                             <div style={{ height: '20px' }} />
                             {!(enablingQoins || enabledQoins) &&
                                 <>
@@ -214,26 +217,26 @@ const EventManagementModal = ({ open, onClose }) => {
                                             onClick={startStreamHandler}
                                             classes={{
                                                 root: classes.startButtonRoot
-                                            }}>Iniciar stream</Button>
+                                            }}>{t('StreamCard.startStream')}</Button>
                                     }
                                     {streamStarted && !enabledXQ &&
-                                        <p className={classes.startText}>Creando recompensas{dots}</p>
+                                        <p className={classes.startText}>{t('StreamModal.creatingRewards')}{dots}</p>
                                     }
                                     {streamStarted && enabledXQ &&
                                         <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                             <TickSquare style={{ marginTop: '7.5px' }} />
-                                            <p className={classes.enabledXQText}>XQ habilitados</p>
+                                            <p className={classes.enabledXQText}>{t('StreamModal.XQEnabled')}</p>
                                         </div>
                                     }
                                 </>
                             }
                             {enablingQoins && !enabledQoins &&
-                                <p className={classes.startText}>Habilitando Qoins{dots}</p>
+                                <p className={classes.startText}>{t('StreamModal.enablingQoins')}{dots}</p>
                             }
                             {enablingQoins && enabledQoins &&
                                 <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                     <TickSquare style={{ marginTop: '7.5px' }} />
-                                    <p className={classes.enabledXQText}>Qoins habilitados</p>
+                                    <p className={classes.enabledXQText}>{t('StreamModal.qoinsEnabled')}</p>
                                 </div>
                             }
                             <div style={{ height: '6px' }} />
@@ -249,8 +252,8 @@ const EventManagementModal = ({ open, onClose }) => {
                         </div>
                         <div style={{ width: '70px' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
-                            <p className={classes.title}>💬 Enviar mensaje</p>
-                            <p className={classes.subtitle}>Avisa a tu gente algo relevante sobre tu stream, crea hype o lo que tu quieras! Tus seguidores recibirán una notificación móvil con tu mensaje. </p>
+                            <p className={classes.title}>{t('StreamModal.sendMessage')}</p>
+                            <p className={classes.subtitle}>{t('StreamModal.sendMessageDescription')}</p>
                             <div style={{ height: '20px' }} />
                             <StreamerTextInput
                                 value={message}
@@ -269,11 +272,13 @@ const EventManagementModal = ({ open, onClose }) => {
                                 classes={{
                                     root: classes.sendButtonRoot
                                 }}
-                            >Enviar</Button>
+                            >{t('StreamModal.send')}</Button>
                         </div>
                     </div>
                 </DialogContent>
-                <p style={{ position: 'absolute', right: '30px', bottom: '-40px', }} className={classes.eventName}>Exploring Astraland 🌙 / 30 Apr / 10:30 p.m.</p>
+                <p style={{ position: 'absolute', right: '30px', bottom: '-40px', }} className={classes.eventName}>
+                    {eventName} / {date.slice(0, -5)} / {hour.split(':')[0] > 12 ? (hour.split(':')[0] - 12).toString().padStart(2, '0') : hour.split(':')[0]}:{hour.split(':')[1]} {hour.split(':')[0] > 12 ? 'p.m.' : 'a.m.'}
+                </p>
             </Dialog>
         </>
     )

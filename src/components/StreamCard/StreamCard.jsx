@@ -3,7 +3,6 @@ import { makeStyles, withStyles, Menu, MenuItem, Card, CardContent, IconButton, 
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
-import { ReactComponent as OptionsIcon } from './../../assets/OptionsIcon.svg';
 import {
     streamsPlaceholderImages,
     SCHEDULED_EVENT_TYPE,
@@ -366,19 +365,18 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onCli
                             borderRadius: '50%'
                         }} />
                         <div style={{ width: '6px' }} />
-                        <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>{revStatus === 1 ? 'Pending for review' : 'Posted'}</p>
+                        <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>{revStatus === 1 ? t('StreamCard.prendingReview') : t('StreamCard.posted')}</p>
                     </div>
                 }
                 <div className={classes.buttonsContainer}>
                     {revStatus === 3 &&
                         <Button size='medium' className={classes.startButton} style={{ backgroundColor: revStatus === 4 ? '#3B4BF9' : '#00FFDD', }} onClick={/*startStream*/ () => { }}>
-                            {revStatus === 4 ? 'End Stream' : t('StreamCard.start')}
+                            {revStatus === 4 ? t('StreamCard.endStream') : t('StreamCard.startStream')}
                         </Button>
                     }
                     <div style={{ height: '11px' }} />
                     <Button size='medium' className={classes.manageButton} onClick={/*startStream*/ () => { }}>
-                        {/* {t('StreamCard.start')} */}
-                        {'Manage stream'}
+                        {t('StreamCard.manageStream')}
                     </Button>
                 </div>
             </div>

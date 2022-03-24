@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as TickCircle } from './../../assets/TickCircle.svg';
 
@@ -51,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
 
 const EventConfirmStartModal = ({ open, onClose }) => {
     const classes = useStyles();
+    const { t } = useTranslation();
 
     const goToManageRewards = () => {
 
@@ -73,7 +75,7 @@ const EventConfirmStartModal = ({ open, onClose }) => {
                             <TickCircle style={{ width: '90px', height: '90px' }} />
                         </div>
                         <div style={{ height: '34px' }} />
-                        <p className={classes.miniModalTitle} >¡Ya se puede minar XQ en tu stream!</p>
+                        <p className={classes.miniModalTitle} >{t('StreamModal.mintActivated')}</p>
                         <div style={{ height: '28px' }} />
 
                         <Button
@@ -82,7 +84,7 @@ const EventConfirmStartModal = ({ open, onClose }) => {
                                 root: classes.manageRewardsButtons,
                             }}
                             style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                        >Gestionar recompensas</Button>
+                        >{t('StreamCard.manageRewards')}</Button>
                     </div>
                 </DialogContent>
             </Dialog>

@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as InfoCircle } from './../../assets/InfoCircle.svg';
 
@@ -63,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
 
 const EventWarningQoinsModal = ({ open, onClose }) => {
     const classes = useStyles();
+    const { t } = useTranslation();
 
     const goToManageRewards = () => {
 
@@ -85,9 +87,9 @@ const EventWarningQoinsModal = ({ open, onClose }) => {
                             <InfoCircle style={{ width: '90px', height: '90px' }} />
                         </div>
                         <div style={{ height: '34px' }} />
-                        <p className={classes.miniModalTitle}>Habilita los Qoins</p>
+                        <p className={classes.miniModalTitle}>{t('StreamModal.enableQoins')}</p>
                         <div style={{ height: '10px' }} />
-                        <p className={classes.miniModalSubTitle}>Habilita los Qoins para la audiencia antes de terminar un stream 🙌</p>
+                        <p className={classes.miniModalSubTitle}>{t('StreamModal.enableQoinsForEndStream')}</p>
                         <div style={{ height: '28px' }} />
 
                         <Button
@@ -96,7 +98,7 @@ const EventWarningQoinsModal = ({ open, onClose }) => {
                                 root: classes.manageRewardsButtons,
                             }}
                             style={{ boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                        >Gestionar recompensas</Button>
+                        >{t('StreamCard.manageRewards')}</Button>
                     </div>
                 </DialogContent>
             </Dialog>

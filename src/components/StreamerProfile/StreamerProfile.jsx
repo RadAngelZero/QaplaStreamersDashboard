@@ -86,9 +86,7 @@ const StreamerProfile = ({ user, games }) => {
     }, [streamType, user, history]);
 
     const createStream = () => {
-        if (user.premium) {
-            history.push('/create');
-        }
+        history.push('/create');
     }
 
     const changestreamType = (val) => setStreamType(val);

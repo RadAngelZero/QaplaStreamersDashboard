@@ -269,6 +269,16 @@
         "publishStream": "Publica un stream",
         "backToDashboard": "Volver al dashboard"
     },
+    "RequestActivation": {
+        "title": "¡Tu publicación está lista\npara ser enviada!",
+        "descriptionP1": "Activa tu ",
+        "descriptionHiglight": "Free Trial",
+        "descriptionP2": " con tu código de invitado\npara poder publicar tus streams",
+        "inviteCode": "Código de Invitado",
+        "startFreeTrial": "Activar Free Trial",
+        "dontHaveACode": "¿No tienes código de invitado?",
+        "subscribe": "Suscríbete para publicar"
+    },
     "continue": "Continuar",
     "cancel": "Cancelar",
     "title": "Título",

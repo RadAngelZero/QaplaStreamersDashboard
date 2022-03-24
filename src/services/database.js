@@ -63,6 +63,14 @@ export async function getInvitationCodeParams(invitationCode) {
 }
 
 /**
+ * Removes the given invitation code from database
+ * @param {string} invitationCode Invitation code
+ */
+export async function removeInvitationCode(invitationCode) {
+    return await InvitationCodeRef.child(invitationCode).remove();
+}
+
+/**
  * Return true if the streamer id exists
  * @param {string} uid Streamer Identifier
  */

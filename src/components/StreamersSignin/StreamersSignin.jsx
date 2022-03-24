@@ -55,6 +55,8 @@ const StreamersSignin = ({ user, title }) => {
                     const userData = await getTwitchUserData(tokenData.data.access_token);
                     const user = await signUpOrSignInTwitchUser(userData, tokenData.data);
                     if (user.userData.isNewUser) {
+                        localStorage.setItem('twitchPermission', 'channel:read:redemptions');
+                        localStorage.setItem('termsAndConditions', 'true');
                         await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
                     }
                 } else {
@@ -81,8 +83,6 @@ const StreamersSignin = ({ user, title }) => {
         const userHasAcceptedTerms = localStorage.getItem('termsAndConditions');
 
         if (userHasAcceptedTerms) {
-            localStorage.setItem('twitchPermission', 'channel:read:redemptions');
-            localStorage.setItem('termsAndConditions', 'true');
             signIn();
         } else {
             setOpenTermsAndConditionsDialog(true);
@@ -118,6 +118,7 @@ const StreamersSignin = ({ user, title }) => {
                 <div className={styles.formContainer}>
                     <Button variant='contained'
                         className={styles.continueButton}
+                        disabled={isLoadingAuth}
                         startIcon={<TwitchIcon />}
                         onClick={handleSignInClick}>
                         {!isLoadingAuth ?

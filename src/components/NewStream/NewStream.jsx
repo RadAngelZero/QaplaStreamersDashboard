@@ -17,6 +17,7 @@ import { ReactComponent as CheckedIcon } from './../../assets/CheckedIcon.svg';
 import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.svg';
 import BackButton from '../BackButton/BackButton';
 import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
+import RequestActivation from '../RequestActivation/RequestActivation';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -124,11 +125,9 @@ const NewStream = ({ user, games }) => {
     const [clockOpen, setClockOpen] = useState(false);
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [gamesData, setGamesData] = useState([]);
+    const [showAccountActviation, setShowAccountActviation] = useState(false);
 
     useEffect(() => {
-        if (user && !user.premium) {
-            history.push('/profile');
-        }
         let gameList = [];
 
         if (games.allGames) {
@@ -239,6 +238,11 @@ const NewStream = ({ user, games }) => {
     const openConfirmationDialog = () => setOpenDetailsDialog(true);
 
     const submitEvent = async () => {
+        console.log(user);
+        if (!user.premium && !user.freeTrial) {
+            return setShowAccountActviation(true);
+        }
+
         if (selectedDate < minDate) {
             alert(t('NewStream.alerts.before24h'));
             return;
@@ -302,242 +306,259 @@ const NewStream = ({ user, games }) => {
         }
     }
 
-    return (
-        <StreamerDashboardContainer user={user}>
-            <Grid container>
-                <Grid item xs={12}>
-                    <BackButton onClick={history.goBack} />
-                </Grid>
-                <Grid item sm={8}>
-                    <h1 className={styles.title}>
-                        {t('NewStream.whatAreYouPlaying')}
-                    </h1>
-                    <div style={{
-                        display: 'flex',
-                        height: '58px',
-                        marginTop: '20px'
-                    }}>
-                        <StreamerSelect
-                            data={gamesData}
-                            value={selectedGame}
-                            onChange={handleGameChange}
-                            initialLabel={t('NewStream.selectYourGame')}
-                            maxHeightOpen={'200px'}
-                            overflowX={'hidden'}
-                            style={{
-                                minHeight: '58px'
-                            }}/>
-                    </div>
+    const successActivation = async () => {
+        const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
+        const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
+        let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
 
-                    <h1 className={styles.title}>
-                        {t('NewStream.when')}
-                    </h1>
-                    <MuiPickersUtilsProvider utils={DayJsUtils}>
-                        <Grid container spacing={4}>
-                            <Grid item sm={4} style={{ minWidth: '175px' }}>
-                                <InputLabel className={classes.datePickerLabel}>
-                                    {t('NewStream.date')}
-                                </InputLabel>
-                                <KeyboardDatePicker
-                                    open={calendarOpen}
-                                    onClick={() => setCalendarOpen(true)}
-                                    onOpen={() => { }}
-                                    onClose={() => setCalendarOpen(false)}
-                                    clearable
-                                    disablePast
-                                    disableToolbar
-                                    autoOk
-                                    value={displayDate}
-                                    placeholder='10-10-2021'
-                                    onChange={handleDateChange}
-                                    defaultValue={new Date()}
-                                    minDate={minDate}
-                                    minDateMessage={t('NewStream.alerts.before24h')}
-                                    format='DD-MM-YY ddd'
-                                    keyboardIcon={
-                                        <InputAdornment position='end' >
-                                            <CalendarIcon />
-                                        </InputAdornment>
-                                    }
-                                    InputProps={{
-                                        disableUnderline: true,
-                                        className: classes.dateInput
-                                    }}
-                                    variant={'inline'}
-                                    PopoverProps={{
-                                        PaperProps: {
-                                            className: classes.popover,
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item sm={4} style={{ minWidth: '175px' }}>
-                                <InputLabel className={classes.datePickerLabel}>
-                                    {t('NewStream.time')}
-                                </InputLabel>
-                                <KeyboardTimePicker
-                                    open={clockOpen}
-                                    onClick={() => setClockOpen(true)}
-                                    onOpen={() => { }}
-                                    onClose={() => setClockOpen(false)}
-                                    autoOk
-                                    error={selectedDate <= minDate}
-                                    helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.before24h')}
-                                    value={displayDate}
-                                    placeholder='08:00 AM'
-                                    onChange={handleDateChange}
-                                    // mask='__:__ _M'
-                                    keyboardIcon={
-                                        <InputAdornment position='end' >
-                                            <TimeIcon />
-                                        </InputAdornment>
-                                    }
-                                    InputProps={{
-                                        disableUnderline: true,
-                                        className: classes.dateInput
-                                    }}
-                                    variant={'inline'}
-                                    PopoverProps={{
-                                        PaperProps: {
-                                            className: classes.popover,
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item sm={8} style={{ width: '90%', minWidth: '330px' }}>
-                                <InputLabel className={classes.datePickerLabel}>
-                                    {t('NewStream.confirmDate')}
-                                </InputLabel>
-                                <StreamerTextInput placeholder={t('NewStream.confirmDatePlaceholder')}
-                                    fullWidth
-                                    value={stringDate}
-                                    onChange={handleStringDateChange} />
-                            </Grid>
-                        </Grid>
-                    </MuiPickersUtilsProvider>
-                    <h1 className={styles.title}>
-                        {t('NewStream.streamType')}
-                    </h1>
-                    <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
-                        <Grid container>
-                            <Grid item sm={2}>
-                                <FormControlLabel
-                                    value={'exp'}
-                                    classes={{ label: classes.label }}
-                                    control={
-                                        <Radio defaultChecked
-                                            checkedIcon={<CheckedIcon />}
-                                            icon={<UncheckedIcon />}
-                                            style={{ backgroundColor: 'transparent' }} />
-                                    }
-                                    label={t('NewStream.streamTypes.casual')} />
-                            </Grid>
-                            {/* <Grid item sm={2}>
-                                <FormControlLabel
-                                    value={'tournament'}
-                                    classes={{ label: classes.label }}
-                                    control={
-                                        <Radio
-                                            checkedIcon={<CheckedIcon />}
-                                            icon={<UncheckedIcon />}
-                                            style={{ backgroundColor: 'transparent' }} />
-                                    }
-                                    label='Tournament' />
-                            </Grid> */}
-                        </Grid>
-                    </RadioGroup>
-                    <Grid container className={classes.accordionContainer}>
-                        <Accordion
-                            className={classes.accordion}
-                        >
-                            <AccordionSummary
-                                expandIcon={<ArrowIcon />}
-                                id={"moreOptions"}
-                                aria-controls="panel1a-content"
-                            >
-                                <InputLabel
-                                    className={classes.label}
-                                >
-                                    {t('NewStream.advanced')}
-                                </InputLabel>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Grid container direction={'column'} className={classes.accordionGridRoot}>
-                                    <InputLabel className={classes.label}>
-                                        {t('NewStream.feelingCreative')}
-                                    </InputLabel>
-                                    <Grid container>
-                                        <h1 className={styles.title}>
-                                            {t('NewStream.streamTitle')}
-                                        </h1>
-                                        <Grid container spacing={4}>
-                                            <Grid item className={classes.accordionGridItem}>
-                                                <StreamerTextInput
-                                                    label={t('NewStream.streamTitle')}
-                                                    placeholder={t('NewStream.streamTitlePlaceholder')}
-                                                    id='eventTitle'
-                                                    fullWidth={true}
-                                                    value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
-                                                    onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                />
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                    <h1 className={styles.title}>
-                                        {t('NewStream.streamDescription')}
-                                    </h1>
-                                    <Grid>
-                                        <Grid container spacing={4}>
-                                            <Grid item className={classes.accordionGridItem}>
-                                                <StreamerTextInput
-                                                    label={t('NewStream.subtitle')}
-                                                    id={'eventDescriptionTitle'}
-                                                    placeholder={t('NewStream.subtitle')}
-                                                    fullWidth={true}
-                                                    value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
-                                                    onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                />
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                    <Grid>
-                                        <Grid container spacing={4}>
-                                            <Grid item className={classes.accordionGridItem} style={{ marginTop: '1rem' }}>
-                                                <StreamerTextInput
-                                                    id={'eventDescription'}
-                                                    label={t('NewStream.streamDescription')}
-                                                    placeholder={t('NewStream.descriptionPlaceholder')}
-                                                    multiline={true}
-                                                    rows={3}
-                                                    rowsMax={30}
-                                                    fullWidth={true}
-                                                    value={optionalData.descriptions ? userLang.toLowerCase().includes('es') ? optionalData.descriptions.es : optionalData.descriptions.en : ''}
-                                                    onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                />
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </AccordionDetails>
-                        </Accordion>
+        const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
+        const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
+        let UTCTime = `${UTCHour}:${UTCMinutes}`;
+
+        await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+        await addToStreamsRequestedOnSubscriptionDetails(user.uid);
+        history.push('/success');
+    }
+
+    if (!showAccountActviation) {
+        return (
+            <StreamerDashboardContainer user={user}>
+                <Grid container>
+                    <Grid item xs={12}>
+                        <BackButton onClick={history.goBack} />
                     </Grid>
-                    <Button
-                        className={styles.button}
-                        onClick={openConfirmationDialog}>
-                        {t('NewStream.submit')}
-                    </Button>
+                    <Grid item sm={8}>
+                        <h1 className={styles.title}>
+                            {t('NewStream.whatAreYouPlaying')}
+                        </h1>
+                        <div style={{
+                            display: 'flex',
+                            height: '58px',
+                            marginTop: '20px'
+                        }}>
+                            <StreamerSelect
+                                data={gamesData}
+                                value={selectedGame}
+                                onChange={handleGameChange}
+                                initialLabel={t('NewStream.selectYourGame')}
+                                maxHeightOpen={'200px'}
+                                overflowX={'hidden'}
+                                style={{
+                                    minHeight: '58px'
+                                }}/>
+                        </div>
+                        <h1 className={styles.title}>
+                            {t('NewStream.when')}
+                        </h1>
+                        <MuiPickersUtilsProvider utils={DayJsUtils}>
+                            <Grid container spacing={4}>
+                                <Grid item sm={4} style={{ minWidth: '175px' }}>
+                                    <InputLabel className={classes.datePickerLabel}>
+                                        {t('NewStream.date')}
+                                    </InputLabel>
+                                    <KeyboardDatePicker
+                                        open={calendarOpen}
+                                        onClick={() => setCalendarOpen(true)}
+                                        onOpen={() => { }}
+                                        onClose={() => setCalendarOpen(false)}
+                                        clearable
+                                        disablePast
+                                        disableToolbar
+                                        autoOk
+                                        value={displayDate}
+                                        placeholder='10-10-2021'
+                                        onChange={handleDateChange}
+                                        defaultValue={new Date()}
+                                        minDate={minDate}
+                                        minDateMessage={t('NewStream.alerts.before24h')}
+                                        format='DD-MM-YY ddd'
+                                        keyboardIcon={
+                                            <InputAdornment position='end' >
+                                                <CalendarIcon />
+                                            </InputAdornment>
+                                        }
+                                        InputProps={{
+                                            disableUnderline: true,
+                                            className: classes.dateInput
+                                        }}
+                                        variant={'inline'}
+                                        PopoverProps={{
+                                            PaperProps: {
+                                                className: classes.popover,
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item sm={4} style={{ minWidth: '175px' }}>
+                                    <InputLabel className={classes.datePickerLabel}>
+                                        {t('NewStream.time')}
+                                    </InputLabel>
+                                    <KeyboardTimePicker
+                                        open={clockOpen}
+                                        onClick={() => setClockOpen(true)}
+                                        onOpen={() => { }}
+                                        onClose={() => setClockOpen(false)}
+                                        autoOk
+                                        error={selectedDate <= minDate}
+                                        helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.before24h')}
+                                        value={displayDate}
+                                        placeholder='08:00 AM'
+                                        onChange={handleDateChange}
+                                        // mask='__:__ _M'
+                                        keyboardIcon={
+                                            <InputAdornment position='end' >
+                                                <TimeIcon />
+                                            </InputAdornment>
+                                        }
+                                        InputProps={{
+                                            disableUnderline: true,
+                                            className: classes.dateInput
+                                        }}
+                                        variant={'inline'}
+                                        PopoverProps={{
+                                            PaperProps: {
+                                                className: classes.popover,
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item sm={8} style={{ width: '90%', minWidth: '330px' }}>
+                                    <InputLabel className={classes.datePickerLabel}>
+                                        {t('NewStream.confirmDate')}
+                                    </InputLabel>
+                                    <StreamerTextInput placeholder={t('NewStream.confirmDatePlaceholder')}
+                                        fullWidth
+                                        value={stringDate}
+                                        onChange={handleStringDateChange} />
+                                </Grid>
+                            </Grid>
+                        </MuiPickersUtilsProvider>
+                        <h1 className={styles.title}>
+                            {t('NewStream.streamType')}
+                        </h1>
+                        <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
+                            <Grid container>
+                                <Grid item sm={2}>
+                                    <FormControlLabel
+                                        value={'exp'}
+                                        classes={{ label: classes.label }}
+                                        control={
+                                            <Radio defaultChecked
+                                                checkedIcon={<CheckedIcon />}
+                                                icon={<UncheckedIcon />}
+                                                style={{ backgroundColor: 'transparent' }} />
+                                        }
+                                        label={t('NewStream.streamTypes.casual')} />
+                                </Grid>
+                                {/* <Grid item sm={2}>
+                                    <FormControlLabel
+                                        value={'tournament'}
+                                        classes={{ label: classes.label }}
+                                        control={
+                                            <Radio
+                                                checkedIcon={<CheckedIcon />}
+                                                icon={<UncheckedIcon />}
+                                                style={{ backgroundColor: 'transparent' }} />
+                                        }
+                                        label='Tournament' />
+                                </Grid> */}
+                            </Grid>
+                        </RadioGroup>
+                        <Grid container className={classes.accordionContainer}>
+                            <Accordion
+                                className={classes.accordion}
+                            >
+                                <AccordionSummary
+                                    expandIcon={<ArrowIcon />}
+                                    id={"moreOptions"}
+                                    aria-controls="panel1a-content"
+                                >
+                                    <InputLabel
+                                        className={classes.label}
+                                    >
+                                        {t('NewStream.advanced')}
+                                    </InputLabel>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Grid container direction={'column'} className={classes.accordionGridRoot}>
+                                        <InputLabel className={classes.label}>
+                                            {t('NewStream.feelingCreative')}
+                                        </InputLabel>
+                                        <Grid container>
+                                            <h1 className={styles.title}>
+                                                {t('NewStream.streamTitle')}
+                                            </h1>
+                                            <Grid container spacing={4}>
+                                                <Grid item className={classes.accordionGridItem}>
+                                                    <StreamerTextInput
+                                                        label={t('NewStream.streamTitle')}
+                                                        placeholder={t('NewStream.streamTitlePlaceholder')}
+                                                        id='eventTitle'
+                                                        fullWidth={true}
+                                                        value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
+                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                        <h1 className={styles.title}>
+                                            {t('NewStream.streamDescription')}
+                                        </h1>
+                                        <Grid>
+                                            <Grid container spacing={4}>
+                                                <Grid item className={classes.accordionGridItem}>
+                                                    <StreamerTextInput
+                                                        label={t('NewStream.subtitle')}
+                                                        id={'eventDescriptionTitle'}
+                                                        placeholder={t('NewStream.subtitle')}
+                                                        fullWidth={true}
+                                                        value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
+                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                        <Grid>
+                                            <Grid container spacing={4}>
+                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '1rem' }}>
+                                                    <StreamerTextInput
+                                                        id={'eventDescription'}
+                                                        label={t('NewStream.streamDescription')}
+                                                        placeholder={t('NewStream.descriptionPlaceholder')}
+                                                        multiline={true}
+                                                        rows={3}
+                                                        rowsMax={30}
+                                                        fullWidth={true}
+                                                        value={optionalData.descriptions ? userLang.toLowerCase().includes('es') ? optionalData.descriptions.es : optionalData.descriptions.en : ''}
+                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid>
+                        <Button
+                            className={styles.button}
+                            onClick={openConfirmationDialog}>
+                            {t('NewStream.submit')}
+                        </Button>
+                    </Grid>
                 </Grid>
-            </Grid>
-            <NewStreamDetailsDialog
-                open={openDetailsDialog}
-                onClose={() => setOpenDetailsDialog(false)}
-                submitEvent={submitEvent}
-                game={selectedGame}
-                date={`${selectedDate.toLocaleDateString()} ${selectedDate.toLocaleTimeString()}`}
-                userName={user ? user.displayName : ''}
-                {...optionalData} />
-        </StreamerDashboardContainer>
-    );
+                <NewStreamDetailsDialog
+                    open={openDetailsDialog}
+                    onClose={() => setOpenDetailsDialog(false)}
+                    submitEvent={submitEvent}
+                    game={selectedGame}
+                    date={`${selectedDate.toLocaleDateString()} ${selectedDate.toLocaleTimeString()}`}
+                    userName={user ? user.displayName : ''}
+                    {...optionalData} />
+            </StreamerDashboardContainer>
+        );
+    } else {
+        return <RequestActivation user={user} onSuccessActivation={successActivation} />
+    }
 }
 
 export default NewStream;

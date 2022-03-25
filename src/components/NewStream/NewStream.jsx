@@ -238,7 +238,6 @@ const NewStream = ({ user, games }) => {
     const openConfirmationDialog = () => setOpenDetailsDialog(true);
 
     const submitEvent = async () => {
-        console.log(user);
         if (!user.premium && !user.freeTrial) {
             return setShowAccountActviation(true);
         }

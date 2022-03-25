@@ -20,7 +20,7 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken } from '../../services/functions';
-import { createStreamerProfile } from '../../services/database';
+import { createStreamerProfile, updateStreamerProfile } from '../../services/database';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -59,6 +59,7 @@ const StreamersSignin = ({ user, title }) => {
                         localStorage.setItem('termsAndConditions', 'true');
                         await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
                     }
+                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, { twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
                 } else {
                     alert('Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico');
                 }

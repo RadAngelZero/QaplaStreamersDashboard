@@ -11,14 +11,12 @@ import {
     loadQaplaGames
 } from './services/database';
 import { handleUserAuthentication, signOut } from './services/auth';
-import InviteCode from './components/InviteCode/InviteCode';
 import StreamersSignin from './components/StreamersSignin/StreamersSignin';
 import StreamerOnBoarding from './components/StreamerOnBoarding/StreamerOnBoarding';
 import StreamerProfile from './components/StreamerProfile/StreamerProfile';
 import NewStream from './components/NewStream/NewStream';
 import EventSent from './components/EventSent/EventSent';
 import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent';
-import PubSubTest from './components/PubSubTest/PubSubTest';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
 import PlanPicker from './components/PlanPicker/PlanPicker';
@@ -74,13 +72,10 @@ const Router = () => {
         <RouterPackage>
             <Switch>
                 <Route exact path='/'>
-                    <InviteCode user={user}/>
-                </Route>
-                <Route exact path='/signin/:inviteCode'>
-                    <StreamersSignin title='Create your account' />
+                    <StreamersSignin user={user} title='Welcome!'/>
                 </Route>
                 <Route exact path='/signin'>
-                    <StreamersSignin user={user} title='Welcome back!' />
+                    <StreamersSignin user={user} title='Welcome!' />
                 </Route>
                 <Route exact path='/welcome'>
                     <StreamerOnBoarding user={user} />
@@ -96,9 +91,6 @@ const Router = () => {
                 </Route>
                 <Route exact path='/success'>
                     <EventSent user={user} />
-                </Route>
-                <Route exact path='/stream/:streamId'>
-                    <PubSubTest user={user} />
                 </Route>
                 <Route exact path='/liveDonations/:streamerId'>
                     <LiveDonations user={user} />

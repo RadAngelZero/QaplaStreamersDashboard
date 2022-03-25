@@ -64,7 +64,6 @@ import ClashMiniImage from './../assets/ClashMiniImage.jpg';
  * Twitch API keys
  */
 export const TWITCH_CLIENT_ID = '3cwpzmazn716nmz6g1087kh4ciu4sp';
-export const TWITCH_SECRET_ID = 'xt2ed1xz00cwglz34fu2m95k77xnj6';
 
 /**
  * Twitch Utils
@@ -128,6 +127,16 @@ export const webhookStreamOffline = {
     callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOffline'
 };
 
+export const XQRewardRedemption = {
+    type: 'channel.channel_points_custom_reward_redemption.add',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/XQRewardRedeemed'
+};
+
+export const QoinsRewardRedemption = {
+    type: 'channel.channel_points_custom_reward_redemption.add',
+    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/QoinsRewardRedeemed'
+};
+
 export const HOUR_IN_MILISECONDS = 3600000;
 
 /**
@@ -146,6 +155,12 @@ export const PROFILE_BACKGROUND_GRADIENTS = [
  */
 export const MIN_BIO_LENGTH = 100;
 export const MIN_TAGS = 3;
+
+/**
+ * Reward types
+ */
+export const XQ_REWARD = 'xqReward';
+export const QOINS_REWARD = 'qoinsReward';
 
 /**
  * Streamers Profiles constants

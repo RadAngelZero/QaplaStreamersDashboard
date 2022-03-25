@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -39,10 +39,23 @@ const BalanceButtonContainer = withStyles(() => ({
     },
     label: {
         display: 'flex'
-    }
+    },
 }))(Button);
 
+const useStyles = makeStyles((theme) => ({
+    createCardContentRoot: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%'
+    },
+    createCardButtonIconLabel: {
+        width: '18px',
+        height: '18px'
+    }
+}));
+
 const StreamerProfile = ({ user, games }) => {
+    const classes = useStyles();
     const history = useHistory();
     const [streamType, setStreamType] = useState(SCHEDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
@@ -279,9 +292,13 @@ const StreamerProfile = ({ user, games }) => {
                                         <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
                                             {t('StreamerProfile.postStream')}
                                         </h1>
-                                        <CardContent>
+                                        <CardContent classes={{
+                                            root: classes.createCardContentRoot,
+                                        }}>
                                             <Box display='flex' justifyContent='center'>
-                                                <IconButton className={styles.createButton}>
+                                                <IconButton className={styles.createButton} classes={{
+                                                    label: classes.buttonIconLabel
+                                                }}>
                                                     <AddIcon />
                                                 </IconButton>
                                             </Box>

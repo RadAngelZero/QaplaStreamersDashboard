@@ -77,9 +77,9 @@ const StreamerSideBar = ({ user }) => {
     const [loadingStripeCustomerPortal, setLoadingStripeCustomerPortal] = useState(false);
     const { t } = useTranslation();
 
-    const closeSession = () => {
+    const closeSession = async () => {
         if (window.confirm('Are you sure you want to signout?')) {
-            signOut();
+            await signOut();
             history.push('/signin');
         }
     }
@@ -129,8 +129,8 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.universalProfile')}
                     </ListItemText>
                     {showNewLabelOnUniversalProfile &&
-                        <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)', marginRight: 8 }}>
-                            <p style={{ color: '#FFF', fontSize: 10, marginRight: 12, marginLeft: 12, marginTop: 6, marginBottom: 6 }}>
+                        <div style={{ float: 'right', borderRadius: 100, background: 'linear-gradient(90deg, #FFC01F 0%, #EB00FF 100%)', marginRight: '14px' }}>
+                            <p style={{ color: '#FFF', fontSize: 10, padding: '5px 8px 6px 8px' }}>
                                 {t('SideBar.new')}
                             </p>
                         </div>

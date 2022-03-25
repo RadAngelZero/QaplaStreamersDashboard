@@ -37,11 +37,21 @@ export async function sednPushNotificationToTopic(topic, titles, bodys, extraDat
  * @param {string} streamerId Streamer Twitch id
  * @param {string} type Webhook name to subscribe
  * @param {string} callback URL to call when webhook is called
+ * @param {object} condition Conditions to apply to twitch webhook (broadcaster_user_id is added automatically, DONT add broadcaster_user_id here)
  */
-export async function subscribeStreamerToTwitchWebhook(streamerId, type, callback) {
-    const authWithTwitch = functions.httpsCallable('subscribeStreamerToTwitchWebhook');
+export async function subscribeStreamerToTwitchWebhook(streamerId, type, callback, condition = {}) {
+    const subscribeToWebhook = functions.httpsCallable('subscribeStreamerToTwitchWebhook');
     try {
-        return await authWithTwitch({ streamerId, type, callback });
+        return await subscribeToWebhook({ streamerId, type, callback, condition });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function unsubscribeStreamerToTwitchWebhook(webhookId) {
+    const unsubscribeToWebhook = functions.httpsCallable('unsubscribeStreamerToTwitchWebhook');
+    try {
+        return await unsubscribeToWebhook({ webhookId });
     } catch (error) {
         console.log(error);
     }
@@ -77,6 +87,47 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
     const cheerMessageTextToSpeech = functions.httpsCallable('cheerMessageTextToSpeech');
     try {
         return await cheerMessageTextToSpeech({ streamerId, donationId, message, voiceName, languageCode });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Generate access and refresh token for Twitch API
+ * @param {string} code Twitch code to generate user tokens
+ */
+export async function getUserToken(code) {
+    const getTwitchUserToken = functions.httpsCallable('getTwitchUserToken');
+    try {
+        return await getTwitchUserToken({ code });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Refresh the access token of the user by using their refresh token
+ * @param {string} refreshToken refreshToken for Twitch access token
+ */
+export async function refreshUserAccessToken(refreshToken) {
+    const refreshTwitchAccessToken = functions.httpsCallable('refreshTwitchAccessToken');
+    try {
+        return await refreshTwitchAccessToken({ refreshToken });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Send a message through FCM for the ${uid}_custom_messages channel
+ * @param {string} uid User identifier
+ * @param {string} title Title for the push notification
+ * @param {string} body Body of the push notification
+ */
+export async function sendCustomMessage(uid, title, body) {
+    const sendCustomPushNotification = functions.httpsCallable('sendStreamerCustomMessage');
+    try {
+        return await sendCustomPushNotification({ uid, title, body });
     } catch (error) {
         console.log(error);
     }

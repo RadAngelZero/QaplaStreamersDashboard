@@ -72,9 +72,55 @@
     "StreamCard": {
         "deleteConfirmation": "¿Estas seguro que deseas eliminar este stream?",
         "participants": "participantes",
-        "start": "Iniciar",
-        "resume": "Reanudar",
-        "cancelStreamRequest": "Cancelar"
+        "pendingReview": "Pendiente de revisión",
+        "posted": "Publicado",
+        "start": "Iniciar stream",
+        "finish": "Terminar stream",
+        "creatingRewards": "Creando recompensas",
+        "manageRewards": "Gestionar recompensas",
+        "manageStream": "Gestionar stream",
+        "cancelStreamRequest": "Cancelar",
+        "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo para continuar"
+    },
+    "QaplaStreamDialogs": {
+        "EventConfirmStartDialog": {
+            "xqAvailable": "¡Ya se puede minar XQ en tu stream!",
+            "manageRewards": "Gestionar recompensas"
+        },
+        "EventManagementDialog": {
+            "streamActions": "⚡️ Acciones de stream",
+            "manageRewards": "Gestiona las recompensas de tu stream.",
+            "start": "Iniciar stream",
+            "creatingRewards": "Creando recompensas",
+            "xqEnabled": "XQ habilitados",
+            "enablingQoins": "Habilitando Qoins",
+            "qoinsEnabled": "Qoins habilitados",
+            "finish": "Terminar stream",
+            "enableQoins": "Habilitar Qoins",
+            "sendMessage": "Enviar mensaje",
+            "sendMessageDetails": "Avisa a tu gente algo relevante sobre tu stream, crea hype o lo que tu quieras! Tus seguidores recibirán una notificación móvil con tu mensaje.",
+            "send": "Enviar"
+        },
+        "EventWarningQoinsDialog": {
+            "enableQoins": "Habilita los Qoins",
+            "description": "Habilita los Qoins para la audiencia antes de terminar un stream 🙌",
+            "manageRewards": "Gestionar recompensas"
+        },
+        "EventEndStreamConfirmDialog": {
+            "title": "Termina tu stream para eliminar las recompensas",
+            "description": "Si aún no quieres eliminar las recompensas vuelve al dashboard",
+            "finish": "Terminar stream",
+            "back": "Volver atras",
+            "dontShowThisMessageAgain": "No volver a mostrar este mensaje"
+        },
+        "EventRewardsRemovedConfirmation": {
+            "title": "Las recompensas se eliminaron correctamente 👌",
+            "back": "Volver al dashboard"
+        },
+        "EventCustomMessageSentConfirmation": {
+            "title": "¡Mensaje enviado!",
+            "manageRewards": "Gestionar recompensas"
+        }
     },
     "NewStream": {
         "alerts": {
@@ -222,6 +268,16 @@
         "paymentProcessedSuccessfuly": "¡Tu pago se ha procesado de manera exitosa! Recibirás el comprobante de tu pago en tu correo a nombre de QAPLAGG 🧾",
         "publishStream": "Publica un stream",
         "backToDashboard": "Volver al dashboard"
+    },
+    "RequestActivation": {
+        "title": "¡Tu publicación está lista\npara ser enviada!",
+        "descriptionP1": "Activa tu ",
+        "descriptionHiglight": "Free Trial",
+        "descriptionP2": " con tu código de invitado\npara poder publicar tus streams",
+        "inviteCode": "Código de Invitado",
+        "startFreeTrial": "Activar Free Trial",
+        "dontHaveACode": "¿No tienes código de invitado?",
+        "subscribe": "Suscríbete para publicar"
     },
     "continue": "Continuar",
     "cancel": "Cancelar",

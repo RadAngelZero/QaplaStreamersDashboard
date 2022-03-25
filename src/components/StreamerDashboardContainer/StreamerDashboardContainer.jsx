@@ -35,22 +35,6 @@ const StreamerDashboardContainer = ({ children, user, containerStyle = {} }) => 
         <Grid container className={[classes.gridContainer, styles.container]} alignItems={user ? 'flex-start' : 'center'} justify={user ? 'flex-start' : 'center'}>
             {!user && user === undefined ?
                 <>
-                    <AppBar className={styles.appBar}>
-                        <Toolbar>
-                            <div style={{ flexGrow: 1 }}></div>
-                            <p className={styles.alreadyAUser}>
-                                Already a user?
-                            </p>
-                            <Link to='/' className={`Margin-Right ${styles.buttonContainer}`}>
-                                <Button variant='outlined'
-                                    color='#5F75EE'
-                                    className={styles.button}
-                                    onClick={() => history.push('/signin')}>
-                                    Sign in
-                                </Button>
-                            </Link>
-                        </Toolbar>
-                    </AppBar>
                     {children}
                 </>
                 :

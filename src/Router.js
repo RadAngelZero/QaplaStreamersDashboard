@@ -11,7 +11,6 @@ import {
     loadQaplaGames
 } from './services/database';
 import { handleUserAuthentication, signOut } from './services/auth';
-import InviteCode from './components/InviteCode/InviteCode';
 import StreamersSignin from './components/StreamersSignin/StreamersSignin';
 import StreamerOnBoarding from './components/StreamerOnBoarding/StreamerOnBoarding';
 import StreamerProfile from './components/StreamerProfile/StreamerProfile';
@@ -73,13 +72,10 @@ const Router = () => {
         <RouterPackage>
             <Switch>
                 <Route exact path='/'>
-                    <InviteCode user={user}/>
-                </Route>
-                <Route exact path='/signin/:inviteCode'>
-                    <StreamersSignin title='Create your account' />
+                    <StreamersSignin user={user} title='Welcome!'/>
                 </Route>
                 <Route exact path='/signin'>
-                    <StreamersSignin user={user} title='Welcome back!' />
+                    <StreamersSignin user={user} title='Welcome!' />
                 </Route>
                 <Route exact path='/welcome'>
                     <StreamerOnBoarding user={user} />

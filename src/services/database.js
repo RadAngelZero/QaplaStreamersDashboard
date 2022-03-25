@@ -63,6 +63,14 @@ export async function getInvitationCodeParams(invitationCode) {
 }
 
 /**
+ * Removes the given invitation code from database
+ * @param {string} invitationCode Invitation code
+ */
+export async function removeInvitationCode(invitationCode) {
+    return await InvitationCodeRef.child(invitationCode).remove();
+}
+
+/**
  * Return true if the streamer id exists
  * @param {string} uid Streamer Identifier
  */
@@ -71,15 +79,15 @@ export async function streamerProfileExists(uid) {
 }
 
 /**
- * Remove the invitation code and create the profile for the streamer
+ * Creates the profile for the streamer
  * @param {string} uid User Identifier
  * @param {object} userData Data to save
- * @param {string} inviteCode Invitation code used
  */
-export async function createStreamerProfile(uid, userData, inviteCode) {
-    if (inviteCode) {
-        InvitationCodeRef.child(inviteCode).remove();
+export async function createStreamerProfile(uid, userData) {
+    if (userData.isNewUser) {
+        delete userData.isNewUser;
     }
+
     return await userStreamersRef.child(uid).update(userData);
 }
 
@@ -124,15 +132,24 @@ export async function saveStreamTwitchCustomReward(uid, rewardName, rewardId, st
     const webhookIdKey = `${rewardName}WebhookId`;
 
     // Timestamp will be overwritten because we used it as a "last reward created" record
-    activeCustomRewardsRef.child(streamId).update({ streamerUid: uid, [rewardName]: rewardId, timestamp: (new Date()).getTime(), [webhookIdKey]: webhookId });
+    await activeCustomRewardsRef.child(streamId).update({ streamerUid: uid, [rewardName]: rewardId, timestamp: (new Date()).getTime(), [webhookIdKey]: webhookId });
+}
+
+/**
+ * Updates an Active Custom Reward node with given rewardsData object
+ * @param {string} streamId Stream identifier
+ * @param {object} rewardsData Data to update
+ */
+export async function updateActiveCustomReward(streamId, rewardsData) {
+    return await activeCustomRewardsRef.child(streamId).update(rewardsData);
 }
 
 /**
  * Gets the information about the given active event
  * @param {string} streamId Stream identifier
  */
-export function checkActiveCustomReward(streamId) {
-    return activeCustomRewardsRef.child(streamId).once('value');
+export async function checkActiveCustomReward(streamId) {
+    return await activeCustomRewardsRef.child(streamId).once('value');
 }
 
 /**

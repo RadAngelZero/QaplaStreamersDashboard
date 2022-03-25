@@ -72,37 +72,55 @@
     "StreamCard": {
         "deleteConfirmation": "Are you sure you want to delete this stream?",
         "participants": "participants",
-        "start": "Start",
-        "resume": "Resume",
-        "cancelStreamRequest": "Cancel",
-
-        "manageStream": "Manage stream",
-        "manageRewards": "Manage recompensas",
-        "startStream": "Start stream",
-        "endStream": "End stream",
-        "prendingReview": "Pending for review",
-        "posted": "Posted"
-    },
-    "StreamModal": {
-        "streamActions": "⚡️ Stream actions",
-        "manageRewards": "Manage your stream rewards",
+        "pendingReview": "Pending for review",
+        "posted": "Posted",
+        "start": "Start stream",
+        "end": "End stream",
         "creatingRewards": "Creating rewards",
-        "XQEnabled": "XQ enabled",
-        "enablingQoins": "Enabling Qoins",
-        "qoinsEnabled": "Qoins enabled",
-        "sendMessage": "💬 Send message",
-        "sendMessageDescription": "Tell your people something relevant about your stream, create hype or whatever you want! Your followers will receive a mobile notification with your message",
-        "send": "Send",
-
-        "mintActivated": "XQ can now be mined on your stream!",
-
-        "enableQoins": "Enable the Qoins",
-        "enableQoinsForEndStream": "Enable Qoins for the audience before ending a stream 🙌",
-
-        "endYourStream": "End your stream to remove rewards",
-        "ifYouDontWant": "If you still don't want to delete the rewards, go back to the dashboard",
-        "goBack": "Go back",
-        "dontShowAgain": "Do not show this message again"
+        "manageRewards": "Manage rewards",
+        "manageStream": "Manage stream",
+        "cancelStreamRequest": "Cancel",
+        "sessionExpired": "Your session has expired. Login again to continue"
+    },
+    "QaplaStreamDialogs": {
+        "EventConfirmStartDialog": {
+            "xqAvailable": "XQ can be mined in your stream now!",
+            "manageRewards": "Manage rewards"
+        },
+        "EventManagementDialog": {
+            "streamActions": "⚡️ Stream actions",
+            "manageRewards": "Manage the rewards of your stream.",
+            "start": "Start stream",
+            "creatingRewards": "Creating rewards",
+            "xqEnabled": "XQ enabled",
+            "enablingQoins": "Enabling Qoins",
+            "qoinsEnabled": "Qoins enabled",
+            "end": "End stream",
+            "enableQoins": "Enable Qoins",
+            "sendMessage": "Send message",
+            "sendMessageDetails": "Tell something relevant about your stream, create hype or whatever you want! Your followers will receive a mobile notification with your message.",
+            "send": "Send"
+        },
+        "EventWarningQoinsDialog": {
+            "enableQoins": "Enable the Qoins",
+            "description": "Enable Qoins for the audience before ending a stream 🙌",
+            "manageRewards": "Manage rewards"
+        },
+        "EventEndStreamConfirmDialog": {
+            "title": "End your stream to remove rewards",
+            "description": "If you still don't want to delete the rewards, go back to the dashboard",
+            "end": "End stream",
+            "back": "Go back",
+            "dontShowThisMessageAgain": "Do not show this message again"
+        },
+        "EventRewardsRemovedConfirmation": {
+            "title": "The rewards were successfully removed 👌",
+            "back": "Back to dashboard"
+        },
+        "EventCustomMessageSentConfirmation": {
+            "title": "Message sent!",
+            "manageRewards": "Manage rewards"
+        }
     },
     "NewStream": {
         "alerts": {
@@ -255,6 +273,16 @@
         "paymentProcessedSuccessfuly": "Your payment has been processed successfully! A receipt from QAPLAGG will be sent to your email",
         "publishStream": "Post a stream",
         "backToDashboard": "Back to dashboard"
+    },
+    "RequestActivation": {
+        "title": "Your publication is\nready to be sent!",
+        "descriptionP1": "Start your ",
+        "descriptionHiglight": "Free Trial",
+        "descriptionP2": " with your invite code\nto be able to publish your streams",
+        "inviteCode": "Invite code",
+        "startFreeTrial": "Start Free Trial",
+        "dontHaveACode": "Don't have a code?",
+        "subscribe": "Subscribe to publish"
     },
     "continue": "Continue",
     "cancel": "Cancel",

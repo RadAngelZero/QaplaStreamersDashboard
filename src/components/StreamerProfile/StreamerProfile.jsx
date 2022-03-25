@@ -91,8 +91,6 @@ const StreamerProfile = ({ user, games }) => {
         async function loadStreams() {
             if (user) {
                 setStreamLoaded(await loadStreamsByStatus(user.uid, streamType));
-            } else {
-                history.push('/');
             }
         }
 
@@ -101,12 +99,8 @@ const StreamerProfile = ({ user, games }) => {
     }, [streamType, user, history]);
 
     const createStream = () => {
-        if (user.premium) {
-            history.push('/create');
-        }
+        history.push('/create');
     }
-
-    const goToStreamDetails = (streamId) => history.push({ pathname: `/edit/${streamId}`, state: { streamType } });
 
     const changestreamType = (val) => setStreamType(val);
 
@@ -118,15 +112,21 @@ const StreamerProfile = ({ user, games }) => {
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
         const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sept', 'Oct', 'Nov', 'Dic'];
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        return `${date.getDate()} ${months[date.getMonth()]}`;
     }
 
     const formatHour = (timestamp) => {
         const date = new Date(timestamp);
-        const hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+        let hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
         const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
 
-        return `${hour}:${minutes}`;
+        const amPm = hour >= 12 ? 'p.m.' : 'a.m.';
+        hour = hour % 12;
+        hour = hour ? hour : 12;
+
+        hour = hour < 10 ? `0${hour}`: hour;
+
+        return `${hour}:${minutes} ${amPm}`;
     }
 
     const onRemoveStream = (streamId) => {
@@ -315,8 +315,7 @@ const StreamerProfile = ({ user, games }) => {
                                             games={games}
                                             date={formatDate(streams[streamId].timestamp)}
                                             hour={formatHour(streams[streamId].timestamp)}
-                                            enableOptionsIcon={streamType !== PAST_STREAMS_EVENT_TYPE}
-                                            onClick={() => goToStreamDetails(streamId)}
+                                            timestamp={streams[streamId].timestamp}
                                             onRemoveStream={onRemoveStream} />
                                     </Grid>
                                 ))}

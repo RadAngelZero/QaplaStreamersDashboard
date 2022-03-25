@@ -77,9 +77,9 @@ const StreamerSideBar = ({ user }) => {
     const [loadingStripeCustomerPortal, setLoadingStripeCustomerPortal] = useState(false);
     const { t } = useTranslation();
 
-    const closeSession = () => {
+    const closeSession = async () => {
         if (window.confirm('Are you sure you want to signout?')) {
-            signOut();
+            await signOut();
             history.push('/signin');
         }
     }

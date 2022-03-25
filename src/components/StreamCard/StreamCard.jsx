@@ -18,8 +18,8 @@ import {
     checkActiveCustomReward
 } from '../../services/database';
 import { closeQaplaStream, enableStreamQoinsReward, startQaplaStream } from '../../services/streamQapla';
-import EventManagementModal from '../QaplaStreamDialogs/EventManagementDialog';
-import EventConfirmStartModal from '../QaplaStreamDialogs/EventConfirmStartDialog';
+import EventManagementDialog from '../QaplaStreamDialogs/EventManagementDialog';
+import EventConfirmStartDialog from '../QaplaStreamDialogs/EventConfirmStartDialog';
 import EventWarningQoinsDialog from '../QaplaStreamDialogs/EventWarningQoinsDialog';
 import EventEndStreamConfirmDialog from '../QaplaStreamDialogs/EventEndStreamConfirmDialog';
 import EventRewardsRemovedConfirmation from '../QaplaStreamDialogs/EventRewardsRemovedConfirmation';
@@ -416,7 +416,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                     }
                 </div>
             </div>
-            <EventManagementModal open={openStreamDialog}
+            <EventManagementDialog open={openStreamDialog}
                 user={user}
                 sendMessage={sendMessage}
                 streamId={streamId}
@@ -430,7 +430,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 streamTitle={title && title['en'] ? title['en'] : ''}
                 date={date}
                 hour={hour} />
-            <EventConfirmStartModal open={openStreamStartedDialog}
+            <EventConfirmStartDialog open={openStreamStartedDialog}
                 onClose={() => setOpenStreamStartedDialog(false)}
                 manageRewards={closeDialogsAndOpenManageRewardsDialog} />
             <EventWarningQoinsDialog open={openQoinsWarningDialog}

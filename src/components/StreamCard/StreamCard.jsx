@@ -220,7 +220,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         if (streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions) {
             const fifteenMinutesInMilliseconds = HOUR_IN_MILISECONDS / 4;
             const currentTimestamp = (new Date()).getTime();
-            if ((currentTimestamp + fifteenMinutesInMilliseconds) >= timestamp && (currentTimestamp + fifteenMinutesInMilliseconds) < (timestamp + HOUR_IN_MILISECONDS * 2)) {
+            if ((currentTimestamp + fifteenMinutesInMilliseconds) >= timestamp) {
                 setShowRewardsOptions(true);
             }
         }

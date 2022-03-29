@@ -238,7 +238,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
 
         // stream is not in this array intentionally, cause it causes a loop because of the checkActiveCustomReward function
-    }, [game, games, streamId, streamType, user, loadingDots, startingStream]);
+    }, [game, games, streamId, streamType, user, loadingDots, startingStream, showRewardsOptions, timestamp]);
 
     const cancelStream = (e) => {
         e.stopPropagation();
@@ -280,7 +280,6 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             setOpenStreamStartedDialog(false);
             setOpenQoinsWarningDialog(false);
             setOpenStreamDialog(false);
-            onRemoveStream();
         } catch (error) {
             handleExpiredSession();
         }
@@ -324,6 +323,11 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         setOpenStreamStartedDialog(false);
         setOpenQoinsWarningDialog(false);
         setOpenStreamDialog(true);
+    }
+
+    const closeAndRemoveStream = () => {
+        setOpenRewardsRemovedDialog(false);
+        onRemoveStream(streamId);
     }
 
     const sendMessage = async (message) => {
@@ -441,7 +445,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 onClose={() => setOpenEndStreamDialog(false)}
                 closeStream={closeStream} />
             <EventRewardsRemovedConfirmation open={openRewardsRemovedDialog}
-                onClose={() => setOpenRewardsRemovedDialog(false)}  />
+                onClose={closeAndRemoveStream}  />
             <EventCustomMessageSentConfirmation open={openCustomMessageSentDialog}
                 onClose={() => setOpenCustomMessageSentDialog(false)} />
         </Card>

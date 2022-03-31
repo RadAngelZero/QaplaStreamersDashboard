@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
+import StreamsSwitch from '../StreamsSwitch/StreamsSwitch';
+import StreamsLeft from '../StreamsLeft/StreamsLeft';
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
@@ -63,6 +65,13 @@ const StreamerProfile = ({ user, games }) => {
     const [buttonPressed, setButtonPressed] = useState('Qoins');
     const [pendingMessages, setPendingMessages] = useState(0);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
+    // use this for check hisroty/pending, 0 = pending/approved | 1 = past
+    const [switchState, setSwitchState] = useState(0);
+    //nedded for left streams
+    const [monthStreamsLeft, setMonthStreamsLeft] = useState(0);
+    const [monthStreams, setMonthStreams] = useState(0);
+    const [renovationTimestamp, setRenovationTimestamp] = useState(new Date().getTime() / 1000);
+    //nedded for left streams
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -124,7 +133,7 @@ const StreamerProfile = ({ user, games }) => {
         hour = hour % 12;
         hour = hour ? hour : 12;
 
-        hour = hour < 10 ? `0${hour}`: hour;
+        hour = hour < 10 ? `0${hour}` : hour;
 
         return `${hour}:${minutes} ${amPm}`;
     }
@@ -142,6 +151,10 @@ const StreamerProfile = ({ user, games }) => {
         cheersQoins = user.qoinsBalance || 0;
         qlanQoins = user.qlanBalance || 0;
         estimatedBits = ((cheersQoins + qlanQoins) / 200) * valueOfQoinsForStreamer;
+    }
+
+    const handleSwitchEvents = () => {
+        setSwitchState(!switchState)
     }
 
     return (
@@ -258,8 +271,9 @@ const StreamerProfile = ({ user, games }) => {
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={12} sm={9} style={{ minHeight: '58px' }}>
-                                                <StreamerSelect
+                                            <Grid item xs={12} sm={3} md={5} style={{ minHeight: '58px' }}>
+                                                <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
+                                                {/* <StreamerSelect
                                                     data={[
                                                         {
                                                             value: SCHEDULED_EVENT_TYPE,
@@ -277,7 +291,10 @@ const StreamerProfile = ({ user, games }) => {
                                                     value={streamType}
                                                     onChange={changestreamType}
                                                     overflowY='hidden'
-                                                    overflowX='hidden' />
+                                                    overflowX='hidden' /> */}
+                                            </Grid>
+                                            <Grid item xs={12} sm={3} style={{ minHeight: '58px' }}>
+                                                <StreamsLeft monthLeft={monthStreamsLeft} monthTotal={monthStreams} renovationDate={renovationTimestamp} />
                                             </Grid>
                                         </Grid>
                                     </Grid>

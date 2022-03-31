@@ -102,7 +102,7 @@ const LiveDonations = () => {
                 audio.onended = () => {
                     setTimeout(() => {
                         setDonationToShow(null);
-                    }, 1500);
+                    }, 3000);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         removeTestDonation(streamerUid, donation.id);
                     } else {
@@ -111,7 +111,7 @@ const LiveDonations = () => {
 
                     setTimeout(() => {
                         setIsPlayingAudio(false);
-                    }, 3000);
+                    }, 6000);
                 }
 
                 audio.play();

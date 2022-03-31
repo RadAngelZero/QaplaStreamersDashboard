@@ -2,12 +2,11 @@ import React from 'react'
 import styles from './StreamsLeft.module.css'
 import { useTranslation } from 'react-i18next'
 
-const StreamsLeft = ({ monthLeft, monthTotal, renovationDate }) => {
-
-    const dateRenovation = new Date(renovationDate * 1000);
+const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
+    const dateRenovation = new Date(renovationDate);
     const renovationDay = (dateRenovation.getDate().toString().length < 2 ? '0' : '') + dateRenovation.getDate().toString();
     const renovationMonth = dateRenovation.getMonth();
-    const leftPercent = (monthLeft/monthTotal) * 100;
+    const leftPercent = (subscriptionDetails.streamsRequested/subscriptionDetails.streamsIncluded) * 100;
     const { t } = useTranslation();
     const monthsArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
@@ -16,7 +15,9 @@ const StreamsLeft = ({ monthLeft, monthTotal, renovationDate }) => {
             <div style={{ display: 'flex' }}>
                 <p style={{ color: '#fff' }} className={styles.streamsLeftText}>{'Publicaciones'}</p>
                 <div style={{ width: '6px' }} />
-                <p style={{ color: leftPercent <= 25 ? '#c00' : '#00FFDD' }} className={styles.streamsLeftText}>{`${monthLeft}/${monthTotal}`}</p>
+                <p style={{ color: leftPercent <= 25 ? '#c00' : '#00FFDD' }} className={styles.streamsLeftText}>
+                    {`${subscriptionDetails.streamsRequested}/${subscriptionDetails.streamsIncluded}`}
+                </p>
             </div>
             <div style={{ display: 'flex' }}>
                 <p className={styles.renovationText}>Renueva el {`${renovationDay} de `}{t(`months.${monthsArray[renovationMonth]}`)}</p>

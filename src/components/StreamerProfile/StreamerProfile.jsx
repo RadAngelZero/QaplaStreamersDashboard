@@ -13,8 +13,7 @@ import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg'
 
-import StreamerSelect from '../StreamerSelect/StreamerSelect';
-import { getStreamerValueOfQoins, loadStreamsByStatus } from '../../services/database';
+import { getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -65,13 +64,7 @@ const StreamerProfile = ({ user, games }) => {
     const [buttonPressed, setButtonPressed] = useState('Qoins');
     const [pendingMessages, setPendingMessages] = useState(0);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
-    // use this for check hisroty/pending, 0 = pending/approved | 1 = past
-    const [switchState, setSwitchState] = useState(0);
-    //nedded for left streams
-    const [monthStreamsLeft, setMonthStreamsLeft] = useState(0);
-    const [monthStreams, setMonthStreams] = useState(0);
-    const [renovationTimestamp, setRenovationTimestamp] = useState(new Date().getTime() / 1000);
-    //nedded for left streams
+    const [switchState, setSwitchState] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -99,19 +92,21 @@ const StreamerProfile = ({ user, games }) => {
 
         async function loadStreams() {
             if (user) {
-                setStreamLoaded(await loadStreamsByStatus(user.uid, streamType));
+                if (!switchState) {
+                    setStreamLoaded(await loadStreamsByStatusRange(user.uid, PENDING_APPROVAL_EVENT_TYPE, SCHEDULED_EVENT_TYPE));
+                } else {
+                    setStreamLoaded(await loadStreamsByStatus(user.uid, PAST_STREAMS_EVENT_TYPE));
+                }
             }
         }
 
         loadStreams();
         getValueOfQoins();
-    }, [streamType, user, history]);
+    }, [switchState, user, history]);
 
     const createStream = () => {
         history.push('/create');
     }
-
-    const changestreamType = (val) => setStreamType(val);
 
     /**
      * Format the date to show in the card
@@ -154,7 +149,7 @@ const StreamerProfile = ({ user, games }) => {
     }
 
     const handleSwitchEvents = () => {
-        setSwitchState(!switchState)
+        setSwitchState(!switchState);
     }
 
     return (
@@ -273,28 +268,11 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                             <Grid item xs={12} sm={3} md={5} style={{ minHeight: '58px' }}>
                                                 <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
-                                                {/* <StreamerSelect
-                                                    data={[
-                                                        {
-                                                            value: SCHEDULED_EVENT_TYPE,
-                                                            label: t('StreamerProfile.scheduled')
-                                                        },
-                                                        {
-                                                            value: PENDING_APPROVAL_EVENT_TYPE,
-                                                            label: t('StreamerProfile.pendingApproval')
-                                                        },
-                                                        {
-                                                            value: PAST_STREAMS_EVENT_TYPE,
-                                                            label: t('StreamerProfile.pastStreams')
-                                                        }
-                                                    ]}
-                                                    value={streamType}
-                                                    onChange={changestreamType}
-                                                    overflowY='hidden'
-                                                    overflowX='hidden' /> */}
                                             </Grid>
                                             <Grid item xs={12} sm={3} style={{ minHeight: '58px' }}>
-                                                <StreamsLeft monthLeft={monthStreamsLeft} monthTotal={monthStreams} renovationDate={renovationTimestamp} />
+                                                {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
+                                                    <StreamsLeft subscriptionDetails={user.subscriptionDetails} renovationDate={user.currentPeriod.endDate} />
+                                                }
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -325,7 +303,7 @@ const StreamerProfile = ({ user, games }) => {
                                 {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard
-                                            streamType={streamType}
+                                            streamType={streams[streamId].status}
                                             streamId={streamId}
                                             user={user}
                                             game={streams[streamId].game}

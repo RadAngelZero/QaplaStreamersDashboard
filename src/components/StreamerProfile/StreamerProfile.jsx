@@ -266,10 +266,10 @@ const StreamerProfile = ({ user, games }) => {
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={12} sm={3} md={5} style={{ minHeight: '58px' }}>
+                                            <Grid item xs={12} sm={3} md={5} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
                                                 <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
                                             </Grid>
-                                            <Grid item xs={12} sm={3} style={{ minHeight: '58px' }}>
+                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
                                                 {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
                                                     <StreamsLeft subscriptionDetails={user.subscriptionDetails} renovationDate={user.currentPeriod.endDate} />
                                                 }
@@ -300,7 +300,7 @@ const StreamerProfile = ({ user, games }) => {
                                         </CardContent>
                                     </Card>
                                 </Grid>
-                                {streams && Object.keys(streams).map((streamId) => (
+                                {/* {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard
                                             streamType={streams[streamId].status}
@@ -313,7 +313,7 @@ const StreamerProfile = ({ user, games }) => {
                                             timestamp={streams[streamId].timestamp}
                                             onRemoveStream={onRemoveStream} />
                                     </Grid>
-                                ))}
+                                ))} */}
                             </Grid>
                         </Grid>
                     </Grid>

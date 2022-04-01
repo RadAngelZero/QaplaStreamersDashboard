@@ -246,6 +246,7 @@ body {
 
 .myStreamsContainer {
     margin-top: 72px;
+    margin-bottom: 40px;
 }
 
 @media (max-width: 565.45px) {
@@ -269,11 +270,11 @@ body {
     font-weight: 500;
     line-height: 48.5px;
     letter-spacing: -1px;
-    margin-bottom: 40px;
 }
 
 @media (max-width: 528.18px) {
-    .title {
+    .myStreamsContainer {
+        margin-top: 72px;
         margin-bottom: 6px;
     }
 }

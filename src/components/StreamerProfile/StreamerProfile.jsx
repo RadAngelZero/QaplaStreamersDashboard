@@ -300,7 +300,7 @@ const StreamerProfile = ({ user, games }) => {
                                         </CardContent>
                                     </Card>
                                 </Grid>
-                                {/* {streams && Object.keys(streams).map((streamId) => (
+                                {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard
                                             streamType={streams[streamId].status}
@@ -313,7 +313,7 @@ const StreamerProfile = ({ user, games }) => {
                                             timestamp={streams[streamId].timestamp}
                                             onRemoveStream={onRemoveStream} />
                                     </Grid>
-                                ))} */}
+                                ))}
                             </Grid>
                         </Grid>
                     </Grid>

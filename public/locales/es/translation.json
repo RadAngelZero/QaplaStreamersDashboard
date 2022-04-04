@@ -179,7 +179,7 @@
         },
         "instruction5": {
             "title": "5. Pega tu URL personalizado de Qapla",
-            "description": "En las opciones de la fuente define la anchura en 400 y la altura en 200 y desmarca todas las opciones"
+            "description": "En las opciones de la fuente define la anchura en 1920 y la altura en 1080 y desmarca todas las opciones"
         },
         "instruction6": {
             "title": "6. Prueba tus alertas Qapla",

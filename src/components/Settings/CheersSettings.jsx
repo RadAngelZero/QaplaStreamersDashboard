@@ -69,7 +69,7 @@ const InstructionSection = ({ title, description, mediaContainerComponent = 'img
                         <Card className={classes.instructionMediaCard}>
                             <CardMedia component={mediaContainerComponent}
                                 width='480'
-                                height='375'
+                                height='475'
                                 src={src}
                                 frameborder='0'
                                 allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'

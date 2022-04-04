@@ -266,10 +266,10 @@ const StreamerProfile = ({ user, games }) => {
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={12} sm={3} md={5} style={{ minHeight: '58px' }}>
+                                            <Grid item xs={12} sm={3} md={5} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
                                                 <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
                                             </Grid>
-                                            <Grid item xs={12} sm={3} style={{ minHeight: '58px' }}>
+                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
                                                 {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
                                                     <StreamsLeft subscriptionDetails={user.subscriptionDetails}
                                                         renovationDate={user.currentPeriod.endDate} />

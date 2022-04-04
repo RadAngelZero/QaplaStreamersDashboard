@@ -76,6 +76,11 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
             }
         };
 
+        window.analytics.identify(userResult.userData.uid, {
+            displayName: userResult.userData.displayName,
+            email: userResult.userData.email
+        });
+
         return userResult;
     } catch (err) {
         console.error(err);

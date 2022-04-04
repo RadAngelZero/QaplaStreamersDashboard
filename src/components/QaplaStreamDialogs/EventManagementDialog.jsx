@@ -5,7 +5,6 @@ import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as TickSquare } from './../../assets/TickSquare.svg';
-import { sednPushNotificationToTopic, sendCustomMessage } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {

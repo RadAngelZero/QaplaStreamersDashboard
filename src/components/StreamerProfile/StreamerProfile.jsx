@@ -271,7 +271,8 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                             <Grid item xs={12} sm={3} style={{ minHeight: '58px' }}>
                                                 {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
-                                                    <StreamsLeft subscriptionDetails={user.subscriptionDetails} renovationDate={user.currentPeriod.endDate} />
+                                                    <StreamsLeft subscriptionDetails={user.subscriptionDetails}
+                                                        renovationDate={user.currentPeriod.endDate} />
                                                 }
                                             </Grid>
                                         </Grid>

@@ -16,7 +16,7 @@ const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
                 <p style={{ color: '#fff' }} className={styles.streamsLeftText}>{'Publicaciones'}</p>
                 <div style={{ width: '6px' }} />
                 <p style={{ color: leftPercent <= 25 ? '#c00' : '#00FFDD' }} className={styles.streamsLeftText}>
-                    {`${subscriptionDetails.streamsRequested}/${subscriptionDetails.streamsIncluded}`}
+                    {`${subscriptionDetails.streamsIncluded - subscriptionDetails.streamsRequested}/${subscriptionDetails.streamsIncluded}`}
                 </p>
             </div>
             <div style={{ display: 'flex' }}>

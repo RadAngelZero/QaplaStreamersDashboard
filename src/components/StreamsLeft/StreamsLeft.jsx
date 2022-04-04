@@ -13,14 +13,18 @@ const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
     return (
         <div className={styles.container}>
             <div style={{ display: 'flex' }}>
-                <p style={{ color: '#fff' }} className={styles.streamsLeftText}>{'Publicaciones'}</p>
+                <p style={{ color: '#fff' }} className={styles.streamsLeftText}>
+                    {t('StreamsLeft.streams')}
+                </p>
                 <div style={{ width: '6px' }} />
                 <p style={{ color: leftPercent >= .75 ? '#FF003D' : '#00FFDD' }} className={styles.streamsLeftText}>
                     {`${subscriptionDetails.streamsIncluded - subscriptionDetails.streamsRequested}/${subscriptionDetails.streamsIncluded}`}
                 </p>
             </div>
             <div style={{ display: 'flex' }}>
-                <p className={styles.renovationText}>Renueva el {`${renovationDay} de `}{t(`months.${monthsArray[renovationMonth]}`)}</p>
+                <p className={styles.renovationText}>
+                    {t('StreamsLeft.renewsOn', { date: renovationDay, month: t(`months.${monthsArray[renovationMonth]}`) })}
+                </p>
             </div>
         </div>
     )

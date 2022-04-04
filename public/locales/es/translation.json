@@ -279,6 +279,10 @@
         "dontHaveACode": "¿No tienes código de invitado?",
         "subscribe": "Suscríbete para publicar"
     },
+    "StreamsLeft": {
+        "streams": "Publicaciones",
+        "renewsOn": "Renueva el {{date}} de {{month}}"
+    },
     "continue": "Continuar",
     "cancel": "Cancelar",
     "title": "Título",

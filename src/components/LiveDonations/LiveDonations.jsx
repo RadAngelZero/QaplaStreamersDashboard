@@ -87,11 +87,22 @@ const LiveDonations = () => {
                         audio = new Audio(TEST_MESSAGE_SPEECH_URL);
                     } else {
                         const messageToRead = `${donation.twitchUserName} dice: ${donation.message}`;
+
+                        window.analytics.track('Cheer received', {
+                            user: donation.twitchUserName,
+                            containsMessage: true,
+                            message: messageToRead
+                        });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
                         audio = new Audio(cheerMessageUrl.data);
                     }
                 } else {
                     const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Qoins`;
+
+                    window.analytics.track('Cheer received', {
+                        user: donation.twitchUserName,
+                        containsMessage: false
+                    });
                     const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
                     audio = new Audio(cheerMessageUrl.data);
                 }

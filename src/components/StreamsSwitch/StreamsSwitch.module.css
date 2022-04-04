@@ -1,0 +1,7 @@
+.icon > path{
+    fill: #2B3274;
+}
+
+.iconSelected > path {
+    fill: #fff;
+}

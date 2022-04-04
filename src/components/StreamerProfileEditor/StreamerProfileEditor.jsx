@@ -299,6 +299,10 @@ const StreamerProfileEditor = ({ user }) => {
             photoUrl: user.photoUrl
         });
 
+        window.analytics.track('Public profile onboarding done', {
+            uid: user.uid,
+            timestamp: (new Date()).getTime()
+        });
         setOnBoardingDone(true);
     }
 

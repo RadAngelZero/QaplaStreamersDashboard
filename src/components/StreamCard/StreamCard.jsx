@@ -256,6 +256,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         try {
             setStartingStream(true);
             const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, user.subscriptionDetails.redemptionsPerStream);
+
+            window.analytics.track('Stream started', {
+                streamId,
+                uid: user.uid,
+                timestamp: (new Date()).getTime()
+            });
             setStream(streamData);
             if (!openStreamDialog) {
                 setOpenStreamStartedDialog(true);
@@ -274,6 +280,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         try {
             setClosingStream(true);
             await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.xqReward, stream.xqRewardWebhookId, stream.qoinsReward, stream.qoinsRewardWebhookId);
+
+            window.analytics.track('Stream finished', {
+                streamId,
+                uid: user.uid,
+                timestamp: (new Date()).getTime()
+            });
             setOpenRewardsRemovedDialog(true);
 
             // Close the rest of Dialogs just in case
@@ -305,6 +317,12 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const enableQoinsReward = async () => {
         try {
             await enableStreamQoinsReward(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward);
+
+            window.analytics.track('Qoins enabled', {
+                streamId,
+                uid: user.uid,
+                timestamp: (new Date()).getTime()
+            });
             setStream({ ...stream, qoinsEnabled: true });
         } catch (error) {
             handleExpiredSession();
@@ -333,6 +351,13 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const sendMessage = async (message) => {
         if (message) {
             await sendCustomMessage(user.uid, title && title['en'] ? title['en'] : '', message);
+
+            window.analytics.track('Custom Message sent', {
+                streamId,
+                uid: user.uid,
+                timestamp: (new Date()).getTime(),
+                message
+            });
             setOpenCustomMessageSentDialog(true);
         }
     }

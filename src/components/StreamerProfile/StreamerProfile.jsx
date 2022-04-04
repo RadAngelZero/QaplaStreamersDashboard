@@ -5,14 +5,15 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
+import StreamsSwitch from '../StreamsSwitch/StreamsSwitch';
+import StreamsLeft from '../StreamsLeft/StreamsLeft';
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg'
 
-import StreamerSelect from '../StreamerSelect/StreamerSelect';
-import { getStreamerValueOfQoins, loadStreamsByStatus } from '../../services/database';
+import { getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -63,6 +64,7 @@ const StreamerProfile = ({ user, games }) => {
     const [buttonPressed, setButtonPressed] = useState('Qoins');
     const [pendingMessages, setPendingMessages] = useState(0);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
+    const [switchState, setSwitchState] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -90,19 +92,21 @@ const StreamerProfile = ({ user, games }) => {
 
         async function loadStreams() {
             if (user) {
-                setStreamLoaded(await loadStreamsByStatus(user.uid, streamType));
+                if (!switchState) {
+                    setStreamLoaded(await loadStreamsByStatusRange(user.uid, PENDING_APPROVAL_EVENT_TYPE, SCHEDULED_EVENT_TYPE));
+                } else {
+                    setStreamLoaded(await loadStreamsByStatus(user.uid, PAST_STREAMS_EVENT_TYPE));
+                }
             }
         }
 
         loadStreams();
         getValueOfQoins();
-    }, [streamType, user, history]);
+    }, [switchState, user, history]);
 
     const createStream = () => {
         history.push('/create');
     }
-
-    const changestreamType = (val) => setStreamType(val);
 
     /**
      * Format the date to show in the card
@@ -124,7 +128,7 @@ const StreamerProfile = ({ user, games }) => {
         hour = hour % 12;
         hour = hour ? hour : 12;
 
-        hour = hour < 10 ? `0${hour}`: hour;
+        hour = hour < 10 ? `0${hour}` : hour;
 
         return `${hour}:${minutes} ${amPm}`;
     }
@@ -142,6 +146,10 @@ const StreamerProfile = ({ user, games }) => {
         cheersQoins = user.qoinsBalance || 0;
         qlanQoins = user.qlanBalance || 0;
         estimatedBits = ((cheersQoins + qlanQoins) / 200) * valueOfQoinsForStreamer;
+    }
+
+    const handleSwitchEvents = () => {
+        setSwitchState(!switchState);
     }
 
     return (
@@ -258,26 +266,14 @@ const StreamerProfile = ({ user, games }) => {
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
                                             </Grid>
-                                            <Grid item xs={12} sm={9} style={{ minHeight: '58px' }}>
-                                                <StreamerSelect
-                                                    data={[
-                                                        {
-                                                            value: SCHEDULED_EVENT_TYPE,
-                                                            label: t('StreamerProfile.scheduled')
-                                                        },
-                                                        {
-                                                            value: PENDING_APPROVAL_EVENT_TYPE,
-                                                            label: t('StreamerProfile.pendingApproval')
-                                                        },
-                                                        {
-                                                            value: PAST_STREAMS_EVENT_TYPE,
-                                                            label: t('StreamerProfile.pastStreams')
-                                                        }
-                                                    ]}
-                                                    value={streamType}
-                                                    onChange={changestreamType}
-                                                    overflowY='hidden'
-                                                    overflowX='hidden' />
+                                            <Grid item xs={12} sm={3} md={5} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
+                                                <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
+                                            </Grid>
+                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
+                                                {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
+                                                    <StreamsLeft subscriptionDetails={user.subscriptionDetails}
+                                                        renovationDate={user.currentPeriod.endDate} />
+                                                }
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -308,7 +304,7 @@ const StreamerProfile = ({ user, games }) => {
                                 {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard
-                                            streamType={streamType}
+                                            streamType={streams[streamId].status}
                                             streamId={streamId}
                                             user={user}
                                             game={streams[streamId].game}

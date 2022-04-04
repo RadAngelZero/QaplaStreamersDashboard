@@ -295,6 +295,12 @@ const NewStream = ({ user, games }) => {
                 let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
                 await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+
+                window.analytics.track('Stream requested', {
+                    selectedGame,
+                    selectedDate: selectedDate.getTime(),
+                    uid: user.uid
+                });
                 history.push('/success');
             } else {
                 // Hacer un modal chido para convencerlos de mejorar su plan o comprar eventos aparte
@@ -316,6 +322,10 @@ const NewStream = ({ user, games }) => {
 
         await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
         await addToStreamsRequestedOnSubscriptionDetails(user.uid);
+
+        window.analytics.track('Free trial started', {
+            uid: user.uid
+        });
         history.push('/success');
     }
 

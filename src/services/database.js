@@ -212,6 +212,16 @@ export async function loadStreamsByStatus(uid, status) {
 }
 
 /**
+ * Load all the strams of StreamersEventsData based on the given statues
+ * @param {string} uid User identifier
+ * @param {number} statusStart Status where the query starts
+ * @param {number} statusEnd Status where the query end
+ */
+ export async function loadStreamsByStatusRange(uid, statusStart, statusEnd) {
+    return await streamersEventsDataRef.child(uid).orderByChild('status').startAt(statusStart).endAt(statusEnd).once('value');
+}
+
+/**
  * Removes a stream request of the database
  * @param {string} uid User identifier
  * @param {string} streamId Identifier of the stream to remove

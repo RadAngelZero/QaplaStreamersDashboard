@@ -284,6 +284,10 @@
         "dontHaveACode": "Don't have a code?",
         "subscribe": "Subscribe to publish"
     },
+    "StreamsLeft": {
+        "streams": "Publications",
+        "renewsOn": "Renews on {{date}} of {{month}}"
+    },
     "continue": "Continue",
     "cancel": "Cancel",
     "title": "Title",

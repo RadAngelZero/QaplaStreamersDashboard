@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
     BrowserRouter as RouterPackage,
     Switch,
-    Route
+    Route,
+    useHistory
 } from 'react-router-dom';
 
 import './App.css';
@@ -31,6 +32,65 @@ window.onbeforeunload = function() {
 
 // Remove navigation prompt
 window.onbeforeunload = null;
+
+const Routes = ({ user, games }) => {
+    const history = useHistory();
+
+    useEffect(() => {
+        if (history) {
+            history.listen((location) => {
+                window.analytics.page();
+            });
+        }
+    }, [history]);
+
+    return (
+        <Switch>
+            <Route exact path='/'>
+                <StreamersSignin user={user} title='Welcome!'/>
+            </Route>
+            <Route exact path='/signin'>
+                <StreamersSignin user={user} title='Welcome!' />
+            </Route>
+            <Route exact path='/welcome'>
+                <StreamerOnBoarding user={user} />
+            </Route>
+            <Route exact path='/create'>
+                <NewStream user={user} games={games} />
+            </Route>
+            <Route exact path='/edit/:streamId'>
+                <EditStreamerEvent user={user} games={games} />
+            </Route>
+            <Route exact path='/profile'>
+                <StreamerProfile user={user} games={games} />
+            </Route>
+            <Route exact path='/success'>
+                <EventSent user={user} />
+            </Route>
+            <Route exact path='/liveDonations/:streamerId'>
+                <LiveDonations user={user} />
+            </Route>
+            <Route exact path='/settings'>
+                <Settings user={user} />
+            </Route>
+            <Route exact path='/membership'>
+                <PlanPicker user={user} />
+            </Route>
+            <Route exact path='/buyStreams'>
+                <StreamsPackages user={user} games={games} />
+            </Route>
+            <Route exact path='/editProfile'>
+                <StreamerProfileEditor user={user}/>
+            </Route>
+            <Route exact path='/successCheckout'>
+                <ChargeConfirmationPage user={user}/>
+            </Route>
+            {/* <Route exact path='/lottery'>
+                <Lottery user={user} />
+            </Route> */}
+        </Switch>
+    );
+}
 
 const Router = () => {
     const [games, setGames] = useState({});
@@ -70,50 +130,7 @@ const Router = () => {
 
     return (
         <RouterPackage>
-            <Switch>
-                <Route exact path='/'>
-                    <StreamersSignin user={user} title='Welcome!'/>
-                </Route>
-                <Route exact path='/signin'>
-                    <StreamersSignin user={user} title='Welcome!' />
-                </Route>
-                <Route exact path='/welcome'>
-                    <StreamerOnBoarding user={user} />
-                </Route>
-                <Route exact path='/create'>
-                    <NewStream user={user} games={games} />
-                </Route>
-                <Route exact path='/edit/:streamId'>
-                    <EditStreamerEvent user={user} games={games} />
-                </Route>
-                <Route exact path='/profile'>
-                    <StreamerProfile user={user} games={games} />
-                </Route>
-                <Route exact path='/success'>
-                    <EventSent user={user} />
-                </Route>
-                <Route exact path='/liveDonations/:streamerId'>
-                    <LiveDonations user={user} />
-                </Route>
-                <Route exact path='/settings'>
-                    <Settings user={user} />
-                </Route>
-                <Route exact path='/membership'>
-                    <PlanPicker user={user} />
-                </Route>
-                <Route exact path='/buyStreams'>
-                    <StreamsPackages user={user} games={games} />
-                </Route>
-                <Route exact path='/editProfile'>
-                    <StreamerProfileEditor user={user}/>
-                </Route>
-                <Route exact path='/successCheckout'>
-                    <ChargeConfirmationPage user={user}/>
-                </Route>
-                {/* <Route exact path='/lottery'>
-                    <Lottery user={user} />
-                </Route> */}
-            </Switch>
+            <Routes user={user} games={games} />
         </RouterPackage>
     );
 }

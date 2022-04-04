@@ -6,7 +6,7 @@ const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
     const dateRenovation = new Date(renovationDate);
     const renovationDay = (dateRenovation.getDate().toString().length < 2 ? '0' : '') + dateRenovation.getDate().toString();
     const renovationMonth = dateRenovation.getMonth();
-    const leftPercent = (subscriptionDetails.streamsRequested/subscriptionDetails.streamsIncluded) * 100;
+    const leftPercent =  subscriptionDetails.streamsRequested/subscriptionDetails.streamsIncluded;
     const { t } = useTranslation();
     const monthsArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
@@ -15,7 +15,7 @@ const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
             <div style={{ display: 'flex' }}>
                 <p style={{ color: '#fff' }} className={styles.streamsLeftText}>{'Publicaciones'}</p>
                 <div style={{ width: '6px' }} />
-                <p style={{ color: leftPercent <= 25 ? '#FF003D' : '#00FFDD' }} className={styles.streamsLeftText}>
+                <p style={{ color: leftPercent >= .75 ? '#FF003D' : '#00FFDD' }} className={styles.streamsLeftText}>
                     {`${subscriptionDetails.streamsIncluded - subscriptionDetails.streamsRequested}/${subscriptionDetails.streamsIncluded}`}
                 </p>
             </div>

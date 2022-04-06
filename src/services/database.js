@@ -25,6 +25,8 @@ const tagsRef = database.ref('/Tags');
 const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
 const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers');
 const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
+const qlanesRef = database.ref('/Qlanes');
+const qreatorsCodesRef = database.ref('/QreatorsCodes');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -755,4 +757,28 @@ export async function getStreamerMediaContent(uid) {
  */
 export async function getStreamerValueOfQoins(type) {
     return qoinsToBitForStreamersRef.child(type).once('value');
+}
+
+/**
+ * Qlanes
+ */
+
+/**
+ * Returns true if the user has a Qlan
+ * @param {string} uid User identifier
+ */
+export async function streamerHasQlan(uid) {
+    return (await qlanesRef.child(uid).once('value')).exists();
+}
+
+/**
+ * Creates a Qlan for the given user
+ * @param {string} uid User identifier
+ * @param {string} code Qreator code
+ * @param {string} name Name of the Qlan
+ * @param {string} image Image url
+ */
+export async function createQlan(uid, code, name, image) {
+    await qreatorsCodesRef.child(uid).update({ code });
+    return await qlanesRef.child(uid).update({ name, image });
 }

@@ -55,11 +55,9 @@ const StreamersSignin = ({ user, title }) => {
                     const userData = await getTwitchUserData(tokenData.data.access_token);
                     const user = await signUpOrSignInTwitchUser(userData, tokenData.data);
                     if (user.userData.isNewUser) {
-                        localStorage.setItem('twitchPermission', 'channel:read:redemptions');
-                        localStorage.setItem('termsAndConditions', 'true');
                         await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
                     }
-                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, { twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
+                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, { termsAndConditions: true, twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
                 } else {
                     alert('Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico');
                 }
@@ -92,72 +90,76 @@ const StreamersSignin = ({ user, title }) => {
 
     const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
 
-    return (
-        <StreamerDashboardContainer>
-            <Grid item md='4' style={{
-                    backgroundImage: `url(${RoomGame})`,
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'cover',
-                    height: '100%',
-                }}>
-                <div style={{
-                        display: 'flex',
-                        flexGrow: 1,
-                        justifyContent: 'center',
-                        height: '100vh',
-                        alignItems: 'flex-end'
+    if (user === undefined) {
+        return (
+            <StreamerDashboardContainer>
+                <Grid item md='4' style={{
+                        backgroundImage: `url(${RoomGame})`,
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'cover',
+                        height: '100%',
                     }}>
-                <QaplaIcon style={{ marginBottom: 32 }} />
-                </div>
-            </Grid>
-            <Grid item md='1' />
-            <Grid item md='4'>
-                <p className={styles.getStarted}>
-                    {title}
-                </p>
-                <div className={styles.formContainer}>
-                    <Button variant='contained'
-                        className={styles.continueButton}
-                        disabled={isLoadingAuth}
-                        startIcon={<TwitchIcon />}
-                        onClick={handleSignInClick}>
-                        {!isLoadingAuth ?
-                            'Sign in with Twitch'
-                            :
-                            'Loading...'
-                        }
-                    </Button>
-                </div>
-            </Grid>
-            <Grid item md='3' />
-            <CustomDialog
-                open={openTermsAndConditionsDialog}
-                onClose={closeTermsAndConditionsModal}>
-                <DialogTitle>AVISO PARA MEJORAR LA EXPERIENCIA DENTRO DE QAPLA (BETA)</DialogTitle>
-                <DialogContent>
-                <DialogContentText style={{ color: '#FFF' }}>
-                    CAMBIOS Y PERMISOS
-                    <br/>
-                    <br/>
-                    Informamos por este medio a toda nuestra Comunidad Streamer que a partir de hoy y en los próximos días, con la finalidad de ofrecer una mejor experiencia dentro de Qapla, se realizarán algunas pruebas y cambios en las herramientas que se utilizan, lo cual puede conllevar a la adecuación en la configuración de la cuentas de TWITCH de los STREMEARS  por parte de QAPLA.
-                    <br/>
-                    <br/>
-                    <br/>
-                    Lo anterior, únicamente para mejorar el rendimiento del uso de QAPLA por parte de la comunidad STREAMER teniendo como consecuencia beneficios y mejoras.
-                </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                <ContainedButton variant='outlined' onClick={closeTermsAndConditionsModal} color="primary">
-                    Cancelar
-                </ContainedButton>
-                <ContainedButton variant='outlined' onClick={signIn} color="primary" autoFocus>
-                    Aceptar
-                </ContainedButton>
-                </DialogActions>
-            </CustomDialog>
-        </StreamerDashboardContainer>
-    );
+                    <div style={{
+                            display: 'flex',
+                            flexGrow: 1,
+                            justifyContent: 'center',
+                            height: '100vh',
+                            alignItems: 'flex-end'
+                        }}>
+                    <QaplaIcon style={{ marginBottom: 32 }} />
+                    </div>
+                </Grid>
+                <Grid item md='1' />
+                <Grid item md='4'>
+                    <p className={styles.getStarted}>
+                        {title}
+                    </p>
+                    <div className={styles.formContainer}>
+                        <Button variant='contained'
+                            className={styles.continueButton}
+                            disabled={isLoadingAuth}
+                            startIcon={<TwitchIcon />}
+                            onClick={handleSignInClick}>
+                            {!isLoadingAuth ?
+                                'Sign in with Twitch'
+                                :
+                                'Loading...'
+                            }
+                        </Button>
+                    </div>
+                </Grid>
+                <Grid item md='3' />
+                <CustomDialog
+                    open={openTermsAndConditionsDialog}
+                    onClose={closeTermsAndConditionsModal}>
+                    <DialogTitle>AVISO PARA MEJORAR LA EXPERIENCIA DENTRO DE QAPLA (BETA)</DialogTitle>
+                    <DialogContent>
+                    <DialogContentText style={{ color: '#FFF' }}>
+                        CAMBIOS Y PERMISOS
+                        <br/>
+                        <br/>
+                        Informamos por este medio a toda nuestra Comunidad Streamer que a partir de hoy y en los próximos días, con la finalidad de ofrecer una mejor experiencia dentro de Qapla, se realizarán algunas pruebas y cambios en las herramientas que se utilizan, lo cual puede conllevar a la adecuación en la configuración de la cuentas de TWITCH de los STREMEARS  por parte de QAPLA.
+                        <br/>
+                        <br/>
+                        <br/>
+                        Lo anterior, únicamente para mejorar el rendimiento del uso de QAPLA por parte de la comunidad STREAMER teniendo como consecuencia beneficios y mejoras.
+                    </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                    <ContainedButton variant='outlined' onClick={closeTermsAndConditionsModal} color="primary">
+                        Cancelar
+                    </ContainedButton>
+                    <ContainedButton variant='outlined' onClick={signIn} color="primary" autoFocus>
+                        Aceptar
+                    </ContainedButton>
+                    </DialogActions>
+                </CustomDialog>
+            </StreamerDashboardContainer>
+        );
+    }
+
+    return null;
 }
 
 export default StreamersSignin;

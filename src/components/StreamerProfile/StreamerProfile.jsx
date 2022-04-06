@@ -58,7 +58,6 @@ const useStyles = makeStyles((theme) => ({
 const StreamerProfile = ({ user, games }) => {
     const classes = useStyles();
     const history = useHistory();
-    const [streamType, setStreamType] = useState(SCHEDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
     const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
     const [buttonPressed, setButtonPressed] = useState('Qoins');
@@ -97,6 +96,8 @@ const StreamerProfile = ({ user, games }) => {
                 } else {
                     setStreamLoaded(await loadStreamsByStatus(user.uid, PAST_STREAMS_EVENT_TYPE));
                 }
+            } else if (user === undefined) {
+                history.push('/');
             }
         }
 

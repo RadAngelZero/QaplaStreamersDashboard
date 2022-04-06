@@ -362,119 +362,123 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
     }
 
-    return (
-        <Card className={classes.eventCard} style={style}>
-            <div className={classes.relativeContainer}>
-                <div className={classes.hourContainer}>
-                    <p className={classes.hourText}>
-                        {hour}
-                    </p>
-                </div>
-                <div className={classes.dateContainer}>
-                    <CalendarIcon />
-                    <p className={classes.dateText}>
-                        {date}
-                    </p>
-                </div>
-                <img
-                    alt='Game'
-                    src={streamsPlaceholderImages[game] || games.allGames[game].fallbackImageUrl}
-                    width='100%'
-                    height='180'
-                    className={classes.eventImage} />
-            </div>
-            <div className={classes.eventCardContent}>
-                <p className={classes.eventCardTitle}>
-                    {title && title['en'] ? title['en'] : ''}
-                </p>
-                {streamType !== PAST_STREAMS_EVENT_TYPE && !showRewardsOptions &&
-                    <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
-                        <div style={{
-                            backgroundColor: streamType === PENDING_APPROVAL_EVENT_TYPE ? '#C6B200' : '#00FFDD',
-                            width: '8px',
-                            height: '8px',
-                            borderRadius: '50%'
-                        }} />
-                        <div style={{ width: '6px' }} />
-                        <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>
-                            {streamType === PENDING_APPROVAL_EVENT_TYPE ? t('StreamCard.pendingReview') : t('StreamCard.posted')}
+    if (game) {
+        return (
+            <Card className={classes.eventCard} style={style}>
+                <div className={classes.relativeContainer}>
+                    <div className={classes.hourContainer}>
+                        <p className={classes.hourText}>
+                            {hour}
                         </p>
                     </div>
-                }
-                <div className={classes.buttonsContainer}>
-                    {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
-                        (!startingStream ?
-                            (stream ?
-                                (!closingStream ?
-                                    <Button size='medium' className={classes.endButton}
-                                        disabled={closingStream}
-                                        onClick={checkIfCloseStreamDialogMustBeShown}>
-                                        {t('StreamCard.end')}
-                                    </Button>
+                    <div className={classes.dateContainer}>
+                        <CalendarIcon />
+                        <p className={classes.dateText}>
+                            {date}
+                        </p>
+                    </div>
+                    <img
+                        alt='Game'
+                        src={streamsPlaceholderImages[game] || (games.allGames[game] ? games.allGames[game].fallbackImageUrl : null)}
+                        width='100%'
+                        height='180'
+                        className={classes.eventImage} />
+                </div>
+                <div className={classes.eventCardContent}>
+                    <p className={classes.eventCardTitle}>
+                        {title && title['en'] ? title['en'] : ''}
+                    </p>
+                    {streamType !== PAST_STREAMS_EVENT_TYPE && !showRewardsOptions &&
+                        <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
+                            <div style={{
+                                backgroundColor: streamType === PENDING_APPROVAL_EVENT_TYPE ? '#C6B200' : '#00FFDD',
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%'
+                            }} />
+                            <div style={{ width: '6px' }} />
+                            <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>
+                                {streamType === PENDING_APPROVAL_EVENT_TYPE ? t('StreamCard.pendingReview') : t('StreamCard.posted')}
+                            </p>
+                        </div>
+                    }
+                    <div className={classes.buttonsContainer}>
+                        {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
+                            (!startingStream ?
+                                (stream ?
+                                    (!closingStream ?
+                                        <Button size='medium' className={classes.endButton}
+                                            disabled={closingStream}
+                                            onClick={checkIfCloseStreamDialogMustBeShown}>
+                                            {t('StreamCard.end')}
+                                        </Button>
+                                        :
+                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                            <CircularProgress style={{ color: '#3B4BF9' }} />
+                                        </div>
+                                    )
                                     :
-                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <CircularProgress style={{ color: '#3B4BF9' }} />
-                                    </div>
+                                    <Button size='medium' className={classes.startButton}
+                                        onClick={startStream }>
+                                        {t('StreamCard.start')}
+                                    </Button>
                                 )
                                 :
-                                <Button size='medium' className={classes.startButton}
-                                    onClick={startStream }>
-                                    {t('StreamCard.start')}
-                                </Button>
+                                <p style={{ fontSize: 11, fontWeight: '600', textAlign: 'center', color: '#FFF', marginBottom: 16 }}>
+                                    {`${t('StreamCard.creatingRewards')}${loadingDots}`}
+                                </p>
                             )
-                            :
-                            <p style={{ fontSize: 11, fontWeight: '600', textAlign: 'center', color: '#FFF', marginBottom: 16 }}>
-                                {`${t('StreamCard.creatingRewards')}${loadingDots}`}
-                            </p>
-                        )
-                    }
-                    <div style={{ height: '11px' }} />
-                    {streamType === SCHEDULED_EVENT_TYPE &&
-                        <Button size='medium' className={classes.manageButton} onClick={showRewardsOptions ? setOpenStreamDialog : manageStream}>
-                            {showRewardsOptions ?
-                                t('StreamCard.manageRewards')
-                                :
-                                t('StreamCard.manageStream')
-                            }
-                        </Button>
-                    }
-                    {streamType === PENDING_APPROVAL_EVENT_TYPE &&
-                        <Button size='medium' className={classes.manageButton} onClick={cancelStream}>
-                            {t('StreamCard.cancelStreamRequest')}
-                        </Button>
-                    }
+                        }
+                        <div style={{ height: '11px' }} />
+                        {streamType === SCHEDULED_EVENT_TYPE &&
+                            <Button size='medium' className={classes.manageButton} onClick={showRewardsOptions ? setOpenStreamDialog : manageStream}>
+                                {showRewardsOptions ?
+                                    t('StreamCard.manageRewards')
+                                    :
+                                    t('StreamCard.manageStream')
+                                }
+                            </Button>
+                        }
+                        {streamType === PENDING_APPROVAL_EVENT_TYPE &&
+                            <Button size='medium' className={classes.manageButton} onClick={cancelStream}>
+                                {t('StreamCard.cancelStreamRequest')}
+                            </Button>
+                        }
+                    </div>
                 </div>
-            </div>
-            <EventManagementDialog open={openStreamDialog}
-                user={user}
-                sendMessage={sendMessage}
-                streamId={streamId}
-                stream={stream}
-                streamStarted={startingStream}
-                closingStream={closingStream}
-                onClose={() => setOpenStreamDialog(false)}
-                startStream={startStream}
-                enableQoins={enableQoinsReward}
-                closeStream={checkIfCloseStreamDialogMustBeShown}
-                streamTitle={title && title['en'] ? title['en'] : ''}
-                date={date}
-                hour={hour} />
-            <EventConfirmStartDialog open={openStreamStartedDialog}
-                onClose={() => setOpenStreamStartedDialog(false)}
-                manageRewards={closeDialogsAndOpenManageRewardsDialog} />
-            <EventWarningQoinsDialog open={openQoinsWarningDialog}
-                onClose={() => setOpenQoinsWarningDialog(false)}
-                manageRewards={closeDialogsAndOpenManageRewardsDialog} />
-            <EventEndStreamConfirmDialog open={openEndStreamDialog}
-                closingStream={closingStream}
-                onClose={() => setOpenEndStreamDialog(false)}
-                closeStream={closeStream} />
-            <EventRewardsRemovedConfirmation open={openRewardsRemovedDialog}
-                onClose={closeAndRemoveStream}  />
-            <EventCustomMessageSentConfirmation open={openCustomMessageSentDialog}
-                onClose={() => setOpenCustomMessageSentDialog(false)} />
-        </Card>
-    );
+                <EventManagementDialog open={openStreamDialog}
+                    user={user}
+                    sendMessage={sendMessage}
+                    streamId={streamId}
+                    stream={stream}
+                    streamStarted={startingStream}
+                    closingStream={closingStream}
+                    onClose={() => setOpenStreamDialog(false)}
+                    startStream={startStream}
+                    enableQoins={enableQoinsReward}
+                    closeStream={checkIfCloseStreamDialogMustBeShown}
+                    streamTitle={title && title['en'] ? title['en'] : ''}
+                    date={date}
+                    hour={hour} />
+                <EventConfirmStartDialog open={openStreamStartedDialog}
+                    onClose={() => setOpenStreamStartedDialog(false)}
+                    manageRewards={closeDialogsAndOpenManageRewardsDialog} />
+                <EventWarningQoinsDialog open={openQoinsWarningDialog}
+                    onClose={() => setOpenQoinsWarningDialog(false)}
+                    manageRewards={closeDialogsAndOpenManageRewardsDialog} />
+                <EventEndStreamConfirmDialog open={openEndStreamDialog}
+                    closingStream={closingStream}
+                    onClose={() => setOpenEndStreamDialog(false)}
+                    closeStream={closeStream} />
+                <EventRewardsRemovedConfirmation open={openRewardsRemovedDialog}
+                    onClose={closeAndRemoveStream}  />
+                <EventCustomMessageSentConfirmation open={openCustomMessageSentDialog}
+                    onClose={() => setOpenCustomMessageSentDialog(false)} />
+            </Card>
+        );
+    }
+
+    return null;
 }
 
 export default StreamCard;

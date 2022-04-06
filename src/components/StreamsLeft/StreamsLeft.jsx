@@ -18,7 +18,7 @@ const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
                 </p>
                 <div style={{ width: '6px' }} />
                 <p style={{ color: leftPercent >= .75 ? '#FF003D' : '#00FFDD' }} className={styles.streamsLeftText}>
-                    {`${subscriptionDetails.streamsIncluded - subscriptionDetails.streamsRequested}/${subscriptionDetails.streamsIncluded}`}
+                    {t('StreamsLeft.leftStreams', { available: subscriptionDetails.streamsIncluded - subscriptionDetails.streamsRequested, total: subscriptionDetails.streamsIncluded })}
                 </p>
             </div>
             <div style={{ display: 'flex' }}>

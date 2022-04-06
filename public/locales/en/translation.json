@@ -285,7 +285,8 @@
         "subscribe": "Subscribe to publish"
     },
     "StreamsLeft": {
-        "streams": "Publications",
+        "streams": "Available publications: ",
+        "leftStreams": "{{available}} of {{total}}",
         "renewsOn": "Renews on {{date}} of {{month}}"
     },
     "continue": "Continue",

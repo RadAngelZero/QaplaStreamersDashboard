@@ -218,9 +218,9 @@ const StreamerProfile = ({ user, games }) => {
                         <Grid item xs={12}>
                             <Grid container xs={12}>
                                 <Grid xs={12}>
-                                    <Grid container xs={11} style={{}}>
+                                    <Grid container xs={11}>
                                         <Grid item xs={12}>
-                                            <h1 className={styles.title}>
+                                            <h1 className={styles.title} style={{ marginBottom: 40 }}>
                                                 {t('StreamerProfile.balance')}
                                             </h1>
                                         </Grid>

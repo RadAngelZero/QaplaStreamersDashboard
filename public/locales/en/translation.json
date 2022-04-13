@@ -285,8 +285,9 @@
         "subscribe": "Subscribe to publish"
     },
     "StreamsLeft": {
-        "streams": "Publications",
-        "renewsOn": "Renews on {{date}} of {{month}}"
+        "streams": "Remaining posts: ",
+        "leftStreams": "{{available}} of {{total}}",
+        "renewsOn": "Renews on {{month}} {{date}}"
     },
     "continue": "Continue",
     "cancel": "Cancel",

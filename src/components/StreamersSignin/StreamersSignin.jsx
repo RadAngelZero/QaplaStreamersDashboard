@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
-    withStyles,
     Grid,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogContentText,
-    DialogActions
+    Button
 } from '@material-ui/core';
 import dayjs from 'dayjs';
 
@@ -17,20 +11,13 @@ import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPa
 import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import ContainedButton from '../ContainedButton/ContainedButton';
 import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken } from '../../services/functions';
 import { createStreamerProfile, updateStreamerProfile } from '../../services/database';
+import QaplaTerms from '../QaplaTerms/QaplaTerms';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
-
-const CustomDialog = withStyles((theme) => ({
-    paper: {
-        backgroundColor: '#0D1021',
-        color: '#FFF'
-    }
-}))(Dialog);
 
 function useQuery() {
     const { search } = useLocation();
@@ -111,7 +98,7 @@ const StreamersSignin = ({ user, title }) => {
                     </div>
                 </Grid>
                 <Grid item md='1' />
-                <Grid item md='4'>
+                <Grid item md='6'>
                     <p className={styles.getStarted}>
                         {title}
                     </p>
@@ -127,34 +114,13 @@ const StreamersSignin = ({ user, title }) => {
                                 'Loading...'
                             }
                         </Button>
+                        <p style={{ marginTop: 16, color: '#FFF', fontSize: '.8rem' }}>
+                            Al presionar Sign in with Twitch, aceptas nuestros <u style={{ cursor: 'pointer', color: '#3B4BF9' }} onClick={() => setOpenTermsAndConditionsDialog(true)}>Terminos y condiciones</u>
+                        </p>
                     </div>
                 </Grid>
-                <Grid item md='3' />
-                <CustomDialog
-                    open={openTermsAndConditionsDialog}
-                    onClose={closeTermsAndConditionsModal}>
-                    <DialogTitle>AVISO PARA MEJORAR LA EXPERIENCIA DENTRO DE QAPLA (BETA)</DialogTitle>
-                    <DialogContent>
-                    <DialogContentText style={{ color: '#FFF' }}>
-                        CAMBIOS Y PERMISOS
-                        <br/>
-                        <br/>
-                        Informamos por este medio a toda nuestra Comunidad Streamer que a partir de hoy y en los próximos días, con la finalidad de ofrecer una mejor experiencia dentro de Qapla, se realizarán algunas pruebas y cambios en las herramientas que se utilizan, lo cual puede conllevar a la adecuación en la configuración de la cuentas de TWITCH de los STREMEARS  por parte de QAPLA.
-                        <br/>
-                        <br/>
-                        <br/>
-                        Lo anterior, únicamente para mejorar el rendimiento del uso de QAPLA por parte de la comunidad STREAMER teniendo como consecuencia beneficios y mejoras.
-                    </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                    <ContainedButton variant='outlined' onClick={closeTermsAndConditionsModal} color="primary">
-                        Cancelar
-                    </ContainedButton>
-                    <ContainedButton variant='outlined' onClick={signIn} color="primary" autoFocus>
-                        Aceptar
-                    </ContainedButton>
-                    </DialogActions>
-                </CustomDialog>
+                <Grid item md='1' />
+                <QaplaTerms open={openTermsAndConditionsDialog} onClose={closeTermsAndConditionsModal} />
             </StreamerDashboardContainer>
         );
     }

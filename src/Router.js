@@ -115,10 +115,7 @@ const Router = () => {
             });
         }
 
-        const permissions = localStorage.getItem('twitchPermission');
-        const termsAndConditions = localStorage.getItem('termsAndConditions');
-
-        if (user && (permissions !== 'channel:read:redemptions' || termsAndConditions !== 'true' )) {
+        if (user && !user.termsAndConditions) {
             signOut();
         }
 

@@ -1,7 +1,7 @@
 import { auth } from './firebase';
 import { createUserWithTwitch } from './functions';
 import { TWITCH_CLIENT_ID, TWITCH_REDIRECT_URI } from '../utilities/Constants';
-import { getStreamerUidWithTwitchId } from './database';
+import { createQlan, getStreamerUidWithTwitchId, streamerHasQlan } from './database';
 
 /**
  * Listens for changes on the user authentication status
@@ -75,6 +75,13 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
                 isNewUser
             }
         };
+
+        const userHasQlan = await streamerHasQlan(userResult.userData.uid);
+
+        if (!userHasQlan) {
+            const qreatorCode = `Q-${twitchUserData.display_name.substring(0, 8)}`;
+            await createQlan(userResult.userData.uid, qreatorCode, userResult.userData.displayName, userResult.userData.photoUrl);
+        }
 
         window.analytics.identify(userResult.userData.uid, {
             displayName: userResult.userData.displayName,

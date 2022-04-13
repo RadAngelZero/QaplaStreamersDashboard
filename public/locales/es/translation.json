@@ -280,7 +280,8 @@
         "subscribe": "Suscríbete para publicar"
     },
     "StreamsLeft": {
-        "streams": "Publicaciones",
+        "streams": "Publicaciones disponibles: ",
+        "leftStreams": "{{available}} de {{total}}",
         "renewsOn": "Renueva el {{date}} de {{month}}"
     },
     "continue": "Continuar",

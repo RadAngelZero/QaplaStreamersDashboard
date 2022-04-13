@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Tooltip } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -11,9 +11,10 @@ import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
-import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg'
+import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg';
+import { ReactComponent as GiftIcon } from './../../assets/Gift.svg';
 
-import { getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
+import { getQreatorCode, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -58,13 +59,14 @@ const useStyles = makeStyles((theme) => ({
 const StreamerProfile = ({ user, games }) => {
     const classes = useStyles();
     const history = useHistory();
-    const [streamType, setStreamType] = useState(SCHEDULED_EVENT_TYPE);
     const [streams, setStreams] = useState({});
     const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
     const [buttonPressed, setButtonPressed] = useState('Qoins');
     const [pendingMessages, setPendingMessages] = useState(0);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
     const [switchState, setSwitchState] = useState(false);
+    const [qreatorCode, setQreatorCode] = useState('');
+    const [openTooltip, setOpenTooltip] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -97,11 +99,23 @@ const StreamerProfile = ({ user, games }) => {
                 } else {
                     setStreamLoaded(await loadStreamsByStatus(user.uid, PAST_STREAMS_EVENT_TYPE));
                 }
+            } else if (user === undefined) {
+                history.push('/');
+            }
+        }
+
+        async function getUserQreatorCode() {
+            if (user) {
+                const code = await getQreatorCode(user.uid);
+                if (code.exists()) {
+                    setQreatorCode(code.val());
+                }
             }
         }
 
         loadStreams();
         getValueOfQoins();
+        getUserQreatorCode();
     }, [switchState, user, history]);
 
     const createStream = () => {
@@ -152,6 +166,14 @@ const StreamerProfile = ({ user, games }) => {
         setSwitchState(!switchState);
     }
 
+    const copyQreatorCode = () => {
+        navigator.clipboard.writeText(qreatorCode);
+        setOpenTooltip(true);
+        setTimeout(() => {
+            setOpenTooltip(false);
+        }, 1250);
+    }
+
     return (
         <StreamerDashboardContainer user={user}>
             {user &&
@@ -173,6 +195,14 @@ const StreamerProfile = ({ user, games }) => {
                             startIcon={<TwitchIcon style={{ width: '20px', height: '20px' }} />}>
                             {user.displayName}
                         </Button>
+                        <Tooltip placement='bottom' open={openTooltip} title='Copiado'>
+                            <div className={styles.qreatorCodeContainer} onClick={copyQreatorCode}>
+                                <GiftIcon />
+                                <p className={styles.qreatorCode}>
+                                    {qreatorCode}
+                                </p>
+                            </div>
+                        </Tooltip>
                         <Button variant='contained'
                             className={styles.messagesButton}
                             style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735' }}
@@ -217,9 +247,9 @@ const StreamerProfile = ({ user, games }) => {
                         <Grid item xs={12}>
                             <Grid container xs={12}>
                                 <Grid xs={12}>
-                                    <Grid container xs={11} style={{}}>
+                                    <Grid container xs={11}>
                                         <Grid item xs={12}>
-                                            <h1 className={styles.title}>
+                                            <h1 className={styles.title} style={{ marginBottom: 40 }}>
                                                 {t('StreamerProfile.balance')}
                                             </h1>
                                         </Grid>

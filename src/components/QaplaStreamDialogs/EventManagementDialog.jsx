@@ -8,7 +8,10 @@ import { ReactComponent as TickSquare } from './../../assets/TickSquare.svg';
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
-        backdropFilter: 'blur(50px)'
+        backdropFilter: 'blur(50px)',
+        [theme.breakpoints.down('md')]: {
+            backgroundColor: '#141833',
+        }
     },
     dialogRoot: {
     },
@@ -18,7 +21,30 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'visible',
         borderRadius: '35px',
         padding: '64px',
-        minWidth: 'min-content'
+        minWidth: 'min-content',
+        [theme.breakpoints.down('md')]: {
+            minWidth: '100%',
+            minHeight: '100%',
+        }
+    },
+    itemsContainer: {
+        display: 'flex',
+        [theme.breakpoints.down('md')]: {
+            padding: '184px 66px 20px 66px',
+        },
+        [theme.breakpoints.down('sm')]: {
+            flexWrap: 'wrap',
+            gap: '50px 0px'
+        }
+    },
+    closeButtonContainer: {
+        position: 'absolute',
+        top: '24px',
+        right: '24px',
+        [theme.breakpoints.down('md')]: {
+            top: '118px',
+            right: '128px',
+        }
     },
     closeButton: {
         '&:hover': {
@@ -125,6 +151,13 @@ const useStyles = makeStyles((theme) => ({
         paddingRight: '4px',
         overflow: 'hidden'
     },
+    sendContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        [theme.breakpoints.up('md')]: {
+            minWidth: '400px',
+        },
+    },
     sendButtonRoot: {
         backgroundColor: '#6C5DD3',
         width: '165px',
@@ -147,12 +180,43 @@ const useStyles = makeStyles((theme) => ({
             opacity: '0.8'
         }
     },
-    eventName: {
+    eventNameContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        position: 'absolute',
+        right: '30px',
+        bottom: '-40px',
+        gap: '0px 5px',
+        [theme.breakpoints.down('md')]: {
+            top: '98px',
+            left: '128px',
+            bottom: 'auto',
+            width: '60%',
+            // right: 'auto',
+            paddingTop: '30px',
+            backgroundColor: '#141833'
+        },
+        [theme.breakpoints.down('xs')]: {
+            top: '148px',
+            left: '128px',
+            bottom: 'auto',
+            right: 'auto',
+            paddingTop: '30px',
+            flexWrap: 'wrap',
+            flexDirection: 'column',
+        },
+
         fontSize: '16px',
         fontStyle: 'normal',
         fontWeight: '500',
         lineHeight: '24px',
-        letterSpacing: '0px'
+        letterSpacing: '0px',
+    },
+    eventName: {
+        background: 'linear-gradient(90deg, #E5BAFF 0%, #FFFCC0 44.48%), #FFFFFF',
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent'
     },
 }));
 
@@ -200,18 +264,18 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
 
     return (
         <Dialog onClose={onClose} open={open} classes={{
-                container: classes.dialogContainer,
-                root: classes.dialogRoot,
-                paper: classes.paper
-            }}
+            container: classes.dialogContainer,
+            root: classes.dialogRoot,
+            paper: classes.paper
+        }}
             maxWidth='sm'
             fullWidth>
             <DialogContent style={{ padding: '0px' }}>
-                <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
+                <div className={classes.closeButtonContainer}>
                     <CloseIcon onClick={onClose} className={classes.closeButton} />
                 </div>
-                <div style={{ display: 'flex' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: '205px', maxWidth: '210px' }}>
+                <div className={classes.itemsContainer}>
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: '210px', width: '210px', marginRight: '70px' }}>
                         <p className={classes.title}>
                             {t('QaplaStreamDialogs.EventManagementDialog.streamActions')}
                         </p>
@@ -275,8 +339,7 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
                             </Button>
                         }
                     </div>
-                    <div style={{ width: '70px' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
+                    <div className={classes.sendContainer}>
                         <p className={classes.title}>
                             💬 {t('QaplaStreamDialogs.EventManagementDialog.sendMessage')}
                         </p>
@@ -306,9 +369,15 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
                     </div>
                 </div>
             </DialogContent>
-            <p style={{ position: 'absolute', right: '30px', bottom: '-40px', }} className={classes.eventName}>
-                {`${streamTitle} / ${date} / ${hour}`}
-            </p>
+            <div className={classes.eventNameContainer}>
+                <p className={classes.eventName}>
+                    {`${streamTitle} `}
+                </p>
+                <p>
+                    {`/ ${date} / ${hour}`}
+                </p>
+            </div>
+
         </Dialog>
     )
 }

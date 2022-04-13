@@ -782,3 +782,11 @@ export async function createQlan(uid, code, name, image) {
     await qreatorsCodesRef.child(uid).update({ code });
     return await qlanesRef.child(uid).update({ name, image });
 }
+
+/**
+ * Gets the Qreator code of the given user
+ * @param {string} uid User identifier
+ */
+export async function getQreatorCode(uid) {
+    return await qreatorsCodesRef.child(uid).child('code').once('value');
+}

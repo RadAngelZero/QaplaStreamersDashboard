@@ -42,6 +42,23 @@ body {
     margin-right: 20px !important;
 }
 
+.qreatorCodeContainer {
+    margin-right: 46px;
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.qreatorCode {
+    margin-left: 8px;
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 700;
+    color: #FFF;
+}
+
 .messagesButton {
     min-height: 72px;
     border-radius: 20px !important;
@@ -52,7 +69,6 @@ body {
     text-transform: none !important;
     max-height: 48px !important;
     margin-right: 20px !important;
-    margin-left: auto !important;
 }
 
 @media (max-width: 766px) {

@@ -58,21 +58,10 @@ const StreamersSignin = ({ user, title }) => {
         }
     }, [user, history, isLoadingAuth]);
 
-    const signIn = async () => {
-        closeTermsAndConditionsModal();
+    const signIn = () => {
         setIsLoadingAuth(true);
         signInWithTwitch();
         setIsLoadingAuth(false);
-    }
-
-    const handleSignInClick = () => {
-        const userHasAcceptedTerms = localStorage.getItem('termsAndConditions');
-
-        if (userHasAcceptedTerms) {
-            signIn();
-        } else {
-            setOpenTermsAndConditionsDialog(true);
-        }
     }
 
     const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
@@ -107,7 +96,7 @@ const StreamersSignin = ({ user, title }) => {
                             className={styles.continueButton}
                             disabled={isLoadingAuth}
                             startIcon={<TwitchIcon />}
-                            onClick={handleSignInClick}>
+                            onClick={signIn}>
                             {!isLoadingAuth ?
                                 'Sign in with Twitch'
                                 :

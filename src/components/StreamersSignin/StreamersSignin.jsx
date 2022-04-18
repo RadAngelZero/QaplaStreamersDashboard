@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     Grid,
     Button
@@ -30,6 +31,7 @@ const StreamersSignin = ({ user, title }) => {
     const [openTermsAndConditionsDialog, setOpenTermsAndConditionsDialog] = useState(false);
     const history = useHistory();
     const query = useQuery();
+    const { t } = useTranslation();
 
     useEffect(() => {
         async function checkIfUsersIsSigningIn() {
@@ -98,13 +100,16 @@ const StreamersSignin = ({ user, title }) => {
                             startIcon={<TwitchIcon />}
                             onClick={signIn}>
                             {!isLoadingAuth ?
-                                'Sign in with Twitch'
+                                t('StreamersSignin.signIn')
                                 :
-                                'Loading...'
+                                t('StreamersSignin.loading')
                             }
                         </Button>
                         <p style={{ marginTop: 16, color: '#FFF', fontSize: '.8rem' }}>
-                            Al presionar Sign in with Twitch, aceptas nuestros <u style={{ cursor: 'pointer', color: '#3B4BF9' }} onClick={() => setOpenTermsAndConditionsDialog(true)}>Terminos y condiciones</u>
+                            {t('StreamersSignin.termsAndConditionsP1')}
+                            <u style={{ cursor: 'pointer', color: '#3B4BF9' }} onClick={() => setOpenTermsAndConditionsDialog(true)}>
+                                {t('StreamersSignin.termsAndConditionsP2')}
+                            </u>
                         </p>
                     </div>
                 </Grid>

@@ -354,6 +354,7 @@ const StreamerProfile = ({ user, games }) => {
                         cheersQoins={cheersQoins}
                         qlanQoins={qlanQoins}
                         estimatedBits={estimatedBits}
+                        valueOfQoinsForStreamer={valueOfQoinsForStreamer}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />
                 </>

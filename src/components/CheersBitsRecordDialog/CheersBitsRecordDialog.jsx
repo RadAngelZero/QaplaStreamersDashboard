@@ -339,8 +339,9 @@ const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanB
     );
 }
 
-const PaidBits = ({ bitsBalance, payments, onPeriodChange }) => {
+const PaidBits = ({ bitsBalance, valueOfQoinsForStreamer, isPaidUser, payments, onPeriodChange }) => {
     const classes = useStyles();
+    const { t } = useTranslation();
 
     return (
         <>
@@ -349,9 +350,15 @@ const PaidBits = ({ bitsBalance, payments, onPeriodChange }) => {
                 showPeriod
                 onPeriodChange={onPeriodChange} />
             <div className={classes.subDataContainer}>
-                <p style={{ display: 'flex' }}> 200 Qoins = 10 Bits </p>
-                <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>Bits estimados a entregar con subscripción activa</p>
-                <p style={{ display: 'flex', color: '#FFFFFFA6', marginTop: '45px', lineHeight: '17px', fontWeight: '400' }}>Cheers entregados</p>
+                <p style={{ display: 'flex' }}>
+                    200 Qoins = {valueOfQoinsForStreamer} Bits
+                </p>
+                <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>
+                    {`${t('CheersBitsRecordDialog.bitsToPay')} ${isPaidUser ? t('CheersBitsRecordDialog.withSubscription') : ''}`}
+                </p>
+                <p style={{ display: 'flex', color: '#FFFFFFA6', marginTop: '45px', lineHeight: '17px', fontWeight: '400' }}>
+                    {t('CheersBitsRecordDialog.deliveredCheers')}
+                </p>
             </div>
 
             <List className={classes.list} style={{ maxHeight: '54vh', marginTop: '20px', paddingTop: '0px' }}>
@@ -375,7 +382,7 @@ const PaidBits = ({ bitsBalance, payments, onPeriodChange }) => {
     );
 }
 
-const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, open, onClose, pressed, setPendingMessages }) => {
+const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, valueOfQoinsForStreamer, open, onClose, pressed, setPendingMessages }) => {
     const [value, setValue] = useState('Qoins');
     const [qoinsCheers, setQoinsCheers] = useState({});
     const [paymentsHistory, setPaymentsHistory] = useState({});
@@ -465,6 +472,8 @@ const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, o
                 }
                 {value === 'Bits' &&
                     <PaidBits bitsBalance={estimatedBits}
+                        valueOfQoinsForStreamer={valueOfQoinsForStreamer}
+                        isPaidUser={user.premium || user.freeTrial}
                         payments={paymentsHistory}
                         onPeriodChange={loadPaymentsByTimestamp} />
                 }

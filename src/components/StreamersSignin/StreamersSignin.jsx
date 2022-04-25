@@ -13,9 +13,10 @@ import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
-import { getUserToken } from '../../services/functions';
+import { getUserToken, subscribeStreamerToTwitchWebhook } from '../../services/functions';
 import { createStreamerProfile, updateStreamerProfile } from '../../services/database';
 import QaplaTerms from '../QaplaTerms/QaplaTerms';
+import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -44,6 +45,8 @@ const StreamersSignin = ({ user, title }) => {
                     const userData = await getTwitchUserData(tokenData.data.access_token);
                     const user = await signUpOrSignInTwitchUser(userData, tokenData.data);
                     if (user.userData.isNewUser) {
+                        await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
+                        await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
                         await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
                     }
                     await updateStreamerProfile(user.firebaseAuthUser.user.uid, { termsAndConditions: true, twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });

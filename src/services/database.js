@@ -27,6 +27,8 @@ const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers
 const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
+const qaplaChallengeRef = database.ref('/QaplaChallenge');
+const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -789,4 +791,43 @@ export async function createQlan(uid, code, name, image) {
  */
 export async function getQreatorCode(uid) {
     return await qreatorsCodesRef.child(uid).child('code').once('value');
+}
+
+////////////////////////
+// Qapla Challenge
+////////////////////////
+
+/**
+ * Listen to the xq counter of the given streamer for the Qapla Challenge
+ * @param {string} streamerUid Streamer identifier
+ * @param {function} callback Function to execute when xq node is updated
+ */
+export function listenQaplaChallengeXQProgress(streamerUid, callback) {
+    return qaplaChallengeRef.child(streamerUid).child('xq').on('value', callback);
+}
+
+/**
+ * Gets the category of the Qapla Challenge in which the user is participating
+ * @param {string} streamerUid Streamer identifier
+ */
+export async function getStreamerChallengeCategory(streamerUid) {
+    return await qaplaChallengeRef.child(streamerUid).child('category').once('value');
+}
+
+/**
+ * Get the goal (XQ amount needed to pass to the next level) of the current level
+ * @param {number} category Category in which the user is participating
+ * @param {number} currentXQ Current ammount of XQ
+ */
+export async function getChallengeLevelGoal(category, currentXQ) {
+    return await qaplaChallengeLevelsRef.child(category).orderByValue().startAt(currentXQ).limitToFirst(1).once('value');
+}
+
+/**
+ * Get the goal (XQ amount needed to pass) from the previous level
+ * @param {number} category Category in which the user is participating
+ * @param {number} currentXQ Current ammount of XQ
+ */
+export async function getChallengePreviousLevelGoal(category, currentXQ) {
+    return await qaplaChallengeLevelsRef.child(category).orderByValue().endAt(currentXQ).limitToLast(1).once('value');
 }

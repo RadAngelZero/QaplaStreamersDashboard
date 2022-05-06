@@ -26,7 +26,7 @@ const useStyles = makeStyles({
     }
 });
 
-const NewStreamDetailsDialog = ({ open, onClose, userName, submitEvent, date, game, title, descriptions, descriptionsTitle }) => {
+const NewStreamDetailsDialog = ({ open, onClose, lockSendButton, userName, submitEvent, date, game, title, descriptions, descriptionsTitle }) => {
     const classes = useStyles();
     const { t } = useTranslation();
 
@@ -74,7 +74,7 @@ const NewStreamDetailsDialog = ({ open, onClose, userName, submitEvent, date, ga
                 <ContainedButton variant='outlined' onClick={onClose} color="primary">
                     {t('cancel')}
                 </ContainedButton>
-                <ContainedButton variant='outlined' onClick={submitEvent} color="primary" autoFocus>
+                <ContainedButton variant='outlined' disabled={lockSendButton} onClick={submitEvent} color="primary" autoFocus>
                     {t('continue')}
                 </ContainedButton>
             </DialogActions>

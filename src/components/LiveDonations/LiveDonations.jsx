@@ -185,22 +185,17 @@ const LiveDonations = () => {
     const qaplaChallengeBarProgress = (qaplaChallengeXQ - previousGoalXQ)/(nextGoalXQ - previousGoalXQ);
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100vh', width: '100%', placeItems: 'flex-end' }}>
-            {showQaplaChallengeProgress && (nextGoalXQ && qaplaChallengeXQ) &&
-                <>
-                    <p style={{ fontSize: 40, color: 'white', marginRight: 24 }}>
-                        {qaplaChallengeBarProgress}
-                    </p>
-                </>
-            }
             {donationToShow &&
                 <>
                     <DonationHandler donationToShow={donationToShow} />
                 </>
             }
-            <QlanProgressBar
-                percentage={0.5} // Progress percentage from 0 to 1
-                xq={2000}
-            />
+            {showQaplaChallengeProgress && qaplaChallengeBarProgress &&
+               <QlanProgressBar
+                    percentage={qaplaChallengeBarProgress}
+                    xq={qaplaChallengeXQ}
+                />
+            }
         </div>
     );
 }

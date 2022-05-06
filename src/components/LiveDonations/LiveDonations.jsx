@@ -7,6 +7,7 @@ import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnrea
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
 import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
@@ -146,6 +147,10 @@ const LiveDonations = () => {
                     <DonationHandler donationToShow={donationToShow} />
                 </>
             }
+            <QlanProgressBar
+                percentage={0.5} // Progress percentage from 0 to 1
+                xq={2000}
+            />
         </div>
     );
 }

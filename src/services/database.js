@@ -742,6 +742,15 @@ export async function setAlertSetting(uid, settingKey, value) {
 }
 
 /**
+ * Listen the alerts settings of the given streamer (useful in the LiveDonations component)
+ * @param {string} uid User identifier
+ * @param {function} callback Function to handle the response of the listener
+ */
+export async function listenToStreamerAlertsSettings(uid, callback) {
+    return streamerAlertsSettingsRef.child(uid).on('value', callback);
+}
+
+/**
  * Get the media selected by the streamer to show in their cheers
  * @param {string} uid User identifier
  */

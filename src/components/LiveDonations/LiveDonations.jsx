@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
 import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
@@ -40,11 +40,12 @@ const LiveDonations = () => {
                 const uid = await getStreamerUidWithTwitchId(streamerId);
                 setStreamerUid(uid);
 
-                const streamerSettings = await getStreamerAlertsSettings(uid);
-                if (streamerSettings.exists()) {
-                    setAlertSideRight(streamerSettings.val().alertSideRight);
-                    setShowQaplaChallengeProgress(streamerSettings.val().showQaplaChallengeProgress !== false);
-                }
+                listenToStreamerAlertsSettings(uid, (streamerSettings) => {
+                    if (streamerSettings.exists()) {
+                        setAlertSideRight(streamerSettings.val().alertSideRight);
+                        setShowQaplaChallengeProgress(streamerSettings.val().showQaplaChallengeProgress !== false);
+                    }
+                });
 
                 listenForTestCheers(uid, (donation) => {
                     pushDonation({ ...donation.val(), id: donation.key });

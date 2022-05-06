@@ -98,9 +98,9 @@ const CheersSettings = ({ uid, twitchId }) => {
         async function getSettings() {
             const settings = await getStreamerAlertsSettings(uid);
             if (settings.exists()) {
-                setSide(Boolean(settings.val().alertSideRight).valueOf() ? RIGHT : LEFT);
+                setSide(settings.val().alertSideRight ? RIGHT : LEFT);
 
-                setShowQaplaChallengeProgress(Boolean(settings.val().showQaplaChallengeProgress).valueOf());
+                setShowQaplaChallengeProgress(settings.val().showQaplaChallengeProgress !== false);
             }
         }
 
@@ -143,12 +143,12 @@ const CheersSettings = ({ uid, twitchId }) => {
                 <Grid container className={classes.instructionsMargin}>
                     <Grid xs={12} sm={8} md={7}>
                         <p className={classes.instructionTitle}>
-                            Qapla Challenge
+                            {t('CheersSettings.QaplaChallenge')}
                         </p>
                         <p className={classes.instructionDescription}>
-                            Choose whether show or not the progress of your Qlan in the Qapla challenge
+                            {t('CheersSettings.showQaplaChallengeProgress')}
                         </p>
-                        <FormControlLabel label='Show progress on overlay'
+                        <FormControlLabel label={t('CheersSettings.QaplaChallengeProgressCheckboxLabel')}
                             control={<Checkbox
                                 checked={showQaplaChallengeProgress}
                                 onChange={(e) => changeQaplaChallengeProgressBarView(e.target.checked)}

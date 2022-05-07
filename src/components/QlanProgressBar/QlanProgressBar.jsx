@@ -89,7 +89,7 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
         }}>
             <div style={{
                 display: 'flex',
-                // zIndex: 10,
+                zIndex: 10,
             }}>
                 <img src={QaplaLogoOverlay} alt='QaplaLogoOverlay' style={{ width: '151px' }} />
             </div>

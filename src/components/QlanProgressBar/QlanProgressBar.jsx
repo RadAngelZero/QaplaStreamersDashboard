@@ -103,22 +103,30 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                 <div style={{
                     alignSelf: 'flex-end',
                     marginRight: '6px',
-                    borderRadius: '6px',
-                    backgroundColor: '#4446',
-                    padding: '2px 6px'
+                    padding: '2px 0px'
                 }}>
                     <p style={{
-                        color: '#fff'
+                        color: '#777',
+                        fontSize: '11px',
+                        fontWeight: '400',
+                        lineHeight: '18px',
+                        letterSpacing: '0.3499999940395355px',
 
-                    }}>{`QLAN XQ `}
-                        <span
-                        className='xq-container'
-                        onAnimationEnd={() => {
-                            setXqSave(xq);
-                            setPlayXqAnimation('false');
-                            console.log('xq end')
+                    }}
+                        ref={(el) => {
+                            if (el) {
+                                el.style.setProperty('font-family', `'Mechsuit', sans-serif`, 'important');
+                            }
                         }}
-                        playAnimation={playXqAnimation}
+                    >{`QLAN XQ `}
+                        <span
+                            className='xq-container'
+                            onAnimationEnd={() => {
+                                setXqSave(xq);
+                                setPlayXqAnimation('false');
+                                console.log('xq end')
+                            }}
+                            playAnimation={playXqAnimation}
                         >
                             <style>{xqAnimation}</style>
                         </span>

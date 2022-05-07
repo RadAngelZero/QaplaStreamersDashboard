@@ -1,8 +1,15 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 import QaplaLogoOverlay from './../../assets/Qapla-Logo-Overlay.png';
 
 const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
+
+    const [percentageSave, setPercentageSave] = useState(0);
+    const [playProgressAnimation, setPlayProgressAnimation] = useState("false")
+
+    useEffect(() => {
+        setPlayProgressAnimation("true");
+    }, [percentage]) 
 
     const gradientAnimation = `
     @keyframes gradient-animation {
@@ -15,6 +22,27 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
         animation-duration: 5s;
         animation-iteration-count: infinite;
         animation-timing-function: linear;
+    }
+    `
+
+    const progressAnimation = `
+    @keyframes progress-animation {
+        from {width: ${percentageSave * 100}%;}
+        to {width: ${percentage * 100}%;}
+    }
+
+    .progress-container {
+        display: flex;
+        height: 100%;
+        width: ${percentageSave * 100}%;
+        overflow: hidden;
+    }
+
+    .progress-container[playAnimation='true'] {
+        animation-name: progress-animation;
+        animation-duration: 2s;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-out;
     }
     `
 
@@ -59,13 +87,16 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                     borderRadius: '5px',
                     overflow: 'hidden',
                 }}>
-                    {/* <style>{gradientAnimation}</style> */}
-                    <div style={{
-                        display: 'flex',
-                        height: '100%',
-                        width: `${percentage * 100}%`,
-                        overflow: 'hidden',
-                    }}>
+                    <div
+                    onAnimationEnd={() => {
+                        setPercentageSave(percentage);
+                        setPlayProgressAnimation('false');
+                        console.log('animation end');
+                    }}
+                    className="progress-container"
+                    playAnimation={playProgressAnimation}
+                    >
+                        <style>{progressAnimation}</style>
                         <div style={{
                             display: 'flex',
                             height: '100%',

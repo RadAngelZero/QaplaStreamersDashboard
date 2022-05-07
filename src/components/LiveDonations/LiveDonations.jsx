@@ -143,39 +143,45 @@ const LiveDonations = () => {
         }
 
         if (streamerUid) {
-            async function getNextGoal(xq) {
-                const category = await getStreamerChallengeCategory(streamerUid);
-                const neededXQ = await getChallengeLevelGoal(category.val(), xq + 1);
-                const previousGoalXQ = await getChallengePreviousLevelGoal(category.val(), xq);
+            async function checkIfUserIsUserParticipantOfQaplaChallenge() {
+                async function getNextGoal(xq, category) {
+                    const neededXQ = await getChallengeLevelGoal(category, xq + 1);
+                    const previousGoalXQ = await getChallengePreviousLevelGoal(category, xq);
 
-                if (neededXQ.exists()) {
-                    neededXQ.forEach((levelXQ) => {
-                        setNextGoalXQ(levelXQ.val());
-                    });
+                    if (neededXQ.exists()) {
+                        neededXQ.forEach((levelXQ) => {
+                            setNextGoalXQ(levelXQ.val());
+                        });
 
-                    previousGoalXQ.forEach((pastLevelXQ) => {
-                        setPreviousGoalXQ(pastLevelXQ.val());
-                    });
+                        previousGoalXQ.forEach((pastLevelXQ) => {
+                            setPreviousGoalXQ(pastLevelXQ.val());
+                        });
 
-                    setQaplaChallengeXQ(xq);
-                } else {
-                    /**
-                     * Show some cool UI to let the streamer know he has achieved all the levels in the
-                     * Qapla Challenge
-                     */
+                        setQaplaChallengeXQ(xq);
+                    } else {
+                        /**
+                         * Show some cool UI to let the streamer know he has achieved all the levels in the
+                         * Qapla Challenge
+                         */
 
-                     previousGoalXQ.forEach((pastLevelXQ) => {
-                        setNextGoalXQ(pastLevelXQ.val());
-                        setQaplaChallengeXQ(pastLevelXQ.val());
+                         previousGoalXQ.forEach((pastLevelXQ) => {
+                            setNextGoalXQ(pastLevelXQ.val());
+                            setQaplaChallengeXQ(pastLevelXQ.val());
+                        });
+                    }
+                }
+
+                const userParticipation = await getStreamerChallengeCategory(streamerUid);
+                if (userParticipation.exists()) {
+                    listenQaplaChallengeXQProgress(streamerUid, (xqProgress) => {
+                        if (xqProgress.exists()) {
+                            getNextGoal(xqProgress.val(), userParticipation.val());
+                        }
                     });
                 }
             }
 
-            listenQaplaChallengeXQProgress(streamerUid, (xqProgress) => {
-                if (xqProgress.exists()) {
-                    getNextGoal(xqProgress.val());
-                }
-            });
+            checkIfUserIsUserParticipantOfQaplaChallenge();
         }
     }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio]);
 

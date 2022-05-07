@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
 import QaplaLogoOverlay from './../../assets/Qapla-Logo-Overlay.png';
 
@@ -6,10 +6,13 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
 
     const [percentageSave, setPercentageSave] = useState(0);
     const [playProgressAnimation, setPlayProgressAnimation] = useState("false")
+    const [xqSave, setXqSave] = useState(0);
+    const [playXqAnimation, setPlayXqAnimation] = useState("false")
 
     useEffect(() => {
         setPlayProgressAnimation("true");
-    }, [percentage]) 
+        setPlayXqAnimation("true");
+    }, [percentage])
 
     const gradientAnimation = `
     @keyframes gradient-animation {
@@ -38,12 +41,45 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
         overflow: hidden;
     }
 
-    .progress-container[playAnimation='true'] {
+    .progress-container[playAnimation="true"] {
         animation-name: progress-animation;
-        animation-duration: 2s;
+        animation-duration: 5s;
         animation-iteration-count: 1;
         animation-timing-function: ease-out;
     }
+    `
+
+    const xqAnimation = `
+    @property --num {
+        syntax: "<integer>";
+        initial-value: ${xqSave};
+        inherits: false;
+    }
+
+    .xq-container {
+        color: #0AFFD2;
+        counter-set: num var(--num);
+    }
+
+    .xq-container:after{
+        content: counter(num);
+    }
+
+    .xq-container[playAnimation='true'] {
+        animation-name: counter;
+        animation-duration: 5s;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-in-out;
+        counter-reset: num var(--num);
+    }
+
+    @keyframes counter {
+        from {
+          --num: ${xqSave};
+        }
+        to {
+          --num: ${xq};
+        } 
     `
 
     return (
@@ -74,8 +110,19 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                     <p style={{
                         color: '#fff'
 
-                    }}>{`QLAN XQ ${xq}`}
-
+                    }}>{`QLAN XQ `}
+                        <span
+                        className='xq-container'
+                        onAnimationEnd={() => {
+                            setXqSave(xq);
+                            setPlayXqAnimation('false');
+                            console.log('xq end')
+                        }}
+                        playAnimation={playXqAnimation}
+                        
+                        >
+                            <style>{xqAnimation}</style>
+                        </span>
                     </p>
                 </div>
 
@@ -88,13 +135,13 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                     overflow: 'hidden',
                 }}>
                     <div
-                    onAnimationEnd={() => {
-                        setPercentageSave(percentage);
-                        setPlayProgressAnimation('false');
-                        console.log('animation end');
-                    }}
-                    className="progress-container"
-                    playAnimation={playProgressAnimation}
+                        onAnimationEnd={() => {
+                            setPercentageSave(percentage);
+                            setPlayProgressAnimation('false');
+                            console.log('progress end');
+                        }}
+                        className="progress-container"
+                        playAnimation={playProgressAnimation}
                     >
                         <style>{progressAnimation}</style>
                         <div style={{

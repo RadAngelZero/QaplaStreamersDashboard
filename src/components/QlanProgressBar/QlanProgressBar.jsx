@@ -12,7 +12,7 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
     useEffect(() => {
         setPlayProgressAnimation("true");
         setPlayXqAnimation("true");
-    }, [percentage])
+    }, [percentage, xq])
 
     const gradientAnimation = `
     @keyframes gradient-animation {
@@ -119,7 +119,6 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                             console.log('xq end')
                         }}
                         playAnimation={playXqAnimation}
-                        
                         >
                             <style>{xqAnimation}</style>
                         </span>

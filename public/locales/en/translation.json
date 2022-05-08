@@ -138,6 +138,9 @@
         }
     },
     "CheersSettings": {
+        "QaplaChallenge": "Qapla Challenge",
+        "showQaplaChallengeProgress": "Choose whether show or not the progress of your Qlan in the Qapla Challenge",
+        "QaplaChallengeProgressCheckboxLabel": "Show progress on overlay",
         "title": "Receive messages from your community",
         "description": "Show the messages of the cheers that your community sends you in your streams by adding this link into your OBS.",
         "instruction0": {

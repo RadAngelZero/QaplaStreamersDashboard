@@ -103,10 +103,12 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                 <div style={{
                     alignSelf: 'flex-end',
                     marginRight: '6px',
-                    padding: '2px 0px'
+                    borderRadius: '6px',
+                    backgroundColor: '#444c',
+                    padding: '2px 6px'
                 }}>
                     <p style={{
-                        color: '#777',
+                        color: '#fff',
                         fontSize: '11px',
                         fontWeight: '400',
                         lineHeight: '18px',

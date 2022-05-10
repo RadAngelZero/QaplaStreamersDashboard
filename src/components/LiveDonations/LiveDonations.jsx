@@ -178,6 +178,8 @@ const LiveDonations = () => {
                             getNextGoal(xqProgress.val(), userParticipation.val());
                         }
                     });
+                }  else {
+                    setShowQaplaChallengeProgress(false);
                 }
             }
 
@@ -196,7 +198,7 @@ const LiveDonations = () => {
                     <DonationHandler donationToShow={donationToShow} />
                 </>
             }
-            {showQaplaChallengeProgress && qaplaChallengeBarProgress &&
+            {showQaplaChallengeProgress &&
                <QlanProgressBar
                     percentage={qaplaChallengeBarProgress}
                     xq={qaplaChallengeXQ}

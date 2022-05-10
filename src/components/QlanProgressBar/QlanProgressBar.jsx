@@ -124,7 +124,6 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                             onAnimationEnd={() => {
                                 setXqSave(xq);
                                 setPlayXqAnimation('false');
-                                console.log('xq end')
                             }}
                             playAnimation={playXqAnimation}
                         >
@@ -145,7 +144,6 @@ const QlanProgressBar = ({ percentage = 0, xq = 0 }) => {
                         onAnimationEnd={() => {
                             setPercentageSave(percentage);
                             setPlayProgressAnimation('false');
-                            console.log('progress end');
                         }}
                         className="progress-container"
                         playAnimation={playProgressAnimation}

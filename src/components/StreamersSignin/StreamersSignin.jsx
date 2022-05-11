@@ -3,12 +3,14 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     Grid,
-    Button
+    Button,
+    Hidden
 } from '@material-ui/core';
 import dayjs from 'dayjs';
 
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPage.svg';
+import { ReactComponent as QaplaGaming } from './../../assets/QaplaGamingLandingPage.svg';
 import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -74,25 +76,30 @@ const StreamersSignin = ({ user, title }) => {
     if (user === undefined) {
         return (
             <StreamerDashboardContainer>
-                <Grid item md='4' style={{
+                <Hidden smDown>
+                    <Grid item md='4' style={{
                         backgroundImage: `url(${RoomGame})`,
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: 'cover',
                         height: '100%',
                     }}>
-                    <div style={{
+                        <div style={{
                             display: 'flex',
                             flexGrow: 1,
                             justifyContent: 'center',
                             height: '100vh',
                             alignItems: 'flex-end'
                         }}>
-                    <QaplaIcon style={{ marginBottom: 32 }} />
-                    </div>
-                </Grid>
+                            <QaplaIcon style={{ marginBottom: 32 }} />
+                        </div>
+                    </Grid>
+                </Hidden>
                 <Grid item md='1' />
-                <Grid item md='6'>
+                <Grid item md='6' className={styles.mainContainer}>
+                    <Hidden mdUp>
+                        <QaplaGaming style={{marginTop: '8vh', marginBottom: '5vh', transform: 'scale(1.5)'}} />
+                    </Hidden>
                     <p className={styles.getStarted}>
                         {title}
                     </p>

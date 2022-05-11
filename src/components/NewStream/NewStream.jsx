@@ -126,6 +126,7 @@ const NewStream = ({ user, games }) => {
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [gamesData, setGamesData] = useState([]);
     const [showAccountActviation, setShowAccountActviation] = useState(false);
+    const [lockSendButton, setLockSendButton] = useState(false);
 
     useEffect(() => {
         let gameList = [];
@@ -238,15 +239,19 @@ const NewStream = ({ user, games }) => {
     const openConfirmationDialog = () => setOpenDetailsDialog(true);
 
     const submitEvent = async () => {
+        setLockSendButton(true);
         if (!user.premium && !user.freeTrial) {
+            setLockSendButton(false);
             return setShowAccountActviation(true);
         }
 
         if (selectedDate < minDate) {
+            setLockSendButton(false);
             alert(t('NewStream.alerts.before24h'));
             return;
         }
         if (!selectedGame) {
+            setLockSendButton(false);
             alert(t('NewStream.alerts.missingData'));
             return;
         }
@@ -556,6 +561,7 @@ const NewStream = ({ user, games }) => {
                     </Grid>
                 </Grid>
                 <NewStreamDetailsDialog
+                    lockSendButton={lockSendButton}
                     open={openDetailsDialog}
                     onClose={() => setOpenDetailsDialog(false)}
                     submitEvent={submitEvent}

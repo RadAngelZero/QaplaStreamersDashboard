@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, Grid, Card, CardMedia, Tooltip } from '@material-ui/core';
+import { Checkbox, makeStyles, Grid, Card, CardMedia, Tooltip, FormControlLabel } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import {
+    CHEERS_URI,
     LEFT,
     RIGHT
 } from '../../utilities/Constants';
 
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
-import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 
 import Step1 from './../../assets/addCheersTutorial1.jpg';
 import Step2 from './../../assets/addCheersTutorial2.jpg';
@@ -17,7 +17,7 @@ import Step3 from './../../assets/addCheersTutorial3.jpg';
 import Step4 from './../../assets/addCheersTutorial4.jpg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
-import { getStreamerAlertsSettings, setAlertSetting, writeTestCheer } from './../../services/database';
+import { getStreamerAlertsSettings, getStreamerChallengeCategory, setAlertSetting, writeTestCheer } from './../../services/database';
 
 const useStyles = makeStyles(() => ({
     instructionsMargin: {
@@ -47,6 +47,9 @@ const useStyles = makeStyles(() => ({
     },
     cursorPointer: {
         cursor: 'pointer'
+    },
+    checkboxColor: {
+        color: '#0AFFD2 !important'
     }
 }));
 
@@ -84,9 +87,11 @@ const InstructionSection = ({ title, description, mediaContainerComponent = 'img
 
 const CheersSettings = ({ uid, twitchId }) => {
     const classes = useStyles();
-    const cheersURL = `https://dashboard.qapla.gg/liveDonations/${twitchId}`;
+    const cheersURL = `${CHEERS_URI}/${twitchId}`;
     const [openTooltip, setOpenTooltip] = useState(false);
     const [side, setSide] = useState(LEFT);
+    const [showQaplaChallengeProgress, setShowQaplaChallengeProgress] = useState(false);
+    const [isUserParticipantOfQaplaChallenge, setIsUserParticipantOfQaplaChallenge] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -94,11 +99,19 @@ const CheersSettings = ({ uid, twitchId }) => {
             const settings = await getStreamerAlertsSettings(uid);
             if (settings.exists()) {
                 setSide(settings.val().alertSideRight ? RIGHT : LEFT);
+
+                setShowQaplaChallengeProgress(settings.val().showQaplaChallengeProgress !== false);
             }
+        }
+
+        async function checkIfUserIsUserParticipantOfQaplaChallenge() {
+            const userParticipation = await getStreamerChallengeCategory(uid);
+            setIsUserParticipantOfQaplaChallenge(userParticipation.exists());
         }
 
         if (uid) {
             getSettings();
+            checkIfUserIsUserParticipantOfQaplaChallenge();
         }
     }, [uid]);
 
@@ -119,9 +132,32 @@ const CheersSettings = ({ uid, twitchId }) => {
         setAlertSetting(uid, 'alertSideRight', side === RIGHT);
     }
 
+    const changeQaplaChallengeProgressBarView = (show) => {
+        setShowQaplaChallengeProgress(show);
+        setAlertSetting(uid, 'showQaplaChallengeProgress', show);
+    }
+
     return (
         <div className={classes.container}>
-            <p className={classes.instructionTitle}>
+            {isUserParticipantOfQaplaChallenge &&
+                <Grid container className={classes.instructionsMargin}>
+                    <Grid xs={12} sm={8} md={7}>
+                        <p className={classes.instructionTitle}>
+                            {t('CheersSettings.QaplaChallenge')}
+                        </p>
+                        <p className={classes.instructionDescription}>
+                            {t('CheersSettings.showQaplaChallengeProgress')}
+                        </p>
+                        <FormControlLabel label={t('CheersSettings.QaplaChallengeProgressCheckboxLabel')}
+                            control={<Checkbox
+                                checked={showQaplaChallengeProgress}
+                                onChange={(e) => changeQaplaChallengeProgressBarView(e.target.checked)}
+                                classes={{ colorSecondary: classes.checkboxColor }} />}
+                            style={{ color: '#FFF', fontSize: 12, marginTop: 16 }} />
+                    </Grid>
+                </Grid>
+            }
+            <p className={`${classes.instructionTitle} ${classes.instructionsMargin}`}>
                 {t('CheersSettings.title')}
             </p>
             <p className={classes.instructionDescription}>

@@ -16,7 +16,7 @@ import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken } from '../../services/functions';
-import { createStreamerProfile, updateStreamerProfile } from '../../services/database';
+import { createStreamerProfile, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import QaplaTerms from '../QaplaTerms/QaplaTerms';
 
 var utc = require('dayjs/plugin/utc');
@@ -55,10 +55,26 @@ const StreamersSignin = ({ user, title }) => {
             }
         }
 
+        async function redirectUser() {
+            const userHasBeenRedirectedToCreateProfile = localStorage.getItem('userHasBeenRedirectedToCreateProfile');
+
+            if (userHasBeenRedirectedToCreateProfile) {
+                history.push('/profile');
+            } else {
+                console.log(await userHasPublicProfile(user.uid));
+                if (await userHasPublicProfile(user.uid)) {
+                    history.push('/profile');
+                } else {
+                    history.push('/editProfile');
+                    localStorage.setItem('userHasBeenRedirectedToCreateProfile', 'true');
+                }
+            }
+        }
+
         checkIfUsersIsSigningIn();
 
         if (user) {
-            history.push('/profile');
+            redirectUser();
         }
     }, [user, history, isLoadingAuth]);
 

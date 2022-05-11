@@ -699,6 +699,14 @@ export async function updateStreamerPublicProfile(uid, dataToUpdate) {
 }
 
 /**
+ * Returns true if the user has a public profile created
+ * @param {string} uid User identifier
+ */
+export async function userHasPublicProfile(uid) {
+    return (await streamersPublicProfilesRef.child(uid).once('value')).exists();
+}
+
+/**
  * Subscription Purchase Details
  */
 

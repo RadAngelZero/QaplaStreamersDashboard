@@ -72,7 +72,8 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
                 twitchAccessToken: tokensData.access_token,
                 refreshToken: tokensData.refresh_token,
                 scope: tokensData.scope,
-                isNewUser
+                isNewUser,
+                termsAndConditions: true
             }
         };
 

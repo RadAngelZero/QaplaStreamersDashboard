@@ -11,7 +11,7 @@ import {
     loadStreamerProfile,
     loadQaplaGames
 } from './services/database';
-import { handleUserAuthentication, signOut } from './services/auth';
+import { handleUserAuthentication } from './services/auth';
 import StreamersSignin from './components/StreamersSignin/StreamersSignin';
 import StreamerOnBoarding from './components/StreamerOnBoarding/StreamerOnBoarding';
 import StreamerProfile from './components/StreamerProfile/StreamerProfile';
@@ -113,10 +113,6 @@ const Router = () => {
             }, () => {
                 setUser(undefined);
             });
-        }
-
-        if (user && !user.termsAndConditions) {
-            signOut();
         }
 
         if (!user) {

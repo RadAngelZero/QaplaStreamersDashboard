@@ -48,7 +48,7 @@ const StreamersSignin = ({ user, title }) => {
                     if (user.userData.isNewUser) {
                         await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
                     }
-                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, { termsAndConditions: true, twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
+                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, { twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
                 } else {
                     alert('Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico');
                 }

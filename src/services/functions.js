@@ -132,3 +132,12 @@ export async function sendCustomMessage(uid, title, body) {
         console.log(error);
     }
 }
+
+export async function subscribeStreamerToMailerLiteGroup(email, name) {
+    const addSubscriberToStreamersMailerLiteGroup = functions.httpsCallable('addSubscriberToStreamersMailerLiteGroup');
+    try {
+        return await addSubscriberToStreamersMailerLiteGroup({ email, name });
+    } catch (error) {
+        console.log(error);
+    }
+}

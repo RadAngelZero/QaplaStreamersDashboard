@@ -15,9 +15,10 @@ import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
-import { getUserToken, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
+import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
 import { createStreamerProfile, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import QaplaTerms from '../QaplaTerms/QaplaTerms';
+import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -53,6 +54,8 @@ const StreamersSignin = ({ user, title }) => {
                             console.error(error);
                         }
 
+                        await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
+                        await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
                         await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
                     }
 

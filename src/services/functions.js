@@ -132,3 +132,17 @@ export async function sendCustomMessage(uid, title, body) {
         console.log(error);
     }
 }
+
+/**
+ * Subscribes a streamer to MailerLite group
+ * @param {string} email email of the streamer
+ * @param {string} name name of the streamer
+ */
+export async function subscribeStreamerToMailerLiteGroup(email, name) {
+    const addSubscriberToStreamersMailerLiteGroup = functions.httpsCallable('addSubscriberToStreamersMailerLiteGroup');
+    try {
+        return await addSubscriberToStreamersMailerLiteGroup({ email, name });
+    } catch (error) {
+        console.log(error);
+    }
+}

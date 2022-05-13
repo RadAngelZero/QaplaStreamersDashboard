@@ -15,9 +15,10 @@ import styles from './StreamersSignin.module.css';
 import RoomGame from './../../assets/room-game.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
-import { getUserToken } from '../../services/functions';
-import { createStreamerProfile, updateStreamerProfile } from '../../services/database';
+import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
+import { createStreamerProfile, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import QaplaTerms from '../QaplaTerms/QaplaTerms';
+import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -45,12 +46,40 @@ const StreamersSignin = ({ user, title }) => {
                 if (tokenData && tokenData.data && tokenData.data.access_token) {
                     const userData = await getTwitchUserData(tokenData.data.access_token);
                     const user = await signUpOrSignInTwitchUser(userData, tokenData.data);
+
                     if (user.userData.isNewUser) {
+                        try {
+                            await subscribeStreamerToMailerLiteGroup(user.userData.email, user.userData.displayName);
+                        } catch (error) {
+                            console.error(error);
+                        }
+
+                        await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOnline.type, webhookStreamOnline.callback);
+                        await subscribeStreamerToTwitchWebhook(user.userData.id, webhookStreamOffline.type, webhookStreamOffline.callback);
                         await createStreamerProfile(user.firebaseAuthUser.user.uid, user.userData);
                     }
-                    await updateStreamerProfile(user.firebaseAuthUser.user.uid, { termsAndConditions: true, twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
+
+                    try {
+                        await updateStreamerProfile(user.firebaseAuthUser.user.uid, { twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
+                    } catch (error) {
+                        console.log(error);
+                    }
                 } else {
                     alert('Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico');
+                }
+            }
+        }
+        async function redirectUser(uid) {
+            const userHasBeenRedirectedToCreateProfile = localStorage.getItem('userHasBeenRedirectedToCreateProfile');
+
+            if (userHasBeenRedirectedToCreateProfile) {
+                history.push('/profile');
+            } else {
+                if (await userHasPublicProfile(uid)) {
+                    history.push('/profile');
+                } else {
+                    history.push('/editProfile');
+                    localStorage.setItem('userHasBeenRedirectedToCreateProfile', 'true');
                 }
             }
         }
@@ -58,7 +87,7 @@ const StreamersSignin = ({ user, title }) => {
         checkIfUsersIsSigningIn();
 
         if (user) {
-            history.push('/profile');
+            redirectUser(user.uid);
         }
     }, [user, history, isLoadingAuth]);
 

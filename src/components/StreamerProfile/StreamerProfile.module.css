@@ -277,12 +277,15 @@ body {
 
 .innerStreamsCardContainer {
     height: 400px;
-    margin: 0px -16px !important;
+}
+
+.cardContainer {
+    margin-top: 8px;
 }
 
 .title {
     color: #FFFFFF;
-    font-size: 40px;
+    font-size: 36px;
     font-weight: 500;
     line-height: 48.5px;
     letter-spacing: -1px;
@@ -308,10 +311,6 @@ h1 {
     height: 100%;
     max-width: '250px';
     min-width: '250px';
-}
-
-.cardContainer {
-    padding: 0px 16px !important;
 }
 
 .newStream {

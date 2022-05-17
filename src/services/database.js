@@ -30,7 +30,6 @@ const qreatorsCodesRef = database.ref('/QreatorsCodes');
 const qaplaChallengeRef = database.ref('/QaplaChallenge');
 const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 const qStoreRef = database.ref('/QStore');
-const streamersGoalsRef = database.ref('/StreamersGoals');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -856,14 +855,4 @@ export async function getChallengePreviousLevelGoal(category, currentXQ) {
  */
 export async function getQStoreItems() {
     return await qStoreRef.once('value');
-}
-
-/**
- * Set the streamer goal on the database (limited to 1 goal per streamer)
- * @param {string} uid User identifier
- * @param {string} title Title of the goal
- * @param {number} qoins Number of Qoins to achieve the goal
- */
-export async function createStreamerGoal(uid, title, qoins) {
-    streamersGoalsRef.child(uid).update({ title, qoins });
 }

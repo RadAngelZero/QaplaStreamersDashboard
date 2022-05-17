@@ -256,7 +256,7 @@ const StreamerProfile = ({ user, games }) => {
                                         <Grid container xs={12} style={{ gap: '20px' }} >
                                             <Grid item xs={12} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
-                                                    <DonatedQoin />
+                                                    <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>Cheers</p>
                                                         <p className={styles.balanceDataText}>
@@ -267,7 +267,7 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                             <Grid item xs={12} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
-                                                    <DonatedQoin />
+                                                    <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>Qlan</p>
                                                         <p className={styles.balanceDataText}>
@@ -278,7 +278,7 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                             <Grid item xs={12} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Bits') }}>
-                                                    <BitsIcon style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <BitsIcon style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>{t('StreamerProfile.stimatedBits')}</p>
                                                         <p className={styles.balanceDataText}>

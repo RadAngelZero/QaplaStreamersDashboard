@@ -271,6 +271,12 @@
         "dontHaveACode": "Don't have a code?",
         "subscribe": "Subscribe to publish"
     },
+    "QStore": {
+        "QStore": "Q Store",
+        "description": "Earn rewards for your community with your $QOINS, or set a Qoins goal to reach a reward.",
+        "setGoal": "Set Qoins goal",
+        "acquire": "Acquire"
+    },
     "StreamsLeft": {
         "streams": "Remaining posts: ",
         "leftStreams": "{{available}} of {{total}}",

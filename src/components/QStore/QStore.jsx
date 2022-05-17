@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, CardActionArea, CardActions, CardMedia, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import { useTranslation } from 'react-i18next';
+
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { getQStoreItems } from '../../services/database';
 
@@ -59,16 +61,17 @@ const useStyles = makeStyles({
 
 const ProductCard = ({ image }) => {
     const classes = useStyles();
+    const { t } = useTranslation();
 
     return (
-        <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
             <Card classes={{ root: classes.card }}>
                 <CardActionArea>
                     <CardMedia className={classes.media} image={image} />
                 </CardActionArea>
                 <CardActions>
                     <Button size='large' variant='contained' classes={{ root: classes.productButton }}>
-                        Adquirir
+                        {t('QStore.acquire')}
                     </Button>
                 </CardActions>
             </Card>
@@ -78,6 +81,7 @@ const ProductCard = ({ image }) => {
 
 const QStore = ({ user }) => {
     const classes = useStyles();
+    const { t } = useTranslation();
 
     const [storeItems, setStoreItems] = useState(null);
 
@@ -99,20 +103,20 @@ const QStore = ({ user }) => {
                 <Grid container spacing={8}>
                     <Grid item xs={12}>
                         <h1 className={classes.title}>
-                            Q-Store
+                            {t('QStore.QStore')}
                         </h1>
                         <p className={classes.description}>
-                            Adquiere recompensas para tu comunidad con tus $QOINS, o pon un meta de Qoins para alcanzar una recompensa.
+                            {t('QStore.description')}
                         </p>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
                         <Card classes={{ root: classes.card }}>
                             <CardActionArea>
                                 <CardMedia className={classes.media} image='https://imageio.forbes.com/specials-images/imageserve/5fd2263efcf061ccad6f7d95/0x0.jpg?format=jpg&width=1200' />
                             </CardActionArea>
                             <CardActions>
                                 <Button size='large' variant='contained' classes={{ root: classes.goalButton }}>
-                                    Poner meta de Qoins
+                                    {t('QStore.setGoal')}
                                 </Button>
                             </CardActions>
                         </Card>

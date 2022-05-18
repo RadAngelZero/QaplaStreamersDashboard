@@ -3,11 +3,12 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
 import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
+import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
@@ -20,6 +21,9 @@ const LiveDonations = () => {
     const [qaplaChallengeXQ, setQaplaChallengeXQ] = useState(0);
     const [nextGoalXQ, setNextGoalXQ] = useState(0);
     const [previousGoalXQ, setPreviousGoalXQ] = useState(0);
+    const [qoinsGoal, setQoinsGoal] = useState(null);
+    const [qoinsGoalProgress, setQoinsGoalProgress] = useState(null);
+    const [goalTitle, setGoalTitle] = useState('');
     const [showQaplaChallengeProgress, setShowQaplaChallengeProgress] = useState(false);
     const { streamerId } = useParams();
 
@@ -183,6 +187,14 @@ const LiveDonations = () => {
                 }
             }
 
+            listenQaplaGoal(streamerUid, (goal) => {
+                if (goal.exists()) {
+                    setQoinsGoal(goal.val().goal);
+                    setQoinsGoalProgress(goal.val().qoins);
+                    setGoalTitle(goal.val().title);
+                }
+            });
+
             checkIfUserIsUserParticipantOfQaplaChallenge();
         }
     }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio]);
@@ -197,6 +209,13 @@ const LiveDonations = () => {
                 <>
                     <DonationHandler donationToShow={donationToShow} />
                 </>
+            }
+            {qoinsGoal && goalTitle &&
+                <GoalProgressBar
+                    percentage={qoinsGoalProgress / qoinsGoal}
+                    title={goalTitle}
+                    qoins={qoinsGoalProgress || 0}
+                />
             }
             {showQaplaChallengeProgress &&
                <QlanProgressBar

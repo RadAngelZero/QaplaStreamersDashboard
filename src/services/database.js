@@ -158,7 +158,8 @@ export async function checkActiveCustomReward(streamId) {
 
 /**
  * Create a stream request in the nodes StreamersEvents and StreamsApproval
- * @param {object} streamer User object
+ * @param {string} uid User identifier
+ * @param {object} streamerData User Twitch data object
  * @param {string} game Selected game for the stream
  * @param {string} date Date in format DD-MM-YYYY
  * @param {string} hour Hour in format hh:mm
@@ -168,8 +169,8 @@ export async function checkActiveCustomReward(streamId) {
  * @param {number} createdAt timestamp of when the request was created
  * @param {string} stringDate Temporary field just to detect a bug
  */
-export async function createNewStreamRequest(streamer, game, date, hour, streamType, timestamp, optionalData, createdAt, stringDate) {
-    const event = await streamersEventsDataRef.child(streamer.uid).push({
+export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, optionalData, createdAt, stringDate) {
+    const event = await streamersEventsDataRef.child(uid).push({
         date,
         hour,
         game,
@@ -181,7 +182,7 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         stringDate
     });
 
-    await premiumEventsSubscriptionRef.child(streamer.uid).child(event.key).set({
+    await premiumEventsSubscriptionRef.child(uid).child(event.key).set({
         approved: false,
         timestamp
     });
@@ -190,12 +191,12 @@ export async function createNewStreamRequest(streamer, game, date, hour, streamT
         date,
         hour,
         game,
-        idStreamer: streamer.uid,
-        streamerName: streamer.displayName,
+        idStreamer: uid,
+        streamerName: streamerData.displayName,
         streamType,
         timestamp,
-        streamerChannelLink: 'https://twitch.tv/' + streamer.login,
-        streamerPhoto: streamer.photoUrl,
+        streamerChannelLink: 'https://twitch.tv/' + streamerData.login,
+        streamerPhoto: streamerData.photoUrl,
         optionalData,
         createdAt,
         stringDate

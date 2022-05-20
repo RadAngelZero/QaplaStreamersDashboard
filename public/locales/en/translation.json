@@ -110,7 +110,7 @@
             "streamsLimit": "You have reached the limit of streams for your subscription",
             "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
         },
-        "whatAreYouPlaying": "What are you playing?",
+        "whatAreYouPlaying": "What are you going to stream?",
         "selectYourGame": "Select your game",
         "when": "When?",
         "date": "Date",

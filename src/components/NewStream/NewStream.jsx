@@ -4,8 +4,8 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from 
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DayJsUtils from '@date-io/dayjs';
-import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer } from './../../services/database';
 
+import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer, updateStreamerProfile } from './../../services/database';
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
@@ -18,6 +18,7 @@ import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.sv
 import BackButton from '../BackButton/BackButton';
 import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
 import RequestActivation from '../RequestActivation/RequestActivation';
+import { getTwitchUserData } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -299,7 +300,25 @@ const NewStream = ({ user, games }) => {
                 const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
                 let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
-                await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+                let userTwitchData = {
+                    displayName: user.displayName,
+                    login: user.login,
+                    photoUrl: user.photoUrl
+                };
+
+                const userTwitchDataRequest = await getTwitchUserData(user.id);
+
+                if (userTwitchDataRequest.data && userTwitchDataRequest.data.display_name) {
+                    userTwitchData = {
+                        displayName: userTwitchDataRequest.data.display_name,
+                        login: userTwitchDataRequest.data.login,
+                        photoUrl: userTwitchDataRequest.data.profile_image_url
+                    };
+                }
+
+                await createNewStreamRequest(user.uid, userTwitchData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+
+                updateStreamerProfile(user.uid, userTwitchData);
 
                 window.analytics.track('Stream requested', {
                     selectedGame,
@@ -325,8 +344,26 @@ const NewStream = ({ user, games }) => {
         const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
         let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
-        await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+        let userTwitchData = {
+            displayName: user.displayName,
+            login: user.login,
+            photoUrl: user.photoUrl
+        };
+
+        const userTwitchDataRequest = await getTwitchUserData(user.id);
+
+        if (userTwitchDataRequest.data && userTwitchDataRequest.data.display_name) {
+            userTwitchData = {
+                displayName: userTwitchDataRequest.data.display_name,
+                login: userTwitchDataRequest.data.login,
+                photoUrl: userTwitchDataRequest.data.profile_image_url
+            };
+        }
+
+        await createNewStreamRequest(user.uid, userTwitchData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
         await addToStreamsRequestedOnSubscriptionDetails(user.uid);
+
+        updateStreamerProfile(user.uid, userTwitchData);
 
         window.analytics.track('Free trial started', {
             uid: user.uid

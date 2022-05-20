@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles, makeStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import { withStyles, makeStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, CircularProgress } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 import ContainedButton from '../ContainedButton/ContainedButton';
 
@@ -23,6 +23,9 @@ const useStyles = makeStyles({
         color: '#FFF',
         fontSize: '14px',
         marginTop: '2rem'
+    },
+    loader: {
+        color: '#0AFFD2'
     }
 });
 
@@ -74,9 +77,13 @@ const NewStreamDetailsDialog = ({ open, onClose, lockSendButton, userName, submi
                 <ContainedButton variant='outlined' onClick={onClose} color="primary">
                     {t('cancel')}
                 </ContainedButton>
-                <ContainedButton variant='outlined' disabled={lockSendButton} onClick={submitEvent} color="primary" autoFocus>
-                    {t('continue')}
-                </ContainedButton>
+                {!lockSendButton ?
+                    <ContainedButton variant='outlined' disabled={lockSendButton} onClick={submitEvent} color="primary" autoFocus>
+                        {t('continue')}
+                    </ContainedButton>
+                    :
+                    <CircularProgress className={classes.loader} />
+                }
             </DialogActions>
         </CustomDialog>
     );

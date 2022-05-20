@@ -198,12 +198,12 @@ const LiveDonations = () => {
                     <DonationHandler donationToShow={donationToShow} />
                 </>
             }
-            {showQaplaChallengeProgress &&
+            {/* {showQaplaChallengeProgress && */}
                <QlanProgressBar
-                    percentage={qaplaChallengeBarProgress}
-                    xq={qaplaChallengeXQ}
+                    percentage={0.5}
+                    xq={1500}
                 />
-            }
+            {/* } */}
         </div>
     );
 }

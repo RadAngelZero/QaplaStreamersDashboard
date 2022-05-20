@@ -37,6 +37,7 @@ const useStyles = makeStyles(() => ({
         height: '100%',
         maxWidth: '250px',
         minWidth: '250px',
+        minHeight: '360px',
     },
     relativeContainer: {
         position: 'relative'

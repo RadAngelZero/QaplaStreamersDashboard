@@ -128,12 +128,7 @@ const StreamersSignin = ({ user, title }) => {
                         </p>
                     </div>
                     <Hidden smDown>
-                        <div style={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0
-                        }}>
+                        <div className={styles.bottomImage} >
                             <img src={SignInImage} alt='Sign In' />
                         </div>
                     </Hidden>

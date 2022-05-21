@@ -168,7 +168,7 @@ const LiveDonations = () => {
                          * Qapla Challenge
                          */
 
-                         previousGoalXQ.forEach((pastLevelXQ) => {
+                        previousGoalXQ.forEach((pastLevelXQ) => {
                             setNextGoalXQ(pastLevelXQ.val());
                             setQaplaChallengeXQ(pastLevelXQ.val());
                         });
@@ -182,7 +182,7 @@ const LiveDonations = () => {
                             getNextGoal(xqProgress.val(), userParticipation.val());
                         }
                     });
-                }  else {
+                } else {
                     setShowQaplaChallengeProgress(false);
                 }
             }
@@ -202,7 +202,7 @@ const LiveDonations = () => {
     document.body.style.backgroundColor = 'transparent';
 
 
-    const qaplaChallengeBarProgress = (qaplaChallengeXQ - previousGoalXQ)/(nextGoalXQ - previousGoalXQ);
+    const qaplaChallengeBarProgress = (qaplaChallengeXQ - previousGoalXQ) / (nextGoalXQ - previousGoalXQ);
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100vh', width: '100%', placeItems: 'flex-end' }}>
             {donationToShow &&
@@ -218,7 +218,7 @@ const LiveDonations = () => {
                 />
             }
             {showQaplaChallengeProgress &&
-               <QlanProgressBar
+                <QlanProgressBar
                     percentage={qaplaChallengeBarProgress}
                     xq={qaplaChallengeXQ}
                 />
@@ -242,11 +242,11 @@ const DonationHandler = (donationToShow) => {
         }}>
             {donation.media && donation.media.type === IMAGE &&
                 <img src={donation.media.source} alt='' style={{
-                display: 'flex',
-                alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
-                maxHeight: '250px',
-                objectFit: 'scale-down'
-            }} />}
+                    display: 'flex',
+                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    maxHeight: '250px',
+                    objectFit: 'scale-down'
+                }} />}
             <div
                 style={{
                     display: 'flex',

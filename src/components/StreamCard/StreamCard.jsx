@@ -36,6 +36,7 @@ const useStyles = makeStyles(() => ({
         boxShadow: '0 6px 15px 0 rgba(0,0,0,0.31)',
         height: '100%',
         minWidth: '250px',
+        minHeight: '360px',
     },
     relativeContainer: {
         position: 'relative'

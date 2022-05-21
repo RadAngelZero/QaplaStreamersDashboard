@@ -28,10 +28,14 @@
         }
     },
     "StreamersSignin": {
-        "signIn": "Sign in with Twitch",
+        "welcome": "Welcome",
+        "signIn": "Continue with Twitch",
         "loading": "Loading...",
         "termsAndConditionsP1": "By clicking Sign in with Twitch, you agree to our ",
-        "termsAndConditionsP2": "Terms and conditions"
+        "termsAndConditionsP2": "Terms and conditions",
+        "alerts": {
+            "errorSignIn": "There was a problem logging in, please try again or report it to technical support"
+        }
     },
     "StreamerProfile": {
         "balance": "Balance",

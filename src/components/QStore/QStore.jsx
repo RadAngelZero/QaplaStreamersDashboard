@@ -29,10 +29,10 @@ const useStyles = makeStyles({
     },
     media: {
         height: 200,
-        borderRadius: 24,
         backgroundSize: 'cover'
     },
     card: {
+        borderRadius: 'unset',
         maxWidth: 200,
         backgroundColor: 'transparent',
         boxShadow: 'none',
@@ -117,7 +117,7 @@ const QStore = ({ user }) => {
                     <Grid item xs={12} sm={6} md={3}>
                         <Card classes={{ root: classes.card }}>
                             <CardActionArea>
-                                <CardMedia className={classes.media} image='https://imageio.forbes.com/specials-images/imageserve/5fd2263efcf061ccad6f7d95/0x0.jpg?format=jpg&width=1200' />
+                                <CardMedia className={classes.media} image='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/QStore%2FGoal.png?alt=media&token=4d9744ce-98d0-41fa-9cec-cba628ac16d1' />
                             </CardActionArea>
                             <CardActions>
                                 <Button target='_blank' href='https://discord.gg/q7tc2A6z' size='large' variant='contained' classes={{ root: classes.goalButton }}>

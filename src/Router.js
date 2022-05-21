@@ -25,6 +25,7 @@ import PlanPicker from './components/PlanPicker/PlanPicker';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
 import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeConfirmationPage';
+import QStore from './components/QStore/QStore';
 import { useTranslation } from 'react-i18next'
 
 window.onbeforeunload = function () {
@@ -65,6 +66,9 @@ const Routes = ({ user, games }) => {
             </Route>
             <Route exact path='/profile'>
                 <StreamerProfile user={user} games={games} />
+            </Route>
+            <Route exact path='/store'>
+                <QStore user={user} />
             </Route>
             <Route exact path='/success'>
                 <EventSent user={user} />

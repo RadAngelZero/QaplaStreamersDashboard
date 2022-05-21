@@ -5,7 +5,7 @@ import DayJsUtils from '@date-io/dayjs';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
-import { ReactComponent as QoinsIcon } from './../../assets/QoinsIcon.svg';
+import { ReactComponent as QoinsIcon } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as DonatedQoinIcon } from './../../assets/DonatedQoin.svg';
 import { getPeriodStreamerPayments, listenForLastStreamerCheers, removeListenerForLastStreamerCheers } from '../../services/database';
@@ -320,7 +320,7 @@ const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanB
                                         <div className={classes.qoinDonationValueText}>
                                             {cheers[cheerId].amountQoins}
                                         </div>
-                                        <DonatedQoinIcon />
+                                        <DonatedQoinIcon style={{ height: 35, width: 35 }} />
                                     </div>
                                 </div>
 

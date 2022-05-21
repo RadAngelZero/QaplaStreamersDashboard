@@ -29,6 +29,8 @@ const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
 const qaplaChallengeRef = database.ref('/QaplaChallenge');
 const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
+const qStoreRef = database.ref('/QStore');
+const qaplaGoalRef = database.ref('/QaplaGoals');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -847,4 +849,29 @@ export async function getChallengeLevelGoal(category, currentXQ) {
  */
 export async function getChallengePreviousLevelGoal(category, currentXQ) {
     return await qaplaChallengeLevelsRef.child(category).orderByValue().endAt(currentXQ).limitToLast(1).once('value');
+}
+
+////////////////////////
+// Q Store
+////////////////////////
+
+/**
+ * Gets all the items in the Q-Store
+ */
+export async function getQStoreItems() {
+    return await qStoreRef.once('value');
+}
+
+////////////////////////
+// Qapla Goal
+////////////////////////
+
+/**
+ * Listen to all the changes in the Qapla goal children of the
+ * given user
+ * @param {string} uid User identifier
+ * @param {function} callback Handler of listener results
+ */
+export function listenQaplaGoal(uid, callback) {
+    return qaplaGoalRef.child(uid).on('value', callback);
 }

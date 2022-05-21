@@ -35,7 +35,6 @@ const useStyles = makeStyles(() => ({
         borderRadius: '1.5rem',
         boxShadow: '0 6px 15px 0 rgba(0,0,0,0.31)',
         height: '100%',
-        maxWidth: '250px',
         minWidth: '250px',
         minHeight: '360px',
     },

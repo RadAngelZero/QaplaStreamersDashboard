@@ -42,8 +42,7 @@ const useStyles = makeStyles({
         fontWeight: '600',
         fontSize: 11,
         letterSpacing: .492,
-        width: '100%',
-        marginTop: 35,
+        marginTop: 26,
         color: '#FFF',
         fontFamily: 'Inter',
         borderRadius: 8,
@@ -54,8 +53,7 @@ const useStyles = makeStyles({
         fontWeight: '600',
         fontSize: 11,
         letterSpacing: .492,
-        width: '100%',
-        marginTop: 35,
+        marginTop: 26,
         color: '#0D1021',
         fontFamily: 'Inter',
         borderRadius: 8,
@@ -70,11 +68,11 @@ const ProductCard = ({ image }) => {
     return (
         <Grid item xs={12} sm={6} md={3}>
             <Card classes={{ root: classes.card }}>
-                <CardActionArea>
+                <CardActionArea target='_blank' href='https://discord.gg/jJv7UHZNK5'>
                     <CardMedia className={classes.media} image={image} />
                 </CardActionArea>
-                <CardActions>
-                    <Button target='_blank' href='https://discord.gg/q7tc2A6z' size='large' variant='contained' classes={{ root: classes.productButton }}>
+                <CardActions style={{ padding: 0 }}>
+                    <Button fullWidth target='_blank' href='https://discord.gg/jJv7UHZNK5' size='large' variant='contained' classes={{ root: classes.productButton }}>
                         {t('QStore.acquire')}
                     </Button>
                 </CardActions>
@@ -112,16 +110,31 @@ const QStore = ({ user }) => {
                         </h1>
                         <p className={classes.description}>
                             {t('QStore.description')}
+                            <br />
+                            <br />
+                            {t('QStore.legend')}
                         </p>
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                         <Card classes={{ root: classes.card }}>
-                            <CardActionArea>
+                            <CardActionArea target='_blank' href='https://discord.gg/dSxcJZ5Nfz'>
                                 <CardMedia className={classes.media} image='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/QStore%2FGoal.png?alt=media&token=4d9744ce-98d0-41fa-9cec-cba628ac16d1' />
                             </CardActionArea>
-                            <CardActions>
-                                <Button target='_blank' href='https://discord.gg/q7tc2A6z' size='large' variant='contained' classes={{ root: classes.goalButton }}>
+                            <CardActions style={{ padding: 0 }}>
+                                <Button fullWidth target='_blank' href='https://discord.gg/dSxcJZ5Nfz' size='large' variant='contained' classes={{ root: classes.goalButton }}>
                                     {t('QStore.setGoal')}
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <Card classes={{ root: classes.card }}>
+                            <CardActionArea target='_blank' href='https://discord.gg/jNXdWcZeuQ'>
+                                <CardMedia className={classes.media} image='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/QStore%2FBits.png?alt=media&token=1d6df7b3-e99d-4078-ae4c-8b3a1bd7cee9' />
+                            </CardActionArea>
+                            <CardActions style={{ padding: 0 }}>
+                                <Button fullWidth target='_blank' href='https://discord.gg/jNXdWcZeuQ' size='large' variant='contained' classes={{ root: classes.goalButton }}>
+                                    {t('QStore.requestBits')}
                                 </Button>
                             </CardActions>
                         </Card>

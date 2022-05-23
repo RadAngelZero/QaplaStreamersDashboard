@@ -32,3 +32,16 @@
     font-size: 14px !important;
     text-transform: none !important;
 }
+
+.bottomImage {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+@media ( max-height: 832px ) {
+   .bottomImage{
+     display: none;  
+    }
+}

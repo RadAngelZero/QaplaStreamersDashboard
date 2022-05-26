@@ -9,16 +9,16 @@ import {
 import dayjs from 'dayjs';
 
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
-import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPage.svg';
 import { ReactComponent as QaplaGaming } from './../../assets/QaplaGamingLandingPage.svg';
 import styles from './StreamersSignin.module.css';
 import SignInImage from './../../assets/SignIn.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
+import { signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
 import { createStreamerProfile, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import QaplaTerms from '../QaplaTerms/QaplaTerms';
 import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
+import { getTwitchUserData } from '../../services/twitch';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -60,7 +60,12 @@ const StreamersSignin = ({ user, title }) => {
                     }
 
                     try {
-                        await updateStreamerProfile(user.firebaseAuthUser.user.uid, { twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
+                        await updateStreamerProfile(user.firebaseAuthUser.user.uid, {
+                            twitchAccessToken: tokenData.data.access_token,
+                            refreshToken: tokenData.data.refresh_token,
+                            displayName: user.userData.displayName,
+                            photoUrl: user.userData.photoUrl
+                        });
                     } catch (error) {
                         console.log(error);
                     }

@@ -4,7 +4,7 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from 
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DayJsUtils from '@date-io/dayjs';
-import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer } from './../../services/database';
+import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer, updateStreamerProfile } from './../../services/database';
 
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
@@ -18,6 +18,7 @@ import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.sv
 import BackButton from '../BackButton/BackButton';
 import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
 import RequestActivation from '../RequestActivation/RequestActivation';
+import { getTwitchUserDataCloudFunction } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -299,7 +300,28 @@ const NewStream = ({ user, games }) => {
                 const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
                 let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
-                await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+                let streamerData = {
+                    displayName: user.displayName,
+                    login: user.login,
+                    photoUrl: user.photoUrl
+                };
+
+                const userData = await getTwitchUserDataCloudFunction(user.id);
+                if (userData && userData.data) {
+                    streamerData = {
+                        displayName: userData.data.display_name,
+                        login: userData.data.login,
+                        photoUrl: userData.data.profile_image_url
+                    };
+
+                    await updateStreamerProfile(user.uid, {
+                        displayName: userData.data.display_name,
+                        login: userData.data.login,
+                        photoUrl: userData.data.profile_image_url
+                    });
+                }
+
+                await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
 
                 window.analytics.track('Stream requested', {
                     selectedGame,
@@ -325,7 +347,28 @@ const NewStream = ({ user, games }) => {
         const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
         let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
-        await createNewStreamRequest(user, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+        let streamerData = {
+            displayName: user.displayName,
+            login: user.login,
+            photoUrl: user.photoUrl
+        };
+
+        const userData = await getTwitchUserDataCloudFunction(user.id);
+        if (userData && userData.data) {
+            streamerData = {
+                displayName: userData.data.display_name,
+                login: userData.data.login,
+                photoUrl: userData.data.profile_image_url
+            };
+
+            await updateStreamerProfile(user.uid, {
+                displayName: userData.data.display_name,
+                login: userData.data.login,
+                photoUrl: userData.data.profile_image_url
+            });
+        }
+
+        await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
         await addToStreamsRequestedOnSubscriptionDetails(user.uid);
 
         window.analytics.track('Free trial started', {

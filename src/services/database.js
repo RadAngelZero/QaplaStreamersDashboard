@@ -107,13 +107,22 @@ export async function updateStreamerProfile(uid, userData) {
     await userStreamersRef.child(uid).update(userData);
 
     if (userData.displayName && userData.photoUrl) {
-        await userStreamerPublicDataRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
+        await updateUserStreamerPublicData(uid, { displayName: userData.displayName, photoUrl: userData.photoUrl });
 
         const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
         if (publicProfile.exists()) {
             await streamersPublicProfilesRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
         }
     }
+}
+
+/**
+ * Update the data on the User Streamer Public Data node
+ * @param {string} uid User identifier
+ * @param {object} streamerData Data to update
+ */
+export async function updateUserStreamerPublicData(uid, streamerData) {
+    await userStreamerPublicDataRef.child(uid).update(streamerData);
 }
 
 /**

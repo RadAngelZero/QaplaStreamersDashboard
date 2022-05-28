@@ -152,9 +152,9 @@ export async function subscribeStreamerToMailerLiteGroup(email, name) {
  * @param {number} userTwitchId Twitch id of the user
  */
  export async function getTwitchUserDataCloudFunction(userTwitchId) {
-    const addSubscriberToStreamersMailerLiteGroup = functions.httpsCallable('getTwitchUserData');
+    const getTwitchUserData = functions.httpsCallable('getTwitchUserData');
     try {
-        return await addSubscriberToStreamersMailerLiteGroup({ userTwitchId });
+        return await getTwitchUserData({ userTwitchId });
     } catch (error) {
         console.log(error);
     }

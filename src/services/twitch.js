@@ -176,3 +176,20 @@ async function getRewardRedemptionsWithCursor(cursor, twitchId, accessToken, rew
 
     return await response.json();
 }
+
+/**
+ * Get the info of the given twitch user
+ * @param {string} access_token Twitch user access token
+ */
+ export async function getTwitchUserData(access_token) {
+    const response = await fetch('https://api.twitch.tv/helix/users', {
+        method: 'GET',
+        headers: {
+            "Client-Id": TWITCH_CLIENT_ID,
+            Authorization: `Bearer ${access_token}`
+        }
+    });
+    const user = (await response.json()).data[0];
+
+    return user;
+}

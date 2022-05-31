@@ -85,7 +85,7 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
         }
 
         window.analytics.identify(userResult.userData.uid, {
-            displayName: userResult.userData.displayName,
+            username: userResult.userData.displayName,
             email: userResult.userData.email
         });
 

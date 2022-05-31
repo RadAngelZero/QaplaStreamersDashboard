@@ -256,7 +256,7 @@ const StreamerProfile = ({ user, games }) => {
                                         <Grid container xs={12} style={{ gap: '20px' }} >
                                             <Grid item xs={12} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
-                                                    <DonatedQoin style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>Cheers</p>
                                                         <p className={styles.balanceDataText}>
@@ -267,7 +267,7 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                             <Grid item xs={12} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
-                                                    <DonatedQoin style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>Qlan</p>
                                                         <p className={styles.balanceDataText}>
@@ -278,7 +278,7 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                             <Grid item xs={12} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Bits') }}>
-                                                    <BitsIcon style={{ display: 'flex', width: '35px', height: '35px' }} />
+                                                    <BitsIcon style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>{t('StreamerProfile.stimatedBits')}</p>
                                                         <p className={styles.balanceDataText}>
@@ -299,7 +299,7 @@ const StreamerProfile = ({ user, games }) => {
                                             <Grid item xs={12} sm={3} md={5} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
                                                 <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
                                             </Grid>
-                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
+                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px', marginLeft: 'auto', marginRight: '-2px', minWidth: 'fit-content' }}>
                                                 {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
                                                     <StreamsLeft subscriptionDetails={user.subscriptionDetails}
                                                         renovationDate={user.currentPeriod.endDate} />
@@ -312,7 +312,7 @@ const StreamerProfile = ({ user, games }) => {
                             </Grid>
                         </Grid>
                         <Grid item xs={12} className={styles.streamsCardContainer}>
-                            <Grid container spacing={4} className={styles.innerStreamsCardContainer}>
+                            <Grid container justifyContent='center' spacing={4} className={styles.innerStreamsCardContainer}>
                                 <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
                                     <Card className={styles.createEventCard} onClick={createStream}>
                                         <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>

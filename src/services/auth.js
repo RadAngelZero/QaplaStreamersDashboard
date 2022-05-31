@@ -85,7 +85,7 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
         }
 
         window.analytics.identify(userResult.userData.uid, {
-            displayName: userResult.userData.displayName,
+            username: userResult.userData.displayName,
             email: userResult.userData.email
         });
 
@@ -94,23 +94,6 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
         console.error(err);
     }
 }
-
-/**
- * Get the info of the given twitch user
- * @param {string} access_token Twitch user access token
- */
-export async function getTwitchUserData(access_token) {
-    const response = await fetch('https://api.twitch.tv/helix/users', {
-        method: 'GET',
-        headers: {
-            "Client-Id": TWITCH_CLIENT_ID,
-            Authorization: `Bearer ${access_token}`
-        }
-    });
-    const user = (await response.json()).data[0];
-
-    return user;
-};
 
 /**
  * Close the current session

@@ -25,8 +25,10 @@ import PlanPicker from './components/PlanPicker/PlanPicker';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
 import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeConfirmationPage';
+import QStore from './components/QStore/QStore';
+import { useTranslation } from 'react-i18next'
 
-window.onbeforeunload = function() {
+window.onbeforeunload = function () {
     return true;
 };
 
@@ -35,6 +37,7 @@ window.onbeforeunload = null;
 
 const Routes = ({ user, games }) => {
     const history = useHistory();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (history) {
@@ -47,10 +50,10 @@ const Routes = ({ user, games }) => {
     return (
         <Switch>
             <Route exact path='/'>
-                <StreamersSignin user={user} title='Welcome!'/>
+                <StreamersSignin user={user} title={t('StreamersSignin.welcome')} />
             </Route>
             <Route exact path='/signin'>
-                <StreamersSignin user={user} title='Welcome!' />
+                <StreamersSignin user={user} title={t('StreamersSignin.welcome')} />
             </Route>
             <Route exact path='/welcome'>
                 <StreamerOnBoarding user={user} />
@@ -63,6 +66,9 @@ const Routes = ({ user, games }) => {
             </Route>
             <Route exact path='/profile'>
                 <StreamerProfile user={user} games={games} />
+            </Route>
+            <Route exact path='/store'>
+                <QStore user={user} />
             </Route>
             <Route exact path='/success'>
                 <EventSent user={user} />
@@ -80,10 +86,10 @@ const Routes = ({ user, games }) => {
                 <StreamsPackages user={user} games={games} />
             </Route>
             <Route exact path='/editProfile'>
-                <StreamerProfileEditor user={user}/>
+                <StreamerProfileEditor user={user} />
             </Route>
             <Route exact path='/successCheckout'>
-                <ChargeConfirmationPage user={user}/>
+                <ChargeConfirmationPage user={user} />
             </Route>
             {/* <Route exact path='/lottery'>
                 <Lottery user={user} />

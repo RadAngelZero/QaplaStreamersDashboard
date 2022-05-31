@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getInvitationCodeParams, removeInvitationCode, updateStreamerProfile } from '../../services/database';
+import { getInvitationCodeParams, removeInvitationCode, updateStreamerProfile, updateUserStreamerPublicData } from '../../services/database';
 
 const useStyles = makeStyles(() => ({
     containerStyle: {
@@ -139,6 +139,10 @@ const RequestActivation = ({ user, onSuccessActivation }) => {
             currentPeriod: { startDate, endDate },
             subscriptionDetails: freeTrialInformation.subscriptionDetails
         });
+        await updateUserStreamerPublicData(user.uid, {
+            premium: true
+        });
+
         await removeInvitationCode(code);
         await onSuccessActivation();
         setValidatingCode(false);

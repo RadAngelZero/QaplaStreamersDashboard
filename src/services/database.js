@@ -29,6 +29,9 @@ const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
 const qaplaChallengeRef = database.ref('/QaplaChallenge');
 const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
+const qStoreRef = database.ref('/QStore');
+const qaplaGoalRef = database.ref('/QaplaGoals');
+const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -102,10 +105,24 @@ export async function createStreamerProfile(uid, userData) {
  */
 export async function updateStreamerProfile(uid, userData) {
     await userStreamersRef.child(uid).update(userData);
-    const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
-    if (publicProfile.exists() && userData.displayName && userData.photoUrl) {
-        await streamersPublicProfilesRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
+
+    if (userData.displayName && userData.photoUrl) {
+        await updateUserStreamerPublicData(uid, { displayName: userData.displayName, photoUrl: userData.photoUrl });
+
+        const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
+        if (publicProfile.exists()) {
+            await streamersPublicProfilesRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
+        }
     }
+}
+
+/**
+ * Update the data on the User Streamer Public Data node
+ * @param {string} uid User identifier
+ * @param {object} streamerData Data to update
+ */
+export async function updateUserStreamerPublicData(uid, streamerData) {
+    await userStreamerPublicDataRef.child(uid).update(streamerData);
 }
 
 /**
@@ -159,7 +176,7 @@ export async function checkActiveCustomReward(streamId) {
 /**
  * Create a stream request in the nodes StreamersEvents and StreamsApproval
  * @param {string} uid User identifier
- * @param {object} streamerData User Twitch data object
+ * @param {object} streamerData Streamer data object
  * @param {string} game Selected game for the stream
  * @param {string} date Date in format DD-MM-YYYY
  * @param {string} hour Hour in format hh:mm
@@ -848,4 +865,29 @@ export async function getChallengeLevelGoal(category, currentXQ) {
  */
 export async function getChallengePreviousLevelGoal(category, currentXQ) {
     return await qaplaChallengeLevelsRef.child(category).orderByValue().endAt(currentXQ).limitToLast(1).once('value');
+}
+
+////////////////////////
+// Q Store
+////////////////////////
+
+/**
+ * Gets all the items in the Q-Store
+ */
+export async function getQStoreItems() {
+    return await qStoreRef.once('value');
+}
+
+////////////////////////
+// Qapla Goal
+////////////////////////
+
+/**
+ * Listen to all the changes in the Qapla goal children of the
+ * given user
+ * @param {string} uid User identifier
+ * @param {function} callback Handler of listener results
+ */
+export function listenQaplaGoal(uid, callback) {
+    return qaplaGoalRef.child(uid).on('value', callback);
 }

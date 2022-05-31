@@ -3,11 +3,12 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
 import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
+import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
@@ -20,6 +21,9 @@ const LiveDonations = () => {
     const [qaplaChallengeXQ, setQaplaChallengeXQ] = useState(0);
     const [nextGoalXQ, setNextGoalXQ] = useState(0);
     const [previousGoalXQ, setPreviousGoalXQ] = useState(0);
+    const [qoinsGoal, setQoinsGoal] = useState(null);
+    const [qoinsGoalProgress, setQoinsGoalProgress] = useState(null);
+    const [goalTitle, setGoalTitle] = useState('');
     const [showQaplaChallengeProgress, setShowQaplaChallengeProgress] = useState(false);
     const { streamerId } = useParams();
 
@@ -164,7 +168,7 @@ const LiveDonations = () => {
                          * Qapla Challenge
                          */
 
-                         previousGoalXQ.forEach((pastLevelXQ) => {
+                        previousGoalXQ.forEach((pastLevelXQ) => {
                             setNextGoalXQ(pastLevelXQ.val());
                             setQaplaChallengeXQ(pastLevelXQ.val());
                         });
@@ -178,10 +182,18 @@ const LiveDonations = () => {
                             getNextGoal(xqProgress.val(), userParticipation.val());
                         }
                     });
-                }  else {
+                } else {
                     setShowQaplaChallengeProgress(false);
                 }
             }
+
+            listenQaplaGoal(streamerUid, (goal) => {
+                if (goal.exists()) {
+                    setQoinsGoal(goal.val().goal);
+                    setQoinsGoalProgress(goal.val().qoins);
+                    setGoalTitle(goal.val().title);
+                }
+            });
 
             checkIfUserIsUserParticipantOfQaplaChallenge();
         }
@@ -190,7 +202,7 @@ const LiveDonations = () => {
     document.body.style.backgroundColor = 'transparent';
 
 
-    const qaplaChallengeBarProgress = (qaplaChallengeXQ - previousGoalXQ)/(nextGoalXQ - previousGoalXQ);
+    const qaplaChallengeBarProgress = (qaplaChallengeXQ - previousGoalXQ) / (nextGoalXQ - previousGoalXQ);
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100vh', width: '100%', placeItems: 'flex-end' }}>
             {donationToShow &&
@@ -198,8 +210,15 @@ const LiveDonations = () => {
                     <DonationHandler donationToShow={donationToShow} />
                 </>
             }
+            {qoinsGoal && goalTitle &&
+                <GoalProgressBar
+                    percentage={qoinsGoalProgress / qoinsGoal}
+                    title={goalTitle}
+                    qoins={qoinsGoalProgress || 0}
+                />
+            }
             {showQaplaChallengeProgress &&
-               <QlanProgressBar
+                <QlanProgressBar
                     percentage={qaplaChallengeBarProgress}
                     xq={qaplaChallengeXQ}
                 />
@@ -223,11 +242,11 @@ const DonationHandler = (donationToShow) => {
         }}>
             {donation.media && donation.media.type === IMAGE &&
                 <img src={donation.media.source} alt='' style={{
-                display: 'flex',
-                alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
-                maxHeight: '250px',
-                objectFit: 'scale-down'
-            }} />}
+                    display: 'flex',
+                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    maxHeight: '250px',
+                    objectFit: 'scale-down'
+                }} />}
             <div
                 style={{
                     display: 'flex',

@@ -237,6 +237,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [openTooltip, setOpenTooltip] = useState(false);
     const [onBoardingDone, setOnBoardingDone] = useState(true);
     const [onBoardingStep, setOnBoardingStep] = useState(0);
+    const [badge, setBadge] = useState(false);
     const [chipHover, setChipHover] = useState({});
     const { t } = useTranslation();
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
@@ -245,7 +246,7 @@ const StreamerProfileEditor = ({ user }) => {
         async function getStreamerInfo() {
             listenStreamerPublicProfile(user.uid, async (info) => {
                 if (info.exists()) {
-                    const { bio, tags, backgroundUrl, backgroundGradient } = info.val();
+                    const { bio, tags, backgroundUrl, backgroundGradient, badge } = info.val();
                     if (!tags || tags.length < MIN_TAGS) {
                         setOnBoardingDone(false);
                         setOnBoardingStep(4);
@@ -259,6 +260,7 @@ const StreamerProfileEditor = ({ user }) => {
                     setBackgroundGradient(backgroundGradient);
                     setBackgroundUrl(backgroundUrl);
                     setStreamerTags(tags || []);
+                    setBadge(badge);
                 } else {
                     setOnBoardingDone(false);
                 }
@@ -473,7 +475,9 @@ const StreamerProfileEditor = ({ user }) => {
                                             {user.displayName}
                                         </p>
                                         <div className={styles.founderBadgeContainer}>
-                                            <FounderBadge className={styles.founderBadge} />
+                                            {badge &&
+                                                <FounderBadge className={styles.founderBadge} />
+                                            }
                                         </div>
                                     </div>
                                     <div className={styles.editBioButtonContainer}>

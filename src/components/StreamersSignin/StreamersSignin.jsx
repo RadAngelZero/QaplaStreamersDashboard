@@ -9,16 +9,16 @@ import {
 import dayjs from 'dayjs';
 
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
-import { ReactComponent as QaplaIcon } from './../../assets/QaplaGamingLandingPage.svg';
 import { ReactComponent as QaplaGaming } from './../../assets/QaplaGamingLandingPage.svg';
 import styles from './StreamersSignin.module.css';
-import RoomGame from './../../assets/room-game.png';
+import SignInImage from './../../assets/SignIn.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import { getTwitchUserData, signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
+import { signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
 import { createStreamerProfile, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import QaplaTerms from '../QaplaTerms/QaplaTerms';
 import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
+import { getTwitchUserData } from '../../services/twitch';
 
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -60,12 +60,17 @@ const StreamersSignin = ({ user, title }) => {
                     }
 
                     try {
-                        await updateStreamerProfile(user.firebaseAuthUser.user.uid, { twitchAccessToken: tokenData.data.access_token, refreshToken: tokenData.data.refresh_token });
+                        await updateStreamerProfile(user.firebaseAuthUser.user.uid, {
+                            twitchAccessToken: tokenData.data.access_token,
+                            refreshToken: tokenData.data.refresh_token,
+                            displayName: user.userData.displayName,
+                            photoUrl: user.userData.photoUrl
+                        });
                     } catch (error) {
                         console.log(error);
                     }
                 } else {
-                    alert('Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico');
+                    alert(t('StreamersSignin.alerts.errorSignIn'));
                 }
             }
         }
@@ -102,30 +107,9 @@ const StreamersSignin = ({ user, title }) => {
     if (user === undefined) {
         return (
             <StreamerDashboardContainer>
-                <Hidden smDown>
-                    <Grid item md='4' style={{
-                        backgroundImage: `url(${RoomGame})`,
-                        backgroundPosition: 'center',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundSize: 'cover',
-                        height: '100%',
-                    }}>
-                        <div style={{
-                            display: 'flex',
-                            flexGrow: 1,
-                            justifyContent: 'center',
-                            height: '100vh',
-                            alignItems: 'flex-end'
-                        }}>
-                            <QaplaIcon style={{ marginBottom: 32 }} />
-                        </div>
-                    </Grid>
-                </Hidden>
                 <Grid item md='1' />
                 <Grid item md='6' className={styles.mainContainer}>
-                    <Hidden mdUp>
-                        <QaplaGaming style={{marginTop: '8vh', marginBottom: '5vh', transform: 'scale(1.5)'}} />
-                    </Hidden>
+                    <QaplaGaming style={{ marginTop: '100px', marginBottom: '80px', transform: 'scale(0.9)' }} />
                     <p className={styles.getStarted}>
                         {title}
                     </p>
@@ -141,13 +125,18 @@ const StreamersSignin = ({ user, title }) => {
                                 t('StreamersSignin.loading')
                             }
                         </Button>
-                        <p style={{ marginTop: 16, color: '#FFF', fontSize: '.8rem' }}>
+                        <p style={{ marginTop: '38px', color: '#FFF', fontSize: '.8rem' }}>
                             {t('StreamersSignin.termsAndConditionsP1')}
                             <u style={{ cursor: 'pointer', color: '#3B4BF9' }} onClick={() => setOpenTermsAndConditionsDialog(true)}>
                                 {t('StreamersSignin.termsAndConditionsP2')}
                             </u>
                         </p>
                     </div>
+                    <Hidden smDown>
+                        <div className={styles.bottomImage} >
+                            <img src={SignInImage} alt='Sign In' />
+                        </div>
+                    </Hidden>
                 </Grid>
                 <Grid item md='1' />
                 <QaplaTerms open={openTermsAndConditionsDialog} onClose={closeTermsAndConditionsModal} />

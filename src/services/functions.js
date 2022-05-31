@@ -148,13 +148,13 @@ export async function subscribeStreamerToMailerLiteGroup(email, name) {
 }
 
 /**
- * Get the public data of the given Twitch user
- * @param {string} userTwitchId Twitch Id of the user
+ * Subscribes a streamer to MailerLite group
+ * @param {number} userTwitchId Twitch id of the user
  */
- export async function getTwitchUserData(userTwitchId) {
-    const getTwitchData = functions.httpsCallable('getTwitchUserData');
+ export async function getTwitchUserDataCloudFunction(userTwitchId) {
+    const getTwitchUserData = functions.httpsCallable('getTwitchUserData');
     try {
-        return await getTwitchData({ userTwitchId });
+        return await getTwitchUserData({ userTwitchId });
     } catch (error) {
         console.log(error);
     }

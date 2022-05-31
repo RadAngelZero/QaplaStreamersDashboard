@@ -28,10 +28,14 @@
         }
     },
     "StreamersSignin": {
-        "signIn": "Sign in with Twitch",
+        "welcome": "Welcome",
+        "signIn": "Continue with Twitch",
         "loading": "Loading...",
         "termsAndConditionsP1": "By clicking Sign in with Twitch, you agree to our ",
-        "termsAndConditionsP2": "Terms and conditions"
+        "termsAndConditionsP2": "Terms and conditions",
+        "alerts": {
+            "errorSignIn": "There was a problem logging in, please try again or report it to technical support"
+        }
     },
     "StreamerProfile": {
         "balance": "Balance",
@@ -270,6 +274,14 @@
         "startFreeTrial": "Start Free Trial",
         "dontHaveACode": "Don't have a code?",
         "subscribe": "Subscribe to publish"
+    },
+    "QStore": {
+        "QStore": "Q Store",
+        "description": "Earn rewards for your community with your $QOINS, or set a Qoins goal to reach a reward.",
+        "legend": "🇲🇽 Mexico  🇺🇸 USA  🌐 International",
+        "requestBits": "Request Bits",
+        "setGoal": "Create a goal of Qoins",
+        "acquire": "Acquire"
     },
     "StreamsLeft": {
         "streams": "Remaining posts: ",

@@ -28,10 +28,14 @@
         }
     },
     "StreamersSignin": {
-        "signIn": "Inicia sesión con Twitch",
+        "welcome": "Bienvenido",
+        "signIn": "Continúa con Twitch",
         "loading": "Cargando...",
         "termsAndConditionsP1": "Al presionar Iniciar sesión con Twitch, aceptas nuestros ",
-        "termsAndConditionsP2": "Terminos y condiciones"
+        "termsAndConditionsP2": "Terminos y condiciones",
+        "alerts": {
+            "errorSignIn": "Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico"
+        }
     },
     "StreamerProfile": {
         "balance": "Balance",
@@ -110,7 +114,7 @@
             "streamsLimit": "Ha alcanzado el límite de streams para su suscripción",
             "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
         },
-        "whatAreYouPlaying": "¿Qué vas a streamear?",
+        "whatAreYouPlaying": "¿Qué vas a transmitir?",
         "selectYourGame": "Selecciona tu juego",
         "when": "¿Cuando?",
         "date": "Fecha",
@@ -265,6 +269,14 @@
         "startFreeTrial": "Activar Free Trial",
         "dontHaveACode": "¿No tienes código de invitado?",
         "subscribe": "Suscríbete para publicar"
+    },
+    "QStore": {
+        "QStore": "Q Store",
+        "description": "Adquiere recompensas para tu comunidad con tus $QOINS, o pon un meta de Qoins para alcanzar una recompensa.",
+        "legend": "🇲🇽 México  🇺🇸 USA  🌐 Internacional",
+        "requestBits": "Solicitar Bits",
+        "setGoal": "Crea una meta de Qoins",
+        "acquire": "Adquirir"
     },
     "StreamsLeft": {
         "streams": "Publicaciones disponibles: ",

@@ -18,7 +18,7 @@ import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.sv
 import BackButton from '../BackButton/BackButton';
 import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
 import RequestActivation from '../RequestActivation/RequestActivation';
-import { getTwitchUserData } from '../../services/functions';
+import { getTwitchUserDataCloudFunction } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -300,25 +300,28 @@ const NewStream = ({ user, games }) => {
                 const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
                 let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
-                let userTwitchData = {
+                let streamerData = {
                     displayName: user.displayName,
                     login: user.login,
                     photoUrl: user.photoUrl
                 };
 
-                const userTwitchDataRequest = await getTwitchUserData(user.id);
-
-                if (userTwitchDataRequest.data && userTwitchDataRequest.data.display_name) {
-                    userTwitchData = {
-                        displayName: userTwitchDataRequest.data.display_name,
-                        login: userTwitchDataRequest.data.login,
-                        photoUrl: userTwitchDataRequest.data.profile_image_url
+                const userData = await getTwitchUserDataCloudFunction(user.id);
+                if (userData && userData.data) {
+                    streamerData = {
+                        displayName: userData.data.display_name,
+                        login: userData.data.login,
+                        photoUrl: userData.data.profile_image_url
                     };
+
+                    await updateStreamerProfile(user.uid, {
+                        displayName: userData.data.display_name,
+                        login: userData.data.login,
+                        photoUrl: userData.data.profile_image_url
+                    });
                 }
 
-                await createNewStreamRequest(user.uid, userTwitchData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
-
-                updateStreamerProfile(user.uid, userTwitchData);
+                await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
 
                 window.analytics.track('Stream requested', {
                     selectedGame,
@@ -344,23 +347,28 @@ const NewStream = ({ user, games }) => {
         const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
         let UTCTime = `${UTCHour}:${UTCMinutes}`;
 
-        let userTwitchData = {
+        let streamerData = {
             displayName: user.displayName,
             login: user.login,
             photoUrl: user.photoUrl
         };
 
-        const userTwitchDataRequest = await getTwitchUserData(user.id);
-
-        if (userTwitchDataRequest.data && userTwitchDataRequest.data.display_name) {
-            userTwitchData = {
-                displayName: userTwitchDataRequest.data.display_name,
-                login: userTwitchDataRequest.data.login,
-                photoUrl: userTwitchDataRequest.data.profile_image_url
+        const userData = await getTwitchUserDataCloudFunction(user.id);
+        if (userData && userData.data) {
+            streamerData = {
+                displayName: userData.data.display_name,
+                login: userData.data.login,
+                photoUrl: userData.data.profile_image_url
             };
+
+            await updateStreamerProfile(user.uid, {
+                displayName: userData.data.display_name,
+                login: userData.data.login,
+                photoUrl: userData.data.profile_image_url
+            });
         }
 
-        await createNewStreamRequest(user.uid, userTwitchData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+        await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
         await addToStreamsRequestedOnSubscriptionDetails(user.uid);
 
         updateStreamerProfile(user.uid, userTwitchData);

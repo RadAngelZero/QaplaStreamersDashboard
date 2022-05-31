@@ -108,7 +108,7 @@ const LiveDonations = () => {
                         audio = new Audio(cheerMessageUrl.data);
                     }
                 } else {
-                    const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Qoins`;
+                    const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
 
                     window.analytics.track('Cheer received', {
                         user: donation.twitchUserName,

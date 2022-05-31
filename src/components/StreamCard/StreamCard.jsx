@@ -173,6 +173,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const [openRewardsRemovedDialog, setOpenRewardsRemovedDialog] = useState(false);
     const [openCustomMessageSentDialog, setOpenCustomMessageSentDialog] = useState(false);
     const [loadingDots, setLoadingDots] = useState('');
+    const [hideStream, setHideStream] = useState(false);
     const history = useHistory();
     const classes = useStyles();
     const { t } = useTranslation();
@@ -208,6 +209,8 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             const streamStatus = await checkActiveCustomReward(streamId);
             if (streamStatus.exists()) {
                 setStream({ key: streamStatus.key, ...streamStatus.val() });
+                setShowRewardsOptions(true);
+                setHideStream(false);
             } else {
                 setStream(null);
             }
@@ -221,7 +224,11 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             const fifteenMinutesInMilliseconds = HOUR_IN_MILISECONDS / 4;
             const currentTimestamp = (new Date()).getTime();
             if ((currentTimestamp + fifteenMinutesInMilliseconds) >= timestamp) {
-                setShowRewardsOptions(true);
+                if ((timestamp + (HOUR_IN_MILISECONDS * 3)) < currentTimestamp) {
+                    setHideStream(true);
+                } else {
+                    setShowRewardsOptions(true);
+                }
             }
         }
 
@@ -362,7 +369,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
     }
 
-    if (game) {
+    if (game && !hideStream) {
         return (
             <Card className={classes.eventCard} style={style}>
                 <div className={classes.relativeContainer}>

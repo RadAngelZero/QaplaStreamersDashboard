@@ -371,7 +371,7 @@ const NewStream = ({ user, games }) => {
         await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
         await addToStreamsRequestedOnSubscriptionDetails(user.uid);
 
-        updateStreamerProfile(user.uid, userTwitchData);
+        updateStreamerProfile(user.uid, streamerData);
 
         window.analytics.track('Free trial started', {
             uid: user.uid

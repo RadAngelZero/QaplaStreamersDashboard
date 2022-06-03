@@ -265,10 +265,14 @@
         "descriptionP1": "Activa tu ",
         "descriptionHiglight": "Free Trial",
         "descriptionP2": " con tu código de referido\npara poder publicar tus streams",
+        "buyAMembership": "Recompensa a tu comunidad y dale visibilidad a tu contenido con una membresía de Qapla",
         "referralCode": "Código de referido",
         "startFreeTrial": "Activar Free Trial",
         "dontHaveACode": "¿No tienes código de referido?",
-        "subscribe": "Suscríbete para publicar"
+        "subscribe": "Suscríbete para publicar",
+        "referralProgramP1": "ó invita a otros streamers con tu ",
+        "qreatorCode": "Código de Qreador",
+        "referralProgramP2": " y recibe 2 publicaciones por cada streamer que invites"
     },
     "QStore": {
         "QStore": "Q Store",

@@ -54,3 +54,28 @@ export async function notifyBugToDevelopTeam(error) {
         }
     );
 }
+
+export async function notifyActivationWithReferralCode(referrerStreamerName, referredStreamerName) {
+	let adminsToTagOnDiscordMessage = ['630187691757273119'];
+
+	let adminTags = '';
+	adminsToTagOnDiscordMessage.forEach((adminId) => {
+		adminTags += `<@${adminId}>`;
+	});
+
+    await fetch(
+		'https://discord.com/api/webhooks/982036841878413322/xHb-x674puSbxzBxtcTTBS81wCTZgp1sRlc5iKz_haBSs2QEs83_5x2XUExARFtFniSS',
+        {
+            method: 'POST',
+            headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				content: `${referredStreamerName} ha publicado su primer evento con código de referido de ${referrerStreamerName}\n${adminTags}`,
+            	username: "Notifier",
+				tts: false
+			})
+        }
+    );
+}

@@ -49,6 +49,7 @@ const useStyles = makeStyles({
         textTransform: 'none'
     },
     goalButton: {
+        textAlign: 'center',
         background: 'linear-gradient(0deg, #00FFDD, #00FFDD), linear-gradient(0deg, #3B4BF9, #3B4BF9), #FF006B',
         fontWeight: '600',
         fontSize: 11,

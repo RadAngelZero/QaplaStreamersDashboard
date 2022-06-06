@@ -1,7 +1,6 @@
-import { database } from './firebase';
+import { database, databaseServerValue } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
-const InvitationCodeRef = database.ref('/InvitationCode');
 const userStreamersRef = database.ref('/UserStreamer');
 const streamsApprovalRef = database.ref('/StreamsApproval');
 const streamersEventsDataRef = database.ref('/StreamersEventsData');
@@ -47,34 +46,6 @@ export function loadStreamerProfile(uid, dataHandler) {
             dataHandler(streamerData.val());
         }
     });
-}
-
-/**
- * Check if the invitation code exists
- * @param {string} invitationCode Random invitation code
- */
-export async function invitationCodeExists(invitationCode) {
-    if (invitationCode) {
-        return (await InvitationCodeRef.child(invitationCode).once('value')).exists();
-    }
-
-    return false;
-}
-
-/**
- * Get the invitationCode node information (users with free trials code have special fields)
- * @param {string} invitationCode Random invitation code
- */
-export async function getInvitationCodeParams(invitationCode) {
-    return await InvitationCodeRef.child(invitationCode).once('value');
-}
-
-/**
- * Removes the given invitation code from database
- * @param {string} invitationCode Invitation code
- */
-export async function removeInvitationCode(invitationCode) {
-    return await InvitationCodeRef.child(invitationCode).remove();
 }
 
 /**
@@ -218,6 +189,10 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
         createdAt,
         stringDate
     });
+}
+
+export async function getUserDisplayName(uid) {
+    return await userStreamersRef.child(uid).child('displayName').once('value');
 }
 
 /**
@@ -481,7 +456,7 @@ export function listenForLastStreamerCheers(streamerUid, limit = 10, callback) {
  * @param {string} streamerUid Uid of the streamer
  * @param {function} callback Handler of the results
  */
- export function listenForUnreadStreamerCheers(streamerUid, callback) {
+export function listenForUnreadStreamerCheers(streamerUid, callback) {
     streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback);
 }
 
@@ -772,7 +747,7 @@ export async function setAlertSetting(uid, settingKey, value) {
  * @param {string} uid User identifier
  * @param {function} callback Function to handle the response of the listener
  */
-export async function listenToStreamerAlertsSettings(uid, callback) {
+export function listenToStreamerAlertsSettings(uid, callback) {
     return streamerAlertsSettingsRef.child(uid).on('value', callback);
 }
 
@@ -826,6 +801,24 @@ export async function createQlan(uid, code, name, image) {
  */
 export async function getQreatorCode(uid) {
     return await qreatorsCodesRef.child(uid).child('code').once('value');
+}
+
+/**
+ * Returns the id of the Qlan based on the Qreator code
+ * @param {string} qreatorCode Unique code to join a Qlan
+ */
+export async function getQlanIdWithQreatorCode(qreatorCode) {
+    let id = '';
+
+    const codes = await qreatorsCodesRef.orderByChild('code').equalTo(qreatorCode).once('value');
+
+    /**
+     * We know this query will return a maximum of one code, however firebase returns an object of objects
+     * so we need to go through it to get the code
+     */
+    codes.forEach((code) => id = code.key);
+
+    return id;
 }
 
 ////////////////////////
@@ -890,4 +883,36 @@ export async function getQStoreItems() {
  */
 export function listenQaplaGoal(uid, callback) {
     return qaplaGoalRef.child(uid).on('value', callback);
+}
+
+////////////////////////
+// Referral codes
+////////////////////////
+
+/**
+ * Add two events to a streamer who referred other streamer
+ * @param {string} uid User identifier of the user to receive the rewards
+ * @param {string} referredDisplayName Display name from the user who used the referral code
+ * @param {number} endDate Timestamp in ms for the end date of the events added
+ */
+export async function giveReferrerRewardsToStreamer(uid, referredDisplayName, endDate) {
+    await userStreamersRef.child(uid).child('subscriptionDetails').child('streamsIncluded').set(databaseServerValue.increment(2));
+    await userStreamersRef.child(uid).child('subscriptionDetails').child('redemptionsPerStream').set(40);
+
+    await userStreamersRef.child(uid).update({
+        premium: true
+    });
+    await updateUserStreamerPublicData(uid, {
+        premium: true
+    });
+
+    const referrerCurrentPeriod = await userStreamersRef.child(uid).child('currentPeriod').once('value');
+    const today = new Date();
+
+    if (!referrerCurrentPeriod.exists() || (today.getTime() >= referrerCurrentPeriod.val().endDate)) {
+        await userStreamersRef.child(uid).child('currentPeriod').child('endDate').set(endDate);
+        if (!referrerCurrentPeriod.exists() || !referrerCurrentPeriod.val().startDate) {
+            await userStreamersRef.child(uid).child('currentPeriod').child('startDate').set(today.getTime());
+        }
+    }
 }

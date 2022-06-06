@@ -269,11 +269,15 @@
         "title": "Your publication is\nready to be sent!",
         "descriptionP1": "Start your ",
         "descriptionHiglight": "Free Trial",
-        "descriptionP2": " with your invite code\nto be able to publish your streams",
-        "inviteCode": "Invite code",
+        "descriptionP2": " with your referral code\nto be able to publish your streams",
+        "buyAMembership": "Reward your community and give your content visibility with a Qapla membership",
+        "referralCode": "Referral code",
         "startFreeTrial": "Start Free Trial",
         "dontHaveACode": "Don't have a code?",
-        "subscribe": "Subscribe to publish"
+        "subscribe": "Subscribe to publish",
+        "referralProgramP1": "or invite other streamers with you ",
+        "qreatorCode": "Qreator code",
+        "referralProgramP2": " and receive 2 posts for each streamer you invite"
     },
     "QStore": {
         "QStore": "Q Store",

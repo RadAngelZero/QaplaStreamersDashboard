@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles, Card, Button, CardContent, CircularProgress } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -7,9 +7,10 @@ import dayjs from 'dayjs';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getInvitationCodeParams, removeInvitationCode, updateStreamerProfile, updateUserStreamerPublicData } from '../../services/database';
+import { getQlanIdWithQreatorCode, getUserDisplayName, giveReferrerRewardsToStreamer, updateStreamerProfile, updateUserStreamerPublicData } from '../../services/database';
+import { notifyActivationWithReferralCode } from '../../services/discord';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     containerStyle: {
         padding: 0
     },
@@ -23,14 +24,16 @@ const useStyles = makeStyles(() => ({
         justifyContent: 'center'
     },
     card: {
-        minWidth: '450px',
         backgroundColor: '#141833',
         boxShadow: '0px 4px 100px 15px rgba(0, 0, 0, 0.25)',
         borderRadius: '35px',
+        [theme.breakpoints.up('md')]: {
+            width: 450
+        },
         paddingLeft: 30,
         paddingRight: 30,
         paddingTop: 24,
-        paddingBottom: 60
+        paddingBottom: 0
     },
     title: {
         fontWeight: '600',
@@ -73,13 +76,28 @@ const useStyles = makeStyles(() => ({
         '&:active': {
             background: '#2E3AC1',
             opacity: '0.9'
-        }
+        },
+        marginBottom: 60
     },
     noCode: {
         textAlign: 'center',
         width: '100%',
         marginTop: 32,
         fontWeight: '600',
+        fontSize: '16px',
+        lineHeight: '22px',
+        letterSpacing: '0.492px',
+        color: '#FFFFFF'
+    },
+    referralProgram: {
+        textAlign: 'center',
+        [theme.breakpoints.up('md')]: {
+            maxWidth: 450
+        },
+        paddingLeft: 30,
+        paddingRight: 30,
+        marginTop: 32,
+        fontWeight: '400',
         fontSize: '16px',
         lineHeight: '22px',
         letterSpacing: '0.492px',
@@ -105,11 +123,15 @@ const useStyles = makeStyles(() => ({
             backgroundColor: '#00EACB',
             opacity: '0.9'
         }
+    },
+    subscribeButtonCointainer: {
+        marginBottom: 24,
+        marginTop: 180
     }
 }));
 
 const RequestActivation = ({ user, onSuccessActivation }) => {
-    const [inviteCode, setInviteCode] = useState('');
+    const [referralCode, setInviteCode] = useState('');
     const [validatingCode, setValidatingCode] = useState(false);
     const history = useHistory();
     const classes = useStyles();
@@ -117,33 +139,48 @@ const RequestActivation = ({ user, onSuccessActivation }) => {
 
     const validateCode = async () => {
         setValidatingCode(true);
-        if (inviteCode) {
-            const invitationCodeSnap = await getInvitationCodeParams(inviteCode);
-            if (invitationCodeSnap.exists()) {
-                if (invitationCodeSnap.val().freeTrial && invitationCodeSnap.val().subscriptionDetails) {
-                    activateFreeTrial(inviteCode, invitationCodeSnap.val());
+        if (referralCode) {
+            const referrerUid = await getQlanIdWithQreatorCode(referralCode);
+            if (referrerUid) {
+                if (!user.referredBy) {
+                    activateFreeTrial(referrerUid, {
+                        redemptionsPerStream: 40,
+                        streamsIncluded: 2
+                    });
+                } else {
+                    setValidatingCode(false);
+                    alert('Ya usaste un código de referido antes');
                 }
             } else {
-                alert('Código invalido');
                 setValidatingCode(false);
+                alert('Código invalido');
             }
+        } else {
+            setValidatingCode(false);
         }
     }
 
-    const activateFreeTrial = async (code, freeTrialInformation) => {
+    const activateFreeTrial = async (referrerUid, freeTrialInformation) => {
         const startDate = dayjs.utc().toDate().getTime();
         const endDate = dayjs.utc().add(1, 'month').endOf('day').toDate().getTime();
         await updateStreamerProfile(user.uid, {
+            referredBy: referrerUid,
             freeTrial: true,
             premium: true,
             currentPeriod: { startDate, endDate },
-            subscriptionDetails: freeTrialInformation.subscriptionDetails
+            subscriptionDetails: freeTrialInformation
         });
+
         await updateUserStreamerPublicData(user.uid, {
             premium: true
         });
 
-        await removeInvitationCode(code);
+        await giveReferrerRewardsToStreamer(referrerUid, user.displayName, endDate);
+
+        const referrerDisplayName = await getUserDisplayName(referrerUid);
+
+        await notifyActivationWithReferralCode(referrerDisplayName.val(), user.displayName);
+
         await onSuccessActivation();
         setValidatingCode(false);
     }
@@ -161,43 +198,72 @@ const RequestActivation = ({ user, onSuccessActivation }) => {
                             {t('RequestActivation.title')} 🚀
                         </p>
                         <p className={classes.instructions}>
-                            {t('RequestActivation.descriptionP1')}
-                            <b style={{ color: '#FFF' }}>{t('RequestActivation.descriptionHiglight')}</b>
-                            {t('RequestActivation.descriptionP2')}
+                            {validatingCode || !user.referredBy ?
+                                <>
+                                    {t('RequestActivation.descriptionP1')}
+                                    <b style={{ color: '#FFF' }}>{t('RequestActivation.descriptionHiglight')}</b>
+                                    {t('RequestActivation.descriptionP2')}
+                                </>
+                                :
+                                t('RequestActivation.buyAMembership')
+                            }
                         </p>
-                        <StreamerTextInput
-                            placeholder={t('RequestActivation.inviteCode')}
-                            fullWidth
-                            containerStyle={{ marginTop: 24 }}
-                            classes={{ input: classes.textInput }}
-                            textInputStyle={{ background: '#202750', borderRadius: '16px' }}
-                            value={inviteCode}
-                            onChange={(e) => setInviteCode(e.target.value)} />
-                        {validatingCode ?
-                            <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', marginTop: 32 }}>
-                                <CircularProgress style={{ color: '#3B4BF9' }} />
-                            </div>
+                        {validatingCode || !user.referredBy ?
+                            <>
+                                <StreamerTextInput
+                                    placeholder={t('RequestActivation.referralCode')}
+                                    fullWidth
+                                    containerStyle={{ marginTop: 24 }}
+                                    classes={{ input: classes.textInput }}
+                                    textInputStyle={{ background: '#202750', borderRadius: '16px' }}
+                                    value={referralCode}
+                                    onChange={(e) => setInviteCode(e.target.value)} />
+                                {validatingCode ?
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', marginTop: 32 }}>
+                                        <CircularProgress style={{ color: '#3B4BF9' }} />
+                                    </div>
+                                    :
+                                    <Button
+                                        onClick={validateCode}
+                                        fullWidth
+                                        classes={{
+                                            root: classes.activeFreeTrialButton
+                                        }}>
+                                        {t('RequestActivation.startFreeTrial')}
+                                    </Button>
+                                }
+                            </>
                             :
-                            <Button
-                                onClick={validateCode}
-                                fullWidth
-                                classes={{
-                                    root: classes.activeFreeTrialButton
-                                }}>
-                                {t('RequestActivation.startFreeTrial')}
-                            </Button>
+                            <div className={classes.subscribeButtonCointainer}>
+                                <Button
+                                    fullWidth
+                                    onClick={() => history.push('/membership')}
+                                    classes={{ root: classes.subscribeButton }}>
+                                    {t('RequestActivation.subscribe')}
+                                </Button>
+                            </div>
                         }
                     </CardContent>
                 </Card>
-                <p className={classes.noCode}>
-                    {t('RequestActivation.dontHaveACode')}
-                </p>
-                <Button
-                    fullWidth
-                    onClick={() => history.push('/membership')}
-                    classes={{ root: classes.subscribeButton }}>
-                    {t('RequestActivation.subscribe')}
-                </Button>
+                {validatingCode || !user.referredBy ?
+                    <>
+                        <p className={classes.noCode}>
+                            {t('RequestActivation.dontHaveACode')}
+                        </p>
+                        <Button
+                            fullWidth
+                            onClick={() => history.push('/membership')}
+                            classes={{ root: classes.subscribeButton }}>
+                            {t('RequestActivation.subscribe')}
+                        </Button>
+                    </>
+                    :
+                    <p className={classes.referralProgram}>
+                        {t('RequestActivation.referralProgramP1')}
+                        <b style={{ color: '#FFF' }}>{t('RequestActivation.qreatorCode')}</b>
+                        {t('RequestActivation.referralProgramP2')}
+                    </p>
+                }
                 </div>
             </div>
         </StreamerDashboardContainer>

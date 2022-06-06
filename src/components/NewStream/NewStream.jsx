@@ -257,84 +257,87 @@ const NewStream = ({ user, games }) => {
             return;
         }
 
-        const { endDate } = user.currentPeriod;
-
-        /**
-         * Check if the selected date is valid to create the event based on the end of the streamer subscription
-         */
-        if (selectedDate.getTime() <= endDate) {
-
-            const numberOfStreamsInTheSelectedPeriod = user.subscriptionDetails.streamsRequested || 0;
-
-            let userCanCreateStream = numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded);
-
-            if (!userCanCreateStream) {
-                if (user.boughtStreams) {
-                    /**
-                     * Check for packages of streams bought by the streamer, if some package has not expired and has not used the total amount of streams bought
-                     * the user can create the stream, this function will also remove expired packages or packages that has been already used
-                     */
-                    userCanCreateStream = Object.keys(user.boughtStreams).some((streamsPackageId) => {
-                        if (selectedDate.getTime() <= user.boughtStreams[streamsPackageId].expirationTimestamp && (!user.boughtStreams[streamsPackageId].streamsRequested || user.boughtStreams[streamsPackageId].streamsRequested + 1 <= user.boughtStreams[streamsPackageId].boughtStreams)) {
-                            addToStreamsRequestedOnStreamsPackage(user.uid, streamsPackageId);
-                            return true;
-                        } else {
-                            removeStreamPackageOfStreamer(user.uid, streamsPackageId);
-                        }
-                    });
-                }
-            } else {
-                addToStreamsRequestedOnSubscriptionDetails(user.uid);
-            }
+        if (user.currentPeriod) {
+            const { endDate } = user.currentPeriod;
 
             /**
-             * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
-             * is lower or equal to the user limit per month then we create the event
+             * Check if the selected date is valid to create the event based on the end of the streamer subscription
              */
-            if (userCanCreateStream) {
-                const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
-                const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
-                let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
+            if (selectedDate.getTime() <= endDate) {
 
-                const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
-                const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
-                let UTCTime = `${UTCHour}:${UTCMinutes}`;
+                const numberOfStreamsInTheSelectedPeriod = user.subscriptionDetails.streamsRequested || 0;
 
-                let streamerData = {
-                    displayName: user.displayName,
-                    login: user.login,
-                    photoUrl: user.photoUrl
-                };
+                let userCanCreateStream = numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded);
 
-                const userData = await getTwitchUserDataCloudFunction(user.id);
-                if (userData && userData.data) {
-                    streamerData = {
-                        displayName: userData.data.display_name,
-                        login: userData.data.login,
-                        photoUrl: userData.data.profile_image_url
-                    };
-
-                    await updateStreamerProfile(user.uid, {
-                        displayName: userData.data.display_name,
-                        login: userData.data.login,
-                        photoUrl: userData.data.profile_image_url
-                    });
+                if (!userCanCreateStream) {
+                    if (user.boughtStreams) {
+                        /**
+                         * Check for packages of streams bought by the streamer, if some package has not expired and has not used the total amount of streams bought
+                         * the user can create the stream, this function will also remove expired packages or packages that has been already used
+                         */
+                        userCanCreateStream = Object.keys(user.boughtStreams).some((streamsPackageId) => {
+                            if (selectedDate.getTime() <= user.boughtStreams[streamsPackageId].expirationTimestamp && (!user.boughtStreams[streamsPackageId].streamsRequested || user.boughtStreams[streamsPackageId].streamsRequested + 1 <= user.boughtStreams[streamsPackageId].boughtStreams)) {
+                                addToStreamsRequestedOnStreamsPackage(user.uid, streamsPackageId);
+                                return true;
+                            } else {
+                                removeStreamPackageOfStreamer(user.uid, streamsPackageId);
+                            }
+                        });
+                    }
+                } else {
+                    addToStreamsRequestedOnSubscriptionDetails(user.uid);
                 }
 
-                await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+                /**
+                 * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
+                 * is lower or equal to the user limit per month then we create the event
+                 */
+                if (userCanCreateStream) {
+                    const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
+                    const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
+                    let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
 
-                window.analytics.track('Stream requested', {
-                    selectedGame,
-                    selectedDate: selectedDate.getTime(),
-                    uid: user.uid
-                });
-                history.push('/success');
+                    const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
+                    const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
+                    let UTCTime = `${UTCHour}:${UTCMinutes}`;
+
+                    let streamerData = {
+                        displayName: user.displayName,
+                        login: user.login,
+                        photoUrl: user.photoUrl
+                    };
+
+                    const userData = await getTwitchUserDataCloudFunction(user.id);
+                    if (userData && userData.data) {
+                        streamerData = {
+                            displayName: userData.data.display_name,
+                            login: userData.data.login,
+                            photoUrl: userData.data.profile_image_url
+                        };
+
+                        await updateStreamerProfile(user.uid, {
+                            displayName: userData.data.display_name,
+                            login: userData.data.login,
+                            photoUrl: userData.data.profile_image_url
+                        });
+                    }
+
+                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+
+                    window.analytics.track('Stream requested', {
+                        selectedGame,
+                        selectedDate: selectedDate.getTime(),
+                        uid: user.uid
+                    });
+                    history.push('/success');
+                } else {
+                    setShowAccountActviation(true);
+                }
             } else {
-                // Hacer un modal chido para convencerlos de mejorar su plan o comprar eventos aparte
-                alert(t('NewStream.alerts.streamsLimit'));
+                alert(t('NewStream.alerts.beforePlanExpiration'));
             }
         } else {
-            alert(t('NewStream.alerts.beforePlanExpiration'));
+            setShowAccountActviation(true);
         }
     }
 

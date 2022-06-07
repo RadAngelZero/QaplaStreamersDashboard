@@ -8,11 +8,12 @@ import { functions } from './firebase';
  * @param {string} login Login string of twitch (regularly is the equal to the display name)
  * @param {string} photoUrl URL of twitch image
  * @param {string} email email of twitch
+ * @param {string} broadcasterType Twitch broadcaster type (one of: "partner", "affiliate", or "")
  */
-export async function createUserWithTwitch(uid, displayName, login, photoUrl, email) {
+export async function createUserWithTwitch(uid, displayName, login, photoUrl, email, broadcasterType) {
     const authWithTwitch = functions.httpsCallable('twitchAuthentication');
     try {
-        return await authWithTwitch({ uid, displayName, login, photoUrl, email });
+        return await authWithTwitch({ uid, displayName, login, photoUrl, email, broadcasterType });
     } catch (error) {
         console.log(error);
     }

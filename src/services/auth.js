@@ -54,11 +54,13 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
         }
 
         const userToken = (await createUserWithTwitch(
-                twitchUserData.id,
-                twitchUserData.display_name,
-                twitchUserData.login,
-                twitchUserData.profile_image_url,
-                twitchUserData.email)
+                    twitchUserData.id,
+                    twitchUserData.display_name,
+                    twitchUserData.login,
+                    twitchUserData.profile_image_url,
+                    twitchUserData.email,
+                    twitchUserData.broadcaster_type
+                )
             ).data;
         const userResult = {
             firebaseAuthUser: await auth.signInWithCustomToken(userToken),
@@ -86,7 +88,8 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
 
         window.analytics.identify(userResult.userData.uid, {
             username: userResult.userData.displayName,
-            email: userResult.userData.email
+            email: userResult.userData.email,
+            broadcasterType: twitchUserData.broadcaster_type
         });
 
         return userResult;

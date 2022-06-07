@@ -241,6 +241,11 @@ const NewStream = ({ user, games }) => {
 
     const submitEvent = async () => {
         setLockSendButton(true);
+        if (user.broadcasterType === '') {
+            setLockSendButton(false);
+            return alert(t('NewStream.alerts.noChannelPoints'));
+        }
+
         if (!user.premium && !user.freeTrial) {
             setLockSendButton(false);
             return setShowAccountActviation(true);
@@ -318,7 +323,8 @@ const NewStream = ({ user, games }) => {
                         await updateStreamerProfile(user.uid, {
                             displayName: userData.data.display_name,
                             login: userData.data.login,
-                            photoUrl: userData.data.profile_image_url
+                            photoUrl: userData.data.profile_image_url,
+                            broadcasterType: userData.data.broadcaster_type
                         });
                     }
 
@@ -367,7 +373,8 @@ const NewStream = ({ user, games }) => {
             await updateStreamerProfile(user.uid, {
                 displayName: userData.data.display_name,
                 login: userData.data.login,
-                photoUrl: userData.data.profile_image_url
+                photoUrl: userData.data.profile_image_url,
+                broadcasterType: userData.data.broadcaster_type
             });
         }
 

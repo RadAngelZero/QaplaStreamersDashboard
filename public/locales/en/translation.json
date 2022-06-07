@@ -109,6 +109,7 @@
     },
     "NewStream": {
         "alerts": {
+            "noChannelPoints": "Apparently you don't have channel points on Twitch 😦 Get your affiliate so you can give rewards and post your streams on Qapla :D\n\nhttps://help.twitch.tv/s/article/joining-the-affiliate-program",
             "before24h": "All requests must be sent at least 24 hours before the stream",
             "missingData": "Verify that all fields have been filled correctly",
             "streamsLimit": "You have reached the limit of streams for your subscription",

@@ -10,7 +10,7 @@ export async function startQaplaStream(uid, twitchId, streamerName, refreshToken
     if (userTokensUpdated.data.status === 200) {
         const userCredentialsUpdated = userTokensUpdated.data;
         updateStreamerProfile(uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
-        const xqReward = await createCustomReward(twitchId, userCredentialsUpdated.access_token, 'XQ Qapla', 500, false, true, 1);
+        const xqReward = await createCustomReward(twitchId, userCredentialsUpdated.access_token, 'XQ Qapla', 250, false, true, 1);
         if (xqReward.status !== 200) {
             // Problem creating reward
         }

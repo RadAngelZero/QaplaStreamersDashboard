@@ -1,6 +1,7 @@
 import { database, databaseServerValue } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
+const InvitationCodeRef = database.ref('/InvitationCode');
 const userStreamersRef = database.ref('/UserStreamer');
 const streamsApprovalRef = database.ref('/StreamsApproval');
 const streamersEventsDataRef = database.ref('/StreamersEventsData');
@@ -46,6 +47,34 @@ export function loadStreamerProfile(uid, dataHandler) {
             dataHandler(streamerData.val());
         }
     });
+}
+
+/**
+  * Check if the invitation code exists
+  * @param {string} invitationCode Random invitation code
+  */
+ export async function invitationCodeExists(invitationCode) {
+    if (invitationCode) {
+        return (await InvitationCodeRef.child(invitationCode).once('value')).exists();
+    }
+
+    return false;
+}
+
+/**
+ * Get the invitationCode node information (users with free trials code have special fields)
+ * @param {string} invitationCode Random invitation code
+ */
+export async function getInvitationCodeParams(invitationCode) {
+    return await InvitationCodeRef.child(invitationCode).once('value');
+}
+
+/**
+ * Removes the given invitation code from database
+ * @param {string} invitationCode Invitation code
+ */
+export async function removeInvitationCode(invitationCode) {
+    return await InvitationCodeRef.child(invitationCode).remove();
 }
 
 /**

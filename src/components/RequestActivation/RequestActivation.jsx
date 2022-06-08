@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getQlanIdWithQreatorCode, getUserDisplayName, giveReferrerRewardsToStreamer, updateStreamerProfile, updateUserStreamerPublicData } from '../../services/database';
+import { getInvitationCodeParams, getQlanIdWithQreatorCode, getUserDisplayName, giveReferrerRewardsToStreamer, removeInvitationCode, updateStreamerProfile, updateUserStreamerPublicData } from '../../services/database';
 import { notifyActivationWithReferralCode } from '../../services/discord';
 
 const useStyles = makeStyles((theme) => ({
@@ -131,19 +131,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const RequestActivation = ({ user, onSuccessActivation }) => {
-    const [referralCode, setInviteCode] = useState('');
+    const [referralCode, setReferralCode] = useState('');
     const [validatingCode, setValidatingCode] = useState(false);
     const history = useHistory();
     const classes = useStyles();
     const { t } = useTranslation();
 
     const validateCode = async () => {
+        if (user.broadcasterType === '') {
+            return alert(t('NewStream.alerts.noChannelPoints'));
+        }
+
         setValidatingCode(true);
         if (referralCode) {
             const referrerUid = await getQlanIdWithQreatorCode(referralCode);
             if (referrerUid) {
                 if (!user.referredBy) {
-                    activateFreeTrial(referrerUid, {
+                    activateFreeTrialWithReferralCode(referrerUid, {
                         redemptionsPerStream: 40,
                         streamsIncluded: 2
                     });
@@ -152,15 +156,22 @@ const RequestActivation = ({ user, onSuccessActivation }) => {
                     alert('Ya usaste un código de referido antes');
                 }
             } else {
-                setValidatingCode(false);
-                alert('Código invalido');
+                const invitationCodeSnap = await getInvitationCodeParams(referralCode);
+                if (invitationCodeSnap.exists()) {
+                    if (invitationCodeSnap.val().freeTrial && invitationCodeSnap.val().subscriptionDetails) {
+                        activateFreeTrialWithInvitationCode(referralCode, invitationCodeSnap.val());
+                    }
+                } else {
+                    setValidatingCode(false);
+                    alert('Código invalido');
+                }
             }
         } else {
             setValidatingCode(false);
         }
     }
 
-    const activateFreeTrial = async (referrerUid, freeTrialInformation) => {
+    const activateFreeTrialWithReferralCode = async (referrerUid, freeTrialInformation) => {
         const startDate = dayjs.utc().toDate().getTime();
         const endDate = dayjs.utc().add(1, 'month').endOf('day').toDate().getTime();
         await updateStreamerProfile(user.uid, {
@@ -181,6 +192,25 @@ const RequestActivation = ({ user, onSuccessActivation }) => {
 
         await notifyActivationWithReferralCode(referrerDisplayName.val(), user.displayName);
 
+        await onSuccessActivation();
+        setValidatingCode(false);
+    }
+
+    const activateFreeTrialWithInvitationCode = async (code, freeTrialInformation) => {
+        const startDate = dayjs.utc().toDate().getTime();
+         const endDate = dayjs.utc().add(1, 'month').endOf('day').toDate().getTime();
+         await updateStreamerProfile(user.uid, {
+            freeTrial: true,
+            premium: true,
+            currentPeriod: { startDate, endDate },
+            subscriptionDetails: freeTrialInformation.subscriptionDetails
+        });
+
+        await updateUserStreamerPublicData(user.uid, {
+            premium: true
+        });
+
+        await removeInvitationCode(code);
         await onSuccessActivation();
         setValidatingCode(false);
     }
@@ -217,7 +247,7 @@ const RequestActivation = ({ user, onSuccessActivation }) => {
                                     classes={{ input: classes.textInput }}
                                     textInputStyle={{ background: '#202750', borderRadius: '16px' }}
                                     value={referralCode}
-                                    onChange={(e) => setInviteCode(e.target.value)} />
+                                    onChange={(e) => setReferralCode(e.target.value)} />
                                 {validatingCode ?
                                     <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', marginTop: 32 }}>
                                         <CircularProgress style={{ color: '#3B4BF9' }} />

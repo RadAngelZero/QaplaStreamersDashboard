@@ -369,7 +369,8 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
     }
 
-    if (game && !hideStream) {
+    // if (game && !hideStream) {
+        if (game) {
         return (
             <Card className={classes.eventCard} style={style}>
                 <div className={classes.relativeContainer}>

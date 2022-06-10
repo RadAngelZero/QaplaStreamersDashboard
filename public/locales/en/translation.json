@@ -19,7 +19,7 @@
         "universalProfile": "Universal Profile",
         "settings": "Settings",
         "new": "New",
-        "signOut": "Sign out"
+        "signOut": "Log out"
     },
     "LanguageHandler": {
         "languages": {
@@ -115,7 +115,7 @@
             "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
         },
         "whatAreYouPlaying": "What are you going to stream?",
-        "selectYourGame": "Select your game",
+        "selectYourGame": "Select your category",
         "when": "When?",
         "date": "Date",
         "time": "Time",
@@ -139,6 +139,9 @@
             "confirmDetails": "Just confirm the details to continue",
             "dateAndHour": "Date and hour",
             "localTime": "Local time"
+        },
+        "successDialog": {
+            "description": "Request sent for approval successfully. We’ll post it as soon as possible"
         }
     },
     "CheersSettings": {
@@ -291,6 +294,27 @@
         "streams": "Remaining posts: ",
         "leftStreams": "{{available}} of {{total}}",
         "renewsOn": "Renews on {{month}} {{date}}"
+    },
+    "EditStream": {
+        "change" : "Change date or time",
+        "changeDesc": "Participants and your followers will be notified of any changes. We recommend not changing the date and time very often, the consistency in your publications generates more to your streams.",
+        "sendMessage": "Send message",
+        "sendMessageDesc": "Notify your people about something relevant in your stream, create hype or whatever you want! Participants and your followers will receive a mobile notification with your message.",
+        "participants": "Participants",
+        "table": {
+            "twitch": "Twitch Username",
+            "game": "Game Username",
+            "qapla": "Qapla Username",
+            "download": "Download List"
+        },
+        "alerts": {
+            "updated": "Updated schedule",
+            "errorDate": "Please verify that you have selected a valid date and/or hour",
+            "sent": "Notification sent",
+            "errorSend": "Error sending notification. Try again later"
+        },
+        "save": "Save Changes",
+        "limit" : "140 character limit"
     },
     "continue": "Continue",
     "cancel": "Cancel",

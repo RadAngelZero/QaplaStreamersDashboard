@@ -16,6 +16,7 @@ import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
 import { ReactComponent as CheckedIcon } from './../../assets/CheckedIcon.svg';
 import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.svg';
 import BackButton from '../BackButton/BackButton';
+import NewStreamSuccessDialog from './NewStreamSuccessDialog';
 import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
 import RequestActivation from '../RequestActivation/RequestActivation';
 import { getTwitchUserDataCloudFunction } from '../../services/functions';
@@ -119,7 +120,7 @@ const NewStream = ({ user, games }) => {
     const classes = useStyles();
     const history = useHistory();
     const { t } = useTranslation();
-    const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+    const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
     const [selectedGame, setSelectedGame] = useState();
     const [selectedEvent, setSelectedEvent] = useState('exp');
     const [stringDate, setStringDate] = useState('');
@@ -237,7 +238,10 @@ const NewStream = ({ user, games }) => {
         setStringDate(event.target.value);
     }
 
-    const openConfirmationDialog = () => setOpenDetailsDialog(true);
+    const openSuccessWindow = () => {
+        setOpenSuccessDialog(true); // uncomment to show success stream
+        // submitEvent(); // uncomment on commit
+    };
 
     const submitEvent = async () => {
         setLockSendButton(true);
@@ -329,7 +333,7 @@ const NewStream = ({ user, games }) => {
                         selectedDate: selectedDate.getTime(),
                         uid: user.uid
                     });
-                    history.push('/success');
+                    setOpenSuccessDialog(true);
                 } else {
                     setShowAccountActviation(true);
                 }
@@ -407,15 +411,15 @@ const NewStream = ({ user, games }) => {
                                 overflowX={'hidden'}
                                 style={{
                                     minHeight: '58px'
-                                }}/>
+                                }} />
                         </div>
                         <h1 className={styles.title}>
                             {t('NewStream.when')}
                         </h1>
                         <MuiPickersUtilsProvider utils={DayJsUtils}>
-                            <Grid container spacing={4}>
-                                <Grid item sm={4} style={{ minWidth: '175px' }}>
-                                    <InputLabel className={classes.datePickerLabel}>
+                            <Grid container spacing={4} style={{ marginTop: '2px' }}>
+                                <Grid item sm={4} style={{ minWidth: '175px', }}>
+                                    <InputLabel className={classes.datePickerLabel} >
                                         {t('NewStream.date')}
                                     </InputLabel>
                                     <KeyboardDatePicker
@@ -484,7 +488,7 @@ const NewStream = ({ user, games }) => {
                                         }}
                                     />
                                 </Grid>
-                                <Grid item sm={8} style={{ width: '90%', minWidth: '330px' }}>
+                                {/* <Grid item sm={8} style={{ width: '90%', minWidth: '330px' }}>
                                     <InputLabel className={classes.datePickerLabel}>
                                         {t('NewStream.confirmDate')}
                                     </InputLabel>
@@ -492,13 +496,13 @@ const NewStream = ({ user, games }) => {
                                         fullWidth
                                         value={stringDate}
                                         onChange={handleStringDateChange} />
-                                </Grid>
+                                </Grid> */}
                             </Grid>
                         </MuiPickersUtilsProvider>
-                        <h1 className={styles.title}>
+                        {/* <h1 className={styles.title}>
                             {t('NewStream.streamType')}
-                        </h1>
-                        <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
+                        </h1> */}
+                        {/* <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
                             <Grid container>
                                 <Grid item sm={2}>
                                     <FormControlLabel
@@ -512,20 +516,8 @@ const NewStream = ({ user, games }) => {
                                         }
                                         label={t('NewStream.streamTypes.casual')} />
                                 </Grid>
-                                {/* <Grid item sm={2}>
-                                    <FormControlLabel
-                                        value={'tournament'}
-                                        classes={{ label: classes.label }}
-                                        control={
-                                            <Radio
-                                                checkedIcon={<CheckedIcon />}
-                                                icon={<UncheckedIcon />}
-                                                style={{ backgroundColor: 'transparent' }} />
-                                        }
-                                        label='Tournament' />
-                                </Grid> */}
                             </Grid>
-                        </RadioGroup>
+                        </RadioGroup> */}
                         <Grid container className={classes.accordionContainer}>
                             <Accordion
                                 className={classes.accordion}
@@ -551,7 +543,7 @@ const NewStream = ({ user, games }) => {
                                                 {t('NewStream.streamTitle')}
                                             </h1>
                                             <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem}>
+                                                <Grid item className={classes.accordionGridItem} style={{marginTop: '10px'}}>
                                                     <StreamerTextInput
                                                         label={t('NewStream.streamTitle')}
                                                         placeholder={t('NewStream.streamTitlePlaceholder')}
@@ -566,7 +558,7 @@ const NewStream = ({ user, games }) => {
                                         <h1 className={styles.title}>
                                             {t('NewStream.streamDescription')}
                                         </h1>
-                                        <Grid>
+                                        {/* <Grid>
                                             <Grid container spacing={4}>
                                                 <Grid item className={classes.accordionGridItem}>
                                                     <StreamerTextInput
@@ -579,10 +571,10 @@ const NewStream = ({ user, games }) => {
                                                     />
                                                 </Grid>
                                             </Grid>
-                                        </Grid>
+                                        </Grid> */}
                                         <Grid>
                                             <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '1rem' }}>
+                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
                                                     <StreamerTextInput
                                                         id={'eventDescription'}
                                                         label={t('NewStream.streamDescription')}
@@ -603,20 +595,25 @@ const NewStream = ({ user, games }) => {
                         </Grid>
                         <Button
                             className={styles.button}
-                            onClick={openConfirmationDialog}>
+                            onClick={openSuccessWindow}>
                             {t('NewStream.submit')}
                         </Button>
                     </Grid>
                 </Grid>
-                <NewStreamDetailsDialog
+                {/* <NewStreamDetailsDialog
                     lockSendButton={lockSendButton}
-                    open={openDetailsDialog}
-                    onClose={() => setOpenDetailsDialog(false)}
+                    open={openSuccessDialog}
+                    onClose={() => setOpenSuccessDialog(false)}
                     submitEvent={submitEvent}
                     game={selectedGame}
                     date={`${selectedDate.toLocaleDateString()} ${selectedDate.toLocaleTimeString()}`}
                     userName={user ? user.displayName : ''}
-                    {...optionalData} />
+                    {...optionalData} /> */}
+                <NewStreamSuccessDialog
+                    open={openSuccessDialog}
+                    onClose={() => history.push('/profile')}
+                    mainPage={() => history.push('/profile')}
+                />
             </StreamerDashboardContainer>
         );
     } else {

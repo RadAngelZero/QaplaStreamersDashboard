@@ -47,7 +47,10 @@ const StreamerSelect = ({ children, style, label, Icon, value, onChange, data, m
                 if (e.value === value) setSelectedLabel(e.label)
             });
         }
-    })
+        if (initialLabel && value === undefined) {
+            setSelectedLabel(initialLabel);
+        }
+    }, [data, initialLabel, value])
 
     return (
         <div className={classes.input} style={style}>

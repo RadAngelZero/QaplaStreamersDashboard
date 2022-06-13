@@ -260,6 +260,7 @@ const PlanPicker = ({ user }) => {
                                 <input type='hidden' name='interval' value={period} />
                                 <CardActions className={styles.actionArea}>
                                     <ContainedButton size='large'
+                                        buttonColor={plan[0] === 'growth' ? 1 : 0}
                                         type='submit'
                                         className={`${classes.subscribeButton} ${plan[0] === 'growth' ? styles.growthSubscribeButton : ''}`}>
                                         {plan[0] === 'growth' ? t('PlanPicker.rewardYourCommunity') : t('PlanPicker.getVisibility')}

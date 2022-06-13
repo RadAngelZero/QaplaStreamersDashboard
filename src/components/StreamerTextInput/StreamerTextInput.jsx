@@ -13,7 +13,6 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: '16px'
     },
     textInput: {
-        marginTop: theme.spacing(1),
         paddingLeft: theme.spacing(2),
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),

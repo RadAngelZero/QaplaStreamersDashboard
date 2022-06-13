@@ -230,7 +230,7 @@ const StreamerSideBar = ({ user }) => {
                         {drawer}
                     </Drawer>
                 </Hidden>
-                {history.location.pathname === '/create' ?
+                {(history.location.pathname === '/create' || history.location.pathname.includes('/edit')) ?
                     <></>
                     :
                     <Hidden lgUp>

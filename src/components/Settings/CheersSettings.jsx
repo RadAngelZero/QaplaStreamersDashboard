@@ -224,9 +224,14 @@ const CheersSettings = ({ uid, twitchId }) => {
                 src={Step4} />
             <InstructionSection title={t('CheersSettings.instruction6.title')}
                 description={t('CheersSettings.instruction6.description')} />
-            <ContainedButton onClick={sendTestCheer}>
-                {t('CheersSettings.testButton')}
-            </ContainedButton>
+            <div style={{
+                marginTop: '25px'
+            }}>
+                <ContainedButton onClick={sendTestCheer}>
+                    {t('CheersSettings.testButton')}
+                </ContainedButton>
+            </div>
+
             <div className={classes.instructionsMargin} />
         </div>
     );

@@ -239,8 +239,7 @@ const NewStream = ({ user, games }) => {
     }
 
     const openSuccessWindow = () => {
-        setOpenSuccessDialog(true); // uncomment to show success stream
-        // submitEvent(); // uncomment on commit
+        submitEvent();
     };
 
     const submitEvent = async () => {

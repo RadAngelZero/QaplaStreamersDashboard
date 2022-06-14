@@ -73,7 +73,7 @@ const LiveDonations = () => {
                 if (isStreaming.exists() && isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
-                    }, 150000);
+                    }, 150);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -97,7 +97,7 @@ const LiveDonations = () => {
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         audio = new Audio(TEST_MESSAGE_SPEECH_URL);
                     } else {
-                        const messageToRead = `${donation.twitchUserName} dice: ${donation.message}`;
+                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins y dice: ${donation.message}`;
 
                         window.analytics.track('Cheer received', {
                             user: donation.twitchUserName,

@@ -158,7 +158,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp }) => {
+const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image }) => {
     // This information is not longer visible in the card but maybe in the future we would want to show it again
     // const [participantsNumber, setParticipantsNumber] = useState(null);
     const [title, setTitle] = useState({ en: '', es: '' });
@@ -386,7 +386,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                     </div>
                     <img
                         alt='Game'
-                        src={streamsPlaceholderImages[game] || (games.allGames[game] ? games.allGames[game].fallbackImageUrl : null)}
+                        src={image ? image : (streamsPlaceholderImages[game] || (games.allGames[game] ? games.allGames[game].fallbackImageUrl : null))}
                         width='100%'
                         height='180'
                         className={classes.eventImage} />

@@ -336,6 +336,7 @@ const StreamerProfile = ({ user, games }) => {
                                         <StreamCard
                                             streamType={streams[streamId].status}
                                             streamId={streamId}
+                                            image={streams[streamId].image}
                                             user={user}
                                             game={streams[streamId].game}
                                             games={games}

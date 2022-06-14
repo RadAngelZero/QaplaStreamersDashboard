@@ -1,5 +1,5 @@
 import React, { useState, useReducer, useEffect } from 'react';
-import { makeStyles, Grid, FormControlLabel, Radio, RadioGroup, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
+import { makeStyles, Grid, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -13,11 +13,8 @@ import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
-import { ReactComponent as CheckedIcon } from './../../assets/CheckedIcon.svg';
-import { ReactComponent as UncheckedIcon } from './../../assets/UncheckedIcon.svg';
 import BackButton from '../BackButton/BackButton';
 import NewStreamSuccessDialog from './NewStreamSuccessDialog';
-import NewStreamDetailsDialog from '../NewStreamDetailsDialog/NewStreamDetailsDialog';
 import RequestActivation from '../RequestActivation/RequestActivation';
 import { getTwitchUserDataCloudFunction } from '../../services/functions';
 
@@ -600,21 +597,13 @@ const NewStream = ({ user, games }) => {
                             </Accordion>
                         </Grid>
                         <Button
+                            disabled={lockSendButton}
                             className={styles.button}
                             onClick={openSuccessWindow}>
                             {t('NewStream.submit')}
                         </Button>
                     </Grid>
                 </Grid>
-                {/* <NewStreamDetailsDialog
-                    lockSendButton={lockSendButton}
-                    open={openSuccessDialog}
-                    onClose={() => setOpenSuccessDialog(false)}
-                    submitEvent={submitEvent}
-                    game={selectedGame}
-                    date={`${selectedDate.toLocaleDateString()} ${selectedDate.toLocaleTimeString()}`}
-                    userName={user ? user.displayName : ''}
-                    {...optionalData} /> */}
                 <NewStreamSuccessDialog
                     open={openSuccessDialog}
                     onClose={() => history.push('/profile')}

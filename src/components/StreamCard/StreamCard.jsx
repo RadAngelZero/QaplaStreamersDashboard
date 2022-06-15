@@ -26,6 +26,7 @@ import EventRewardsRemovedConfirmation from '../QaplaStreamDialogs/EventRewardsR
 import { auth } from '../../services/firebase';
 import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
 import { sendCustomMessage } from '../../services/functions';
+import { generateStreamDynamicLink } from '../../services/dynamicLinks';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -367,6 +368,16 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             });
             setOpenCustomMessageSentDialog(true);
         }
+    }
+
+    const shareStreamLink = async () => {
+        const link = await generateStreamDynamicLink(streamId, {
+            title: title && title['en'] ? title['en'] : '',
+            description: `Evento de ${user.displayName}`,
+            image: image ? image : ''
+        });
+
+        console.log(link);
     }
 
     if (game && !hideStream) {

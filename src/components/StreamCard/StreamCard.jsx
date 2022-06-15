@@ -377,7 +377,10 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             image: image ? image : ''
         });
 
-        console.log(link);
+        // This does not work on Safari for some reason
+        if (link) {
+            navigator.clipboard.writeText(link);
+        }
     }
 
     if (game && !hideStream) {

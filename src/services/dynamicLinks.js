@@ -9,11 +9,17 @@
  */
 export async function generateStreamDynamicLink(streamId, streamData) {
     const link = `https://qapla.app/?type=stream&streamId=${streamId}`;
-    return await createShortDynamicLink(link, {
+    const response = await createShortDynamicLink(link, {
         socialTitle: streamData.title,
         socialDescription: streamData.description,
         socialImageLink: streamData.image
     });
+
+    if (response) {
+        return response.shortLink;
+    }
+
+    return '';
 }
 
 /**

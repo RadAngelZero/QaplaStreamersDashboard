@@ -17,6 +17,7 @@ import BackButton from '../BackButton/BackButton';
 import NewStreamSuccessDialog from './NewStreamSuccessDialog';
 import RequestActivation from '../RequestActivation/RequestActivation';
 import { getTwitchUserDataCloudFunction } from '../../services/functions';
+import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '14px'
     },
     datePickerLabel: {
+        marginBottom: theme.spacing(1),
         fontSize: '12px',
         color: '#B2B3BD',
         lineHeight: '16px'
@@ -36,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
     },
     dateInput: {
         color: '#FFF',
-        marginTop: theme.spacing(1),
         paddingLeft: theme.spacing(2),
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
@@ -44,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#141833',
         borderRadius: '.5rem',
         fontSize: '14px',
+        height: '56px',
         '& .MuiInputAdornment-root': {
             width: '20px',
             marginLeft: '-6px',
@@ -131,24 +133,17 @@ const NewStream = ({ user, games }) => {
         let gameList = [];
 
         if (games.allGames) {
-            gameList = Object.keys(games.allGames).map((gameKey) => ({ gameKey, ...games.allGames[gameKey] })).sort((a, b) => {
-                if (a.gameName < b.gameName) {
-                    return -1;
-                }
-                if (a.gameName > b.gameName) {
-                    return 1;
-                }
+            gameList = Object.keys(games.allGames).map((gameKey) => ({ gameKey, ...games.allGames[gameKey] }));
 
-                return 0;
-            });
-            let tempGamesData = []
-            gameList.forEach(game => {
+            let tempGamesData = [];
+            gameList.forEach((game) => {
                 tempGamesData.push({
-                    value: game.gameKey,
-                    label: game.gameName
+                    id: game.gameKey,
+                    name: game.gameName
                 })
             });
-            setGamesData(tempGamesData)
+
+            setGamesData(tempGamesData);
         }
     }, [games.allGames, user]);
 
@@ -224,16 +219,6 @@ const NewStream = ({ user, games }) => {
 
         setDisplayDate(date)
     };
-    const handleGameChange = (game) => {
-        setSelectedGame(game);
-    };
-    const handleEventTypeChange = (event) => {
-        setSelectedEvent(event.target.value);
-    };
-
-    const handleStringDateChange = (event) => {
-        setStringDate(event.target.value);
-    }
 
     const openSuccessWindow = () => {
         submitEvent();
@@ -389,6 +374,7 @@ const NewStream = ({ user, games }) => {
         history.push('/success');
     }
 
+    console.log(selectedGame);
     if (!showAccountActviation) {
         return (
             <StreamerDashboardContainer user={user}>
@@ -400,28 +386,43 @@ const NewStream = ({ user, games }) => {
                         <h1 className={styles.title}>
                             {t('NewStream.whatAreYouPlaying')}
                         </h1>
-                        <div style={{
-                            display: 'flex',
-                            height: '58px',
-                            marginTop: '20px'
-                        }}>
-                            <StreamerSelect
-                                data={gamesData}
-                                value={selectedGame}
-                                onChange={handleGameChange}
-                                initialLabel={t('NewStream.selectYourGame')}
-                                maxHeightOpen={'200px'}
-                                overflowX={'hidden'}
-                                style={{
-                                    minHeight: '58px'
-                                }} />
-                        </div>
+                        <Grid container spacing={4} style={{ marginTop: '2px' }}>
+                            <Grid item sm={5} style={{ maxWidth: '274px', }}>
+                                <InputLabel className={classes.datePickerLabel}>
+                                    {t('NewStream.pickACategory')}
+                                </InputLabel>
+                                <ReactSearchAutocomplete
+                                    items={gamesData}
+                                    autofocus
+                                    placeholder={t('NewStream.categoryPickerPlaceholder')}
+                                    showItemsOnFocus
+                                    maxResults={5}
+                                    onSelect={(game) => setSelectedGame(game.id)}
+                                    onClear={() => setSelectedGame(null)}
+                                    styling={{
+                                        zIndex: 999,
+                                        height: '56px',
+                                        color: '#FFF',
+                                        hoverBackgroundColor: 'rgba(255, 255, 255, 0.25)',
+                                        fontSize: '1rem',
+                                        fontWeight: 'bold',
+                                        backgroundColor: '#141833',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        placeholderColor: 'rgba(255, 255, 255, 0.5)',
+                                        fontFamily: 'Inter',
+                                        lineColor: 'transparent'
+                                    }}
+                                    showIcon={false}
+                                    formatResults={(item) => <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>} />
+                            </Grid>
+                        </Grid>
                         <h1 className={styles.title}>
                             {t('NewStream.when')}
                         </h1>
                         <MuiPickersUtilsProvider utils={DayJsUtils}>
                             <Grid container spacing={4} style={{ marginTop: '2px' }}>
-                                <Grid item sm={4} style={{ minWidth: '175px', }}>
+                                <Grid item sm={5} style={{ maxWidth: '274px', }}>
                                     <InputLabel className={classes.datePickerLabel} >
                                         {t('NewStream.date')}
                                     </InputLabel>
@@ -458,7 +459,7 @@ const NewStream = ({ user, games }) => {
                                         }}
                                     />
                                 </Grid>
-                                <Grid item sm={4} style={{ minWidth: '175px' }}>
+                                <Grid item sm={5} style={{ maxWidth: '274px', }}>
                                     <InputLabel className={classes.datePickerLabel}>
                                         {t('NewStream.time')}
                                     </InputLabel>

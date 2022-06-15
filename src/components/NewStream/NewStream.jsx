@@ -387,7 +387,7 @@ const NewStream = ({ user, games }) => {
                             {t('NewStream.whatAreYouPlaying')}
                         </h1>
                         <Grid container spacing={4} style={{ marginTop: '2px' }}>
-                            <Grid item sm={5} style={{ maxWidth: '274px', }}>
+                            <Grid item sm={5} style={{ width: '274px', maxWidth: '274px', }}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.pickACategory')}
                                 </InputLabel>

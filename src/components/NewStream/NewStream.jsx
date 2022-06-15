@@ -374,7 +374,6 @@ const NewStream = ({ user, games }) => {
         history.push('/success');
     }
 
-    console.log(selectedGame);
     if (!showAccountActviation) {
         return (
             <StreamerDashboardContainer user={user}>

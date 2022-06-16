@@ -313,7 +313,8 @@
             "updated": "Updated schedule",
             "errorDate": "Please verify that you have selected a valid date and/or hour",
             "sent": "Notification sent",
-            "errorSend": "Error sending notification. Try again later"
+            "errorSend": "Error sending notification. Try again later",
+            "updatesPolicy": "It is allowed to change the schedule up to 5 minutes before the scheduled date"
         },
         "save": "Save Changes",
         "limit" : "140 character limit"

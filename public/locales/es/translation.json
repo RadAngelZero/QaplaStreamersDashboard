@@ -182,6 +182,7 @@
         "testButton": "Enviar mensaje de prueba"
     },
     "CheersBitsRecordDialog": {
+        "messages": "Mensajes",
         "period": "Periodo:",
         "bitsToPay": "Bits estimados a entregar",
         "withSubscription": "con subscripción activa",

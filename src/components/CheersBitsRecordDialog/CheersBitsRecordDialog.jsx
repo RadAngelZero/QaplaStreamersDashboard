@@ -387,6 +387,7 @@ const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, v
     const [qoinsCheers, setQoinsCheers] = useState({});
     const [paymentsHistory, setPaymentsHistory] = useState({});
     const classes = useStyles();
+    const { t } = useTranslation();
 
     useEffect(() => {
         async function loadDefaultPayments() {
@@ -458,7 +459,7 @@ const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, v
                             onChange={setValue} />
                         <ToggleButton currentValue={value}
                             value='Messages'
-                            label='Mensajes'
+                            label={t('CheersBitsRecordDialog.messages')}
                             onChange={setValue} />
                     </div>
                     <IconButton onClick={onClose} style={{ zIndex: '10', alignSelf: 'flex-start', width: '40px', height: '40px', padding: '0px', marginTop: '-4px', marginRight: '-16px' }} >
@@ -484,7 +485,6 @@ const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, v
                         setPendingMessages={setPendingMessages}
                     />
                 }
-
             </DialogContent>
         </Dialog>
     );

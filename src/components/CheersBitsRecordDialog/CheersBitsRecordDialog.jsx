@@ -8,7 +8,8 @@ import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as QoinsIcon } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as DonatedQoinIcon } from './../../assets/DonatedQoin.svg';
-import { getPeriodStreamerPayments, listenForLastStreamerCheers, removeListenerForLastStreamerCheers } from '../../services/database';
+import { ReactComponent as RepeatIcon } from './../../assets/RepeatIcon.svg';
+import { getPeriodStreamerPayments, listenForLastStreamerCheers, markDonationAsUnreadToRepeat, removeListenerForLastStreamerCheers } from '../../services/database';
 
 const useStyles = makeStyles((theme) => ({
     toggleButton: {
@@ -171,6 +172,23 @@ const useStyles = makeStyles((theme) => ({
         '& .MuiPickersClockNumber-clockNumberSelected': {
             color: '#000'
         }
+    },
+    repeatButton: {
+        alignSelf: 'center',
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#FFF',
+        borderRadius: 5,
+        backgroundColor: '#22272F',
+        marginLeft: 8,
+        paddingTop: '2px',
+        paddingBottom: '2px',
+        paddingLeft: '11px',
+        paddingRight: '11px',
+        '&:hover': {
+            backgroundColor: '#22272F',
+            opacity: '.9'
+        }
     }
 }));
 
@@ -250,7 +268,7 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
     );
 }
 
-const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanBalance }) => {
+const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, qlanBalance }) => {
     const classes = useStyles();
     const [balance, setBalance] = useState(qoinsBalance + qlanBalance);
 
@@ -304,8 +322,14 @@ const QoinsCheers = ({ qoinsBalance, cheers, messages, setPendingMessages, qlanB
                                             src={cheers[cheerId].photoURL} />
                                     </ListItemAvatar>
                                     <ListItemText primary={
-                                        <div style={{ display: 'flex' }}>
+                                        <div style={{ display: 'flex', alignContent: 'center' }}>
                                             <p>{cheers[cheerId].twitchUserName}</p>
+                                            <Button onClick={() => markDonationAsUnreadToRepeat(uid, cheerId)}
+                                                className={classes.repeatButton}
+                                                endIcon={<RepeatIcon />}
+                                                variant='contained'>
+                                                Repetir
+                                            </Button>
                                             {!cheers[cheerId].read && <div style={{ backgroundColor: '#8DEBFF', alignSelf: 'center', marginLeft: '8px', width: '8px', height: '8px', borderRadius: '8px' }}>
                                             </div>}
                                         </div>
@@ -467,7 +491,8 @@ const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, v
                     </IconButton>
                 </div>
                 {value === 'Qoins' &&
-                    <QoinsCheers qoinsBalance={cheersQoins}
+                    <QoinsCheers uid={user.uid}
+                        qoinsBalance={cheersQoins}
                         cheers={qoinsCheers}
                         qlanBalance={qlanQoins} />
                 }
@@ -479,7 +504,8 @@ const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, v
                         onPeriodChange={loadPaymentsByTimestamp} />
                 }
                 {value === 'Messages' &&
-                    <QoinsCheers qoinsBalance={cheersQoins}
+                    <QoinsCheers uid={user.uid}
+                        qoinsBalance={cheersQoins}
                         messages={true}
                         cheers={qoinsCheers}
                         setPendingMessages={setPendingMessages}
@@ -496,7 +522,7 @@ function formatDate(timestamp) {
     const date = paymentDate.getDate() >= 10 ? paymentDate.getDate() : `0${paymentDate.getDate()}`;
     const month = (paymentDate.getMonth() + 1) >= 10 ? (paymentDate.getMonth() + 1) : `0${(paymentDate.getMonth() + 1)}`;
 
-    return `${date}/${month}/${paymentDate.getFullYear()}`;
+    return `${date}/${month}/${paymentDate.getFullYear().toString().substring(2)}`;
 }
 
 export default CheersBitsRecordDialog;

@@ -9,6 +9,7 @@ import { speakCheerMessage } from '../../services/functions';
 import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
 import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
+import { getCheerVoiceMessage } from '../../services/storage';
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
@@ -70,7 +71,7 @@ const LiveDonations = () => {
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
-                if (isStreaming.exists() && isStreaming.val()) {
+                if (isStreaming.exists() && !isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
                     }, 150);
@@ -93,29 +94,37 @@ const LiveDonations = () => {
                 }
 
                 let audio = new Audio(donationAudio);
-                if (donation.message) {
-                    if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
-                        audio = new Audio(TEST_MESSAGE_SPEECH_URL);
+                if (!donation.repeating) {
+                    if (donation.message) {
+                        if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
+                            audio = new Audio(TEST_MESSAGE_SPEECH_URL);
+                        } else {
+                            const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins y dice: ${donation.message}`;
+
+                            window.analytics.track('Cheer received', {
+                                user: donation.twitchUserName,
+                                containsMessage: true,
+                                message: messageToRead
+                            });
+                            const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
+                            audio = new Audio(cheerMessageUrl.data);
+                        }
                     } else {
-                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins y dice: ${donation.message}`;
+                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
 
                         window.analytics.track('Cheer received', {
                             user: donation.twitchUserName,
-                            containsMessage: true,
-                            message: messageToRead
+                            containsMessage: false
                         });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
                         audio = new Audio(cheerMessageUrl.data);
                     }
                 } else {
-                    const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
+                    const cheerMessageUrl = await getCheerVoiceMessage(streamerUid, donation.id);
 
-                    window.analytics.track('Cheer received', {
-                        user: donation.twitchUserName,
-                        containsMessage: false
-                    });
-                    const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
-                    audio = new Audio(cheerMessageUrl.data);
+                    if (cheerMessageUrl) {
+                        audio = new Audio(cheerMessageUrl);
+                    }
                 }
 
                 donation.isRightSide = alertSideRight;

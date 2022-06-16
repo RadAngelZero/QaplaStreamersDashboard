@@ -472,6 +472,10 @@ export function listenToUserStreamingStatus(streamerUid, callback) {
 }
 
 /**
+ * Streamers Donations and Streamers Donations Tests
+ */
+
+/**
  * Listener to get the last x cheers added to the StreamersDonations
  * @param {string} streamerUid Uid of the streamer
  * @param {function} callback Handler of the results
@@ -555,6 +559,15 @@ export function removeTestDonation(streamerUid, donationId) {
  */
 export async function markDonationAsRead(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: true });
+}
+
+/**
+ * Mark as unread and repeating the given donation
+ * @param {string} streamerUid Uid of the streamer who receive the donation
+ * @param {string} donationId Id of the donation
+ */
+ export async function markDonationAsUnreadToRepeat(streamerUid, donationId) {
+    return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: false, repeating: true });
 }
 
 /**

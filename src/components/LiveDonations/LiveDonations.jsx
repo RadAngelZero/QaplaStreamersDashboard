@@ -71,10 +71,10 @@ const LiveDonations = () => {
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
-                if (isStreaming.exists() && isStreaming.val()) {
+                if (isStreaming.exists() && !isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
-                    }, 150000);
+                    }, 150);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -120,10 +120,14 @@ const LiveDonations = () => {
                         audio = new Audio(cheerMessageUrl.data);
                     }
                 } else {
-                    const cheerMessageUrl = await getCheerVoiceMessage(streamerUid, donation.id);
+                    try {
+                        const cheerMessageUrl = await getCheerVoiceMessage(streamerUid, donation.id);
 
-                    if (cheerMessageUrl) {
-                        audio = new Audio(cheerMessageUrl);
+                        if (cheerMessageUrl) {
+                            audio = new Audio(cheerMessageUrl);
+                        }
+                    } catch (error) {
+                        console.log('Message not found, what must be do here?');
                     }
                 }
 

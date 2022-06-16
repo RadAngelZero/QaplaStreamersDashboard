@@ -184,15 +184,14 @@ const EditStreamerEvent = ({ user }) => {
     const { streamType } = useLocation().state;
     const { streamId } = useParams();
     const [title, setTitle] = useState({ en: '', es: '' });
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [displayDate, setDisplayDate] = useState(null)
-    const [firstTimestamp, setFirstTimestamp] = useState(null)
-    const [maxTimeToAcceptUpdates, setMaxTimeToAcceptUpdates] = useState(0);
+    const [selectedDate, setSelectedDate] = useState(new Date(1655251661000));
+    const [displayDate, setDisplayDate] = useState(new Date(1655251661000))
+    const [firstTimestamp, setFirstTimestamp] = useState(new Date(1655251661000))
     const [notificationBody, setNotificationBody] = useState('');
     const [participantsList, setParticipantsList] = useState({});
     const [clockOpen, setClockOpen] = useState(false);
     const [calendarOpen, setCalendarOpen] = useState(false);
-    const minDate = new Date((new Date()).getTime() + 86400000);
+    const [minDateToAllowUpdates, setMinDateToAllowUpdates] = useState(new Date((new Date()).getTime() + 300000));
     const { t } = useTranslation();
     const classes = useStyles();
     const history = useHistory();
@@ -200,21 +199,12 @@ const EditStreamerEvent = ({ user }) => {
     useEffect(() => {
         async function setStreamData() {
             if (streamType === SCHEDULED_EVENT_TYPE) {
-                setMaxTimeToAcceptUpdates(1655068255000)
-                setSelectedDate(new Date(1655251661000))
-                setDisplayDate(new Date(1655251661000))
-                setFirstTimestamp(new Date(1655251661000))
-                // now = new Date()
-                // setMaxTimeToAcceptUpdates(now.getTime() - 600000)
-                // setSelectedDate(now)
-                // setDisplayDate(now)
-                // setFirstTimestamp(now)
                 const timeStamp = await loadApprovedStreamTimeStamp(streamId);
                 if (timeStamp.exists()) {
                     setSelectedDate(new Date(timeStamp.val()));
                     setDisplayDate(new Date(timeStamp.val()));
                     setFirstTimestamp(new Date(timeStamp.val()));
-                    setMaxTimeToAcceptUpdates(timeStamp.val() - 600000);
+                    setMinDateToAllowUpdates(new Date(1655400300000 - 300000));
                 }
             }
         }
@@ -271,35 +261,34 @@ const EditStreamerEvent = ({ user }) => {
     }
 
     const saveDate = async () => {
-        if (maxTimeToAcceptUpdates !== 0 && new Date().getTime() < maxTimeToAcceptUpdates) {
-            if (selectedDate) {
-                if (selectedDate.getTime() > minDate.getTime()) {
-                    const dateRef = new Date(selectedDate);
-                    const UTCDay = dateRef.getUTCDate() < 10 ? `0${dateRef.getUTCDate()}` : dateRef.getUTCDate();
-                    const UTCMonth = dateRef.getUTCMonth() + 1 < 10 ? `0${dateRef.getUTCMonth() + 1}` : dateRef.getUTCMonth() + 1;
-                    let UTCDate = `${UTCDay}-${UTCMonth}-${dateRef.getUTCFullYear()}`;
+        if (selectedDate) {
+            const minValidDate = new Date().getTime() + 300000;
+            if (selectedDate.getTime() >= minValidDate) {
+                const dateRef = new Date(selectedDate);
+                const UTCDay = dateRef.getUTCDate() < 10 ? `0${dateRef.getUTCDate()}` : dateRef.getUTCDate();
+                const UTCMonth = dateRef.getUTCMonth() + 1 < 10 ? `0${dateRef.getUTCMonth() + 1}` : dateRef.getUTCMonth() + 1;
+                let UTCDate = `${UTCDay}-${UTCMonth}-${dateRef.getUTCFullYear()}`;
 
-                    const UTCHours = dateRef.getUTCHours() < 10 ? `0${dateRef.getUTCHours()}` : dateRef.getUTCHours();
-                    const UTCMinutes = dateRef.getUTCMinutes() < 10 ? `0${dateRef.getUTCMinutes()}` : dateRef.getUTCMinutes();
-                    let UTCHour = `${UTCHours}:${UTCMinutes}`;
+                const UTCHours = dateRef.getUTCHours() < 10 ? `0${dateRef.getUTCHours()}` : dateRef.getUTCHours();
+                const UTCMinutes = dateRef.getUTCMinutes() < 10 ? `0${dateRef.getUTCMinutes()}` : dateRef.getUTCMinutes();
+                let UTCHour = `${UTCHours}:${UTCMinutes}`;
 
-                    const localDay = dateRef.getDate() < 10 ? `0${dateRef.getDate()}` : dateRef.getDate();
-                    const localMonth = dateRef.getMonth() + 1 < 10 ? `0${dateRef.getMonth() + 1}` : dateRef.getMonth() + 1;
-                    let localDate = `${localDay}-${localMonth}-${dateRef.getFullYear()}`;
+                const localDay = dateRef.getDate() < 10 ? `0${dateRef.getDate()}` : dateRef.getDate();
+                const localMonth = dateRef.getMonth() + 1 < 10 ? `0${dateRef.getMonth() + 1}` : dateRef.getMonth() + 1;
+                let localDate = `${localDay}-${localMonth}-${dateRef.getFullYear()}`;
 
-                    const localHours = dateRef.getHours() < 10 ? `0${dateRef.getHours()}` : dateRef.getHours();
-                    const localMinutes = dateRef.getMinutes() < 10 ? `0${dateRef.getMinutes()}` : dateRef.getMinutes();
-                    let localHour = `${localHours}:${localMinutes}`;
+                const localHours = dateRef.getHours() < 10 ? `0${dateRef.getHours()}` : dateRef.getHours();
+                const localMinutes = dateRef.getMinutes() < 10 ? `0${dateRef.getMinutes()}` : dateRef.getMinutes();
+                let localHour = `${localHours}:${localMinutes}`;
 
-                    await updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
-                    notifyUpdateToQaplaAdmins(streamId, user.displayName, dateRef);
-                    alert(t('EditStream.alerts.updated'));
-                } else {
-                    alert(t('EditStream.alerts.errorDate'))
-                }
+                await updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
+                notifyUpdateToQaplaAdmins(streamId, user.displayName, dateRef);
+                alert(t('EditStream.alerts.updated'));
             } else {
-                alert(t('EditStream.alerts.errorDate'));
+                alert(t('EditStream.alerts.errorDate'))
             }
+        } else {
+            alert(t('EditStream.alerts.errorDate'));
         }
     }
 
@@ -339,10 +328,9 @@ const EditStreamerEvent = ({ user }) => {
                                                         {t('NewStream.date')}
                                                     </InputLabel>
                                                     <KeyboardDatePicker
-                                                        disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates}
+                                                        disabled={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
                                                         open={calendarOpen}
-                                                        onClick={() => maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates ? {} : setCalendarOpen(true)}
-                                                        onOpen={() => { }}
+                                                        onClick={() => (new Date()).getTime() >= minDateToAllowUpdates.getTime() ? {} : setCalendarOpen(true)}
                                                         onClose={() => setCalendarOpen(false)}
                                                         clearable
                                                         disablePast
@@ -377,13 +365,13 @@ const EditStreamerEvent = ({ user }) => {
                                                     </InputLabel>
                                                     <KeyboardTimePicker
                                                         open={clockOpen}
-                                                        onClick={() => maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates ? {} : setClockOpen(true)}
+                                                        onClick={() => (new Date()).getTime() >= minDateToAllowUpdates.getTime() ? {} : setClockOpen(true)}
                                                         onOpen={() => { }}
                                                         onClose={() => setClockOpen(false)}
-                                                        disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates}
+                                                        disabled={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
                                                         autoOk
-                                                        error={selectedDate.getTime() <= minDate.getTime()}
-                                                        helperText={selectedDate.getTime() === firstTimestamp.getTime() ? '' : selectedDate >= minDate.getTime() ? '' : t('NewStream.alerts.before24h')}
+                                                        error={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
+                                                        helperText={(new Date()).getTime() >= minDateToAllowUpdates.getTime() ? t('EditStream.alerts.updatesPolicy') : ''}
                                                         value={displayDate}
                                                         placeholder='08:00 AM'
                                                         onChange={handleDateChange}
@@ -410,7 +398,7 @@ const EditStreamerEvent = ({ user }) => {
                                     }
                                     <ContainedButton className={classes.button}
                                         onClick={saveDate}
-                                        disabled={maxTimeToAcceptUpdates === 0 || new Date().getTime() >= maxTimeToAcceptUpdates ? true : (selectedDate.getTime() === firstTimestamp.getTime()) ? true : (selectedDate <= minDate.getTime())}>
+                                        disabled={(new Date()).getTime() >= minDateToAllowUpdates || selectedDate.getTime() === firstTimestamp.getTime()}>
                                         {t('EditStream.save')}
                                     </ContainedButton>
                                 </Grid>

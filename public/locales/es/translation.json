@@ -308,7 +308,8 @@
             "updated": "Horario actualizado",
             "errorDate": "Por favor verifica que has selecionado una fecha y/o hora valida",
             "sent": "Notificación enviada",
-            "errorSend": "Error al enviar la notificación. Intenta de nuevo mas tarde"
+            "errorSend": "Error al enviar la notificación. Intenta de nuevo mas tarde",
+            "updatesPolicy": "Se permite cambiar de horario hasta 5 minutos antes de la fecha programada"
         },
         "save": "Guardar cambios",
         "limit" : "Limite de 140 caracteres"

@@ -324,12 +324,14 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, 
                                     <ListItemText primary={
                                         <div style={{ display: 'flex', alignContent: 'center' }}>
                                             <p>{cheers[cheerId].twitchUserName}</p>
-                                            <Button onClick={() => markDonationAsUnreadToRepeat(uid, cheerId)}
-                                                className={classes.repeatButton}
-                                                endIcon={<RepeatIcon />}
-                                                variant='contained'>
-                                                Repetir
-                                            </Button>
+                                            {cheers[cheerId].read &&
+                                                <Button onClick={() => markDonationAsUnreadToRepeat(uid, cheerId)}
+                                                    className={classes.repeatButton}
+                                                    endIcon={<RepeatIcon />}
+                                                    variant='contained'>
+                                                    Repetir
+                                                </Button>
+                                            }
                                             {!cheers[cheerId].read && <div style={{ backgroundColor: '#8DEBFF', alignSelf: 'center', marginLeft: '8px', width: '8px', height: '8px', borderRadius: '8px' }}>
                                             </div>}
                                         </div>

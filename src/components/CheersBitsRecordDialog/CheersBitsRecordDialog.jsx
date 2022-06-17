@@ -271,6 +271,7 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
 const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, qlanBalance }) => {
     const classes = useStyles();
     const [balance, setBalance] = useState(qoinsBalance + qlanBalance);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (setPendingMessages !== undefined) {
@@ -306,7 +307,7 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, 
                             <p style={{ display: 'flex', }}> {qlanBalance.toLocaleString()} </p>
                         </div>
                         <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>
-                            Cheers recibidos al {showDate()}
+                            {t('CheersBitsRecordDialog.cheersReceivedAt', { date: showDate() })}
                         </p>
                     </div>
                 </>
@@ -329,7 +330,7 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, 
                                                     className={classes.repeatButton}
                                                     endIcon={<RepeatIcon />}
                                                     variant='contained'>
-                                                    Repetir
+                                                    {t('CheersBitsRecordDialog.repeatCheer')}
                                                 </Button>
                                             }
                                             {!cheers[cheerId].read && <div style={{ backgroundColor: '#8DEBFF', alignSelf: 'center', marginLeft: '8px', width: '8px', height: '8px', borderRadius: '8px' }}>

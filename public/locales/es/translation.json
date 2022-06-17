@@ -186,7 +186,9 @@
         "period": "Periodo:",
         "bitsToPay": "Bits estimados a entregar",
         "withSubscription": "con subscripción activa",
-        "deliveredCheers": "Cheers entregados"
+        "deliveredCheers": "Cheers entregados",
+        "cheersReceivedAt": "Cheers recibidos al {{date}}",
+        "repeatCheer": "Repetir"
     },
     "PlanPicker": {
         "titlePart1": "Genera visibilidad para tu contenido",

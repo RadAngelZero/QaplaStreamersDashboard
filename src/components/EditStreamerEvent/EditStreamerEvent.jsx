@@ -204,7 +204,7 @@ const EditStreamerEvent = ({ user }) => {
                     setSelectedDate(new Date(timeStamp.val()));
                     setDisplayDate(new Date(timeStamp.val()));
                     setFirstTimestamp(new Date(timeStamp.val()));
-                    setMinDateToAllowUpdates(new Date(1655400300000 - 300000));
+                    setMinDateToAllowUpdates(new Date(timeStamp.val() - 300000));
                 }
             }
         }

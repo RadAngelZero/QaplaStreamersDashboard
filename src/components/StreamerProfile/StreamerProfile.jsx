@@ -360,7 +360,7 @@ const StreamerProfile = ({ user, games }) => {
                         setPendingMessages={setPendingMessages} />
                 </>
             }
-        </StreamerDashboardContainer >
+        </StreamerDashboardContainer>
     );
 }
 

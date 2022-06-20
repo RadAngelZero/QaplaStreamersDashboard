@@ -21,3 +21,16 @@ export function uploadImage(image, ref, updateUploadStatus, onError, onFinished)
         onFinished(url);
     });
 }
+
+/**
+ * Get the downloadURL for the voice message of the specified cheer
+ * @param {string} uid User identifier
+ * @param {string} cheerId Cheer identifier
+ * @returns {Promise<any>} A Promise that resolves with the download URL or rejects if the fetch failed,
+ * including if the object did not exist.
+ */
+export async function getCheerVoiceMessage(uid, cheerId) {
+    const cheerMessage = await storage.ref('Cheers').child(uid).child(`${cheerId}.mp3`).getDownloadURL();
+
+    return cheerMessage;
+}

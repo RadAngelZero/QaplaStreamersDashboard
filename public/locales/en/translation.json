@@ -116,7 +116,8 @@
             "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
         },
         "whatAreYouPlaying": "What are you going to stream?",
-        "selectYourGame": "Select your category",
+        "pickACategory": "Pick a category",
+        "categoryPickerPlaceholder": "E.g., Just Chatting",
         "when": "When?",
         "date": "Date",
         "time": "Time",

@@ -116,7 +116,8 @@
             "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
         },
         "whatAreYouPlaying": "¿Qué vas a transmitir?",
-        "selectYourGame": "Selecciona tu categoría",
+        "pickACategory": "Selecciona una categoría",
+        "categoryPickerPlaceholder": "Ej: Just Chatting",
         "when": "¿Cuando?",
         "date": "Fecha",
         "time": "Hora",

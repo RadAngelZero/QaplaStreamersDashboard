@@ -292,6 +292,11 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, 
         }
     }
 
+    const repeatSelectedCheer = async (cheerId) => {
+        await markDonationAsUnreadToRepeat(uid, cheerId);
+        window.analytics.track('Cheer repeated');
+    }
+
     return (
         <>
             {!messages &&
@@ -326,7 +331,7 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, 
                                         <div style={{ display: 'flex', alignContent: 'center' }}>
                                             <p>{cheers[cheerId].twitchUserName}</p>
                                             {cheers[cheerId].read &&
-                                                <Button onClick={() => markDonationAsUnreadToRepeat(uid, cheerId)}
+                                                <Button onClick={() => repeatSelectedCheer(cheerId)}
                                                     className={classes.repeatButton}
                                                     endIcon={<RepeatIcon />}
                                                     variant='contained'>

@@ -1,5 +1,5 @@
 import React, { useState, useReducer, useEffect } from 'react';
-import { makeStyles, Grid, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
+import { makeStyles, Grid, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -371,7 +371,7 @@ const NewStream = ({ user, games }) => {
         window.analytics.track('Free trial started', {
             uid: user.uid
         });
-        history.push('/success');
+        setOpenSuccessDialog(true);
     }
 
     if (!showAccountActviation) {
@@ -546,7 +546,7 @@ const NewStream = ({ user, games }) => {
                                                 {t('NewStream.streamTitle')}
                                             </h1>
                                             <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem} style={{marginTop: '10px'}}>
+                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
                                                     <StreamerTextInput
                                                         label={t('NewStream.streamTitle')}
                                                         placeholder={t('NewStream.streamTitlePlaceholder')}
@@ -600,7 +600,16 @@ const NewStream = ({ user, games }) => {
                             disabled={lockSendButton}
                             className={styles.button}
                             onClick={openSuccessWindow}>
-                            {t('NewStream.submit')}
+                            {lockSendButton ?
+                                <CircularProgress
+                                    style={{
+                                        color: '#fff7',
+                                        alignSelf: 'center'
+                                    }}
+                                    size={25} />
+                                :
+                                t('NewStream.submit')
+                            }
                         </Button>
                     </Grid>
                 </Grid>
@@ -612,7 +621,16 @@ const NewStream = ({ user, games }) => {
             </StreamerDashboardContainer>
         );
     } else {
-        return <RequestActivation user={user} onSuccessActivation={successActivation} />
+        return (
+            <>
+                <RequestActivation user={user} onSuccessActivation={successActivation} />
+                <NewStreamSuccessDialog
+                    open={openSuccessDialog}
+                    onClose={() => history.push('/profile')}
+                    mainPage={() => history.push('/profile')}
+                />
+            </>
+        )
     }
 }
 

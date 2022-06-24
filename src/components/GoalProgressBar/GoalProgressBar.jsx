@@ -85,34 +85,33 @@ const GoalProgressBar = ({ percentage = 0, title, qoins = 0 }) => {
     return (
         <div style={{
             display: 'flex',
-
         }}>
             <div style={{
                 display: 'flex',
                 zIndex: 10,
             }}>
-                <img src={QaplaLogoOverlay} alt='QaplaLogoOverlay' style={{ width: '151px' }} />
+                <img src={QaplaLogoOverlay} alt='QaplaLogoOverlay' style={{ width: '302px' }} />
             </div>
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'absolute',
                 bottom: 0,
-                left: '102px'
+                left: '204px',
             }}>
                 <div style={{
                     alignSelf: 'flex-start',
-                    marginLeft: 48,
-                    marginRight: '6px',
-                    borderRadius: '6px',
+                    marginLeft: 96,
+                    marginRight: '12px',
+                    borderRadius: '12px',
                     backgroundColor: '#444c',
-                    padding: '2px 6px'
+                    padding: '4px 12px'
                 }}>
                     <p style={{
                         color: '#fff',
-                        fontSize: '11px',
+                        fontSize: '22px',
                         fontWeight: '400',
-                        lineHeight: '18px',
+                        lineHeight: '36px',
                         letterSpacing: '0.3499999940395355px',
 
                     }}
@@ -138,9 +137,9 @@ const GoalProgressBar = ({ percentage = 0, title, qoins = 0 }) => {
                 <div style={{
                     display: 'flex',
                     backgroundColor: '#0D1021',
-                    width: 320,
-                    height: '20px',
-                    borderRadius: '5px',
+                    width: '640px',
+                    height: '40px',
+                    borderRadius: '10px',
                     overflow: 'hidden',
                 }}>
                     <div
@@ -162,22 +161,22 @@ const GoalProgressBar = ({ percentage = 0, title, qoins = 0 }) => {
                             <div style={{
                                 background: 'linear-gradient(270deg, #4FF4FF 0%, #924FFF 52.52%, #FF8ADE 100%), #0AFFD2',
                                 height: '100%',
-                                minWidth: '186px',
+                                minWidth: '372px',
                             }} />
                             <div style={{
                                 background: 'linear-gradient(90deg, #4FF4FF 0%, #924FFF 52.52%, #FF8ADE 100%), #0AFFD2',
                                 height: '100%',
-                                minWidth: '186px',
+                                minWidth: '372px',
                             }} />
                             <div style={{
                                 background: 'linear-gradient(270deg, #4FF4FF 0%, #924FFF 52.52%, #FF8ADE 100%), #0AFFD2',
                                 height: '100%',
-                                minWidth: '186px',
+                                minWidth: '372px',
                             }} />
                             <div style={{
                                 background: 'linear-gradient(90deg, #4FF4FF 0%, #924FFF 52.52%, #FF8ADE 100%), #0AFFD2',
                                 height: '100%',
-                                minWidth: '186px',
+                                minWidth: '372px',
                             }} />
                         </div>
                     </div>

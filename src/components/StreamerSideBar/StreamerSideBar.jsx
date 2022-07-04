@@ -156,7 +156,7 @@ const StreamerSideBar = ({ user }) => {
                         </div>
                     }
                 </ListItem>
-                {user && user.stripeCustomerId ?
+                {user && user.stripeCustomerId && user.premium ?
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post' onSubmit={() => setLoadingStripeCustomerPortal(true)}>
                         <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
                         <ListItem button type='submit' component='button' className={classes.listItem}>

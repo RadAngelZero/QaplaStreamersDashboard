@@ -146,14 +146,19 @@ const RequestActivation = ({ user, onSuccessActivation }) => {
         if (referralCode) {
             const referrerUid = await getQlanIdWithQreatorCode(referralCode);
             if (referrerUid) {
-                if (!user.referredBy) {
-                    activateFreeTrialWithReferralCode(referrerUid, {
-                        redemptionsPerStream: 40,
-                        streamsIncluded: 2
-                    });
+                if (referrerUid !== user.uid) {
+                    if (!user.referredBy) {
+                        activateFreeTrialWithReferralCode(referrerUid, {
+                            redemptionsPerStream: 40,
+                            streamsIncluded: 2
+                        });
+                    } else {
+                        setValidatingCode(false);
+                        alert('Ya usaste un código de referido antes');
+                    }
                 } else {
                     setValidatingCode(false);
-                    alert('Ya usaste un código de referido antes');
+                    alert('No puedes usar tu propio código');
                 }
             } else {
                 const invitationCodeSnap = await getInvitationCodeParams(referralCode);

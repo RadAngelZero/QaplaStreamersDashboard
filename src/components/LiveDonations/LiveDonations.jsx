@@ -104,14 +104,14 @@ const LiveDonations = () => {
                             audio = new Audio(cheerMessageUrl.data);
                         }
                     } else {
-                        /* const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
+                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
 
                         window.analytics.track('Cheer received', {
                             user: donation.twitchUserName,
                             containsMessage: false
                         });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
-                        audio = new Audio(cheerMessageUrl.data); */
+                        audio = new Audio(cheerMessageUrl.data);
                     }
                 } else {
                     try {

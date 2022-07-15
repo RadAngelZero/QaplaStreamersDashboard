@@ -6,7 +6,7 @@ import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
-import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { GIPHY_GIFS, GIPHY_STICKERS, MEME, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
 import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
 import { getCheerVoiceMessage } from '../../services/storage';
@@ -74,7 +74,7 @@ const LiveDonations = () => {
                 if (isStreaming.exists() && isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
-                    }, 150000);
+                    }, 150);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -87,12 +87,6 @@ const LiveDonations = () => {
             const donation = popDonation();
 
             async function showCheer() {
-                if (mediaContent && mediaContent['images'] && mediaContent['images'].length > 0) {
-                    const maxLength = mediaContent['images'].length - 1;
-                    const mediaToShow = mediaContent['images'][Math.floor(Math.random() * (maxLength - 0 + 1)) + 0];
-                    donation.media = { type: IMAGE, source: mediaToShow };
-                }
-
                 let audio = new Audio(donationAudio);
                 if (!donation.repeating) {
                     if (donation.message) {
@@ -110,14 +104,14 @@ const LiveDonations = () => {
                             audio = new Audio(cheerMessageUrl.data);
                         }
                     } else {
-                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
+                        /* const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
 
                         window.analytics.track('Cheer received', {
                             user: donation.twitchUserName,
                             containsMessage: false
                         });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
-                        audio = new Audio(cheerMessageUrl.data);
+                        audio = new Audio(cheerMessageUrl.data); */
                     }
                 } else {
                     try {
@@ -137,7 +131,7 @@ const LiveDonations = () => {
                 audio.onended = () => {
                     setTimeout(() => {
                         setDonationToShow(null);
-                    }, 3000);
+                    }, 4000);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         removeTestDonation(streamerUid, donation.id);
                     } else {
@@ -253,13 +247,15 @@ const DonationHandler = (donationToShow) => {
             marginLeft: donation.isRightSide ? '0px' : '20px',
             marginRight: donation.isRightSide ? '20px' : '0px'
         }}>
-            {donation.media && donation.media.type === IMAGE &&
-                <img src={donation.media.source} alt='' style={{
+            {donation.media && (donation.media.type === MEME || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) &&
+                <img src={donation.media.url} alt='' style={{
+                    aspectRatio: donation.media.width / donation.media.height,
                     display: 'flex',
                     alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
                     maxHeight: '250px',
                     objectFit: 'scale-down'
-                }} />}
+                }} />
+            }
             <div
                 style={{
                     display: 'flex',

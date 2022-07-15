@@ -74,7 +74,7 @@ const LiveDonations = () => {
                 if (isStreaming.exists() && isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
-                    }, 150);
+                    }, 150000);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);

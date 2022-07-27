@@ -136,11 +136,6 @@ export const webhookStreamOffline = {
     callback: 'https://us-central1-qapplaapp.cloudfunctions.net/userStreamOffline'
 };
 
-export const XQRewardRedemption = {
-    type: 'channel.channel_points_custom_reward_redemption.add',
-    callback: 'https://us-central1-qapplaapp.cloudfunctions.net/XQRewardRedeemed'
-};
-
 export const QoinsRewardRedemption = {
     type: 'channel.channel_points_custom_reward_redemption.add',
     callback: 'https://us-central1-qapplaapp.cloudfunctions.net/QoinsRewardRedeemed'

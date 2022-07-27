@@ -100,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: '16px',
         color: '#FFFFFF'
     },
-    enabledXQText: {
+    enabledRewardText: {
         display: 'flex',
         alignItems: 'center',
         fontSize: '14px',
@@ -298,15 +298,6 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
                             </p>
                         }
 
-                        {stream && !stream.qoinsEnabled &&
-                            <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
-                                <TickSquare style={{ marginTop: '7.5px' }} />
-                                <p className={classes.enabledXQText}>
-                                    {t('QaplaStreamDialogs.EventManagementDialog.xqEnabled')}
-                                </p>
-                            </div>
-                        }
-
                         {stream && enablingQoins &&
                             <p className={classes.startText}>
                                 {`${t('QaplaStreamDialogs.EventManagementDialog.enablingQoins')}${dots}`}
@@ -316,7 +307,7 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
                         {stream && stream.qoinsEnabled &&
                             <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
                                 <TickSquare style={{ marginTop: '7.5px' }} />
-                                <p className={classes.enabledXQText}>
+                                <p className={classes.enabledRewardText}>
                                     {t('QaplaStreamDialogs.EventManagementDialog.qoinsEnabled')}
                                 </p>
                             </div>

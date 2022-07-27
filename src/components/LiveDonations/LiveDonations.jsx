@@ -221,12 +221,10 @@ const LiveDonations = () => {
         if (qaplaOnOpacity !== 1){
             setTimeout(() => {
                 setPlayQaplaOnAnimation("true");
-                console.log("desaparecer")
             }, 10 * 1000)
         } else {
             setTimeout(() => {
                 setPlayQaplaOnAnimation("true");
-                console.log("aparecer")
             }, 60 * 1000)
         }
     }

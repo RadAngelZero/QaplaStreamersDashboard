@@ -9,6 +9,8 @@ import { speakCheerMessage } from '../../services/functions';
 import { IMAGE, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
 import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
+import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
+import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
 
 const LiveDonations = () => {
@@ -26,9 +28,12 @@ const LiveDonations = () => {
     const [qoinsGoalProgress, setQoinsGoalProgress] = useState(null);
     const [goalTitle, setGoalTitle] = useState('');
     const [showQaplaChallengeProgress, setShowQaplaChallengeProgress] = useState(false);
+    const [qaplaOnOpacity, setQaplaOnOpacity] = useState(1);
+    const [playQaplaOnAnimation, setPlayQaplaOnAnimation] = useState("false");
     const { streamerId } = useParams();
 
     useEffect(() => {
+        queueAnimation();
         const pushDonation = (donation) => {
             setDonationQueue((array) => [donation, ...array]);
         }
@@ -212,12 +217,66 @@ const LiveDonations = () => {
         }
     }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio]);
 
+    const queueAnimation = () => {
+        if (qaplaOnOpacity !== 1){
+            setTimeout(() => {
+                setPlayQaplaOnAnimation("true");
+                console.log("desaparecer")
+            }, 10 * 1000)
+        } else {
+            setTimeout(() => {
+                setPlayQaplaOnAnimation("true");
+                console.log("aparecer")
+            }, 60 * 1000)
+        }
+    }
+
     document.body.style.backgroundColor = 'transparent';
 
 
     const qaplaChallengeBarProgress = (qaplaChallengeXQ - previousGoalXQ) / (nextGoalXQ - previousGoalXQ);
     return (
-        <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100vh', width: '100%', placeItems: 'flex-end' }}>
+        <div style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end' }}>
+            <div
+                onAnimationEnd={() => {
+                    setPlayQaplaOnAnimation("false");
+                    if (qaplaOnOpacity === 1)
+                        setQaplaOnOpacity(0)
+                    if (qaplaOnOpacity === 0)
+                        setQaplaOnOpacity(1)
+                    queueAnimation();
+                }}
+                style={{
+                    position: 'fixed',
+                    bottom: '-15px',
+                    left: alertSideRight ? 'auto' : '-12px',
+                    right: alertSideRight ? '-12px' : 'auto',
+                    width: '150px',
+                }}
+                className="qapla-logo-container"
+                playAnimation={playQaplaOnAnimation}
+            >
+                <style>{`
+                @keyframes dissapear {
+                    from {
+                        opacity: ${qaplaOnOpacity === 1 ? 1 : 0};
+                    }
+                    to {
+                        opacity: ${qaplaOnOpacity === 1 ? 0 : 1};
+                    }
+                }
+                .qapla-logo-container{
+                    opacity: ${qaplaOnOpacity};
+                }
+                .qapla-logo-container[playAnimation="true"] {
+                    animation-name: dissapear;
+                    animation-duration: 5s;
+                    animation-iteration-count: 1;
+                    animation-timing-function: ease-in-out;
+                }
+                `}</style>
+                <img src={alertSideRight ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
+            </div>
             {donationToShow &&
                 <>
                     <DonationHandler donationToShow={donationToShow} />

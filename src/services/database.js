@@ -32,6 +32,7 @@ const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 const qStoreRef = database.ref('/QStore');
 const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
+const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -515,8 +516,13 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  * @param {string} completeMessage Message to show if the operation is succesfuly completed
  * @param {string} errorMessage Message to show if the write operation fails
  */
-export function writeTestCheer(streamerUid, completeMessage, errorMessage) {
+export async function writeTestCheer(streamerUid, completeMessage, errorMessage) {
+    const testMediaArrayLength = await streamerReactionTestMediaRef.child('length').once('value');
+    const index = Math.floor(Math.random() * testMediaArrayLength.val());
+    const media = (await streamerReactionTestMediaRef.child('media').child(index).once('value')).val();
+
     streamersDonationsTestRef.child(streamerUid).push({
+        media,
         amountQoins: 0,
         message: 'Test',
         timestamp: (new Date()).getTime(),

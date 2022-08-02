@@ -697,15 +697,19 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                 `}</style>
                                 {'Compartir'}
                             </p>
-                            <ShareArrow
+                            <div
                                 playGrowAnimation={shareGrowAnimationPlay}
                                 playShrinkAnimation={shareShrinkAnimationPlay}
                                 style={shareHover ?
                                     {
                                         transform: 'scale(0.8)',
+                                        display: 'flex',
                                     }
                                     :
-                                    {}
+                                    {
+                                        transform: 'scale(1)',
+                                        display: 'flex',
+                                    }
                                 } className="share-icon">
                                 <style>{`
                                         @keyframes shareIconShrink {
@@ -731,8 +735,11 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                         .share-icon[playShrinkAnimation="true"] {
                                             animation: shareIconNormal 0.5s ease-in-out 1;
                                         }
-                                    `}</style>
-                            </ShareArrow>
+                                    `}
+                                </style>
+                                <ShareArrow />
+                            </div>
+
                         </div>
 
                         {/* {shareHover && <p style={{

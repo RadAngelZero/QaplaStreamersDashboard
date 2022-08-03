@@ -450,7 +450,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                         onMouseLeave={() => {
                             setShareHover(false);
                             actualShareHover.current = false;
-                            if (shareCopied) return;
+                            if (shareCopied || isTouch) return;
                             setShareShrinkAnimationPlay("true");
                         }}
                         onMouseDown={() => {
@@ -697,18 +697,16 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                 `}</style>
                                 {'Compartir'}
                             </p>
-                            <div
+                            <ShareArrow
                                 playGrowAnimation={shareGrowAnimationPlay}
                                 playShrinkAnimation={shareShrinkAnimationPlay}
                                 style={shareHover ?
                                     {
                                         transform: 'scale(0.8)',
-                                        display: 'flex',
                                     }
                                     :
                                     {
-                                        transform: 'scale(1)',
-                                        display: 'flex',
+                                        transform: 'scale(1)'
                                     }
                                 } className="share-icon">
                                 <style>{`
@@ -735,11 +733,8 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                         .share-icon[playShrinkAnimation="true"] {
                                             animation: shareIconNormal 0.5s ease-in-out 1;
                                         }
-                                    `}
-                                </style>
-                                <ShareArrow />
-                            </div>
-
+                                    `}</style>
+                            </ShareArrow>
                         </div>
 
                         {/* {shareHover && <p style={{

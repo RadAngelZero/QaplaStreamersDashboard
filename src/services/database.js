@@ -572,8 +572,24 @@ export async function markDonationAsRead(streamerUid, donationId) {
  * @param {string} streamerUid Uid of the streamer who receive the donation
  * @param {string} donationId Id of the donation
  */
- export async function markDonationAsUnreadToRepeat(streamerUid, donationId) {
+export async function markDonationAsUnreadToRepeat(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: false, repeating: true });
+}
+
+/**
+ * Set to true the isOverlayActive flag of the streamer
+ * @param {string} streamerUid Streamer identifier
+ */
+export async function markOverlayAsActive(streamerUid) {
+    return await userStreamerPublicDataRef.child(streamerUid).child('isOverlayActive').set(true);
+}
+
+/**
+ * Set to onDisconnect listener for the isOverlayActive flag
+ * @param {string} streamerUid Streamer identifier
+ */
+export function onLiveDonationsDisconnect(streamerUid) {
+    userStreamerPublicDataRef.child(streamerUid).child('isOverlayActive').onDisconnect().set(false);
 }
 
 /**

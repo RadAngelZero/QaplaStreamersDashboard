@@ -112,7 +112,12 @@ export async function updateStreamerProfile(uid, userData) {
 
         const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
         if (publicProfile.exists()) {
-            await streamersPublicProfilesRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
+            await streamersPublicProfilesRef.child(uid).update({
+                displayName: userData.displayName,
+                displayNameLowerCase: userData.displayName.toLowerCase(),
+                photoUrl: userData.photoUrl,
+                broadcasterType: userData.broadcasterType
+            });
         }
     }
 }
@@ -834,7 +839,7 @@ export async function streamerHasQlan(uid) {
  * @param {string} image Image url
  */
 export async function createQlan(uid, code, name, image) {
-    await qreatorsCodesRef.child(uid).update({ code });
+    await qreatorsCodesRef.child(uid).update({ code, codeLowerCase: code.toLowerCase() });
     return await qlanesRef.child(uid).update({ name, image });
 }
 
@@ -970,4 +975,10 @@ export async function saveInteractionsRewardData(uid, rewardId, webhookId) {
 
 export async function getInteractionsRewardData(uid) {
     return await streamersInteractionsRewardsRef.child(uid).once('value');
+}
+
+export async function saveGiphyText(uid, data) {
+    database.ref('/GiphyTextRequests').child(uid).set({
+        data
+    });
 }

@@ -118,7 +118,12 @@ export async function updateStreamerProfile(uid, userData) {
 
         const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
         if (publicProfile.exists()) {
-            await streamersPublicProfilesRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
+            await streamersPublicProfilesRef.child(uid).update({
+                displayName: userData.displayName,
+                displayNameLowerCase: userData.displayName.toLowerCase(),
+                photoUrl: userData.photoUrl,
+                broadcasterType
+            });
         }
     }
 }

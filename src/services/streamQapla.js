@@ -43,8 +43,8 @@ export async function startQaplaStream(uid, twitchId, streamerName, refreshToken
             // Abort and notify Qapla developers
             notifyBugToDevelopTeam(errorMessage);
         }
-    } else if (userTokensUpdated.data.status === 401) {
-        Promise.reject({ status: userTokensUpdated.data.status });
+    } else if (userTokensUpdated.data.status === 400 || userTokensUpdated.data.status === 401) {
+        await Promise.reject();
     }
 }
 

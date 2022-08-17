@@ -33,6 +33,7 @@ const qStoreRef = database.ref('/QStore');
 const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
+const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -108,7 +109,13 @@ export async function updateStreamerProfile(uid, userData) {
     await userStreamersRef.child(uid).update(userData);
 
     if (userData.displayName && userData.photoUrl) {
-        await updateUserStreamerPublicData(uid, { displayName: userData.displayName, photoUrl: userData.photoUrl, displayNameLowerCase: userData.displayName.toLowerCase() });
+        const broadcasterType = userData.broadcasterType ? userData.broadcasterType : {};
+        await updateUserStreamerPublicData(uid, {
+            displayName: userData.displayName,
+            photoUrl: userData.photoUrl,
+            displayNameLowerCase: userData.displayName.toLowerCase(),
+            broadcasterType
+        });
 
         const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
         if (publicProfile.exists()) {
@@ -521,8 +528,13 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  * @param {string} completeMessage Message to show if the operation is succesfuly completed
  * @param {string} errorMessage Message to show if the write operation fails
  */
-export function writeTestCheer(streamerUid, completeMessage, errorMessage) {
+export async function writeTestCheer(streamerUid, completeMessage, errorMessage) {
+    const testMediaArrayLength = await streamerReactionTestMediaRef.child('length').once('value');
+    const index = Math.floor(Math.random() * testMediaArrayLength.val());
+    const media = (await streamerReactionTestMediaRef.child('media').child(index).once('value')).val();
+
     streamersDonationsTestRef.child(streamerUid).push({
+        media,
         amountQoins: 0,
         message: 'Test',
         timestamp: (new Date()).getTime(),
@@ -572,8 +584,24 @@ export async function markDonationAsRead(streamerUid, donationId) {
  * @param {string} streamerUid Uid of the streamer who receive the donation
  * @param {string} donationId Id of the donation
  */
- export async function markDonationAsUnreadToRepeat(streamerUid, donationId) {
+export async function markDonationAsUnreadToRepeat(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: false, repeating: true });
+}
+
+/**
+ * Set to true the isOverlayActive flag of the streamer
+ * @param {string} streamerUid Streamer identifier
+ */
+export async function markOverlayAsActive(streamerUid) {
+    return await userStreamerPublicDataRef.child(streamerUid).child('isOverlayActive').set(true);
+}
+
+/**
+ * Set to onDisconnect listener for the isOverlayActive flag
+ * @param {string} streamerUid Streamer identifier
+ */
+export function onLiveDonationsDisconnect(streamerUid) {
+    userStreamerPublicDataRef.child(streamerUid).child('isOverlayActive').onDisconnect().set(false);
 }
 
 /**

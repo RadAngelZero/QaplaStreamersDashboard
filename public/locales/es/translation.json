@@ -292,7 +292,8 @@
     "StreamsLeft": {
         "streams": "Publicaciones disponibles: ",
         "leftStreams": "{{available}} de {{total}}",
-        "renewsOn": "Renueva el {{date}} de {{month}}"
+        "renewsOn": "Renueva el {{date}} de {{month}}",
+        "membershipExpired": "Venció el {{date}} de {{month}}"
     },
     "EditStream": {
         "change" : "Cambiar fecha u hora",

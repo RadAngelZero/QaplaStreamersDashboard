@@ -297,7 +297,8 @@
     "StreamsLeft": {
         "streams": "Remaining posts: ",
         "leftStreams": "{{available}} of {{total}}",
-        "renewsOn": "Renews on {{month}} {{date}}"
+        "renewsOn": "Renews on {{month}} {{date}}",
+        "membershipExpired": "Membership expired on {{month}} {{date}}"
     },
     "EditStream": {
         "change" : "Change date or time",

@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
 import { GIPHY_GIFS, GIPHY_STICKERS, MEME, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
@@ -159,6 +159,15 @@ const LiveDonations = () => {
         }
 
         if (streamerUid) {
+            async function listenToOverlayStatus() {
+                try {
+                    await markOverlayAsActive(streamerUid);
+                    onLiveDonationsDisconnect(streamerUid);
+                } catch (error) {
+                    console.log('Error mounting overlay listeners');
+                }
+            }
+
             async function checkIfUserIsUserParticipantOfQaplaChallenge() {
                 async function getNextGoal(xq, category) {
                     const neededXQ = await getChallengeLevelGoal(category, xq + 1);
@@ -198,6 +207,8 @@ const LiveDonations = () => {
                     setShowQaplaChallengeProgress(false);
                 }
             }
+
+            listenToOverlayStatus();
 
             listenQaplaGoal(streamerUid, (goal) => {
                 if (goal.exists()) {

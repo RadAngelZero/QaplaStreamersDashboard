@@ -76,23 +76,23 @@ const LiveDonations = () => {
         /**
          * Emoji rain functions
          */
-         var emojiRainContainer = document.getElementById('animate');
-         var circles = [];
+         let emojiRainContainer = document.getElementById('animate');
+         let circles = [];
 
          function addCircle(delay, range, color) {
              setTimeout(function () {
-                 var c = new Circle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
+                let c = new Circle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
                     x: -0.15 + Math.random() * 0.3,
                     y: 1 + Math.random() * 10
                 }, range);
 
                 circles.push(c);
-             }, delay);
+            }, delay);
          }
 
          class Circle {
             constructor(x, y, color, velocity, range) {
-                var _this = this;
+                let _this = this;
                 this.x = x;
                 this.y = y;
                 this.color = color;
@@ -123,12 +123,30 @@ const LiveDonations = () => {
         }
 
          function animate() {
-            for (var i in circles) {
+            for (let i in circles) {
                 circles[i].update();
             }
 
             return requestAnimationFrame(animate);
          }
+
+        function executeEmojiRain(emoji) {
+
+            for (let i = 0; i < 10; i++) {
+                addCircle(i * 350, [10 + 0, 300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 + 0, -300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 - 200, -300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 + 200, 300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 - 400, -300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 + 400, 300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 - 600, -300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
+                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
+            }
+
+            animate();
+        }
 
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
@@ -191,30 +209,14 @@ const LiveDonations = () => {
 
                 setDonationToShow(donation);
 
-                var emoji = ['👀'];
-
-                for (var i = 0; i < 10; i++) {
-                    addCircle(i * 350, [10 + 0, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 + 0, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 - 200, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 + 200, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 - 400, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 + 400, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 - 600, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                    addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
+                if (donation.emojiRain && donation.emojiRain.emojis) {
+                    executeEmojiRain(donation.emojiRain.emojis);
                 }
 
-                animate();
                 audio.onended = () => {
                     setTimeout(() => {
-                        setDonationToShow(null);
                         emojiRainContainer.innerHTML = '';
-                        let requestradAnimationFrames = requestAnimationFrame(()=>{});
-                        while (requestradAnimationFrames--) {
-                            cancelAnimationFrame(requestradAnimationFrames);
-                        }
+                        setDonationToShow(null);
                     }, 4000);
                     if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                         removeTestDonation(streamerUid, donation.id);

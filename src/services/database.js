@@ -529,6 +529,9 @@ export async function writeTestCheer(streamerUid, completeMessage, errorMessage)
         uid: '',
         read: false,
         twitchUserName: 'QAPLA',
+        emojiRain: {
+            emojis: ['🐕', '🐈', '🐢']
+        },
         userName: 'QAPLA',
         photoURL: ''
     }, (error) => {

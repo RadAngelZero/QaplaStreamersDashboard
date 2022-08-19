@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import { GiphyFetch } from '@giphy/js-fetch-api';
+import { Video } from '@giphy/react-components';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, getStreamerAlertsSettings, getStreamerMediaContent, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
 import donationAudio from '../../assets/notification.wav';
 import { speakCheerMessage } from '../../services/functions';
 import { GIPHY_GIFS, GIPHY_STICKERS, MEME, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
@@ -13,6 +15,8 @@ import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
 
+const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
+
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
     const [donationQueue, setDonationQueue] = useState([]);
@@ -20,7 +24,6 @@ const LiveDonations = () => {
     const [listenersAreSetted, setListenersAreSetted] = useState(false);
     const [alertSideRight, setAlertSideRight] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-    const [mediaContent, setMediaContent] = useState({ videos: [], images: [] });
     const [qaplaChallengeXQ, setQaplaChallengeXQ] = useState(0);
     const [nextGoalXQ, setNextGoalXQ] = useState(0);
     const [previousGoalXQ, setPreviousGoalXQ] = useState(0);
@@ -30,6 +33,7 @@ const LiveDonations = () => {
     const [showQaplaChallengeProgress, setShowQaplaChallengeProgress] = useState(false);
     const [qaplaOnOpacity, setQaplaOnOpacity] = useState(1);
     const [playQaplaOnAnimation, setPlayQaplaOnAnimation] = useState("false");
+    const [showEmojiRain, setShowEmojiRain] = useState(false);
     const { streamerId } = useParams();
 
     useEffect(() => {
@@ -61,9 +65,6 @@ const LiveDonations = () => {
                 listenForTestCheers(uid, (donation) => {
                     pushDonation({ ...donation.val(), id: donation.key });
                 });
-
-                const streamerMedia = await getStreamerMediaContent(uid);
-                setMediaContent(streamerMedia.val());
             }
         }
 
@@ -76,7 +77,6 @@ const LiveDonations = () => {
         /**
          * Emoji rain functions
          */
-         let emojiRainContainer = document.getElementById('animate');
          let circles = [];
 
          function addCircle(delay, range, color) {
@@ -105,7 +105,10 @@ const LiveDonations = () => {
                 this.element.style.fontSize = '26px';
                 this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
                 this.element.innerHTML = color;
-                emojiRainContainer.appendChild(this.element);
+                const container = document.getElementById('animate');
+                if (container) {
+                    container.appendChild(this.element);
+                }
 
                 this.update = function () {
                     if (_this.y > 800) {
@@ -131,7 +134,7 @@ const LiveDonations = () => {
          }
 
         function executeEmojiRain(emoji) {
-
+            setShowEmojiRain(true);
             for (let i = 0; i < 10; i++) {
                 addCircle(i * 350, [10 + 0, 300], emoji[Math.floor(Math.random() * emoji.length)]);
                 addCircle(i * 350, [10 + 0, -300], emoji[Math.floor(Math.random() * emoji.length)]);
@@ -215,21 +218,13 @@ const LiveDonations = () => {
 
                 audio.onended = () => {
                     setTimeout(() => {
-                        emojiRainContainer.innerHTML = '';
-                        setDonationToShow(null);
+                        finishReaction(donation);
                     }, 4000);
-                    if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
-                        removeTestDonation(streamerUid, donation.id);
-                    } else {
-                        markDonationAsRead(streamerUid, donation.id);
-                    }
-
-                    setTimeout(() => {
-                        setIsPlayingAudio(false);
-                    }, 6000);
                 }
 
-                audio.play();
+                if (!donation.media || (donation.media && donation.media.type !== 'video')) {
+                    audio.play();
+                }
             }
 
             showCheer();
@@ -303,6 +298,19 @@ const LiveDonations = () => {
         }
     }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio]);
 
+    function finishReaction(donation) {
+        setDonationToShow(null);
+        setShowEmojiRain(false);
+        if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
+            removeTestDonation(streamerUid, donation.id);
+        } else {
+            markDonationAsRead(streamerUid, donation.id);
+        }
+        setTimeout(() => {
+            setIsPlayingAudio(false);
+        }, 2000);
+    }
+
     const queueAnimation = () => {
         if (qaplaOnOpacity !== 1) {
             setTimeout(() => {
@@ -361,17 +369,19 @@ const LiveDonations = () => {
                 `}</style>
                 <img src={alertSideRight ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
             </div>
-            <div id="animate" style={{
-                position: 'fixed',
-                top: 100,
-                bottom: 0,
-                left: '800px',
-                right: 0,
-                transform: 'scale(1.5)',
-            }}></div>
+            {showEmojiRain &&
+                <div id="animate" style={{
+                    position: 'fixed',
+                    top: 100,
+                    bottom: 0,
+                    left: '800px',
+                    right: 0,
+                    transform: 'scale(1.5)',
+                }}></div>
+            }
             {donationToShow &&
                 <>
-                    <DonationHandler donationToShow={donationToShow} />
+                    <DonationHandler donationToShow={donationToShow} finishReaction={finishReaction} />
                 </>
             }
             {qoinsGoal && goalTitle &&
@@ -391,8 +401,19 @@ const LiveDonations = () => {
     );
 }
 
-const DonationHandler = (donationToShow) => {
-    const donation = donationToShow.donationToShow;
+const DonationHandler = ({ donationToShow, finishReaction }) => {
+    const [clip, setClip] = useState(null);
+    const donation = donationToShow;
+
+    useEffect(() => {
+        const getClip = async () => {
+            const { data } = await gf.gif(donation.media.id);
+            setClip(data);
+        }
+
+        getClip();
+    }, []);
+
     return (
         <div style={{
             display: 'flex',
@@ -404,14 +425,30 @@ const DonationHandler = (donationToShow) => {
             marginLeft: donation.isRightSide ? '0px' : '20px',
             marginRight: donation.isRightSide ? '20px' : '0px'
         }}>
-            {donation.media && (donation.media.type === MEME || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) &&
-                <img src={donation.media.url} alt='' style={{
-                    aspectRatio: donation.media.width / donation.media.height,
-                    display: 'flex',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
-                    maxHeight: '250px',
-                    objectFit: 'scale-down'
-                }} />
+            {donation.media &&
+                <>
+                {(donation.media.type === MEME || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) ?
+                    <img src={donation.media.url} alt='' style={{
+                        aspectRatio: donation.media.width / donation.media.height,
+                        display: 'flex',
+                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                        maxHeight: '250px',
+                        objectFit: 'scale-down'
+                    }} />
+                    :
+                    donation.media.type === 'video' && clip ?
+                        <div style={{
+                            display: 'flex',
+                            alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                            maxHeight: '250px',
+                            objectFit: 'scale-down'
+                        }}>
+                            <Video hideAttribution gif={clip} width={300} muted={false} loop={false} onEnded={() => finishReaction(donation)} />
+                        </div>
+                    :
+                    null
+                }
+                </>
             }
             <div
                 style={{

@@ -532,6 +532,13 @@ export async function writeTestCheer(streamerUid, completeMessage, errorMessage)
         emojiRain: {
             emojis: ['🐕', '🐈', '🐢']
         },
+        media: {
+            id: 'Iz0eDDbIrrItMCp2lO',
+            type: 'video',
+            url: 'https://media4.giphy.com/media/702ybfQFkrkrWnIByR/giphy.gif?cid=4a0959dasorjbz2984fgzq40a91lfjjsjy1rka1a2tcc5gdn&rid=giphy.gif&ct=v',
+            height: 480,
+            width: 480
+        },
         userName: 'QAPLA',
         photoURL: ''
     }, (error) => {
@@ -816,14 +823,6 @@ export async function setAlertSetting(uid, settingKey, value) {
  */
 export function listenToStreamerAlertsSettings(uid, callback) {
     return streamerAlertsSettingsRef.child(uid).on('value', callback);
-}
-
-/**
- * Get the media selected by the streamer to show in their cheers
- * @param {string} uid User identifier
- */
-export async function getStreamerMediaContent(uid) {
-    return await streamerCustomMediaForCheers.child(uid).once('value');
 }
 
 /**

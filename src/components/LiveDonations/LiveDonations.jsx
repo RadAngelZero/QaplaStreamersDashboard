@@ -172,6 +172,8 @@ const LiveDonations = () => {
             async function showCheer() {
                 let audio = new Audio(donationAudio);
                 if (!donation.repeating) {
+                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
+
                     if (donation.message) {
                         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                             audio = new Audio(TEST_MESSAGE_SPEECH_URL);
@@ -183,7 +185,7 @@ const LiveDonations = () => {
                                 containsMessage: true,
                                 message: messageToRead
                             });
-                            const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
+                            const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'es-MX');
                             audio = new Audio(cheerMessageUrl.data);
                         }
                     } else {
@@ -193,7 +195,7 @@ const LiveDonations = () => {
                             user: donation.twitchUserName,
                             containsMessage: false
                         });
-                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, 'es-US-Standard-A', 'es-MX');
+                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'es-MX');
                         audio = new Audio(cheerMessageUrl.data);
                     }
                 } else {

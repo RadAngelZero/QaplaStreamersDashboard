@@ -534,10 +534,13 @@ export async function writeTestCheer(streamerUid, completeMessage, errorMessage)
         },
         media: {
             id: 'Iz0eDDbIrrItMCp2lO',
-            type: 'video',
+            type: 'gifs',
             url: 'https://media4.giphy.com/media/702ybfQFkrkrWnIByR/giphy.gif?cid=4a0959dasorjbz2984fgzq40a91lfjjsjy1rka1a2tcc5gdn&rid=giphy.gif&ct=v',
             height: 480,
             width: 480
+        },
+        messageExtraData: {
+            voiceAPIName: 'pt-BR-Standard-B'
         },
         userName: 'QAPLA',
         photoURL: ''

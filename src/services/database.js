@@ -94,6 +94,9 @@ export async function streamerProfileExists(uid) {
 export async function createStreamerProfile(uid, userData) {
     if (userData.isNewUser) {
         delete userData.isNewUser;
+        if (!userData.email) {
+            userData.email = '';
+        }
     }
 
     return await userStreamersRef.child(uid).update(userData);

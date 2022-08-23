@@ -33,6 +33,7 @@ const qStoreRef = database.ref('/QStore');
 const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
+const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -984,4 +985,13 @@ export async function giveReferrerRewardsToStreamer(uid, referredDisplayName, en
             await userStreamersRef.child(uid).child('currentPeriod').child('startDate').set(today.getTime());
         }
     }
+}
+
+/**
+ * Saves on database the given array of Giphy Texts
+ * @param {string} uid User identifier
+ * @param {array} data Array of Giphy Text gifs
+ */
+export async function saveGiphyText(uid, data) {
+    return giphyTextRequestsRef.child(uid).set(data);
 }

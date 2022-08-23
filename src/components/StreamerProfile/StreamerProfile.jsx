@@ -13,6 +13,7 @@ import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg';
 import { ReactComponent as GiftIcon } from './../../assets/Gift.svg';
+import StreamerProfileEditCoin from '../StreamerProfileEditCoin/StreamerProfileEditCoin'
 
 import { getQreatorCode, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
@@ -242,6 +243,7 @@ const StreamerProfile = ({ user, games }) => {
                             }
                             <p>{'Messages'}</p>
                         </Button>
+                       
                     </div>
                     <Grid container>
                         <Grid item xs={12}>
@@ -304,6 +306,7 @@ const StreamerProfile = ({ user, games }) => {
                                                     <StreamsLeft subscriptionDetails={user.subscriptionDetails}
                                                         renovationDate={user.currentPeriod.endDate} />
                                                 }
+                                              
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -331,6 +334,7 @@ const StreamerProfile = ({ user, games }) => {
                                         </CardContent>
                                     </Card>
                                 </Grid>
+                                <StreamerProfileEditCoin/>
                                 {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard
@@ -347,6 +351,7 @@ const StreamerProfile = ({ user, games }) => {
                                     </Grid>
                                 ))}
                             </Grid>
+                            
                         </Grid>
                     </Grid>
                     <CheersBitsRecordDialog open={openRecordsDialog}
@@ -358,9 +363,15 @@ const StreamerProfile = ({ user, games }) => {
                         valueOfQoinsForStreamer={valueOfQoinsForStreamer}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />
+
+
                 </>
+                 
             }
+            
         </StreamerDashboardContainer>
+        
+        
     );
 }
 

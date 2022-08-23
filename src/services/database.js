@@ -32,6 +32,7 @@ const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 const qStoreRef = database.ref('/QStore');
 const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
+const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 
 /**
@@ -993,4 +994,16 @@ export async function giveReferrerRewardsToStreamer(uid, referredDisplayName, en
             await userStreamersRef.child(uid).child('currentPeriod').child('startDate').set(today.getTime());
         }
     }
+}
+
+////////////////////////
+ // Channel Point Interactions
+ ////////////////////////
+
+/**
+ * Get the interactions reward data of the given user
+ * @param {string} uid User identifier
+ */
+export async function getInteractionsRewardData(uid) {
+    return await streamersInteractionsRewardsRef.child(uid).once('value');
 }

@@ -108,6 +108,26 @@ export async function enableCustomReward(twitchId, accessToken, rewardId) {
     }
 }
 
+export async function updateCustomReward(twitchId, accessToken, rewardId, dataToUpdate) {
+    try {
+        console.log(dataToUpdate);
+        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
+            method: 'PATCH',
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToUpdate)
+        });
+
+        console.log(await response.json());
+        return response.status;
+    } catch (e) {
+        console.log('Error: ', e);
+    }
+}
+
 /**
  * Delete a custom reward in the user´s twitch
  * @param {string} twitchId Twitch identifier

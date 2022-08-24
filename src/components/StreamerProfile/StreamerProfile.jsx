@@ -331,6 +331,19 @@ const StreamerProfile = ({ user, games }) => {
                                         </CardContent>
                                     </Card>
                                 </Grid>
+                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={'testEvent'} className={styles.cardContainer}>
+                                    <StreamCard
+                                        streamType={SCHEDULED_EVENT_TYPE}
+                                        streamId={'testEvent'}
+                                        image={''}
+                                        user={user}
+                                        game={'multiRocket'}
+                                        games={games}
+                                        date={formatDate(1658958436782)}
+                                        hour={formatHour(1658958436782)}
+                                        timestamp={1658958436782}
+                                        onRemoveStream={onRemoveStream} />
+                                </Grid>
                                 {streams && Object.keys(streams).map((streamId) => (
                                     <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                         <StreamCard

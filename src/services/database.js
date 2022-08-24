@@ -32,6 +32,7 @@ const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 const qStoreRef = database.ref('/QStore');
 const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
+const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 
 /**
@@ -869,7 +870,7 @@ export async function streamerHasQlan(uid) {
  * @param {string} image Image url
  */
 export async function createQlan(uid, code, name, image) {
-    await qreatorsCodesRef.child(uid).update({ code });
+    await qreatorsCodesRef.child(uid).update({ code, codeLowerCase: code.toLowerCase() });
     return await qlanesRef.child(uid).update({ name, image });
 }
 
@@ -993,4 +994,22 @@ export async function giveReferrerRewardsToStreamer(uid, referredDisplayName, en
             await userStreamersRef.child(uid).child('currentPeriod').child('startDate').set(today.getTime());
         }
     }
+}
+
+////////////////////////
+// Channel Point Interactions
+////////////////////////
+
+export async function saveInteractionsRewardData(uid, rewardId, webhookId) {
+    await streamersInteractionsRewardsRef.child(uid).update({ rewardId, webhookId })
+}
+
+export async function getInteractionsRewardData(uid) {
+    return await streamersInteractionsRewardsRef.child(uid).once('value');
+}
+
+export async function saveGiphyText(uid, data) {
+    database.ref('/GiphyTextRequests').child(uid).set({
+        data
+    });
 }

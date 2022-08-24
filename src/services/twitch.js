@@ -108,26 +108,6 @@ export async function enableCustomReward(twitchId, accessToken, rewardId) {
     }
 }
 
-export async function updateCustomReward(twitchId, accessToken, rewardId, dataToUpdate) {
-    try {
-        console.log(dataToUpdate);
-        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
-            method: 'PATCH',
-            headers: {
-                'Client-Id': TWITCH_CLIENT_ID,
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToUpdate)
-        });
-
-        console.log(await response.json());
-        return response.status;
-    } catch (e) {
-        console.log('Error: ', e);
-    }
-}
-
 /**
  * Delete a custom reward in the user´s twitch
  * @param {string} twitchId Twitch identifier
@@ -183,27 +163,21 @@ export async function getCustomReward(rewardId, twitchId, accessToken) {
  * @param {string} rewardId Reward identifier
  * @param {string} twitchId Twitch identifier
  * @param {string} accessToken Twitch access token
- * @param {string} title Title for the reward
- * @param {number} cost Cost for the reward
- * @param {boolean} paused True if want to pause the reward
+ * @param {object} dataToUpdate Data to send to Twitch (see Twitch docs for more details)
  */
-export async function updateCustomReward(rewardId, twitchId, accessToken, title, cost, paused) {
+ export async function updateCustomReward(twitchId, accessToken, rewardId, dataToUpdate) {
     try {
         let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
             method: 'PATCH',
             headers: {
                 'Client-Id': TWITCH_CLIENT_ID,
                 Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json; charset=utf-8'
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                title,
-                cost,
-                is_paused: paused
-            })
+            body: JSON.stringify(dataToUpdate)
         });
 
-        const result = (await response.json());
+        const result = await response.json();
 
         return result.data && result.data[0] ? result.data[0] : null;
     } catch (error) {

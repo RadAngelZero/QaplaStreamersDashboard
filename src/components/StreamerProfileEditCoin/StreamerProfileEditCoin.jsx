@@ -54,7 +54,16 @@ const StreamerProfileEditCoin = ({ user }) => {
                 if (userTokensUpdated.data.status === 200) {
                     const userCredentialsUpdated = userTokensUpdated.data;
                     updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
-                    const rewardUpdated = await updateCustomReward(rewardId, user.id, userCredentialsUpdated.access_token, rewardName, rewardCost, false);
+                    const rewardUpdated = await updateCustomReward(
+                        user.id,
+                        userCredentialsUpdated.access_token,
+                        rewardId,
+                        {
+                            title: rewardName,
+                            cost: rewardCost,
+                            is_paused: false
+                        }
+                    );
                     if (rewardUpdated) {
                         setRewardName(rewardUpdated.title);
                         setRewardCost(rewardUpdated.cost);

@@ -36,6 +36,7 @@
 .input {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .input button {
@@ -64,7 +65,6 @@
   color: #fff;
   font-size: 14px;
 }
-
 
 .disableInteractions {
   display: flex;

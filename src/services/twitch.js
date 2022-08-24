@@ -166,23 +166,19 @@ export async function getCustomReward(rewardId, twitchId, accessToken) {
  * @param {object} dataToUpdate Data to send to Twitch (see Twitch docs for more details)
  */
  export async function updateCustomReward(twitchId, accessToken, rewardId, dataToUpdate) {
-    try {
-        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
-            method: 'PATCH',
-            headers: {
-                'Client-Id': TWITCH_CLIENT_ID,
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToUpdate)
-        });
+    let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
+        method: 'PATCH',
+        headers: {
+            'Client-Id': TWITCH_CLIENT_ID,
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToUpdate)
+    });
 
-        const result = await response.json();
+    const result = await response.json();
 
-        return result.data && result.data[0] ? result.data[0] : null;
-    } catch (error) {
-        return error;
-    }
+    return response.status === 200 ? { status: response.status, ...result.data[0] } : { status: response.status };
 }
 
 ///////////////

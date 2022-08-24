@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { CircularProgress, makeStyles } from "@material-ui/core";
+import { Button, CircularProgress, makeStyles } from "@material-ui/core";
+import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router-dom";
 
 import imgStreameCoin from "../../assets/streamerProfileCoin.jpg";
 import style from "./StreamerProfileEditCoin.module.css";
@@ -7,6 +9,8 @@ import iconEdit from "../../assets/Edit.svg";
 import { getCustomReward, updateCustomReward } from "../../services/twitch";
 import { getInteractionsRewardData, updateStreamerProfile } from "../../services/database";
 import { refreshUserAccessToken } from "../../services/functions";
+import { auth } from "../../services/firebase";
+import { ReactComponent as ConfirmChange } from './../../assets/ConfirmChange.svg';
 
 const useStyles = makeStyles((theme) => ({
     circularProgress: {
@@ -22,6 +26,8 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [rewardName, setRewardName] = useState(undefined);
     const [rewardCost, setRewardCost] = useState(undefined);
     const classes = useStyles();
+    const { t } = useTranslation();
+    const history = useHistory();
 
     useEffect(() => {
         async function getRewardData() {
@@ -64,15 +70,45 @@ const StreamerProfileEditCoin = ({ user }) => {
                             is_paused: false
                         }
                     );
-                    if (rewardUpdated) {
+
+                    if (rewardUpdated.status === 200) {
                         setRewardName(rewardUpdated.title);
                         setRewardCost(rewardUpdated.cost);
                         setActiveEditCoins(false);
                         setActiveEditTitle(false);
+                    } else {
+                        switch (rewardUpdated.status) {
+                            case 404:
+                                // Not found (maybe the reward was removed from Twitch)
+                                break;
+                            case 500:
+                                // Twitch internal server error (could not update because of Twitch)
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                } else {
+                    switch (userTokensUpdated.data.status) {
+                        case 401:
+                            // Invalid refresh token (need to sign in again)
+                            handleExpiredSession();
+                            break;
+                        case 500:
+                            // Twitch internal server error
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
         }
+    }
+
+    const handleExpiredSession = async () => {
+        alert(t('StreamCard.sessionExpired'));
+        await auth.signOut();
+        history.push('/');
     }
 
     return (
@@ -93,18 +129,18 @@ const StreamerProfileEditCoin = ({ user }) => {
                                 value={rewardName}
                                 onChange={(event) => setRewardName(event.target.value)}
                                 onKeyPress={saveData} />
-                            <button onClick={saveData}>
-                                <img src={iconEdit} alt="icons-edit" />
-                            </button>
+                            <Button onClick={saveData}>
+                                <ConfirmChange />
+                            </Button>
                             </>
                             :
                             <>
                             <p className={style.p}>
                                 {rewardName}
                             </p>
-                            <button onClick={() => setActiveEditTitle(!ActiveEditTitle)}>
+                            <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)}>
                                 <img src={iconEdit} alt="icons-edit" />
-                            </button>
+                            </Button>
                             </>
                         }
                     </div>
@@ -118,18 +154,18 @@ const StreamerProfileEditCoin = ({ user }) => {
                                 value={rewardCost}
                                 onChange={(event) => setRewardCost(event.target.value || 0)}
                                 onKeyPress={saveData} />
-                                <button onClick={saveData}>
-                                    <img src={iconEdit} alt="icons-edit" />
-                                </button>
+                                <Button onClick={saveData}>
+                                    <ConfirmChange />
+                                </Button>
                             </>
                             :
                             <>
                             <p className={style.p}>
                                 {rewardCost.toLocaleString()}
                             </p>
-                            <button onClick={() => setActiveEditCoins(!ActiveEditCoins)}>
+                            <Button onClick={() => setActiveEditCoins(!ActiveEditCoins)}>
                                 <img src={iconEdit} alt="icons-edit" />
-                            </button>
+                            </Button>
                             </>
                         }
                     </div>

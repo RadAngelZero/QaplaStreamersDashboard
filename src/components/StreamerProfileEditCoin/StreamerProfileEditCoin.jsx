@@ -6,6 +6,7 @@ import iconEdit from "../../assets/Edit.svg";
 import style from "./StreamerProfileEditCoin.module.css";
 
 import StreamerProfileModalDisableInteractions from "../StreamerProfileModalDisableInteractions/StreamerProfileModalDisableInteractions";
+import  StreamerProfileImgCoin from '../StreamerProfileImgCoin/StreamerProfileImgCoin'
 
 import { Modal } from "@material-ui/core";
 
@@ -19,9 +20,9 @@ const StreamerProfileEditCoin = () => {
   const [inputCoint, setinputCoint] = useState('2.000')
 
   const handleCheckbox = (e) => {
+
     if (!e.target.checked) {
       setModal(true);
-      // setTitleCheckbox("disabled");
     } else {
       setChecked(true);
       setTitleCheckbox("enabled");
@@ -35,7 +36,8 @@ const StreamerProfileEditCoin = () => {
   return (
     <div className={style.containerItereractions}>
       <h1 className={style.Titulo}>Reactions</h1>
-      <img className={style.img} src={imgStreameCoin} alt="coin" />
+      <StreamerProfileImgCoin inputCoint={inputCoint}/>
+     
       <div className={style.content_input}>
         <div className={style.input}>
           <p className={style.p}>Qapla Reaction</p>
@@ -47,6 +49,7 @@ const StreamerProfileEditCoin = () => {
             maxlength="18"
             value={inputTitle}
             autoFocus
+            onChange={(e) => setInputTitle(e.target.value)}
           />
           <button onClick={() => setActiveEditTitle(!ActiveEditTitle)}>
             <img src={iconEdit} alt="icons-edit" />
@@ -59,8 +62,10 @@ const StreamerProfileEditCoin = () => {
               ActiveEditCoins ? style.Visibility_input : style.Desabilite_input
             }
             type="number"
+            maxlength="10"
             value={inputCoint}
             autoFocus
+            onChange={(e) => setinputCoint(e.target.value)}
           />
           <button onClick={() => setActiveEditCoins(!ActiveEditCoins)}>
             <img src={iconEdit} alt="icons-edit" />

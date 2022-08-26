@@ -6,9 +6,10 @@ import { Video } from '@giphy/react-components';
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
-import donationAudio from '../../assets/notification.wav';
+import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
+import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import { speakCheerMessage } from '../../services/functions';
-import { GIPHY_GIFS, GIPHY_STICKERS, MEME, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { GIPHY_CLIPS, GIPHY_GIFS, GIPHY_STICKERS, MEME, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
 import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
@@ -16,6 +17,9 @@ import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
+
+let audioAlert = new Audio(channelPointReactionAudio);
+let voiceBotMessage = new Audio(channelPointReactionAudio);
 
 const LiveDonations = () => {
     const [streamerUid, setStreamerUid] = useState('');
@@ -170,15 +174,17 @@ const LiveDonations = () => {
             const donation = popDonation();
 
             async function showCheer() {
-                let audio = new Audio(donationAudio);
+                const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
+                const bigQoinsDonation = qoinsDonation && donation.amountQoins >= 1000;
+                audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
                 if (!donation.repeating) {
                     const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
 
                     if (donation.message) {
                         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
-                            audio = new Audio(TEST_MESSAGE_SPEECH_URL);
+                            voiceBotMessage = new Audio(TEST_MESSAGE_SPEECH_URL);
                         } else {
-                            const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins y dice: ${donation.message}`;
+                            const messageToRead = bigQoinsDonation ? `${donation.twitchUserName} te ha enviado ${donation.amountQoins} de Coins y dice: ${donation.message}` : donation.message;
 
                             window.analytics.track('Cheer received', {
                                 user: donation.twitchUserName,
@@ -186,24 +192,24 @@ const LiveDonations = () => {
                                 message: messageToRead
                             });
                             const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'es-MX');
-                            audio = new Audio(cheerMessageUrl.data);
+                            voiceBotMessage = new Audio(cheerMessageUrl.data);
                         }
-                    } else {
-                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} Coins`;
+                    } else if (bigQoinsDonation) {
+                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} de Coins`;
 
                         window.analytics.track('Cheer received', {
                             user: donation.twitchUserName,
                             containsMessage: false
                         });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'es-MX');
-                        audio = new Audio(cheerMessageUrl.data);
+                        voiceBotMessage = new Audio(cheerMessageUrl.data);
                     }
                 } else {
                     try {
                         const cheerMessageUrl = await getCheerVoiceMessage(streamerUid, donation.id);
 
                         if (cheerMessageUrl) {
-                            audio = new Audio(cheerMessageUrl);
+                            voiceBotMessage = new Audio(cheerMessageUrl);
                         }
                     } catch (error) {
                         console.log('Message not found, what must be do here?');
@@ -218,14 +224,18 @@ const LiveDonations = () => {
                     executeEmojiRain(donation.emojiRain.emojis);
                 }
 
-                audio.onended = () => {
-                    setTimeout(() => {
-                        finishReaction(donation);
-                    }, 4000);
-                }
-
-                if (!donation.media || (donation.media && donation.media.type !== 'video')) {
-                    audio.play();
+                if (!donation.message && !bigQoinsDonation) {
+                    audioAlert.onended = () => {
+                        setTimeout(() => {
+                            finishReaction(donation);
+                        }, 4000);
+                    }
+                } else {
+                    voiceBotMessage.onended = () => {
+                        setTimeout(() => {
+                            finishReaction(donation);
+                        }, 4000);
+                    }
                 }
             }
 
@@ -325,6 +335,23 @@ const LiveDonations = () => {
         }
     }
 
+    const startDonation = () => {
+        const qoinsDonation = donationToShow.amountQoins && donationToShow.amountQoins >= 100;
+        const bigQoinsDonation = qoinsDonation && donationToShow.amountQoins >= 1000;
+        if (bigQoinsDonation) {
+            voiceBotMessage.play();
+        } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIPS)) {
+            audioAlert.play();
+            if (donationToShow.message) {
+                audioAlert.onended = () => {
+                    setTimeout(() => {
+                        voiceBotMessage.play();
+                    }, 750);
+                }
+            }
+        }
+    }
+
     document.body.style.backgroundColor = 'transparent';
 
 
@@ -383,7 +410,7 @@ const LiveDonations = () => {
             }
             {donationToShow &&
                 <>
-                    <DonationHandler donationToShow={donationToShow} finishReaction={finishReaction} />
+                    <DonationHandler donationToShow={donationToShow} finishReaction={finishReaction} startDonation={startDonation} />
                 </>
             }
             {qoinsGoal && goalTitle &&
@@ -403,21 +430,58 @@ const LiveDonations = () => {
     );
 }
 
-const DonationHandler = ({ donationToShow, finishReaction }) => {
+const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
     const [clip, setClip] = useState(null);
+    const [mediaReady, setMediaReady] = useState(false);
+    const [giphyTextReady, setGiphyTextReady] = useState(false);
+    const [showDonation, setShowDonation] = useState(false);
     const donation = donationToShow;
 
     useEffect(() => {
         const getClip = async () => {
             const { data } = await gf.gif(donation.media.id);
             setClip(data);
+            setShowDonation(true);
         }
 
-        getClip();
-    }, []);
+        if ((donation.media && donation.media.type === GIPHY_CLIPS && donation.media.id) && !clip) {
+            getClip();
+        } else {
+            if (donation.media && donation.messageExtraData && donation.messageExtraData.giphyText && mediaReady && giphyTextReady) {
+                displayDonation();
+            }
+
+            if (!(donation.messageExtraData && donation.messageExtraData.giphyText) && donation.media && mediaReady) {
+                displayDonation();
+            }
+
+            if ((!donation.media) && donation.messageExtraData && donation.messageExtraData.giphyText && giphyTextReady) {
+                displayDonation();
+            }
+        }
+    }, [clip, mediaReady, giphyTextReady]);
+
+    const displayDonation = () => {
+        setShowDonation(true);
+        startDonation();
+    }
+
+    const onClipEnded = () => {
+        const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
+        const bigQoinsDonation = qoinsDonation && donation.amountQoins >= 1000;
+
+        if (bigQoinsDonation) {
+            setTimeout(() => {
+                startDonation(donation);
+            }, 100);
+        } else {
+            finishReaction(donation);
+        }
+    }
 
     return (
         <div style={{
+            opacity: showDonation ? 1 : 0,
             display: 'flex',
             flex: 1,
             flexDirection: 'column',
@@ -429,28 +493,40 @@ const DonationHandler = ({ donationToShow, finishReaction }) => {
         }}>
             {donation.media &&
                 <>
-                {(donation.media.type === MEME || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) ?
+                {donation.media && (donation.media.type === MEME || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) ?
                     <img src={donation.media.url} alt='' style={{
                         aspectRatio: donation.media.width / donation.media.height,
                         display: 'flex',
                         alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
                         maxHeight: '250px',
                         objectFit: 'scale-down'
-                    }} />
+                    }}
+                    onLoad={() => setMediaReady(true)} />
                     :
-                    donation.media.type === 'video' && clip ?
+                    donation.media && donation.media.type === GIPHY_CLIPS && clip ?
                         <div style={{
                             display: 'flex',
+                            aspectRatio: donation.media.width / donation.media.height,
                             alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
                             maxHeight: '250px',
                             objectFit: 'scale-down'
                         }}>
-                            <Video hideAttribution gif={clip} width={300} muted={false} loop={false} onEnded={() => finishReaction(donation)} />
+                            <Video hideAttribution gif={clip} height={250} muted={false} loop={false} onEnded={onClipEnded} />
                         </div>
                     :
                     null
                 }
                 </>
+            }
+            {donation.messageExtraData && donation.messageExtraData.giphyText &&
+                <img src={donation.messageExtraData.giphyText.url} alt='' style={{
+                    aspectRatio: donation.messageExtraData.giphyText.width / donation.messageExtraData.giphyText.height,
+                    display: 'flex',
+                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    maxHeight: '250px',
+                    objectFit: 'scale-down'
+                }}
+                onLoad={() => setGiphyTextReady(true)} />
             }
             <div
                 style={{
@@ -475,39 +551,53 @@ const DonationHandler = ({ donationToShow, finishReaction }) => {
                         fontSize: '26px',
                         textAlign: 'center'
                     }}>
-                        <b style={{ color: '#0AFFD2' }}>{donation.twitchUserName}</b>
-                        <div style={{ margin: '0 6px' }}>ha enviado</div>
-                        <b style={{ color: '#0AFFD2', fontWeight: '700', }}>{donation.amountQoins} Qoins</b>
+                        <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
+                        {donation.amountQoins ?
+                            <>
+                            <div style={{ margin: '0 6px' }}>ha enviado</div>
+                            <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
+                                {`${donation.amountQoins.toLocaleString()} Qoins`}
+                            </b>
+                            </>
+                            :
+                            <b style={{ color: '#FFF', fontWeight: '700', margin: '0 6px' }}>
+                                reacted
+                            </b>
+                        }
                     </p>
                 </div>
-                <div style={{ width: '10px' }}></div>
-                <div style={{ display: 'flex', alignSelf: 'center' }}>
-                    <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
-                </div>
-            </div>
-            {donation.message !== '' &&
-                <>
-                    <div style={{
-                        display: 'flex',
-                        width: 'fit-content',
-                        backgroundColor: '#FFFFFF',
-                        marginTop: '-20px',
-                        borderRadius: '30px',
-                        borderTopLeftRadius: donation.isRightSide ? '30px' : '0px',
-                        borderTopRightRadius: donation.isRightSide ? '0px' : '30px',
-                        padding: '30px',
-                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
-                    }}>
-                        <p style={{
-                            display: 'flex',
-                            color: '#0D1021',
-                            fontSize: '24px',
-                            fontWeight: '600',
-                            lineHeight: '36px',
-                            letterSpacing: '0.6px'
-                        }}>{donation.message}</p>
+                {donation.amountQoins ?
+                    <>
+                    <div style={{ width: '10px' }}></div>
+                    <div style={{ display: 'flex', alignSelf: 'center' }}>
+                        <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
                     </div>
-                </>
+                    </>
+                    :
+                    null
+                }
+            </div>
+            {(donation.message && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
+                <div style={{
+                    display: 'flex',
+                    width: 'fit-content',
+                    backgroundColor: '#FFFFFF',
+                    marginTop: '-20px',
+                    borderRadius: '30px',
+                    borderTopLeftRadius: donation.isRightSide ? '30px' : '0px',
+                    borderTopRightRadius: donation.isRightSide ? '0px' : '30px',
+                    padding: '30px',
+                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                }}>
+                    <p style={{
+                        display: 'flex',
+                        color: '#0D1021',
+                        fontSize: '24px',
+                        fontWeight: '600',
+                        lineHeight: '36px',
+                        letterSpacing: '0.6px'
+                    }}>{donation.message}</p>
+                </div>
             }
         </div >
     )

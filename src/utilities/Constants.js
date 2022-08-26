@@ -93,9 +93,9 @@ export const YEARLY = 'yearly';
  */
 export const MEME = 'memes';
 // Giphy media types
-export const GIPHY_GIFS = 'gifs';
-export const GIPHY_STICKERS = 'stickers';
-export const GIPHY_CLIPS = 'clips';
+export const GIPHY_GIFS = 'gif';
+export const GIPHY_STICKERS = 'sticker';
+export const GIPHY_CLIPS = 'video';
 
 /**
  * Streams Status

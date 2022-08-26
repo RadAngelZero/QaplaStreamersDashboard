@@ -531,17 +531,22 @@ export async function writeTestCheer(streamerUid, completeMessage, errorMessage)
         read: false,
         twitchUserName: 'QAPLA',
         emojiRain: {
-            emojis: ['🐕', '🐈', '🐢']
+            emojis: ['👋']
         },
         media: {
             id: 'Iz0eDDbIrrItMCp2lO',
-            type: 'gifs',
-            url: 'https://media4.giphy.com/media/702ybfQFkrkrWnIByR/giphy.gif?cid=4a0959dasorjbz2984fgzq40a91lfjjsjy1rka1a2tcc5gdn&rid=giphy.gif&ct=v',
+            type: 'gif',
+            url: 'https://media2.giphy.com/media/bGCwmLDnwL25kCg3FV/giphy.gif?cid=4a0959dab7zzbi4dj9xiwv1dvfbut8y76yk7b08sglwcdltp&rid=giphy.gif&ct=g',
             height: 480,
             width: 480
         },
         messageExtraData: {
-            voiceAPIName: 'pt-BR-Standard-B'
+            voiceAPIName: 'pt-BR-Standard-B',
+            giphyText: {
+                url: 'https://text.media.giphy.com/v1/media/giphy.gif?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiJwcm9kLTIwMjAtMDQtMjIiLCJzdHlsZSI6Im1lbWUiLCJ0ZXh0IjoiQnVlbmFzIGJ1ZW5hcyEiLCJpYXQiOjE2NjE0NDk1NTR9.iDZZaFNXfW7TISZM-eS3ZF76X2RFrp6k5H_BL5BIzU0&cid=025a3d845a80faa3d6f2c679f74e7958b157c9e17aac766e&dynamic_style=meme&rid=giphy.gif&ct=t',
+                height: 300,
+                width: 600
+            }
         },
         userName: 'QAPLA',
         photoURL: ''

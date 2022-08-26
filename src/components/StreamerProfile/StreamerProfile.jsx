@@ -243,7 +243,6 @@ const StreamerProfile = ({ user, games }) => {
                             }
                             <p>{'Messages'}</p>
                         </Button>
-                       
                     </div>
                     <Grid container>
                         <Grid item xs={12}>
@@ -306,7 +305,6 @@ const StreamerProfile = ({ user, games }) => {
                                                     <StreamsLeft subscriptionDetails={user.subscriptionDetails}
                                                         renovationDate={user.currentPeriod.endDate} />
                                                 }
-                                              
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -351,7 +349,6 @@ const StreamerProfile = ({ user, games }) => {
                                     </Grid>
                                 ))}
                             </Grid>
-                            
                         </Grid>
                     </Grid>
                     <CheersBitsRecordDialog open={openRecordsDialog}
@@ -366,12 +363,8 @@ const StreamerProfile = ({ user, games }) => {
 
 
                 </>
-                 
             }
-            
         </StreamerDashboardContainer>
-        
-        
     );
 }
 

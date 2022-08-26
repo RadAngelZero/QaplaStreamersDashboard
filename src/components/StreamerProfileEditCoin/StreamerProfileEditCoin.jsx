@@ -2,15 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Button, CircularProgress, makeStyles } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
+import { Modal } from "@material-ui/core";
 
 import imgStreameCoin from "../../assets/streamerProfileCoin.jpg";
-import style from "./StreamerProfileEditCoin.module.css";
 import iconEdit from "../../assets/Edit.svg";
 import { getCustomReward, updateCustomReward } from "../../services/twitch";
 import { getInteractionsRewardData, updateStreamerProfile } from "../../services/database";
 import { refreshUserAccessToken } from "../../services/functions";
 import { auth } from "../../services/firebase";
 import { ReactComponent as ConfirmChange } from './../../assets/ConfirmChange.svg';
+import StreamerProfileModalDisableInteractions from "../StreamerProfileModalDisableInteractions/StreamerProfileModalDisableInteractions";
+import StreamerProfileImgCoin from '../StreamerProfileImgCoin/StreamerProfileImgCoin';
+import style from "./StreamerProfileEditCoin.module.css";
 
 const useStyles = makeStyles((theme) => ({
     circularProgress: {
@@ -25,6 +28,9 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [rewardId, setRewardId] = useState('');
     const [rewardName, setRewardName] = useState(undefined);
     const [rewardCost, setRewardCost] = useState(undefined);
+    const [modal, setModal] = useState(false);
+    const [titleCheckbox, setTitleCheckbox] = useState("enabled");
+    const [checked, setChecked] = useState(true);
     const classes = useStyles();
     const { t } = useTranslation();
     const history = useHistory();
@@ -48,8 +54,10 @@ const StreamerProfileEditCoin = ({ user }) => {
             }
         }
 
-        getRewardData();
-    }, []);
+        if (user && user.uid) {
+            getRewardData();
+        }
+    }, [user]);
 
     const saveData = async (event) => {
         if (event.key === 'Enter' || event.type === 'click') {
@@ -111,6 +119,15 @@ const StreamerProfileEditCoin = ({ user }) => {
         history.push('/');
     }
 
+    const handleCheckbox = (e) => {
+        if (!e.target.checked) {
+            setModal(true);
+        } else {
+            setChecked(true);
+            setTitleCheckbox("enabled");
+        }
+    };
+
     return (
         <div className={style.containerItereractions}>
             <h1 className={style.Titulo}>Reactions</h1>
@@ -170,8 +187,14 @@ const StreamerProfileEditCoin = ({ user }) => {
                         }
                     </div>
                     <div className={style.disableInteractions}>
-                        <p className={style.p}>Reactions enabled</p>
-                        <input type="checkbox" id="boton" />
+                        <p className={style.p}>Reactions {titleCheckbox}</p>
+                        <input
+                            className={style.input_checkbox}
+                            type="checkbox"
+                            id="boton"
+                            checked={checked}
+                            onChange={(e) => handleCheckbox(e)}
+                        />
                         <label for="boton"></label>
                     </div>
                 </div>
@@ -181,6 +204,11 @@ const StreamerProfileEditCoin = ({ user }) => {
                     <CircularProgress className={classes.circularProgress} size={25} />
                 </div>
             }
+            <Modal className={style.modalContainer}
+                open={modal}
+                onClose={() => setModal(false)}>
+                <StreamerProfileModalDisableInteractions cerrarModal={() => setModal(false)}  setChecked={setChecked} setTitleCheckbox={setTitleCheckbox}/>
+            </Modal>
         </div>
     );
 };

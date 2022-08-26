@@ -179,74 +179,76 @@ const StreamerProfile = ({ user, games }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <div className={styles.header} >
-                        <Hidden lgUp>
-                            <div style={{ width: '30px' }}></div>
-                        </Hidden>
-                        <div className={styles.avatarContainer}>
-                            <Avatar
-                                alt='User image'
-                                src={user.photoUrl} />
-                            <span className={styles.streamerName}>{user.displayName}</span>
-                        </div>
-                        <Button variant='contained'
-                            style={{ height: '48px', }}
-                            className={styles.twitchButton}
-                            onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
-                            startIcon={<TwitchIcon style={{ width: '20px', height: '20px' }} />}>
-                            {user.displayName}
-                        </Button>
-                        <Tooltip placement='bottom' open={openTooltip} title='Copiado'>
-                            <div className={styles.qreatorCodeContainer} onClick={copyQreatorCode}>
-                                <GiftIcon />
-                                <p className={styles.qreatorCode}>
-                                    {qreatorCode}
-                                </p>
-                            </div>
-                        </Tooltip>
-                        <Button variant='contained'
-                            className={styles.messagesButton}
-                            style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735' }}
-                            onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
-                            endIcon={
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <MessageIcon style={{ width: '32px', height: '32px' }} />
-                                    {pendingMessages > 0 &&
-                                        <div style={{
-                                            display: 'flex',
-                                            marginLeft: '12px',
-                                            backgroundColor: '#FF007A',
-                                            width: '27px',
-                                            height: '27px',
-                                            borderRadius: '30px',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <p style={{
-                                                display: 'flex',
-                                                fontSize: '11px',
-                                                lineHeight: '24px',
-                                                fontWeight: '600',
-                                                marginTop: '2px'
-                                            }}>
-                                                {pendingMessages}
-                                            </p>
-                                        </div>
-
-                                    }
-                                </div>
-                            }>
-                            {pendingMessages > 0 &&
-                                <>
-                                    <p>{`New `}</p>
-                                    <div style={{ width: '6px' }}></div>
-                                </>
-                            }
-                            <p>{'Messages'}</p>
-                        </Button>
-                    </div>
                     <Grid container>
-                        <Grid item xs={12}>
+                        <Grid item xs={9}>
                             <Grid container xs={12}>
+                                <Grid xs={12}>
+                                    <div className={styles.header}>
+                                        <Hidden lgUp>
+                                            <div style={{ width: '30px' }}></div>
+                                        </Hidden>
+                                        <div className={styles.avatarContainer}>
+                                            <Avatar
+                                                alt='User image'
+                                                src={user.photoUrl} />
+                                            <span className={styles.streamerName}>{user.displayName}</span>
+                                        </div>
+                                        <Button variant='contained'
+                                            style={{ height: '48px', }}
+                                            className={styles.twitchButton}
+                                            onClick={() => window.open(`https://www.twitch.tv/${user.displayName}`, '_blank')}
+                                            startIcon={<TwitchIcon style={{ width: '20px', height: '20px' }} />}>
+                                            {user.displayName}
+                                        </Button>
+                                        <Tooltip placement='bottom' open={openTooltip} title='Copiado'>
+                                            <div className={styles.qreatorCodeContainer} onClick={copyQreatorCode}>
+                                                <GiftIcon />
+                                                <p className={styles.qreatorCode}>
+                                                    {qreatorCode}
+                                                </p>
+                                            </div>
+                                        </Tooltip>
+                                        <Button variant='contained'
+                                            className={styles.messagesButton}
+                                            style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735' }}
+                                            onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
+                                            endIcon={
+                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    <MessageIcon style={{ width: '32px', height: '32px' }} />
+                                                    {pendingMessages > 0 &&
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            marginLeft: '12px',
+                                                            backgroundColor: '#FF007A',
+                                                            width: '27px',
+                                                            height: '27px',
+                                                            borderRadius: '30px',
+                                                            justifyContent: 'center'
+                                                        }}>
+                                                            <p style={{
+                                                                display: 'flex',
+                                                                fontSize: '11px',
+                                                                lineHeight: '24px',
+                                                                fontWeight: '600',
+                                                                marginTop: '2px'
+                                                            }}>
+                                                                {pendingMessages}
+                                                            </p>
+                                                        </div>
+
+                                                    }
+                                                </div>
+                                            }>
+                                            {pendingMessages > 0 &&
+                                                <>
+                                                    <p>{`New `}</p>
+                                                    <div style={{ width: '6px' }}></div>
+                                                </>
+                                            }
+                                            <p>{'Messages'}</p>
+                                        </Button>
+                                    </div>
+                                </Grid>
                                 <Grid xs={12}>
                                     <Grid container xs={11}>
                                         <Grid item xs={12}>
@@ -309,46 +311,47 @@ const StreamerProfile = ({ user, games }) => {
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                                <Grid xs={1} />
+                                <Grid item xs={12} className={styles.streamsCardContainer}>
+                                    <Grid container justifyContent='center' spacing={4} className={styles.innerStreamsCardContainer}>
+                                        <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
+                                            <Card className={styles.createEventCard} onClick={createStream}>
+                                                <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
+                                                    {t('StreamerProfile.postStream')}
+                                                </h1>
+                                                <CardContent classes={{
+                                                    root: classes.createCardContentRoot,
+                                                }}>
+                                                    <Box display='flex' justifyContent='center'>
+                                                        <IconButton className={styles.createButton} classes={{
+                                                            label: classes.buttonIconLabel
+                                                        }}>
+                                                            <AddIcon />
+                                                        </IconButton>
+                                                    </Box>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                        {streams && Object.keys(streams).map((streamId) => (
+                                            <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
+                                                <StreamCard
+                                                    streamType={streams[streamId].status}
+                                                    streamId={streamId}
+                                                    image={streams[streamId].image}
+                                                    user={user}
+                                                    game={streams[streamId].game}
+                                                    games={games}
+                                                    date={formatDate(streams[streamId].timestamp)}
+                                                    hour={formatHour(streams[streamId].timestamp)}
+                                                    timestamp={streams[streamId].timestamp}
+                                                    onRemoveStream={onRemoveStream} />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs={12} className={styles.streamsCardContainer}>
-                            <Grid container justifyContent='center' spacing={4} className={styles.innerStreamsCardContainer}>
-                                <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
-                                    <Card className={styles.createEventCard} onClick={createStream}>
-                                        <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
-                                            {t('StreamerProfile.postStream')}
-                                        </h1>
-                                        <CardContent classes={{
-                                            root: classes.createCardContentRoot,
-                                        }}>
-                                            <Box display='flex' justifyContent='center'>
-                                                <IconButton className={styles.createButton} classes={{
-                                                    label: classes.buttonIconLabel
-                                                }}>
-                                                    <AddIcon />
-                                                </IconButton>
-                                            </Box>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                                <StreamerProfileEditCoin user={user} />
-                                {streams && Object.keys(streams).map((streamId) => (
-                                    <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
-                                        <StreamCard
-                                            streamType={streams[streamId].status}
-                                            streamId={streamId}
-                                            image={streams[streamId].image}
-                                            user={user}
-                                            game={streams[streamId].game}
-                                            games={games}
-                                            date={formatDate(streams[streamId].timestamp)}
-                                            hour={formatHour(streams[streamId].timestamp)}
-                                            timestamp={streams[streamId].timestamp}
-                                            onRemoveStream={onRemoveStream} />
-                                    </Grid>
-                                ))}
-                            </Grid>
+                        <Grid item xs={3}>
+                            <StreamerProfileEditCoin user={user} />
                         </Grid>
                     </Grid>
                     <CheersBitsRecordDialog open={openRecordsDialog}

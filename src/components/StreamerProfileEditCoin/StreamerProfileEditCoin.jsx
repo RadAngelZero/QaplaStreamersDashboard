@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { Modal } from "@material-ui/core";
 
-import imgStreameCoin from "../../assets/streamerProfileCoin.jpg";
 import iconEdit from "../../assets/Edit.svg";
 import { getCustomReward, updateCustomReward } from "../../services/twitch";
 import { getInteractionsRewardData, updateStreamerProfile } from "../../services/database";
@@ -28,9 +27,10 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [rewardId, setRewardId] = useState('');
     const [rewardName, setRewardName] = useState(undefined);
     const [rewardCost, setRewardCost] = useState(undefined);
+    const [rewardBackgroundColor, setRewardBackgroundColor] = useState('');
     const [modal, setModal] = useState(false);
     const [titleCheckbox, setTitleCheckbox] = useState("enabled");
-    const [checked, setChecked] = useState(true);
+    const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const classes = useStyles();
     const { t } = useTranslation();
     const history = useHistory();
@@ -49,65 +49,64 @@ const StreamerProfileEditCoin = ({ user }) => {
                         setRewardId(reward.id);
                         setRewardName(reward.title);
                         setRewardCost(reward.cost);
+                        setRewardBackgroundColor(reward.background_color);
+                        setReactionsEnabled(!reward.is_paused);
                     }
                 }
             }
         }
 
-        if (user && user.uid) {
+        if (user.uid) {
             getRewardData();
         }
-    }, [user]);
+    }, [user.uid, user.id, user.refreshToken]);
 
     const saveData = async (event) => {
         if (event.key === 'Enter' || event.type === 'click') {
-            const rewardData = await getInteractionsRewardData(user.uid);
-            if (rewardData.exists()) {
-                const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+            const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
 
-                if (userTokensUpdated.data.status === 200) {
-                    const userCredentialsUpdated = userTokensUpdated.data;
-                    updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
-                    const rewardUpdated = await updateCustomReward(
-                        user.id,
-                        userCredentialsUpdated.access_token,
-                        rewardId,
-                        {
-                            title: rewardName,
-                            cost: rewardCost,
-                            is_paused: false
-                        }
-                    );
-
-                    if (rewardUpdated.status === 200) {
-                        setRewardName(rewardUpdated.title);
-                        setRewardCost(rewardUpdated.cost);
-                        setActiveEditCoins(false);
-                        setActiveEditTitle(false);
-                    } else {
-                        switch (rewardUpdated.status) {
-                            case 404:
-                                // Not found (maybe the reward was removed from Twitch)
-                                break;
-                            case 500:
-                                // Twitch internal server error (could not update because of Twitch)
-                                break;
-                            default:
-                                break;
-                        }
+            if (userTokensUpdated.data.status === 200) {
+                const userCredentialsUpdated = userTokensUpdated.data;
+                updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+                const rewardUpdated = await updateCustomReward(
+                    user.id,
+                    userCredentialsUpdated.access_token,
+                    rewardId,
+                    {
+                        title: rewardName,
+                        cost: rewardCost
                     }
+                );
+
+                if (rewardUpdated.status === 200) {
+                    setRewardName(rewardUpdated.title);
+                    setRewardCost(rewardUpdated.cost);
+                    setRewardBackgroundColor(rewardUpdated.background_color);
+                    setActiveEditCoins(false);
+                    setActiveEditTitle(false);
                 } else {
-                    switch (userTokensUpdated.data.status) {
-                        case 401:
-                            // Invalid refresh token (need to sign in again)
-                            handleExpiredSession();
+                    switch (rewardUpdated.status) {
+                        case 404:
+                            // Not found (maybe the reward was removed from Twitch)
                             break;
                         case 500:
-                            // Twitch internal server error
+                            // Twitch internal server error (could not update because of Twitch)
                             break;
                         default:
                             break;
                     }
+                }
+            } else {
+                switch (userTokensUpdated.data.status) {
+                    case 401:
+                        // Invalid refresh token (need to sign in again)
+                        handleExpiredSession();
+                        break;
+                    case 500:
+                        // Twitch internal server error
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -121,19 +120,68 @@ const StreamerProfileEditCoin = ({ user }) => {
 
     const handleCheckbox = (e) => {
         if (!e.target.checked) {
-            setModal(true);
+            const dontShowDialog = localStorage.getItem('dontShowCloseDisableReactionsDialog');
+            if (!dontShowDialog) {
+                setModal(true);
+            } else {
+                toggleReward();
+            }
         } else {
-            setChecked(true);
             setTitleCheckbox("enabled");
+            toggleReward();
         }
-    };
+    }
+
+    const toggleReward = async () => {
+        const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+
+        if (userTokensUpdated.data.status === 200) {
+            const userCredentialsUpdated = userTokensUpdated.data;
+            updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+            const rewardUpdated = await updateCustomReward(
+                user.id,
+                userCredentialsUpdated.access_token,
+                rewardId,
+                {
+                    is_paused: reactionsEnabled
+                }
+            );
+
+            if (rewardUpdated.status === 200) {
+                setReactionsEnabled(!rewardUpdated.is_paused);
+            } else {
+                switch (rewardUpdated.status) {
+                    case 404:
+                        // Not found (maybe the reward was removed from Twitch)
+                        break;
+                    case 500:
+                        // Twitch internal server error (could not update because of Twitch)
+                        break;
+                    default:
+                        break;
+                }
+            }
+        } else {
+            switch (userTokensUpdated.data.status) {
+                case 401:
+                    // Invalid refresh token (need to sign in again)
+                    handleExpiredSession();
+                    break;
+                case 500:
+                    // Twitch internal server error
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
     return (
         <div className={style.containerItereractions}>
             <h1 className={style.Titulo}>Reactions</h1>
             {(rewardName !== undefined && rewardCost !== undefined)?
                 <>
-                <img className={style.img} src={imgStreameCoin} alt="coin" />
+                <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
                 <div className={style.content_input}>
                     <div className={style.input}>
                         {ActiveEditTitle ?
@@ -146,7 +194,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                                 value={rewardName}
                                 onChange={(event) => setRewardName(event.target.value)}
                                 onKeyPress={saveData} />
-                            <Button onClick={saveData}>
+                            <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
                                 <ConfirmChange />
                             </Button>
                             </>
@@ -155,7 +203,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                             <p className={style.p}>
                                 {rewardName}
                             </p>
-                            <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)}>
+                            <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
                                 <img src={iconEdit} alt="icons-edit" />
                             </Button>
                             </>
@@ -171,7 +219,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                                 value={rewardCost}
                                 onChange={(event) => setRewardCost(event.target.value || 0)}
                                 onKeyPress={saveData} />
-                                <Button onClick={saveData}>
+                                <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
                                     <ConfirmChange />
                                 </Button>
                             </>
@@ -180,7 +228,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                             <p className={style.p}>
                                 {rewardCost.toLocaleString()}
                             </p>
-                            <Button onClick={() => setActiveEditCoins(!ActiveEditCoins)}>
+                            <Button onClick={() => setActiveEditCoins(!ActiveEditCoins)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
                                 <img src={iconEdit} alt="icons-edit" />
                             </Button>
                             </>
@@ -192,7 +240,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                             className={style.input_checkbox}
                             type="checkbox"
                             id="boton"
-                            checked={checked}
+                            checked={reactionsEnabled}
                             onChange={(e) => handleCheckbox(e)}
                         />
                         <label for="boton"></label>
@@ -207,7 +255,10 @@ const StreamerProfileEditCoin = ({ user }) => {
             <Modal className={style.modalContainer}
                 open={modal}
                 onClose={() => setModal(false)}>
-                <StreamerProfileModalDisableInteractions cerrarModal={() => setModal(false)}  setChecked={setChecked} setTitleCheckbox={setTitleCheckbox}/>
+                <StreamerProfileModalDisableInteractions closeDialog={() => setModal(false)}
+                    disableReward={toggleReward}
+                    setReactionsEnabled={setReactionsEnabled}
+                    setTitleCheckbox={setTitleCheckbox} />
             </Modal>
         </div>
     );

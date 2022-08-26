@@ -179,8 +179,8 @@ const StreamerProfile = ({ user, games }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <Grid container>
-                        <Grid item xs={9}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={9}>
                             <Grid container xs={12}>
                                 <Grid xs={12}>
                                     <div className={styles.header}>
@@ -350,7 +350,7 @@ const StreamerProfile = ({ user, games }) => {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={12} sm={3}>
                             <StreamerProfileEditCoin user={user} />
                         </Grid>
                     </Grid>

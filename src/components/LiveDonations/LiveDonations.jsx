@@ -161,7 +161,7 @@ const LiveDonations = () => {
                 if (isStreaming.exists() && isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
-                    }, 150000);
+                    }, 15);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -236,10 +236,6 @@ const LiveDonations = () => {
                             finishReaction(donation);
                         }, 4000);
                     }
-                }
-
-                if (donation.message && !donation.media && !(donation.messageExtraData && donation.messageExtraData.giphyText)) {
-                    startDonation();
                 }
             }
 
@@ -460,6 +456,10 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
             }
 
             if ((!donation.media) && donation.messageExtraData && donation.messageExtraData.giphyText && giphyTextReady) {
+                displayDonation();
+            }
+
+            if (donation.message && !donation.media && !(donation.messageExtraData && donation.messageExtraData.giphyText)) {
                 displayDonation();
             }
         }

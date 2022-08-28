@@ -276,7 +276,11 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             }
             setStartingStream(false);
         } catch (error) {
-            handleExpiredSession();
+            if (error && error.status === 401) {
+                handleExpiredSession();
+            } else {
+                alert('Hubo un problema al iniciar, si el problema persiste contacta con soporte tecnico');
+            }
         }
     }
 
@@ -287,7 +291,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
 
         try {
             setClosingStream(true);
-            await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.xqReward, stream.xqRewardWebhookId, stream.qoinsReward, stream.qoinsRewardWebhookId);
+            await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward, stream.qoinsRewardWebhookId);
 
             window.analytics.track('Stream finished', {
                 streamId,

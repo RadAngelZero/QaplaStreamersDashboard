@@ -10,6 +10,12 @@ const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
     const { t } = useTranslation();
     const monthsArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
+    let isMembershipOver = false;
+    const currentDate = new Date();
+    if (currentDate.getTime() > dateRenovation.getTime()) {
+        isMembershipOver = true;
+    }
+
     return (
         <div className={styles.container}>
             <div style={{ display: 'flex' }}>
@@ -23,7 +29,11 @@ const StreamsLeft = ({ subscriptionDetails, renovationDate }) => {
             </div>
             <div style={{ display: 'flex' }}>
                 <p className={styles.renovationText}>
-                    {t('StreamsLeft.renewsOn', { date: renovationDay, month: t(`months.${monthsArray[renovationMonth]}`) })}
+                    {!isMembershipOver ?
+                        t('StreamsLeft.renewsOn', { date: renovationDay, month: t(`months.${monthsArray[renovationMonth]}`) })
+                        :
+                        t('StreamsLeft.membershipExpired', { date: renovationDay, month: t(`months.${monthsArray[renovationMonth]}`) })
+                    }
                 </p>
             </div>
         </div>

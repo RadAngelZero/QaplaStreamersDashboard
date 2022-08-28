@@ -64,7 +64,8 @@ const StreamersSignin = ({ user, title }) => {
                             twitchAccessToken: tokenData.data.access_token,
                             refreshToken: tokenData.data.refresh_token,
                             displayName: user.userData.displayName,
-                            photoUrl: user.userData.photoUrl
+                            photoUrl: user.userData.photoUrl,
+                            broadcasterType: user.userData.broadcasterType
                         });
                     } catch (error) {
                         console.log(error);

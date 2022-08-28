@@ -32,6 +32,7 @@ const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 const qStoreRef = database.ref('/QStore');
 const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
+const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
 
@@ -95,6 +96,9 @@ export async function streamerProfileExists(uid) {
 export async function createStreamerProfile(uid, userData) {
     if (userData.isNewUser) {
         delete userData.isNewUser;
+        if (!userData.email) {
+            userData.email = '';
+        }
     }
 
     return await userStreamersRef.child(uid).update(userData);
@@ -109,11 +113,22 @@ export async function updateStreamerProfile(uid, userData) {
     await userStreamersRef.child(uid).update(userData);
 
     if (userData.displayName && userData.photoUrl) {
-        await updateUserStreamerPublicData(uid, { displayName: userData.displayName, photoUrl: userData.photoUrl, displayNameLowerCase: userData.displayName.toLowerCase() });
+        const broadcasterType = userData.broadcasterType ? userData.broadcasterType : {};
+        await updateUserStreamerPublicData(uid, {
+            displayName: userData.displayName,
+            photoUrl: userData.photoUrl,
+            displayNameLowerCase: userData.displayName.toLowerCase(),
+            broadcasterType
+        });
 
         const publicProfile = await streamersPublicProfilesRef.child(uid).once('value');
         if (publicProfile.exists()) {
-            await streamersPublicProfilesRef.child(uid).update({ displayName: userData.displayName, photoUrl: userData.photoUrl });
+            await streamersPublicProfilesRef.child(uid).update({
+                displayName: userData.displayName,
+                displayNameLowerCase: userData.displayName.toLowerCase(),
+                photoUrl: userData.photoUrl,
+                broadcasterType
+            });
         }
     }
 }
@@ -866,7 +881,7 @@ export async function streamerHasQlan(uid) {
  * @param {string} image Image url
  */
 export async function createQlan(uid, code, name, image) {
-    await qreatorsCodesRef.child(uid).update({ code });
+    await qreatorsCodesRef.child(uid).update({ code, codeLowerCase: code.toLowerCase() });
     return await qlanesRef.child(uid).update({ name, image });
 }
 
@@ -992,11 +1007,27 @@ export async function giveReferrerRewardsToStreamer(uid, referredDisplayName, en
     }
 }
 
+////////////////////////
+// Channel Point Interactions
+////////////////////////
+
+export async function saveInteractionsRewardData(uid, rewardId, webhookId) {
+    await streamersInteractionsRewardsRef.child(uid).update({ rewardId, webhookId })
+}
+
+export async function getInteractionsRewardData(uid) {
+    return await streamersInteractionsRewardsRef.child(uid).once('value');
+}
+
+////////////////////////
+// Giphy Text
+////////////////////////
+
 /**
  * Saves on database the given array of Giphy Texts
  * @param {string} uid User identifier
  * @param {array} data Array of Giphy Text gifs
  */
-export async function saveGiphyText(uid, data) {
+ export async function saveGiphyText(uid, data) {
     return giphyTextRequestsRef.child(uid).set(data);
 }

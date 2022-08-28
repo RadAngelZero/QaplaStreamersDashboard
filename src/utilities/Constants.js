@@ -91,7 +91,7 @@ export const YEARLY = 'yearly';
 /**
  * Valid media type for cheers
  */
-export const MEME = 'memes';
+export const MEME = 'meme';
 // Giphy media types
 export const GIPHY_GIFS = 'gif';
 export const GIPHY_STICKERS = 'sticker';

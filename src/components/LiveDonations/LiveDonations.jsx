@@ -175,7 +175,7 @@ const LiveDonations = () => {
 
             async function showCheer() {
                 const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
-                const bigQoinsDonation = qoinsDonation && donation.amountQoins >= 1000;
+                const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
                 audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
                 if (!donation.repeating) {
                     const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
@@ -236,6 +236,10 @@ const LiveDonations = () => {
                             finishReaction(donation);
                         }, 4000);
                     }
+                }
+
+                if (donation.message && !donation.media && !(donation.messageExtraData && donation.messageExtraData.giphyText)) {
+                    startDonation();
                 }
             }
 
@@ -337,7 +341,7 @@ const LiveDonations = () => {
 
     const startDonation = () => {
         const qoinsDonation = donationToShow.amountQoins && donationToShow.amountQoins >= 100;
-        const bigQoinsDonation = qoinsDonation && donationToShow.amountQoins >= 1000;
+        const bigQoinsDonation = Boolean(qoinsDonation && donationToShow.amountQoins >= 1000).valueOf();
         if (bigQoinsDonation) {
             voiceBotMessage.play();
         } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIPS)) {
@@ -468,7 +472,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
 
     const onClipEnded = () => {
         const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
-        const bigQoinsDonation = qoinsDonation && donation.amountQoins >= 1000;
+        const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
 
         if (bigQoinsDonation) {
             setTimeout(() => {

@@ -9,7 +9,7 @@ import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnrea
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import { speakCheerMessage } from '../../services/functions';
-import { GIPHY_CLIPS, GIPHY_GIFS, GIPHY_STICKERS, MEME, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { GIPHY_CLIP, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
 import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
@@ -340,7 +340,7 @@ const LiveDonations = () => {
         const bigQoinsDonation = Boolean(qoinsDonation && donationToShow.amountQoins >= 1000).valueOf();
         if (bigQoinsDonation) {
             voiceBotMessage.play();
-        } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIPS)) {
+        } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIP)) {
             audioAlert.play();
             if (donationToShow.message) {
                 audioAlert.onended = () => {
@@ -444,7 +444,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
             setShowDonation(true);
         }
 
-        if ((donation.media && donation.media.type === GIPHY_CLIPS && donation.media.id) && !clip) {
+        if ((donation.media && donation.media.type === GIPHY_CLIP && donation.media.id) && !clip) {
             getClip();
         } else {
             if (donation.media && donation.messageExtraData && donation.messageExtraData.giphyText && mediaReady && giphyTextReady) {
@@ -497,7 +497,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
         }}>
             {donation.media &&
                 <>
-                {donation.media && (donation.media.type === MEME || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) ?
+                {donation.media && (donation.media.type === MEME || donation.media.type === GIPHY_GIF || donation.media.type === GIPHY_STICKER || donation.media.type === MEMES || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) ?
                     <img src={donation.media.url} alt='' style={{
                         aspectRatio: donation.media.width / donation.media.height,
                         display: 'flex',
@@ -507,7 +507,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                     }}
                     onLoad={() => setMediaReady(true)} />
                     :
-                    donation.media && donation.media.type === GIPHY_CLIPS && clip ?
+                    donation.media && donation.media.type === GIPHY_CLIP && clip ?
                         <div style={{
                             display: 'flex',
                             aspectRatio: donation.media.width / donation.media.height,

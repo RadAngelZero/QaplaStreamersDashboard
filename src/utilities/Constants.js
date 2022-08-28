@@ -92,10 +92,13 @@ export const YEARLY = 'yearly';
  * Valid media type for cheers
  */
 export const MEME = 'meme';
+export const MEMES = 'memes';
 // Giphy media types
-export const GIPHY_GIFS = 'gif';
-export const GIPHY_STICKERS = 'sticker';
-export const GIPHY_CLIPS = 'video';
+export const GIPHY_GIFS = 'gifs';
+export const GIPHY_STICKERS = 'stickers';
+export const GIPHY_GIF = 'gif';
+export const GIPHY_STICKER = 'sticker';
+export const GIPHY_CLIP = 'video';
 
 /**
  * Streams Status

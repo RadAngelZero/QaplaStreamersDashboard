@@ -6,7 +6,7 @@ import { Modal } from "@material-ui/core";
 
 import iconEdit from "../../assets/Edit.svg";
 import { getCustomReward, updateCustomReward } from "../../services/twitch";
-import { getInteractionsRewardData, updateStreamerProfile } from "../../services/database";
+import { getInteractionsRewardData, setAlertSetting, updateStreamerProfile } from "../../services/database";
 import { refreshUserAccessToken } from "../../services/functions";
 import { auth } from "../../services/firebase";
 import { ReactComponent as ConfirmChange } from './../../assets/ConfirmChange.svg';
@@ -25,8 +25,9 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [ActiveEditTitle, setActiveEditTitle] = useState(false);
     const [ActiveEditCoins, setActiveEditCoins] = useState(false);
     const [rewardId, setRewardId] = useState('');
-    const [rewardName, setRewardName] = useState(undefined);
-    const [rewardCost, setRewardCost] = useState(undefined);
+    const [rewardName, setRewardName] = useState('');
+    const [rewardCost, setRewardCost] = useState('');
+    const [savingChanges, setSavingChanges] = useState(false);
     const [rewardBackgroundColor, setRewardBackgroundColor] = useState('');
     const [modal, setModal] = useState(false);
     const [titleCheckbox, setTitleCheckbox] = useState("enabled");
@@ -46,11 +47,11 @@ const StreamerProfileEditCoin = ({ user }) => {
                     updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
                     const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
                     if (reward) {
-                        setRewardId(reward.id);
                         setRewardName(reward.title);
                         setRewardCost(reward.cost);
                         setRewardBackgroundColor(reward.background_color);
                         setReactionsEnabled(!reward.is_paused);
+                        setRewardId(reward.id);
                     }
                 }
             }
@@ -63,6 +64,7 @@ const StreamerProfileEditCoin = ({ user }) => {
 
     const saveData = async (event) => {
         if (event.key === 'Enter' || event.type === 'click') {
+            setSavingChanges(true);
             const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
 
             if (userTokensUpdated.data.status === 200) {
@@ -96,6 +98,8 @@ const StreamerProfileEditCoin = ({ user }) => {
                             break;
                     }
                 }
+
+                setSavingChanges(false);
             } else {
                 switch (userTokensUpdated.data.status) {
                     case 401:
@@ -133,6 +137,7 @@ const StreamerProfileEditCoin = ({ user }) => {
     }
 
     const toggleReward = async () => {
+        setSavingChanges(true);
         const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
 
         if (userTokensUpdated.data.status === 200) {
@@ -148,6 +153,7 @@ const StreamerProfileEditCoin = ({ user }) => {
             );
 
             if (rewardUpdated.status === 200) {
+                setAlertSetting(user.uid, 'reactionsEnabled', !rewardUpdated.is_paused);
                 setReactionsEnabled(!rewardUpdated.is_paused);
             } else {
                 switch (rewardUpdated.status) {
@@ -161,6 +167,8 @@ const StreamerProfileEditCoin = ({ user }) => {
                         break;
                 }
             }
+
+            setSavingChanges(false);
         } else {
             switch (userTokensUpdated.data.status) {
                 case 401:
@@ -179,7 +187,7 @@ const StreamerProfileEditCoin = ({ user }) => {
     return (
         <div className={style.containerItereractions}>
             <h1 className={style.Titulo}>Reactions</h1>
-            {(rewardName !== undefined && rewardCost !== undefined)?
+            {rewardId !== '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
                 <div className={style.content_input}>
@@ -248,7 +256,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                 </div>
                 </>
             :
-                <div style={{ display: 'flex', flex: 1, alignItems: 'center' }}>
+                <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                     <CircularProgress className={classes.circularProgress} size={25} />
                 </div>
             }

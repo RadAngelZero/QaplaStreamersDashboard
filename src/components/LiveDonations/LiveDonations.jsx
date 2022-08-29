@@ -5,13 +5,11 @@ import { Video } from '@giphy/react-components';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenQaplaChallengeXQProgress, getChallengeLevelGoal, getStreamerChallengeCategory, getChallengePreviousLevelGoal, listenToStreamerAlertsSettings, listenQaplaGoal, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import { speakCheerMessage } from '../../services/functions';
 import { GIPHY_CLIP, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
-import QlanProgressBar from '../QlanProgressBar/QlanProgressBar';
-import GoalProgressBar from '../GoalProgressBar/GoalProgressBar';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
@@ -28,16 +26,10 @@ const LiveDonations = () => {
     const [listenersAreSetted, setListenersAreSetted] = useState(false);
     const [alertSideRight, setAlertSideRight] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-    const [qaplaChallengeXQ, setQaplaChallengeXQ] = useState(0);
-    const [nextGoalXQ, setNextGoalXQ] = useState(0);
-    const [previousGoalXQ, setPreviousGoalXQ] = useState(0);
-    const [qoinsGoal, setQoinsGoal] = useState(null);
-    const [qoinsGoalProgress, setQoinsGoalProgress] = useState(null);
-    const [goalTitle, setGoalTitle] = useState('');
-    const [showQaplaChallengeProgress, setShowQaplaChallengeProgress] = useState(false);
     const [qaplaOnOpacity, setQaplaOnOpacity] = useState(1);
     const [playQaplaOnAnimation, setPlayQaplaOnAnimation] = useState("false");
     const [showEmojiRain, setShowEmojiRain] = useState(false);
+    const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const { streamerId } = useParams();
 
     useEffect(() => {
@@ -61,8 +53,8 @@ const LiveDonations = () => {
 
                 listenToStreamerAlertsSettings(uid, (streamerSettings) => {
                     if (streamerSettings.exists()) {
+                        setReactionsEnabled(streamerSettings.val().reactionsEnabled !== false);
                         setAlertSideRight(streamerSettings.val().alertSideRight);
-                        setShowQaplaChallengeProgress(streamerSettings.val().showQaplaChallengeProgress !== false);
                     }
                 });
 
@@ -161,7 +153,7 @@ const LiveDonations = () => {
                 if (isStreaming.exists() && isStreaming.val()) {
                     setTimeout(() => {
                         loadDonations();
-                    }, 15);
+                    }, 150);
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -169,7 +161,7 @@ const LiveDonations = () => {
             });
         }
 
-        if (donationQueue.length > 0 && !isPlayingAudio) {
+        if (donationQueue.length > 0 && !isPlayingAudio && reactionsEnabled) {
             setIsPlayingAudio(true);
             const donation = popDonation();
 
@@ -178,30 +170,30 @@ const LiveDonations = () => {
                 const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
                 audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
                 if (!donation.repeating) {
-                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
+                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'en-US-Standard-C';
 
                     if (donation.message) {
                         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                             voiceBotMessage = new Audio(TEST_MESSAGE_SPEECH_URL);
                         } else {
-                            const messageToRead = bigQoinsDonation ? `${donation.twitchUserName} te ha enviado ${donation.amountQoins} de Coins y dice: ${donation.message}` : donation.message;
+                            const messageToRead = bigQoinsDonation ? `${donation.twitchUserName} has sent you ${donation.amountQoins} coins and says: ${donation.message}` : `${donation.twitchUserName} say: ${donation.message}`;
 
                             window.analytics.track('Cheer received', {
                                 user: donation.twitchUserName,
                                 containsMessage: true,
                                 message: messageToRead
                             });
-                            const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'es-MX');
+                            const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
                             voiceBotMessage = new Audio(cheerMessageUrl.data);
                         }
                     } else if (bigQoinsDonation) {
-                        const messageToRead = `${donation.twitchUserName} te ha enviado ${donation.amountQoins} de Coins`;
+                        const messageToRead = `${donation.twitchUserName} has sent you ${donation.amountQoins} Coins`;
 
                         window.analytics.track('Cheer received', {
                             user: donation.twitchUserName,
                             containsMessage: false
                         });
-                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'es-MX');
+                        const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
                         voiceBotMessage = new Audio(cheerMessageUrl.data);
                     }
                 } else {
@@ -256,59 +248,9 @@ const LiveDonations = () => {
                 }
             }
 
-            async function checkIfUserIsUserParticipantOfQaplaChallenge() {
-                async function getNextGoal(xq, category) {
-                    const neededXQ = await getChallengeLevelGoal(category, xq + 1);
-                    const previousGoalXQ = await getChallengePreviousLevelGoal(category, xq);
-
-                    if (neededXQ.exists()) {
-                        neededXQ.forEach((levelXQ) => {
-                            setNextGoalXQ(levelXQ.val());
-                        });
-
-                        previousGoalXQ.forEach((pastLevelXQ) => {
-                            setPreviousGoalXQ(pastLevelXQ.val());
-                        });
-
-                        setQaplaChallengeXQ(xq);
-                    } else {
-                        /**
-                         * Show some cool UI to let the streamer know he has achieved all the levels in the
-                         * Qapla Challenge
-                         */
-
-                        previousGoalXQ.forEach((pastLevelXQ) => {
-                            setNextGoalXQ(pastLevelXQ.val());
-                            setQaplaChallengeXQ(pastLevelXQ.val());
-                        });
-                    }
-                }
-
-                const userParticipation = await getStreamerChallengeCategory(streamerUid);
-                if (userParticipation.exists()) {
-                    listenQaplaChallengeXQProgress(streamerUid, (xqProgress) => {
-                        if (xqProgress.exists()) {
-                            getNextGoal(xqProgress.val(), userParticipation.val());
-                        }
-                    });
-                } else {
-                    setShowQaplaChallengeProgress(false);
-                }
-            }
-
             listenToOverlayStatus();
-
-            listenQaplaGoal(streamerUid, (goal) => {
-                if (goal.exists()) {
-                    setQoinsGoal(goal.val().goal);
-                    setQoinsGoalProgress(goal.val().qoins);
-                    setGoalTitle(goal.val().title);
-                }
-            });
-
-            checkIfUserIsUserParticipantOfQaplaChallenge();
         }
-    }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio]);
+    }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio, reactionsEnabled]);
 
     function finishReaction(donation) {
         setDonationToShow(null);
@@ -353,9 +295,6 @@ const LiveDonations = () => {
     }
 
     document.body.style.backgroundColor = 'transparent';
-
-
-    const qaplaChallengeBarProgress = (qaplaChallengeXQ - previousGoalXQ) / (nextGoalXQ - previousGoalXQ);
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end' }}>
             <div
@@ -412,19 +351,6 @@ const LiveDonations = () => {
                 <>
                     <DonationHandler donationToShow={donationToShow} finishReaction={finishReaction} startDonation={startDonation} />
                 </>
-            }
-            {qoinsGoal && goalTitle &&
-                <GoalProgressBar
-                    percentage={qoinsGoalProgress / qoinsGoal}
-                    title={goalTitle}
-                    qoins={qoinsGoalProgress || 0}
-                />
-            }
-            {showQaplaChallengeProgress &&
-                <QlanProgressBar
-                    percentage={qaplaChallengeBarProgress}
-                    xq={qaplaChallengeXQ}
-                />
             }
         </div>
     );
@@ -558,7 +484,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                         <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
                         {donation.amountQoins ?
                             <>
-                            <div style={{ margin: '0 6px' }}>ha enviado</div>
+                            <div style={{ margin: '0 6px' }}>has sent you</div>
                             <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
                                 {`${donation.amountQoins.toLocaleString()} Qoins`}
                             </b>

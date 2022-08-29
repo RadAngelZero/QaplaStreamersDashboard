@@ -28,9 +28,7 @@ const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
 const qaplaChallengeRef = database.ref('/QaplaChallenge');
-const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 const qStoreRef = database.ref('/QStore');
-const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
@@ -911,43 +909,12 @@ export async function getQlanIdWithQreatorCode(qreatorCode) {
     return id;
 }
 
-////////////////////////
-// Qapla Challenge
-////////////////////////
-
-/**
- * Listen to the xq counter of the given streamer for the Qapla Challenge
- * @param {string} streamerUid Streamer identifier
- * @param {function} callback Function to execute when xq node is updated
- */
-export function listenQaplaChallengeXQProgress(streamerUid, callback) {
-    return qaplaChallengeRef.child(streamerUid).child('xq').on('value', callback);
-}
-
 /**
  * Gets the category of the Qapla Challenge in which the user is participating
  * @param {string} streamerUid Streamer identifier
  */
 export async function getStreamerChallengeCategory(streamerUid) {
     return await qaplaChallengeRef.child(streamerUid).child('category').once('value');
-}
-
-/**
- * Get the goal (XQ amount needed to pass to the next level) of the current level
- * @param {number} category Category in which the user is participating
- * @param {number} currentXQ Current ammount of XQ
- */
-export async function getChallengeLevelGoal(category, currentXQ) {
-    return await qaplaChallengeLevelsRef.child(category).orderByValue().startAt(currentXQ).limitToFirst(1).once('value');
-}
-
-/**
- * Get the goal (XQ amount needed to pass) from the previous level
- * @param {number} category Category in which the user is participating
- * @param {number} currentXQ Current ammount of XQ
- */
-export async function getChallengePreviousLevelGoal(category, currentXQ) {
-    return await qaplaChallengeLevelsRef.child(category).orderByValue().endAt(currentXQ).limitToLast(1).once('value');
 }
 
 ////////////////////////
@@ -959,20 +926,6 @@ export async function getChallengePreviousLevelGoal(category, currentXQ) {
  */
 export async function getQStoreItems() {
     return await qStoreRef.once('value');
-}
-
-////////////////////////
-// Qapla Goal
-////////////////////////
-
-/**
- * Listen to all the changes in the Qapla goal children of the
- * given user
- * @param {string} uid User identifier
- * @param {function} callback Handler of listener results
- */
-export function listenQaplaGoal(uid, callback) {
-    return qaplaGoalRef.child(uid).on('value', callback);
 }
 
 ////////////////////////

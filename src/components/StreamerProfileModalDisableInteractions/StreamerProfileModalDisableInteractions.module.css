@@ -19,7 +19,9 @@
 }
 
 .item{
-    padding: 25px;
+    padding-top: 25px;
+    padding-left: 25px;
+    padding-right: 25px;
     display: flex;
     flex-direction: column;
     justify-content:center;
@@ -51,14 +53,12 @@ color: #8F9BBA;
 }
 
 .boton{
-    margin:13px;
-    width:202px;
-    height:56px;
-    border-radius:16px;
-    color: #FFFFFF;
-    background-color: #3B4BF9;
-    border:none;
-    cursor: pointer;
+    margin:13px !important;
+    border-radius:16px !important;
+    color: #FFFFFF !important;
+    background-color: #3B4BF9 !important;
+    border:none !important;
+    cursor: pointer !important;
 }
 
 .p{

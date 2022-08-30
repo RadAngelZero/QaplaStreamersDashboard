@@ -147,23 +147,22 @@ margin-right:8px;
   margin-top: 32px;
   display: flex;
   justify-content:center;
-  align-items:start;
+  align-items: center;
 }
 
 .loading_End p {
-font-family: 'Inter';
-font-style: normal;
-font-weight: 600;
-font-size: 14px;
-line-height: 17px;
-display: flex;
-align-items: center;
-letter-spacing: 1px;
--webkit-background-clip: text;
-background-clip: text;
-color: #ffffff;
-padding: 4px 0px 0px 2px;
-
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 1px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: #ffffff;
+  padding: 4px 0px 0px 2px;
 }
 
 .loading_End img{

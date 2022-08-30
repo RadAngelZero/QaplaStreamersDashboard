@@ -8,9 +8,9 @@ import {
 } from "@material-ui/core";
 
 import style from "./ModalQoinsDrops.module.css";
-import {ReactComponent as  CheckedIcon}  from "../../assets/Unchecked.svg";
+import { ReactComponent as  CheckedIcon }  from "../../assets/Unchecked.svg";
 import { ReactComponent as UncheckedIcon }  from "../../assets/Checked.svg";
-import  Checkeck  from "../../assets/TickSquareDark.svg";
+import { ReactComponent as DoneIcon }  from "../../assets/TickSquareDark.svg";
 
 const useStyles = makeStyles((theme) => ({
     label: {
@@ -145,7 +145,7 @@ const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoin
                 }
                 {(stream && !stream.qoinsEnabled) &&
                     <div className={style.loading_End}>
-                        <img src={Checkeck} alt="icons"/>
+                        <DoneIcon  />
                         <p>Qoins will drop in {selectedTime} mins</p>
                     </div>
                 }

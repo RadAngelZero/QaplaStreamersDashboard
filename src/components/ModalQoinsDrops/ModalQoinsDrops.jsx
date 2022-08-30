@@ -1,21 +1,16 @@
 import React, { useState } from "react";
-
-import style from "./ModalQoinsDrops.module.css";
-
-
-
-import {ReactComponent as  CheckedIcon}  from "../../assets/Unchecked.svg";
-import { ReactComponent as UncheckedIcon }  from "../../assets/TickSquare.svg";
-import  Checkeck  from "../../assets/TickSquareDark.svg";
-
 import {
+  Button,
   FormControlLabel,
   makeStyles,
   Radio,
   RadioGroup,
 } from "@material-ui/core";
 
-
+import style from "./ModalQoinsDrops.module.css";
+import {ReactComponent as  CheckedIcon}  from "../../assets/Unchecked.svg";
+import { ReactComponent as UncheckedIcon }  from "../../assets/Checked.svg";
+import  Checkeck  from "../../assets/TickSquareDark.svg";
 
 const useStyles = makeStyles((theme) => ({
   label: {
@@ -25,129 +20,138 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "13px",
     color: "rgba(255, 255, 255, 0.603447)",
   },
-
+  enableButtonRoot: {
+    marginTop: 32,
+    backgroundColor: '#00FFDD',
+    width: '200px',
+    height: '56px',
+    borderRadius: '16px',
+    fontSize: '14px',
+    fontStyle: 'normal',
+    fontWeight: '600',
+    lineHeight: '20px',
+    letterSpacing: '0px',
+    color: '#0D1021',
+    textTransform: 'none',
+    '&:hover': {
+        backgroundColor: '#00EACB'
+    },
+    '&:active': {
+        backgroundColor: '#00EACB',
+        opacity: '0.9'
+    }
+  }
 }));
 
+const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoins }) => {
+    const [selectedTime, setSelectedTime] = useState(0);
+    const classes = useStyles();
 
+    const handleOnClick = async (e) => {
+        if (e) {
+            e.stopPropagation();
+        }
 
+        const streamData = await startStream(selectedTime);
 
-const ModalQoinsDrops = () => {
-  const [loanding, setLoading] = useState(false);
-  const [loadingEnd, setLoadingEnd] = useState(false);
-  const classes = useStyles();
+        if (selectedTime === 0) {
+            await enableQoins(streamData.qoinsReward);
+        }
+    };
 
-  
-
-  const handleOnClick = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoadingEnd(true);
-    }, 4000);
-  };
-
-
-
-
-  return (
-    <div className={style.containerModal}>
-      <div className={style.container}>
-        <div className={style.secctions_input}>
-          <div className={style.titulo}>
-            <h1>🪂 Qoins' Drops</h1>
-            <p>
-              Set a time for the Qoins' channel reward to show on yor stream
-            </p>
-          </div>
-          {!loadingEnd ? (
-            <>
-              
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="Right away"
-                    classes={{ label: classes.label }}
-                    control={
-                      <Radio
-                      classes={{Radio: classes.Radio}}
-                        defaultChecked
-                        checkedIcon={<UncheckedIcon />}
-                        icon={<CheckedIcon />}
-                        style={{ backgroundColor: "transparent" }}
-                      />
-                    }
-                    label="Right away"
-                  />
-                  <FormControlLabel
-                    value="in 30 min"
-                    classes={{ label: classes.label }}
-                    control={
-                      <Radio
-                        defaultChecked
-                        checkedIcon={<UncheckedIcon />}
-                        icon={<CheckedIcon />}
-                        style={{ backgroundColor: "transparent" }}
-                      />
-                    }
-                    label="in 30 min"
-                  />
-                  <FormControlLabel
-                    value="in 45 min"
-                    classes={{ label: classes.label }}
-                    control={
-                      <Radio
-                        defaultChecked
-                        checkedIcon={<UncheckedIcon />}
-                        icon={<CheckedIcon />}
-                        style={{ backgroundColor: "transparent" }}
-                      />
-                    }
-                    label="in 45 min"
-                  />
-                  <FormControlLabel
-                    value="in 1 hour"
-                    classes={{ label: classes.label }}
-                    control={
-                      <Radio
-                        defaultChecked
-                        checkedIcon={<UncheckedIcon />}
-                        icon={<CheckedIcon />}
-                        style={{ backgroundColor: "transparent" }}
-                      />
-                    }
-                    label="in 1 hour"
-                  />
-                </RadioGroup>
-              
-              <div>
-                {!loanding ? (
-                  <button onClick={handleOnClick} className={style.button}>
-                    Enable Drops
-                  </button>
-                ) : (
-                  <div className={style.container_loader}>
-                    
-                    <p>Setting up drops</p>
-                    <div className={style.loader}></div>
-                  </div>
-                )}
-              </div>{" "}
-            </>
-          ) : (
-            <div className={style.loading_End}>
-              <img src={Checkeck} alt="icons"/>
-              <p>Qoins will drop in 30 min</p>
+    return (
+        <div className={style.container}>
+            <div className={style.secctions_input}>
+                <div className={style.titulo}>
+                    <p className={style.heading}>
+                        🪂 Qoins' Drops
+                    </p>
+                    <p className={style.subheading}>
+                        Set a time for the Qoins' channel reward to show on yor stream
+                    </p>
+                </div>
+                {(!stream && !streamStarted) &&
+                    <>
+                    <RadioGroup
+                    className={style.radioGroup}
+                    aria-labelledby="demo-radio-buttons-group-label"
+                    name="radio-buttons-group"
+                    onChange={(e) => setSelectedTime(Number(e.target.value))}
+                    value={selectedTime}
+                    >
+                        <FormControlLabel value={0}
+                            classes={{ label: classes.label }}
+                            control={
+                            <Radio
+                            classes={{ Radio: classes.Radio }}
+                                defaultChecked
+                                checkedIcon={<UncheckedIcon />}
+                                icon={<CheckedIcon />}
+                                style={{ backgroundColor: "transparent", padding: 8 }}
+                            />
+                            }
+                            label="Right away"
+                        />
+                        <FormControlLabel value={30}
+                            classes={{ label: classes.label }}
+                            control={
+                            <Radio
+                                defaultChecked
+                                checkedIcon={<UncheckedIcon />}
+                                icon={<CheckedIcon />}
+                                style={{ backgroundColor: "transparent", padding: 8 }}
+                            />
+                            }
+                            label="in 30 min"
+                        />
+                        <FormControlLabel value={45}
+                            classes={{ label: classes.label }}
+                            control={
+                            <Radio
+                                defaultChecked
+                                checkedIcon={<UncheckedIcon />}
+                                icon={<CheckedIcon />}
+                                style={{ backgroundColor: "transparent", padding: 8 }}
+                            />
+                            }
+                            label="in 45 min"
+                        />
+                        <FormControlLabel value={60}
+                            classes={{ label: classes.label }}
+                            control={
+                            <Radio
+                                defaultChecked
+                                checkedIcon={<UncheckedIcon />}
+                                icon={<CheckedIcon />}
+                                style={{ backgroundColor: "transparent", padding: 8 }}
+                            />
+                            }
+                            label="in 1 hour"
+                        />
+                    </RadioGroup>
+                    <Button onClick={handleOnClick}
+                        classes={{
+                        root: classes.enableButtonRoot
+                        }}>
+                        Enable Drops
+                    </Button>
+                    </>
+                }
+                {!stream && streamStarted &&
+                    <div className={style.container_loader}>
+                        <p>Setting up drops</p>
+                        <div className={style.loader}></div>
+                    </div>
+                }
+                {(stream && !stream.qoinsEnabled) &&
+                    <div className={style.loading_End}>
+                        <img src={Checkeck} alt="icons"/>
+                        <p>Qoins will drop in {selectedTime} mins</p>
+                    </div>
+                }
             </div>
-          )}
         </div>
-      </div>
-
-      <p className={style.extraData}>
-        Exploring Astraland 🌙 /30 Apri/10:30 p.m.
-      </p>
-    </div>
-  );
+    );
 };
 
 export default ModalQoinsDrops;

@@ -1,32 +1,18 @@
-.containerModal {
-  width: 836px;
-  height: 473px;
-}
-
 .container {
   width: 100%;
-  height: 418px;
-  background-color: #141833;
-  border-radius: 35px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 24px;
 }
 
 .secctions_input {
-  width: 224px;
-  height: 290px;
+  padding-left: 2px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 0px;
-  margin: 20px;
 }
 
-.titulo h1 {
-  font-family: "Inter";
+.heading {
   font-style: normal;
   font-weight: 500;
   font-size: 18px;
@@ -34,7 +20,8 @@
   color: #ffffff;
 }
 
-.titulo p {
+.subheading {
+  margin-top: 8px;
   font-family: "Inter";
   font-style: normal;
   font-weight: 400;
@@ -49,11 +36,8 @@ display: flex;
 
 }
 
-
-
 .button {
-  width: 202px;
-  height: 56px;
+  margin-top: 32px;
   border-radius: 16px;
   color: #0d1021;
   background-color: #00ffdd;
@@ -84,6 +68,7 @@ padding:30px;
 
 
 .container_loader{
+  margin-top: 32px;
   display: flex;
   height:10px;
 }
@@ -159,8 +144,7 @@ margin-right:8px;
 }
 
 .loading_End{
-  height:180px;
-  
+  margin-top: 32px;
   display: flex;
   justify-content:center;
   align-items:start;
@@ -185,4 +169,8 @@ padding: 4px 0px 0px 2px;
 .loading_End img{
   width:30px;
   height:30px;
+}
+
+.radioGroup {
+  margin-top: 20px;
 }

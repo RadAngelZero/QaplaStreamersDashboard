@@ -38,22 +38,26 @@ const StreamerProfileEditCoin = ({ user }) => {
 
     useEffect(() => {
         async function getRewardData() {
-            const rewardData = await getInteractionsRewardData(user.uid);
-            if (rewardData.exists()) {
-                const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+            try {
+                const rewardData = await getInteractionsRewardData(user.uid);
+                if (rewardData.exists()) {
+                    const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
 
-                if (userTokensUpdated.data.status === 200) {
-                    const userCredentialsUpdated = userTokensUpdated.data;
-                    updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
-                    const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
-                    if (reward) {
-                        setRewardName(reward.title);
-                        setRewardCost(reward.cost);
-                        setRewardBackgroundColor(reward.background_color);
-                        setReactionsEnabled(!reward.is_paused);
-                        setRewardId(reward.id);
+                    if (userTokensUpdated.data.status === 200) {
+                        const userCredentialsUpdated = userTokensUpdated.data;
+                        updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+                        const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
+                        if (reward) {
+                            setRewardName(reward.title);
+                            setRewardCost(reward.cost);
+                            setRewardBackgroundColor(reward.background_color);
+                            setReactionsEnabled(!reward.is_paused);
+                            setRewardId(reward.id);
+                        }
                     }
                 }
+            } catch (error) {
+                console.log(error);
             }
         }
 

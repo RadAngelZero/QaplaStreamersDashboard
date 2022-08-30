@@ -968,6 +968,10 @@ export async function saveInteractionsRewardData(uid, rewardId, webhookId) {
     await streamersInteractionsRewardsRef.child(uid).update({ rewardId, webhookId })
 }
 
+/**
+ * Get the interactions reward data of the given user
+ * @param {string} uid User identifier
+ */
 export async function getInteractionsRewardData(uid) {
     return await streamersInteractionsRewardsRef.child(uid).once('value');
 }

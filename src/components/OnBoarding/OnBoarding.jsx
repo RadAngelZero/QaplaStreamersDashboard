@@ -60,13 +60,20 @@ const OnBoarding = ({ user, games }) => {
     const [errorCode, setErrorCode] = useState(0);
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);
     const [streamerOverlayLink, setStreamerOverlayLink] = useState('https://www.twitch.tv/');
+    const [stepIndicator, setStepIndicator] = useState(0);
 
     const handleMainButton = () => {
         if (step === -1) {
             return openDiscordSupport();
         }
+        if (step === 0) {
+            setStepIndicator(1);
+        }
         if (step === 1) {
             return createChannelPointsRewards();
+        }
+        if (step === 3) {
+            setStepIndicator(2);
         }
         if (step === 5) {
             return history.push('/profile');
@@ -409,6 +416,36 @@ const OnBoarding = ({ user, games }) => {
                     </>}
                 </Button>
             </div>
+            {step !== 5 &&
+                <div style={{
+                    display: 'flex',
+                    position: 'absolute',
+                    bottom: '12vh',
+                }}>
+                    <div style={{
+                        backgroundColor: stepIndicator === 0 ? '#00FEDF' : '#00FEDF8A',
+                        height: '8px',
+                        width: stepIndicator === 0 ? '28px' : '8px',
+                        borderRadius: '4px',
+                        margin: '0px 6.5px',
+                    }} />
+                    <div style={{
+                        backgroundColor: stepIndicator === 1 ? '#00FEDF' : '#00FEDF8A',
+                        height: '8px',
+                        width: stepIndicator === 1 ? '28px' : '8px',
+                        borderRadius: '4px',
+                        margin: '0px 6.5px',
+
+                    }} />
+                    <div style={{
+                        backgroundColor: stepIndicator === 2 ? '#00FEDF' : '#00FEDF8A',
+                        height: '8px',
+                        width: stepIndicator === 2 ? '28px' : '8px',
+                        borderRadius: '4px',
+                        margin: '0px 6.5px',
+                    }} />
+                </div>}
+
         </div >
     )
 

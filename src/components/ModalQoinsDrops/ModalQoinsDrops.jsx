@@ -13,34 +13,34 @@ import { ReactComponent as UncheckedIcon }  from "../../assets/Checked.svg";
 import  Checkeck  from "../../assets/TickSquareDark.svg";
 
 const useStyles = makeStyles((theme) => ({
-  label: {
-    fontfamily: "Inter",
-    fontstyle: "normal",
-    fontweight: "400",
-    fontSize: "13px",
-    color: "rgba(255, 255, 255, 0.603447)",
-  },
-  enableButtonRoot: {
-    marginTop: 32,
-    backgroundColor: '#00FFDD',
-    width: '200px',
-    height: '56px',
-    borderRadius: '16px',
-    fontSize: '14px',
-    fontStyle: 'normal',
-    fontWeight: '600',
-    lineHeight: '20px',
-    letterSpacing: '0px',
-    color: '#0D1021',
-    textTransform: 'none',
-    '&:hover': {
-        backgroundColor: '#00EACB'
+    label: {
+        fontfamily: "Inter",
+        fontstyle: "normal",
+        fontweight: "400",
+        fontSize: "13px",
+        color: "rgba(255, 255, 255, 0.603447)",
     },
-    '&:active': {
-        backgroundColor: '#00EACB',
-        opacity: '0.9'
+    enableButtonRoot: {
+        marginTop: 32,
+        backgroundColor: '#00FFDD',
+        width: '200px',
+        height: '56px',
+        borderRadius: '16px',
+        fontSize: '14px',
+        fontStyle: 'normal',
+        fontWeight: '600',
+        lineHeight: '20px',
+        letterSpacing: '0px',
+        color: '#0D1021',
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#00EACB'
+        },
+        '&:active': {
+            backgroundColor: '#00EACB',
+            opacity: '0.9'
+        }
     }
-  }
 }));
 
 const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoins }) => {

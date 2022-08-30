@@ -1,0 +1,117 @@
+.headerText {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: center;
+}
+
+ul {
+    margin-top: 32px;
+}
+
+li {
+   
+}
+
+.subText{
+    color: #FFFFFFCC;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: left;
+    max-width: 337px;
+}
+
+.subTextMartinTop {
+    margin-top: 16px;
+}
+
+.liMargin {
+    margin-top: 18px;
+}
+
+.qoinsMainContainer {
+    display: flex;
+    width: 128px;
+    height: 38px;
+    border-radius: 8px;
+    margin-top: 28px;
+    background: linear-gradient(91deg, #881CEE -1.34%, #FF4BA2 50.99%, #FFBD8B 100.15%);
+    padding: 2px;
+}
+
+.qoinsSubContainer {
+    display: flex;
+    flex: 1;
+    border-radius: 8px;
+    background-color: #202750;
+    justify-content: center;
+    align-items: center;
+}
+
+.qoins {
+    background-color: transparent;
+    color: #00FFDD;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 22px;
+    width: 115px;
+    text-align: center;
+    border: none;
+    outline: none;
+}
+
+.alignTextCenter {
+    text-align: center;
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+
+input[type=number] {
+    -moz-appearance: textfield;
+}  
+
+.gradientText {
+    background: linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: 1px;
+    max-width: 310px;
+    text-align: center;
+}
+
+.overlayResText {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+}
+
+.overlayResNumbContainer {
+    background-color: #202750;
+    padding: 4px 16px;
+    margin-left: 11px;
+    border-radius: 6px;
+}
+
+.overlayResNumb {
+    color: #00FFDD;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+}

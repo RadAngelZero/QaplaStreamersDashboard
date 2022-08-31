@@ -29,3 +29,10 @@
   max-width: 100px;
   overflow: hidden;
 }
+
+.modal{
+  backdrop-filter: blur(20px);
+    display: flex;
+    justify-content:center;
+    align-items:center;
+}

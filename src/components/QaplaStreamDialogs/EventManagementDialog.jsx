@@ -5,6 +5,7 @@ import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
 import { ReactComponent as TickSquare } from './../../assets/TickSquare.svg';
+import ModalQoinsDrops from '../ModalQoinsDrops/ModalQoinsDrops';
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
@@ -65,7 +66,6 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: '400',
         lineHeight: '18px',
         letterSpacing: '0px',
-        marginTop: '8px',
     },
     startButtonRoot: {
         backgroundColor: '#00FFDD',
@@ -154,6 +154,7 @@ const useStyles = makeStyles((theme) => ({
     sendContainer: {
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between',
         [theme.breakpoints.up('md')]: {
             minWidth: '400px',
         },
@@ -242,20 +243,6 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
         }
     }, [streamStarted, dots, enablingQoins]);
 
-    const startStreamHandler = async () => {
-        await startStream();
-    }
-
-    const enableQoinsHandler = async () => {
-        setEnablingQoins(true);
-        await enableQoins();
-        setEnablingQoins(false);
-    }
-
-    const closeStreamHandler = async () => {
-        closeStream();
-    }
-
     const sendNotificationHandler = async () => {
         // We need to add validations, check BioEditorTextArea to get an idea for a possible implementation
         await sendMessage(message);
@@ -276,59 +263,12 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
                 </div>
                 <div className={classes.itemsContainer}>
                     <div style={{ display: 'flex', flexDirection: 'column', minWidth: '210px', width: '210px', marginRight: '70px' }}>
-                        <p className={classes.title}>
-                            {t('QaplaStreamDialogs.EventManagementDialog.streamActions')}
-                        </p>
-                        <p className={classes.subtitle}>
-                            {t('QaplaStreamDialogs.EventManagementDialog.manageRewards')}
-                        </p>
-                        <div style={{ height: '20px' }} />
-                        {(!stream && !streamStarted) &&
-                            <Button
-                                style={{ boxShadow: '0px 20px 40px -10px rgba(0, 255, 221, 0.2)' }}
-                                onClick={startStreamHandler}
-                                classes={{ root: classes.startButtonRoot }}>
-                                {t('QaplaStreamDialogs.EventManagementDialog.start')}
-                            </Button>
-                        }
-
-                        {!stream && streamStarted &&
-                            <p className={classes.startText}>
-                                {`${t('QaplaStreamDialogs.EventManagementDialog.creatingRewards')}${dots}`}
-                            </p>
-                        }
-
-                        {stream && enablingQoins &&
-                            <p className={classes.startText}>
-                                {`${t('QaplaStreamDialogs.EventManagementDialog.enablingQoins')}${dots}`}
-                            </p>
-                        }
-
-                        {stream && stream.qoinsEnabled &&
-                            <div style={{ display: 'flex', height: '56px', alignItems: 'center' }}>
-                                <TickSquare style={{ marginTop: '7.5px' }} />
-                                <p className={classes.enabledRewardText}>
-                                    {t('QaplaStreamDialogs.EventManagementDialog.qoinsEnabled')}
-                                </p>
-                            </div>
-                        }
-                        <div style={{ height: '6px' }} />
-                        {!enablingQoins &&
-                            <Button
-                                onClick={(stream && stream.qoinsEnabled) ? closeStreamHandler : enableQoinsHandler}
-                                classes={{
-                                    root: classes.qoinsButtonRoot,
-                                    disabled: classes.qoinsButtonRootDisabled
-                                }}
-                                style={!stream ? { backgroundColor: '#0000' } : { boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)' }}
-                                disabled={!stream || (stream && enablingQoins) || closingStream}>
-                                {(stream && stream.qoinsEnabled) ?
-                                    t('QaplaStreamDialogs.EventManagementDialog.end')
-                                    :
-                                    t('QaplaStreamDialogs.EventManagementDialog.enableQoins')
-                                }
-                            </Button>
-                        }
+                        <ModalQoinsDrops
+                            stream={stream}
+                            streamStarted={streamStarted}
+                            closingStream={closingStream}
+                            startStream={startStream}
+                            enableQoins={enableQoins} />
                     </div>
                     <div className={classes.sendContainer}>
                         <p className={classes.title}>

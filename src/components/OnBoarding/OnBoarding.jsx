@@ -99,7 +99,7 @@ const OnBoarding = ({ user }) => {
     const createChannelPointsRewards = async () => {
         setStep(step + 1);
 
-        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, 'Qapla Interaction', channelPointsRewardCost);
+        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, 'Qapla Reaction', channelPointsRewardCost);
         if (result.reward.status === 200) {
             if (result.webhookSubscription) {
                 onSuccessfullChannelPointsCreation();
@@ -175,9 +175,6 @@ const OnBoarding = ({ user }) => {
             </>}
             {step === 0 &&
                 <>
-                {/* Image 480 * 291 */}
-                {/* Image Here 334 * 202 */}
-                {/* Dialog 450 * 256 */}
                     <img src={`https://media.giphy.com/media/yQssIXdTQlbN3EEPYj/giphy.gif`} alt={`Barnaby on PC`}
                         style={{
                             zIndex: -1,

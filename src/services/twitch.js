@@ -149,9 +149,13 @@ export async function getCustomReward(rewardId, twitchId, accessToken) {
             }
         });
 
-        const result = (await response.json());
+        if (response.status === 200) {
+            const result = (await response.json());
 
-        return result.data && result.data[0] ? result.data[0] : null;
+            return result.data && result.data[0] ? result.data[0] : null;
+        } else {
+            return response.status;
+        }
     } catch (error) {
         return error;
     }

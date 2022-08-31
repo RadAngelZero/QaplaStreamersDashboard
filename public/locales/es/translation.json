@@ -52,7 +52,19 @@
             "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
         },
         "learnMore": "¿Qué es el balance?",
-        "postStream": "Publicar un\nStream"
+        "postStream": "Publicar un\nStream",
+        "StreamerProfileEditCoin": {
+            "reactions": "Reacciones",
+            "enabled": "habilitadass",
+            "disabled": "deshabilitadas"
+        },
+        "StreamerProfileModalDisableInteractions": {
+            "title": "Deshabilitar las reacciones esconde la recompensa de canal y el overlay en tus streams",
+            "subtitle": "Siempre puedes habilitarlas de nuevo cuando quieras ;)",
+            "disable": "Deshabilitar reacciones",
+            "dontDisable": "No deshabilitar",
+            "dontShowAgain": "No mostrar este mensaje de nuevo"
+        }
     },
     "StreamCard": {
         "deleteConfirmation": "¿Estas seguro que deseas eliminar este stream?",

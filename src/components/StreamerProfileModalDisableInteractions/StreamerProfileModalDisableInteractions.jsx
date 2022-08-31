@@ -1,5 +1,6 @@
 import React, { useState }  from "react";
 import { Button, Checkbox, makeStyles } from "@material-ui/core";
+import { useTranslation } from "react-i18next";
 
 import style from "./StreamerProfileModalDisableInteractions.module.css";
 import { ReactComponent as Unchecked } from './../../assets/Unchecked.svg';
@@ -54,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerProfileModalDisableInteractions = ({ disableReward, closeDialog, setTitleCheckbox }) => {
     const [notShowEndStreamAgain, setNotShowEndStreamAgain] = useState(false);
+    const { t } = useTranslation();
     const classes = useStyles();
 
     const notShowAgainHandler = () => {
@@ -75,20 +77,22 @@ const StreamerProfileModalDisableInteractions = ({ disableReward, closeDialog, s
             <div className={style.content}>
                 <div className={style.item}>
                     <h2 className={style.title}>
-                        Disabling reactions hides the channel reward and overlay on your stream
+                        {t('StreamerProfile.StreamerProfileModalDisableInteractions.title')}
                     </h2>
-                    <p className={style.subTitle}>You can always turn them back on whenever you like ;)</p>
+                    <p className={style.subTitle}>
+                        {t('StreamerProfile.StreamerProfileModalDisableInteractions.subtitle')}
+                    </p>
                     <Button onClick={disableReactions}
                         classes={{
                             root: classes.disableButtonRoot
                         }}>
-                        Disable reactions
+                        {t('StreamerProfile.StreamerProfileModalDisableInteractions.disable')}
                     </Button>
                     <Button onClick={closeDialog}
                         classes={{
                             root: classes.dontDisableButtonRoot
                         }}>
-                        Don't disable
+                        {t('StreamerProfile.StreamerProfileModalDisableInteractions.dontDisable')}
                     </Button>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
@@ -106,7 +110,7 @@ const StreamerProfileModalDisableInteractions = ({ disableReward, closeDialog, s
                         style={{ color: notShowEndStreamAgain ? '#fff' : 'darkgrey', paddingLeft: '6px' }}
                         className={style.label}
                         onClick={notShowAgainHandler}>
-                        Don't show this message again
+                        {t('StreamerProfile.StreamerProfileModalDisableInteractions.dontShowAgain')}
                     </Button>
                 </div>
             </div>

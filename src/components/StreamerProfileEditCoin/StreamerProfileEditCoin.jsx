@@ -30,7 +30,7 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [savingChanges, setSavingChanges] = useState(false);
     const [rewardBackgroundColor, setRewardBackgroundColor] = useState('');
     const [modal, setModal] = useState(false);
-    const [titleCheckbox, setTitleCheckbox] = useState("enabled");
+    const [titleCheckbox, setTitleCheckbox] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const classes = useStyles();
     const { t } = useTranslation();
@@ -51,6 +51,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                             setRewardCost(reward.cost);
                             setRewardBackgroundColor(reward.background_color);
                             setReactionsEnabled(!reward.is_paused);
+                            setTitleCheckbox(t(!reward.is_paused ? 'StreamerProfile.StreamerProfileEditCoin.enabled' : 'StreamerProfile.StreamerProfileEditCoin.disabled'));
                             setRewardId(reward.id);
                         } else if (reward === 404) {
                             history.push('/onboarding');
@@ -138,7 +139,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                 toggleReward();
             }
         } else {
-            setTitleCheckbox("enabled");
+            setTitleCheckbox(t('StreamerProfile.StreamerProfileEditCoin.enabled'));
             toggleReward();
         }
     }
@@ -162,6 +163,7 @@ const StreamerProfileEditCoin = ({ user }) => {
             if (rewardUpdated.status === 200) {
                 setAlertSetting(user.uid, 'reactionsEnabled', !rewardUpdated.is_paused);
                 setReactionsEnabled(!rewardUpdated.is_paused);
+                setTitleCheckbox(t(!rewardUpdated.is_paused ? 'StreamerProfile.StreamerProfileEditCoin.enabled' : 'StreamerProfile.StreamerProfileEditCoin.disabled'))
             } else {
                 switch (rewardUpdated.status) {
                     case 404:
@@ -193,7 +195,9 @@ const StreamerProfileEditCoin = ({ user }) => {
 
     return (
         <div className={style.containerItereractions}>
-            <h1 className={style.Titulo}>Reactions</h1>
+            <h1 className={style.Titulo}>
+                {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
+            </h1>
             {rewardId !== '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
@@ -250,7 +254,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                         }
                     </div>
                     <div className={style.disableInteractions}>
-                        <p className={style.p}>Reactions {titleCheckbox}</p>
+                        <p className={style.p}>{t('StreamerProfile.StreamerProfileEditCoin.reactions')} {titleCheckbox}</p>
                         <input
                             className={style.input_checkbox}
                             type="checkbox"

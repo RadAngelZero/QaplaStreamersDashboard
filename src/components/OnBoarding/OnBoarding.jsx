@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 const OnBoarding = ({ user, games }) => {
     const classes = useStyles();
     const history = useHistory();
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(-1);
     const [channelPointsRewardCost, setChannelPointsRewardCost] = useState(2000);
     const [errorCode, setErrorCode] = useState(0);
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);
@@ -126,26 +126,44 @@ const OnBoarding = ({ user, games }) => {
             alignItems: 'center',
             flexDirection: 'column',
         }}>
+            <div style={{
+                marginTop: 24,
+                position: 'relative',
+                display: 'flex',
+                backgroundColor: '#141833',
+                width: '450px',
+                height: step === 4 ? '402px' : '256px',
+                borderRadius: '35px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                zIndex: 500,
+            }}>
             {step === -1 &&
-                <>
-                    <img src={`https://media.giphy.com/media/51Uiuy5QBZNkoF3b2Z/giphy.gif`} alt={`Scared Dog`}
-                        style={{
-                            position: 'absolute',
-                            width: '238px',
-                            height: '239px',
-                            marginTop: '-230px',
-                            zIndex: '1000',
-                        }}
-                    />
-                </>}
+            <>
+                <img src={`https://media.giphy.com/media/51Uiuy5QBZNkoF3b2Z/giphy.gif`} alt={`Scared Dog`}
+                    style={{
+                        position: 'absolute',
+                        bottom: 190, // 256 - 23 (height of container - hidden part of the image)
+                        width: '238px',
+                        height: '239px',
+                        zIndex: '1000',
+                    }}
+                />
+            </>}
             {step === 0 &&
                 <>
-                    <img src={`https://media.giphy.com/media/xT8pdY1jyzYYU6Gpaw/giphy.gif`} alt={`Barnaby on PC`}
+                {/* Image 480 * 291 */}
+                {/* Image Here 334 * 202 */}
+                {/* Dialog 450 * 256 */}
+                    <img src={`https://media.giphy.com/media/yQssIXdTQlbN3EEPYj/giphy.gif`} alt={`Barnaby on PC`}
                         style={{
+                            zIndex: -1,
                             position: 'absolute',
+                            bottom: 256, // 256 - 23 (height of container - hidden part of the image)
                             width: '334px',
-                            height: '202px',
-                            marginTop: '-250px',
+                            height: '179px',
+                            resize: ''
                         }}
                     />
                 </>}
@@ -157,8 +175,8 @@ const OnBoarding = ({ user, games }) => {
                             position: 'absolute',
                             width: '269px',
                             height: '134px',
-                            marginTop: '-230px',
                             transform: 'rotate(-15deg)',
+                            bottom: 256, // 256 (height of container)
                         }}
                     />
                     <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
@@ -166,9 +184,9 @@ const OnBoarding = ({ user, games }) => {
                             position: 'absolute',
                             width: '162px',
                             height: '151px',
-                            marginTop: '-233px',
                             zIndex: '1000',
                             transform: 'rotate(-3.45deg)',
+                            bottom: 244, // 256 - 12 (height of container - hidden part of the image)
                         }}
                     />
                 </>
@@ -178,9 +196,9 @@ const OnBoarding = ({ user, games }) => {
                     <img src='https://media.giphy.com/media/3o752nnUPE7OzLeSVW/giphy.gif' alt={`Barnaby Working`}
                         style={{
                             position: 'absolute',
+                            bottom: 256, // 256 - 8 (height of container - hidden part of the image)
                             width: '206px',
                             height: '135px',
-                            marginTop: '-220px',
                             zIndex: '1',
                         }}
                     />
@@ -191,9 +209,9 @@ const OnBoarding = ({ user, games }) => {
                     <img src='https://media.giphy.com/media/xULW8v7LtZrgcaGvC0/giphy.gif' alt={`Barnaby Says Thanks`}
                         style={{
                             position: 'absolute',
+                            bottom: 190, // 256 - 66 (height of container - visible part of the image over the card)
                             width: '239px',
                             height: '239px',
-                            marginTop: '-220px',
                             zIndex: '1000',
                         }}
                     />
@@ -205,34 +223,23 @@ const OnBoarding = ({ user, games }) => {
                         alt='overlay'
                         style={{
                             position: 'absolute',
+                            bottom: 402, // 402 - 66 (height of container)
                             width: '300px',
                             height: '150px',
-                            marginTop: '-300px',
                         }}
                     />
                     <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
                         style={{
                             position: 'absolute',
+                            bottom: 390, // 256 - 12 (height of container - hidden part of the image)
                             width: '162px',
                             height: '151px',
-                            marginTop: '-306px',
                             zIndex: '1000',
                             transform: 'rotate(-3.45deg)',
                         }}
                     />
                 </>
             }
-            <div style={{
-                display: 'flex',
-                backgroundColor: '#141833',
-                width: '450px',
-                height: step === 4 ? '402px' : '256px',
-                borderRadius: '35px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'column',
-                zIndex: '500',
-            }}>
                 {step === -1 && <>
                     <p style={{ marginTop: '20px' }} className={styles.headerText}>
                         {`Oh no! Error ${errorCode}`}
@@ -361,6 +368,8 @@ const OnBoarding = ({ user, games }) => {
                 {step === 5 && <>
                     <img src={`https://media.giphy.com/media/3o751SMzZ5TjLWInoQ/giphy.gif`} alt={`Barnaby Thats Rad`}
                         style={{
+                            position: 'absolute',
+                            bottom: 135, // 256 - 121
                             width: '351px',
                             height: '220px',
                             marginTop: '-100px',
@@ -369,16 +378,17 @@ const OnBoarding = ({ user, games }) => {
                     <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/f43e82ea-dfdd-4542-8d32-4dcba84e573d/you_are_set.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T174423Z&X-Amz-Expires=86400&X-Amz-Signature=28eb462c0fc2b4e03083bf5ea609ed384c312ee41907e1d7b4e324ce99c35541&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22you%2520are%2520set.gif%22&x-id=GetObject'
                         alt={`you're set`}
                         style={{
+                            position: 'absolute',
+                            bottom: 24, // 256 - 121
                             width: '400px',
                             height: '107px',
-                            marginTop: '8px',
                         }}
                     />
                 </>}
             </div>
             <div
                 style={{
-                    marginTop: '24px',
+                    marginTop: 24,
                 }}>
                 <Button
                     disabled={step === 2 || (step === 4 && !overlayLinkCopied)}
@@ -420,7 +430,7 @@ const OnBoarding = ({ user, games }) => {
                 <div style={{
                     display: 'flex',
                     position: 'absolute',
-                    bottom: '12vh',
+                    bottom: 48,
                 }}>
                     <div style={{
                         backgroundColor: stepIndicator === 0 ? '#00FEDF' : '#00FEDF8A',

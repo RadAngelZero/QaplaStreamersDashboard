@@ -95,6 +95,7 @@ const Routes = ({ user, games }) => {
             </Route>
             <Route exact path='/onboarding'>
                 <OnBoarding user={user} />
+            </Route>
             <Route exact path='/giphyTextGenerator/:uid/:text'>
                 <GiphyTextGenerator user={user} />
             </Route>

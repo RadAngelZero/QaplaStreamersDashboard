@@ -565,9 +565,13 @@ export async function writeTestCheer(streamerUid, completeMessage, errorMessage)
         photoURL: ''
     }, (error) => {
         if (error) {
-            alert(errorMessage);
+            if (errorMessage) {
+                alert(errorMessage);
+            }
         } else {
-            alert(completeMessage);
+            if (completeMessage) {
+                alert(completeMessage);
+            }
         }
     });
 }

@@ -189,6 +189,19 @@ export async function checkActiveCustomReward(streamId) {
 }
 
 /**
+ * Listen to the value of qoinsEnabled flag
+ * @param {string} streamId Stream identifier
+ * @param {function} callback Function to handle listener results
+ */
+export function listenToQoinsEnabled(streamId, callback) {
+    activeCustomRewardsRef.child(streamId).child('qoinsEnabled').on('value', callback);
+}
+
+export function removeQoinsEnabledListener(streamId) {
+    activeCustomRewardsRef.child(streamId).child('qoinsEnabled').off('value');
+}
+
+/**
  * Create a stream request in the nodes StreamersEvents and StreamsApproval
  * @param {string} uid User identifier
  * @param {object} streamerData Streamer data object
@@ -295,11 +308,13 @@ export async function updateStreamStatus(uid, streamId, status) {
 export async function removeStreamFromEventsData(uid, streamId) {
     const streamData = await streamsRef.child(streamId).once('value');
 
-    // Save a copy in the streamer event history
-    await streamersHistoryEventsDataRef.child(uid).child(streamId).update(streamData.val());
+    if (streamData.exists()) {
+        // Save a copy in the streamer event history
+        await streamersHistoryEventsDataRef.child(uid).child(streamId).update(streamData.val());
+        // Admin copy while we test if everything is working
+        database.ref('EventsDataAdmin').child(streamId).update(streamData.val());
+    }
 
-    // Admin copy while we test if everything is working
-    database.ref('EventsDataAdmin').child(streamId).update(streamData.val());
     return await streamsRef.child(streamId).remove();
 }
 

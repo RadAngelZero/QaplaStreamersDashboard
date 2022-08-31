@@ -4,7 +4,7 @@ import { notifyBugToDevelopTeam } from './discord';
 import { refreshUserAccessToken, subscribeStreamerToTwitchWebhook, unsubscribeStreamerToTwitchWebhook } from './functions';
 import { createCustomReward, deleteCustomReward, disableCustomReward, enableCustomReward, getAllRewardRedemptions } from './twitch';
 
-export async function startQaplaStream(uid, twitchId, streamerName, refreshToken, streamId, redemptionsPerStream) {
+export async function startQaplaStream(uid, twitchId, streamerName, refreshToken, streamId, redemptionsPerStream, enableIn) {
     const userTokensUpdated = await refreshUserAccessToken(refreshToken);
 
     if (userTokensUpdated.data.status === 200) {
@@ -30,7 +30,7 @@ export async function startQaplaStream(uid, twitchId, streamerName, refreshToken
             // Save webhook id on database
             await saveStreamTwitchCustomReward(uid, QOINS_REWARD, qoinsReward.data.id, streamId, qoinsWebhookSubscription.data.id);
 
-            await updateActiveCustomReward(streamId, { qoinsEnabled: false });
+            await updateActiveCustomReward(streamId, { qoinsEnabled: false, enableIn });
 
             // Get the recently created ActiveCustomReward node
             const streamStatus = await checkActiveCustomReward(streamId);
@@ -77,22 +77,22 @@ export async function closeQaplaStream(uid, twitchId, refreshToken, streamId, qo
         await updateStreamStatus(uid, streamId, PAST_STREAMS_EVENT_TYPE);
         await removeStreamFromEventsData(uid, streamId);
     } else if (userTokensUpdated.data.status === 401) {
-        Promise.reject({ status: userTokensUpdated.data.status });
+        await Promise.reject({ status: userTokensUpdated.data.status });
     }
 }
 
 export async function enableStreamQoinsReward(uid, twitchId, refreshToken, streamId, qoinsRewardId) {
     const userTokensUpdated = await refreshUserAccessToken(refreshToken);
 
-        if (userTokensUpdated.data.status === 200) {
-            const userCredentialsUpdated = userTokensUpdated.data;
-            updateStreamerProfile(uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+    if (userTokensUpdated.data.status === 200) {
+        const userCredentialsUpdated = userTokensUpdated.data;
+        updateStreamerProfile(uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
 
-            const qoinsUpdateStatus = await enableCustomReward(twitchId, userCredentialsUpdated.access_token, qoinsRewardId);
-            if (qoinsUpdateStatus === 200) {
-                updateActiveCustomReward(streamId, { qoinsEnabled: true });
-            }
-        } else if (userTokensUpdated.data.status === 400) {
-            Promise.reject();
+        const qoinsUpdateStatus = await enableCustomReward(twitchId, userCredentialsUpdated.access_token, qoinsRewardId);
+        if (qoinsUpdateStatus === 200) {
+            updateActiveCustomReward(streamId, { qoinsEnabled: true });
         }
+    } else if (userTokensUpdated.data.status === 400) {
+        await Promise.reject();
+    }
 }

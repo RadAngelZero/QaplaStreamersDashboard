@@ -42,19 +42,22 @@ const StreamerProfileEditCoin = ({ user }) => {
                 const rewardData = await getInteractionsRewardData(user.uid);
                 if (rewardData.exists()) {
                     const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
-
                     if (userTokensUpdated.data.status === 200) {
                         const userCredentialsUpdated = userTokensUpdated.data;
                         updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
                         const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
-                        if (reward) {
+                        if (reward && reward.id) {
                             setRewardName(reward.title);
                             setRewardCost(reward.cost);
                             setRewardBackgroundColor(reward.background_color);
                             setReactionsEnabled(!reward.is_paused);
                             setRewardId(reward.id);
+                        } else if (reward === 404) {
+                            history.push('/onboarding');
                         }
                     }
+                } else {
+                    history.push('/onboarding');
                 }
             } catch (error) {
                 console.log(error);

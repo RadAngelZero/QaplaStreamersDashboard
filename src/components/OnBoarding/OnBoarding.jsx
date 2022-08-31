@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles, Button } from "@material-ui/core";
-import styles from './OnBoarding.module.css';
+import { makeStyles, Button, Checkbox } from "@material-ui/core";
+import { useTranslation } from 'react-i18next';
 
+import styles from './OnBoarding.module.css';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { useHistory } from "react-router-dom";
 import { createInteractionsReward } from "../../services/interactionsQapla";
 import { writeTestCheer } from "../../services/database";
 import { CHEERS_URI } from "../../utilities/Constants";
 import { notifyBugToDevelopTeam } from "../../services/discord";
+
+import { ReactComponent as Unchecked } from './../../assets/Unchecked.svg';
+import { ReactComponent as Checked } from './../../assets/Checked.svg';
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -65,6 +69,8 @@ const OnBoarding = ({ user }) => {
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);
     const [streamerOverlayLink, setStreamerOverlayLink] = useState(CHEERS_URI);
     const [stepIndicator, setStepIndicator] = useState(0);
+    const [acceptPolicies, setAcceptPolicies] = useState(true);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (user && user.id) {
@@ -139,6 +145,8 @@ const OnBoarding = ({ user }) => {
         navigator.clipboard.writeText(streamerOverlayLink);
     }
 
+    const handlePoliciesCheckbox = () => setAcceptPolicies(!acceptPolicies);
+
     return (
         <div style={{
             background: 'conic-gradient(from 134.88deg at 50.55% 49.24%, #5600E1 -61.47deg, #373FFF 26.68deg, #A534FE 167.74deg, #B518FF 197.3deg, #5600E1 298.53deg, #373FFF 386.68deg), rgba(3, 7, 34, 0.95)',
@@ -161,19 +169,20 @@ const OnBoarding = ({ user }) => {
                 flexDirection: 'column',
                 zIndex: 500,
             }}>
-            {step === -1 &&
-            <>
-                <img src={`https://media.giphy.com/media/51Uiuy5QBZNkoF3b2Z/giphy.gif`} alt={`Scared Dog`}
-                    style={{
-                        position: 'absolute',
-                        bottom: 190, // 256 - 23 (height of container - hidden part of the image)
-                        width: '238px',
-                        height: '239px',
-                        zIndex: '1000',
-                    }}
-                />
-            </>}
-            {step === 0 &&
+                {step === -1 &&
+                <>
+                    <img src={`https://media.giphy.com/media/51Uiuy5QBZNkoF3b2Z/giphy.gif`} alt={`Scared Dog`}
+                        style={{
+                            position: 'absolute',
+                            bottom: 190, // 256 - 23 (height of container - hidden part of the image)
+                            width: '238px',
+                            height: '239px',
+                            zIndex: '1000',
+                        }}
+                    />
+                </>
+                }
+                {step === 0 &&
                 <>
                     <img src={`https://media.giphy.com/media/yQssIXdTQlbN3EEPYj/giphy.gif`} alt={`Barnaby on PC`}
                         style={{
@@ -185,8 +194,9 @@ const OnBoarding = ({ user }) => {
                             resize: ''
                         }}
                     />
-                </>}
-            {step === 1 &&
+                </>
+                }
+                {step === 1 &&
                 <>
                     <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/c842463b-291d-4172-910c-e5f40a673ea7/channelpoints-pink.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T171548Z&X-Amz-Expires=86400&X-Amz-Signature=a3a1c0e04ecde2d13557c07daabc6cea08e962753f2eae9080b3586e27c9402b&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22channelpoints-pink.gif%22&x-id=GetObject'
                         alt='channel points'
@@ -209,8 +219,8 @@ const OnBoarding = ({ user }) => {
                         }}
                     />
                 </>
-            }
-            {step === 2 &&
+                }
+                {step === 2 &&
                 <>
                     <img src='https://media.giphy.com/media/3o752nnUPE7OzLeSVW/giphy.gif' alt={`Barnaby Working`}
                         style={{
@@ -222,8 +232,8 @@ const OnBoarding = ({ user }) => {
                         }}
                     />
                 </>
-            }
-            {step === 3 &&
+                }
+                {step === 3 &&
                 <>
                     <img src='https://media.giphy.com/media/xULW8v7LtZrgcaGvC0/giphy.gif' alt={`Barnaby Says Thanks`}
                         style={{
@@ -235,8 +245,8 @@ const OnBoarding = ({ user }) => {
                         }}
                     />
                 </>
-            }
-            {step === 4 &&
+                }
+                {step === 4 &&
                 <>
                     <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/f3d31749-cd27-4908-b913-9c5d227cc342/overlay.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T173737Z&X-Amz-Expires=86400&X-Amz-Signature=48fefc679c88f8deb2875bff1d595158917f87f8f051661c629ef077d465af68&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22overlay.gif%22&x-id=GetObject'
                         alt='overlay'
@@ -258,34 +268,39 @@ const OnBoarding = ({ user }) => {
                         }}
                     />
                 </>
-            }
-                {step === -1 && <>
+                }
+                {step === -1 &&
+                <>
                     <p style={{ marginTop: '20px' }} className={styles.headerText}>
-                        {`Oh no! Error ${errorCode}`}
+                        {t('Onboarding.errorTitle', { errorCode })}
                     </p>
                     <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                        {`Don’t worry. Let’s try again! Make sure your channel rewards are not full `}
+                        {t('Onboarding.errorDescription')}
                     </p>
-                </>}
-                {step === 0 && <>
+                </>
+                }
+                {step === 0 &&
+                <>
                     <p className={styles.headerText}>
-                        {`Let’s set up your account`}
+                        {t('Onboarding.letsSetUp')}
                     </p>
                     <ul>
                         <li className={styles.subText}>
-                            {`🔗 We’ll create a Custom Reward on your channel with one click`}
+                            {t('Onboarding.processDescriptionP1')}
                         </li>
                         <li className={`${styles.subText} ${styles.liMargin}`}>
-                            {`🪪 We‘ll add a browser source to your OBS/Streamlabs`}
+                            {t('Onboarding.processDescriptionP2')}
                         </li>
                     </ul>
-                </>}
-                {step === 1 && <>
+                </>
+                }
+                {step === 1 &&
+                <>
                     <p className={styles.headerText}>
-                        {`Set the custom reward “cost”`}
+                        {t('Onboarding.setRewardCost')}
                     </p>
                     <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                        {`This is how much channel points your viewers will burn per reaction. You can always change it later`}
+                        {t('Onboarding.setRewardCostDescription')}
                     </p>
                     <div className={styles.qoinsMainContainer}>
                         <div className={styles.qoinsSubContainer}>
@@ -297,23 +312,29 @@ const OnBoarding = ({ user }) => {
                             />
                         </div>
                     </div>
-                </>}
-                {step === 2 && <>
+                </>
+                }
+                {step === 2 &&
+                <>
                     <h1 className={styles.gradientText}>
-                        {`I’m working on your request lovely human`}
+                        {t('Onboarding.workingOnRequest')}
                     </h1>
-                </>}
-                {step === 3 && <>
+                </>
+                }
+                {step === 3 &&
+                <>
                     <h1 className={styles.gradientText}>
-                        {`Custom reward created successfully!`}
+                        {t('Onboarding.rewardCreated')}
                     </h1>
-                </>}
-                {step === 4 && <>
+                </>
+                }
+                {step === 4 &&
+                    <>
                     <h1 className={styles.headerText}>
-                        {`Add the reactions overlay`}
+                        {t('Onboarding.addReactionsToOverlay')}
                     </h1>
                     <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                        {`Copy the link and add it as a browser source on your OBS/Streamlabs`}
+                        {t('Onboarding.copyLink')}
                     </p>
                     <div style={{
                         marginTop: '32px',
@@ -325,7 +346,7 @@ const OnBoarding = ({ user }) => {
                             flexDirection: 'row',
                         }}>
                             <p className={styles.overlayResText}>
-                                {`Width`}
+                                {t('Onboarding.width')}
                             </p>
                             <div className={styles.overlayResNumbContainer}>
                                 <p className={styles.overlayResNumb}>
@@ -340,7 +361,7 @@ const OnBoarding = ({ user }) => {
                             flexDirection: 'row',
                         }}>
                             <p className={styles.overlayResText}>
-                                {`Height`}
+                                {t('Onboarding.height')}
                             </p>
                             <div className={styles.overlayResNumbContainer}>
                                 <p className={styles.overlayResNumb}>
@@ -374,81 +395,92 @@ const OnBoarding = ({ user }) => {
                             <Button
                                 onClick={handleTestOverlay}
                                 className={classes.testButton}>
-                                {`Test Overlay`}
+                                {t('Onboarding.testOverlay')}
                             </Button>
                             :
                             <div style={{ height: '60px' }} />
                         }
                     </div>
-
-
-                </>}
-                {step === 5 && <>
-                    <img src={`https://media.giphy.com/media/3o751SMzZ5TjLWInoQ/giphy.gif`} alt={`Barnaby Thats Rad`}
-                        style={{
-                            position: 'absolute',
-                            bottom: 135, // 256 - 121
-                            width: '351px',
-                            height: '220px',
-                            marginTop: '-100px',
-                        }}
-                    />
-                    <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/f43e82ea-dfdd-4542-8d32-4dcba84e573d/you_are_set.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T174423Z&X-Amz-Expires=86400&X-Amz-Signature=28eb462c0fc2b4e03083bf5ea609ed384c312ee41907e1d7b4e324ce99c35541&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22you%2520are%2520set.gif%22&x-id=GetObject'
-                        alt={`you're set`}
-                        style={{
-                            position: 'absolute',
-                            bottom: 24, // 256 - 121
-                            width: '400px',
-                            height: '107px',
-                        }}
-                    />
-                </>}
+                </>
+                }
+                {step === 5 &&
+                    <>
+                        <img src={`https://media.giphy.com/media/3o751SMzZ5TjLWInoQ/giphy.gif`} alt={`Barnaby Thats Rad`}
+                            style={{
+                                position: 'absolute',
+                                bottom: 135, // 256 - 121
+                                width: '351px',
+                                height: '220px',
+                                marginTop: '-100px',
+                            }}
+                        />
+                        <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/f43e82ea-dfdd-4542-8d32-4dcba84e573d/you_are_set.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T174423Z&X-Amz-Expires=86400&X-Amz-Signature=28eb462c0fc2b4e03083bf5ea609ed384c312ee41907e1d7b4e324ce99c35541&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22you%2520are%2520set.gif%22&x-id=GetObject'
+                            alt={`you're set`}
+                            style={{
+                                position: 'absolute',
+                                bottom: 24, // 256 - 121
+                                width: '400px',
+                                height: '107px',
+                            }}
+                        />
+                    </>
+                }
             </div>
             <div
                 style={{
                     marginTop: 24,
                 }}>
                 <Button
-                    disabled={step === 2 || (step === 4 && !overlayLinkCopied)}
+                    disabled={step === 2 || (step === 4 && !overlayLinkCopied) || (step === 0 && !acceptPolicies)}
                     onClick={handleMainButton}
                     className={classes.button}
                 >
-                    {step === -1 && <>
-                        {`Go Discord Support`}
-                    </>}
-                    {step === 0 && <>
-                        {`Let’s Go`}
-                    </>}
-                    {step === 1 && <>
-                        {`Create Custom Reward`}
-                    </>}
-                    {step === 2 && <>
-                        {`Wait a bit`}
-                    </>}
-                    {step === 3 && <>
-                        {`Finish set up`}
-                    </>}
-                    {step === 4 && <>
-                        {overlayLinkCopied ?
-                            <>
-                                {`Looks awesome! i'm done`}
-                            </>
-                            :
-                            <>
-                                {`Copy link to test overlay`}
-                            </>
-                        }
-                    </>}
-                    {step === 5 && <>
-                        {`Go to dashboard`}
-                    </>}
+                    {step === -1 &&
+                        <>
+                            {t('Onboarding.goToDiscord')}
+                        </>
+                    }
+                    {step === 0 &&
+                        <>
+                            {t('Onboarding.letsGo')}
+                        </>
+                    }
+                    {step === 1 &&
+                        <>
+                            {t('Onboarding.createCustomReward')}
+                        </>
+                    }
+                    {step === 2 &&
+                        <>
+                            {t('Onboarding.waitABit')}
+                        </>
+                    }
+                    {step === 3 &&
+                        <>
+                            {t('Onboarding.finishSetUp')}
+                        </>
+                    }
+                    {step === 4 &&
+                        <>
+                            {overlayLinkCopied ?
+                                    t('Onboarding.finishSetUp')
+                                :
+                                    t('Onboarding.copyToTest')
+                            }
+                        </>
+                    }
+                    {step === 5 &&
+                        <>
+                            {t('Onboarding.goToDashboard')}
+                        </>
+                    }
                 </Button>
             </div>
             {step !== 5 &&
                 <div style={{
                     display: 'flex',
                     position: 'absolute',
-                    bottom: 48,
+                    bottom: 72,
                 }}>
                     <div style={{
                         backgroundColor: stepIndicator === 0 ? '#00FEDF' : '#00FEDF8A',
@@ -472,9 +504,33 @@ const OnBoarding = ({ user }) => {
                         borderRadius: '4px',
                         margin: '0px 6.5px',
                     }} />
-                </div>}
-
-        </div >
+                </div>
+            }
+            {step === 0 &&
+                <div style={{ position: 'absolute', bottom: 24, display: 'flex', alignItems: 'center' }}>
+                    <Checkbox
+                        icon={<Unchecked />}
+                        checkedIcon={<Checked />}
+                        onChange={handlePoliciesCheckbox}
+                        checked={acceptPolicies}
+                        style={{ paddingRight: '0px' }}
+                    />
+                    <div style={{ opacity: acceptPolicies ? 1 : 0.7, color: '#FFF', paddingLeft: '6px' }}>
+                        {t('Onboarding.policiesP1')}
+                        <a href="" target="_blank"
+                            style={{ color: '#00FFDD', marginLeft: 4, marginRight: 4, textDecoration: 'none' }}>
+                            {t('Onboarding.policiesP2')}
+                        </a>
+                        {t('Onboarding.policiesP3')}
+                        <a href="https://www.qapla.gg/privacy"
+                            target="_blank"
+                            style={{ color: '#00FFDD', marginLeft: 4, textDecoration: 'none' }}>
+                            {t('Onboarding.policiesP4')}
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
     )
 
 }

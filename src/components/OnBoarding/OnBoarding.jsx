@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles, Button } from "@material-ui/core";
 import styles from './OnBoarding.module.css';
 
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { useHistory } from "react-router-dom";
+import { createInteractionsReward } from "../../services/interactionsQapla";
+import { writeTestCheer } from "../../services/database";
+import { CHEERS_URI } from "../../utilities/Constants";
+import { notifyBugToDevelopTeam } from "../../services/discord";
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -52,24 +56,30 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const OnBoarding = ({ user, games }) => {
+const OnBoarding = ({ user }) => {
     const classes = useStyles();
     const history = useHistory();
-    const [step, setStep] = useState(-1);
+    const [step, setStep] = useState(0);
     const [channelPointsRewardCost, setChannelPointsRewardCost] = useState(2000);
     const [errorCode, setErrorCode] = useState(0);
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);
-    const [streamerOverlayLink, setStreamerOverlayLink] = useState('https://www.twitch.tv/');
+    const [streamerOverlayLink, setStreamerOverlayLink] = useState(CHEERS_URI);
     const [stepIndicator, setStepIndicator] = useState(0);
+
+    useEffect(() => {
+        if (user && user.id) {
+            setStreamerOverlayLink(`${CHEERS_URI}/${user.id}`);
+        }
+    }, [user]);
 
     const handleMainButton = () => {
         if (step === -1) {
             return openDiscordSupport();
         }
-        if (step === 0) {
+        if (step === 0) { // Welcome
             setStepIndicator(1);
         }
-        if (step === 1) {
+        if (step === 1) { // Set channel points cost and create reward
             return createChannelPointsRewards();
         }
         if (step === 3) {
@@ -78,24 +88,32 @@ const OnBoarding = ({ user, games }) => {
         if (step === 5) {
             return history.push('/profile');
         }
+
         setStep(step + 1);
     }
 
     const openDiscordSupport = () => {
-        console.log('discord');
+        window.open('https://discord.gg/2UMQ6ZXPkq', '_blank');
     }
 
-    const createChannelPointsRewards = () => {
-        console.log('creating channel points rewards');
+    const createChannelPointsRewards = async () => {
         setStep(step + 1);
-        setTimeout(() => {
-            onSuccessfullChannelPointsCreation();
-            // onErrorChannelPointsCreation('402');
-        }, 1000);
+
+        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, 'Qapla Interaction', channelPointsRewardCost);
+        if (result.reward.status === 200) {
+            if (result.webhookSubscription) {
+                onSuccessfullChannelPointsCreation();
+            } else {
+                notifyBugToDevelopTeam(`${user.uid} Reward webhook creation error`);
+                onErrorChannelPointsCreation(500);
+            }
+        } else {
+            notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: ` + JSON.stringify(result.reward));
+            onErrorChannelPointsCreation(result.reward.status);
+        }
     }
 
     const onSuccessfullChannelPointsCreation = () => {
-        console.log('created');
         setStep(step + 2);
     }
 
@@ -109,12 +127,16 @@ const OnBoarding = ({ user, games }) => {
     }
 
     const handleCopyOverlayLink = () => {
-        console.log('copy');
+        copyCheersURL();
         setOverlayLinkCopied(true);
     }
 
     const handleTestOverlay = () => {
-        console.log('test overlay');
+        writeTestCheer(user.uid);
+    }
+
+    const copyCheersURL = () => {
+        navigator.clipboard.writeText(streamerOverlayLink);
     }
 
     return (
@@ -272,7 +294,6 @@ const OnBoarding = ({ user, games }) => {
                         <div className={styles.qoinsSubContainer}>
                             <input
                                 className={styles.qoins}
-                                type="number"
                                 value={channelPointsRewardCost}
                                 onChange={handleChannePointsRewardCostChange}
 
@@ -343,7 +364,7 @@ const OnBoarding = ({ user, games }) => {
                             textAlign: 'center',
                             flexGrow: 1,
                         }}>
-                            {`${streamerOverlayLink}`}
+                            {streamerOverlayLink}
                         </p>
                         <CopyIcon style={{
                             justifySelf: 'flex-end',
@@ -356,7 +377,7 @@ const OnBoarding = ({ user, games }) => {
                             <Button
                                 onClick={handleTestOverlay}
                                 className={classes.testButton}>
-                                {`TestOverlay`}
+                                {`Test Overlay`}
                             </Button>
                             :
                             <div style={{ height: '60px' }} />

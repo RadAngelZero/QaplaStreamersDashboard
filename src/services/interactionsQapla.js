@@ -4,7 +4,6 @@ import { refreshUserAccessToken, subscribeStreamerToTwitchWebhook } from './func
 import { createCustomReward, deleteCustomReward, updateCustomReward } from './twitch';
 
 export async function createInteractionsReward(uid, twitchId, refreshToken, title, cost) {
-    alert('Creando');
     const userTokensUpdated = await refreshUserAccessToken(refreshToken);
 
     if (userTokensUpdated.data.status === 200) {
@@ -18,20 +17,14 @@ export async function createInteractionsReward(uid, twitchId, refreshToken, titl
             if (webhookSubscription.data.id) {
                 // Store on database
                 await saveInteractionsRewardData(uid, reward.data.id, webhookSubscription.data.id);
-                alert('Creada');
+
+                return { reward, webhookSubscription };
             } else {
                 // Webhook creation failed
                 await deleteCustomReward(twitchId, userCredentialsUpdated.access_token, reward.data.id);
             }
-            // Created
-        } else if (reward.status === 400 && reward.message === 'CREATE_CUSTOM_REWARD_TOO_MANY_REWARDS') {
-            // Too many rewards
-        } else if (reward.status === 401) {
-            // Unauthenticated: Missing/invalid Token
-        } else if (reward.status === 403) {
-            // Forbidden: Channel Points are not available for the broadcaster
-        } else if (reward.status === 500) {
-            // Internal Server Error: Something bad happened on Twitch
+        } else {
+            return { reward };
         }
     }
 }

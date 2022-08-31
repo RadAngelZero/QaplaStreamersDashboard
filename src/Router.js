@@ -28,6 +28,7 @@ import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeCo
 import QStore from './components/QStore/QStore';
 import { useTranslation } from 'react-i18next'
 import OnBoarding from './components/OnBoarding/OnBoarding';
+import GiphyTextGenerator from './components/GiphyTextGenerator/GiphyTextGenerator';
 
 window.onbeforeunload = function () {
     return true;
@@ -94,6 +95,8 @@ const Routes = ({ user, games }) => {
             </Route>
             <Route exact path='/onboarding'>
                 <OnBoarding user={user} />
+            <Route exact path='/giphyTextGenerator/:uid/:text'>
+                <GiphyTextGenerator user={user} />
             </Route>
             {/* <Route exact path='/lottery'>
                 <Lottery user={user} />

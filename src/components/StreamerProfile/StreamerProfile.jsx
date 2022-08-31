@@ -14,6 +14,8 @@ import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg';
 import { ReactComponent as GiftIcon } from './../../assets/Gift.svg';
 
+import BarProgressBit from '../BarProgressBit/BarProgressBit';
+
 import { getQreatorCode, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
@@ -33,7 +35,7 @@ const BalanceButtonContainer = withStyles(() => ({
         padding: '22px 24px',
         height: '100px',
         minWidth: '180px !important',
-        maxWidth: '230px !important',
+        maxWidth: '330px !important',
         borderRadius: '20px',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -276,16 +278,22 @@ const StreamerProfile = ({ user, games }) => {
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
-                                            <Grid item xs={12} className={styles.balanceContainers}>
-                                                <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Bits') }}>
-                                                    <BitsIcon style={{ width: '35px', height: '35px' }} />
+                                            <Grid item xs={12}   className={styles.bitBalanceContainer}>
+                                                <div style={{ width: '100%', height: '100px', display: 'flex', alignItems: 'center', cursor: 'pointer'}}
+                                                 onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Bits') }}> 
+                                                <BitsIcon style={{ width: '35px', height: '35px' }} />
+                                                <BarProgressBit/>
+                                                
+                                                {/* <BalanceButtonContainer >
+                                                    
                                                     <div className={styles.balanceInnerContainer}>
                                                         <p className={styles.balanceDataTextTitle}>{t('StreamerProfile.stimatedBits')}</p>
                                                         <p className={styles.balanceDataText}>
                                                             {Math.floor(estimatedBits).toLocaleString()}
                                                         </p>
                                                     </div>
-                                                </BalanceButtonContainer>
+                                                </BalanceButtonContainer> */}
+                                                </div>
                                             </Grid>
                                         </Grid>
                                     </Grid>

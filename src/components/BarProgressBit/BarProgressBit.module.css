@@ -1,0 +1,71 @@
+.container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.barProgress {
+  height: 57px;
+}
+
+.titulo_Porcentaje {
+  padding-bottom: 13px;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  display: flex;
+  align-items: center;
+  text-align: right;
+  color: #6c5dd3;
+}
+
+.titulos {
+  display: flex;
+}
+
+.porcentaje {
+  margin: 0px 0px 0px 10px;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  letter-spacing: -0.864px;
+  color: #ffffff;
+}
+
+.puntos p {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  color: #6c5dd3;
+}
+
+.puntos h2 {
+  margin: 5px;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 36px;
+  text-align: center;
+  letter-spacing: -0.864px;
+  color: #ffffff;
+}
+
+.button {
+  width: 90px;
+  height: 40px;
+  background: #3B4BF9;
+  border-radius: 8px;
+color: #FFFFFF;
+border:none;
+outline: none;
+}

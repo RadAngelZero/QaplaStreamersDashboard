@@ -106,6 +106,17 @@ body {
     align-items: center;
 }
 
+.bitBalanceContainer{
+    display: flex;
+    background-color: #141735;
+    padding: 22px 24px;
+    height: 100px;
+    min-width: 180px !important;
+    max-width: 520px !important;
+    border-radius: 20px;
+    align-items: center;
+}
+
 .balanceInnerContainer {
     display: flex;
     flex-grow: 1;

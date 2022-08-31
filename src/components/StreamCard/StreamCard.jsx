@@ -357,16 +357,20 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
     }
 
-    const enableQoinsReward = async (qoinsReward = stream.qoinsReward) => {
+    /**
+     * When reward created inmediately from modal stream can be undefined and give problems for that case we
+     * have streamObject as parameter with a default value of stream state
+     */
+    const enableQoinsReward = async (streamObject = stream) => {
         try {
-            await enableStreamQoinsReward(user.uid, user.id, user.refreshToken, streamId, qoinsReward);
+            await enableStreamQoinsReward(user.uid, user.id, user.refreshToken, streamId, streamObject.qoinsReward);
 
             window.analytics.track('Qoins enabled', {
                 streamId,
                 uid: user.uid,
                 timestamp: (new Date()).getTime()
             });
-            setStream({ ...stream, qoinsEnabled: true });
+            setStream({ ...streamObject, qoinsEnabled: true });
         } catch (error) {
             console.log(error);
             handleExpiredSession();
@@ -470,8 +474,8 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                             {t('StreamCard.end')}
                                         </Button>
                                         :
-                                        <p style={{ color: '#FFF' }}>
-                                            Drops will be available soon
+                                        <p style={{ color: '#FFF', textAlign: 'center' }}>
+                                            {t('StreamCard.dropsScheduled')}
                                         </p>
                                     )
                                     :

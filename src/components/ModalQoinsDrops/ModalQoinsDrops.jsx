@@ -6,6 +6,7 @@ import {
   Radio,
   RadioGroup,
 } from "@material-ui/core";
+import { useTranslation } from "react-i18next";
 
 import style from "./ModalQoinsDrops.module.css";
 import { ReactComponent as  CheckedIcon }  from "../../assets/Unchecked.svg";
@@ -46,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
 const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoins }) => {
     const [selectedTime, setSelectedTime] = useState(0);
     const classes = useStyles();
+    const { t } = useTranslation();
 
     const handleOnClick = async (e) => {
         if (e) {
@@ -55,7 +57,7 @@ const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoin
         const streamData = await startStream(selectedTime);
 
         if (selectedTime === 0) {
-            await enableQoins(streamData.qoinsReward);
+            await enableQoins(streamData);
         }
     };
 
@@ -64,21 +66,21 @@ const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoin
             <div className={style.secctions_input}>
                 <div className={style.titulo}>
                     <p className={style.heading}>
-                        🪂 Qoins' Drops
+                        {t('QaplaStreamDialogs.ModalQoinsDrops.drops')}
                     </p>
                     <p className={style.subheading}>
-                        Set a time for the Qoins' channel reward to show on yor stream
+                        {t('QaplaStreamDialogs.ModalQoinsDrops.setTimer')}
                     </p>
                 </div>
                 {(!stream && !streamStarted) &&
                     <>
                     <RadioGroup
-                    className={style.radioGroup}
-                    aria-labelledby="demo-radio-buttons-group-label"
-                    name="radio-buttons-group"
-                    onChange={(e) => setSelectedTime(Number(e.target.value))}
-                    value={selectedTime}
-                    >
+                        className={style.radioGroup}
+                        aria-labelledby="demo-radio-buttons-group-label"
+                        name="radio-buttons-group"
+                        onChange={(e) => setSelectedTime(Number(e.target.value))}
+                        value={selectedTime}
+                        >
                         <FormControlLabel value={0}
                             classes={{ label: classes.label }}
                             control={
@@ -90,7 +92,7 @@ const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoin
                                 style={{ backgroundColor: "transparent", padding: 8 }}
                             />
                             }
-                            label="Right away"
+                            label={t('QaplaStreamDialogs.ModalQoinsDrops.rightAway')}
                         />
                         <FormControlLabel value={30}
                             classes={{ label: classes.label }}
@@ -102,7 +104,7 @@ const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoin
                                 style={{ backgroundColor: "transparent", padding: 8 }}
                             />
                             }
-                            label="in 30 min"
+                            label={t('QaplaStreamDialogs.ModalQoinsDrops.in30Min')}
                         />
                         <FormControlLabel value={45}
                             classes={{ label: classes.label }}
@@ -114,7 +116,7 @@ const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoin
                                 style={{ backgroundColor: "transparent", padding: 8 }}
                             />
                             }
-                            label="in 45 min"
+                            label={t('QaplaStreamDialogs.ModalQoinsDrops.in45Min')}
                         />
                         <FormControlLabel value={60}
                             classes={{ label: classes.label }}
@@ -126,27 +128,39 @@ const ModalQoinsDrops = ({ stream = null, streamStarted, startStream, enableQoin
                                 style={{ backgroundColor: "transparent", padding: 8 }}
                             />
                             }
-                            label="in 1 hour"
+                            label={t('QaplaStreamDialogs.ModalQoinsDrops.in1Hour')}
                         />
                     </RadioGroup>
                     <Button onClick={handleOnClick}
                         classes={{
                         root: classes.enableButtonRoot
                         }}>
-                        Enable Drops
+                        {t('QaplaStreamDialogs.ModalQoinsDrops.enableDrops')}
                     </Button>
                     </>
                 }
                 {!stream && streamStarted &&
                     <div className={style.container_loader}>
-                        <p>Setting up drops</p>
+                        <p>
+                            {t('QaplaStreamDialogs.ModalQoinsDrops.settingDrops')}
+                        </p>
                         <div className={style.loader}></div>
                     </div>
                 }
                 {(stream && !stream.qoinsEnabled) &&
                     <div className={style.loading_End}>
                         <DoneIcon  />
-                        <p>Qoins will drop in {selectedTime} mins</p>
+                        <p>
+                            {t('QaplaStreamDialogs.ModalQoinsDrops.qoinsDropIn', { selectedTime })}
+                        </p>
+                    </div>
+                }
+                {(stream && stream.qoinsEnabled) &&
+                    <div className={style.loading_End}>
+                        <DoneIcon  />
+                        <p>
+                            {t('QaplaStreamDialogs.ModalQoinsDrops.dropsEnabled')}
+                        </p>
                     </div>
                 }
             </div>

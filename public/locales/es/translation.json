@@ -60,6 +60,8 @@
         "pendingReview": "Pendiente de revisión",
         "posted": "Publicado",
         "enableDrops": "Habilitar drops de Qoins",
+        "dropsScheduled": "🪂 Drops programados",
+        "end": "Finalizar stream",
         "finish": "Terminar stream",
         "creatingRewards": "Creando recompensas",
         "manageRewards": "Gestionar recompensas",
@@ -104,6 +106,18 @@
         "EventCustomMessageSentConfirmation": {
             "title": "¡Mensaje enviado!",
             "manageRewards": "Gestionar recompensas"
+        },
+        "ModalQoinsDrops": {
+            "drops": "🪂 Drops de Qoins'",
+            "setTimer": "Escoge un tiempo para que la recompensa de Qoins se muestre en tu stream",
+            "rightAway": "De inmediato",
+            "in30Min": "en 30 min",
+            "in45Min": "en 45 min",
+            "in1Hour": "en 1 hour",
+            "enableDrops": "Habilitar Drops",
+            "settingDrops": "Configurando drops",
+            "qoinsDropIn": "Los Qoins se mostraran en {{selectedTime}} mins",
+            "dropsEnabled": "Drops habilitados"
         }
     },
     "NewStream": {

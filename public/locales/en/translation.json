@@ -60,7 +60,8 @@
         "pendingReview": "Pending for review",
         "posted": "Posted",
         "enableDrops": "Enable Qoins Drops",
-        "end": "End stream",
+        "dropsScheduled": "🪂 Drops scheduled",
+        "end": "End drops",
         "creatingRewards": "Creating rewards",
         "manageRewards": "Manage rewards",
         "manageStream": "Manage stream",
@@ -104,6 +105,18 @@
         "EventCustomMessageSentConfirmation": {
             "title": "Message sent!",
             "manageRewards": "Manage rewards"
+        },
+        "ModalQoinsDrops": {
+            "drops": "🪂 Qoins' Drops",
+            "setTimer": "Set a time for the Qoins' channel reward to show on yor stream",
+            "rightAway": "Right away",
+            "in30Min": "in 30 min",
+            "in45Min": "in 45 min",
+            "in1Hour": "in 1 hour",
+            "enableDrops": "Enable Drops",
+            "settingDrops": "Setting up drops",
+            "qoinsDropIn": "Qoins will drop in {{selectedTime}} mins",
+            "dropsEnabled": "Drops enabled"
         }
     },
     "NewStream": {

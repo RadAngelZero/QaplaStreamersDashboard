@@ -339,9 +339,9 @@ const StreamerProfile = ({ user, games }) => {
                                                 user={user}
                                                 game={'multiRocket'}
                                                 games={games}
-                                                date={formatDate(1661880770435)}
-                                                hour={formatHour(1661880770435)}
-                                                timestamp={1661880770435}
+                                                date={formatDate(1661973272294)}
+                                                hour={formatHour(1661973272294)}
+                                                timestamp={1661973272294}
                                                 onRemoveStream={onRemoveStream} />
                                         </Grid>
                                         {streams && Object.keys(streams).map((streamId) => (

@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 const OnBoarding = ({ user }) => {
     const classes = useStyles();
     const history = useHistory();
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(5);
     const [channelPointsRewardCost, setChannelPointsRewardCost] = useState(2000);
     const [errorCode, setErrorCode] = useState(0);
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);
@@ -198,7 +198,7 @@ const OnBoarding = ({ user }) => {
                 }
                 {step === 1 &&
                 <>
-                    <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/c842463b-291d-4172-910c-e5f40a673ea7/channelpoints-pink.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T171548Z&X-Amz-Expires=86400&X-Amz-Signature=a3a1c0e04ecde2d13557c07daabc6cea08e962753f2eae9080b3586e27c9402b&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22channelpoints-pink.gif%22&x-id=GetObject'
+                    <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Fchannelpoints-pink.gif?alt=media&token=f5ca8128-99cc-4d03-9257-e5e6f960cac4'
                         alt='channel points'
                         style={{
                             position: 'absolute',
@@ -248,7 +248,7 @@ const OnBoarding = ({ user }) => {
                 }
                 {step === 4 &&
                 <>
-                    <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/f3d31749-cd27-4908-b913-9c5d227cc342/overlay.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T173737Z&X-Amz-Expires=86400&X-Amz-Signature=48fefc679c88f8deb2875bff1d595158917f87f8f051661c629ef077d465af68&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22overlay.gif%22&x-id=GetObject'
+                    <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Foverlay.gif?alt=media&token=178044eb-f697-44ad-860c-81e93741d276'
                         alt='overlay'
                         style={{
                             position: 'absolute',
@@ -414,7 +414,7 @@ const OnBoarding = ({ user }) => {
                                 marginTop: '-100px',
                             }}
                         />
-                        <img src='https://s3.us-west-2.amazonaws.com/secure.notion-static.com/f43e82ea-dfdd-4542-8d32-4dcba84e573d/you_are_set.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220830%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220830T174423Z&X-Amz-Expires=86400&X-Amz-Signature=28eb462c0fc2b4e03083bf5ea609ed384c312ee41907e1d7b4e324ce99c35541&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22you%2520are%2520set.gif%22&x-id=GetObject'
+                        <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Fyou%2520are%2520set.gif?alt=media&token=0c285185-9be1-4f56-ae8e-efd67a7e2099'
                             alt={`you're set`}
                             style={{
                                 position: 'absolute',

@@ -16,7 +16,8 @@
     "SideBar": {
         "dashboard": "Dashboard",
         "membership": "Membresía",
-        "universalProfile": "Perfil Universal",
+        "billing": "Membresía",
+        "universalProfile": "Perfil",
         "settings": "Ajustes",
         "new": "Nuevo",
         "signOut": "Cerrar sesión"
@@ -63,7 +64,9 @@
         "policiesP1": "Al continuar acepto los",
         "policiesP2": "Terminos de uso",
         "policiesP3": "y la",
-        "policiesP4": "Política de Privacidad"
+        "policiesP4": "Política de Privacidad",
+        "termsOfUseUrl": "https://www.qapla.gg/es/terminos-y-condiciones-creadores",
+        "privacyPolicy": "https://www.qapla.gg/es/aviso-de-privacidad"
     },
     "StreamerProfile": {
         "balance": "Balance",

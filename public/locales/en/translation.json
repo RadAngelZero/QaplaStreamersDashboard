@@ -15,8 +15,9 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
-        "membership": "Membership",
-        "universalProfile": "Universal Profile",
+        "membership": "Upgrade plan",
+        "billing": "Billing",
+        "universalProfile": "Profile",
         "settings": "Settings",
         "new": "New",
         "signOut": "Log out"
@@ -63,7 +64,9 @@
         "policiesP1": "By signing up you accept our",
         "policiesP2": "Terms of Use",
         "policiesP3": "and",
-        "policiesP4": "Privacy Policy"
+        "policiesP4": "Privacy Policy",
+        "termsOfUseUrl": "https://www.qapla.gg/terms-of-use-creators",
+        "privacyPolicy": "https://www.qapla.gg/privacy"
     },
     "StreamerProfile": {
         "balance": "Balance",

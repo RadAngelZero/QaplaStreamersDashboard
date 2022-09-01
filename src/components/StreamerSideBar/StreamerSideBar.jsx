@@ -41,10 +41,8 @@ const useStyles = makeStyles((theme) => ({
 
 const DashboardIcon = ({ active }) => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill={active ? "#0AFFD2" : 'rgba(255, 255, 255, .25)'} d="M1.4526 9.37983C1.76537 6.87768 3.89237 5 6.41399 5H17.5862C20.1078 5 22.2348 6.87768 22.5476 9.37983L23.322 15.5757C23.6821 18.456 21.4363 21 18.5336 21C16.9301 21 15.5005 20.2154 14.6212 19H9.37894C8.4997 20.2154 7.07009 21 5.46656 21C2.5639 21 0.318082 18.456 0.678112 15.5757L1.4526 9.37983Z" />
-        <path fill={active ? "#4040FF" : '#FFF'} d="M8 9C7.44772 9 7 9.44772 7 10V11H6C5.44772 11 5 11.4477 5 12C5 12.5523 5.44772 13 6 13H7V14C7 14.5523 7.44772 15 8 15C8.55229 15 9 14.5523 9 14V13H10C10.5523 13 11 12.5523 11 12C11 11.4477 10.5523 11 10 11H9V10C9 9.44772 8.55229 9 8 9Z" />
-        <path fill={active ? "#4040FF" : '#FFF'} d="M18 11C18.5523 11 19 10.5523 19 10C19 9.44771 18.5523 9 18 9C17.4477 9 17 9.44771 17 10C17 10.5523 17.4477 11 18 11Z" />
-        <path fill={active ? "#4040FF" : '#FFF'} d="M16 15C16.5523 15 17 14.5523 17 14C17 13.4477 16.5523 13 16 13C15.4477 13 15 13.4477 15 14C15 14.5523 15.4477 15 16 15Z" />
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.92 2H4.54C3.14 2 2 3.15 2 4.561V7.97C2 9.39 3.14 10.53 4.54 10.53H7.92C9.33 10.53 10.46 9.39 10.46 7.97V4.561C10.46 3.15 9.33 2 7.92 2ZM7.92 13.4697H4.54C3.14 13.4697 2 14.6107 2 16.0307V19.4397C2 20.8497 3.14 21.9997 4.54 21.9997H7.92C9.33 21.9997 10.46 20.8497 10.46 19.4397V16.0307C10.46 14.6107 9.33 13.4697 7.92 13.4697ZM16.0801 13.4697H19.4601C20.8601 13.4697 22.0001 14.6107 22.0001 16.0307V19.4397C22.0001 20.8497 20.8601 21.9997 19.4601 21.9997H16.0801C14.6701 21.9997 13.5401 20.8497 13.5401 19.4397V16.0307C13.5401 14.6107 14.6701 13.4697 16.0801 13.4697Z" fill={active ? "#00FFDD" : 'rgba(255, 255, 255, .25)'} />
+        <path d="M19.46 2H16.08C14.67 2 13.54 3.15 13.54 4.561V7.97C13.54 9.39 14.67 10.53 16.08 10.53H19.46C20.86 10.53 22 9.39 22 7.97V4.561C22 3.15 20.86 2 19.46 2Z" fill={active ? "#3B4BF9" : '#FFF'} />
     </svg>
 );
 
@@ -133,14 +131,6 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => history.push('/store')} className={classes.listItem}>
-                    <ListItemIcon style={{ minWidth: 40 }}>
-                        <StoreIcon active={currentScreen === 'store'} />
-                    </ListItemIcon>
-                    <ListItemText style={{ opacity: currentScreen === 'store' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
-                        Q Store
-                    </ListItemText>
-                </ListItem>
                 <ListItem button onClick={goToUniversalProfile} className={classes.listItem}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <ProfileIcon active={currentScreen === 'editProfile'} />
@@ -156,6 +146,14 @@ const StreamerSideBar = ({ user }) => {
                         </div>
                     }
                 </ListItem>
+                <ListItem button onClick={goToSettings} className={classes.listItem}>
+                    <ListItemIcon style={{ minWidth: 40 }}>
+                        <CogIcon active={currentScreen === 'settings'} />
+                    </ListItemIcon>
+                    <ListItemText style={{ opacity: currentScreen === 'settings' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                        {t('SideBar.settings')}
+                    </ListItemText>
+                </ListItem>
                 {user && user.stripeCustomerId && user.premium ?
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post' onSubmit={() => setLoadingStripeCustomerPortal(true)}>
                         <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
@@ -165,7 +163,7 @@ const StreamerSideBar = ({ user }) => {
                             </ListItemIcon>
                             <ListItemText style={{ opacity: currentScreen === 'membership' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                                 {!loadingStripeCustomerPortal ?
-                                    t('SideBar.membership')
+                                    t('SideBar.billing')
                                     :
                                     <CircularProgress className={classes.circularProgress} size={25} />
                                 }
@@ -182,14 +180,6 @@ const StreamerSideBar = ({ user }) => {
                         </ListItemText>
                     </ListItem>
                 }
-                <ListItem button onClick={goToSettings} className={classes.listItem}>
-                    <ListItemIcon style={{ minWidth: 40 }}>
-                        <CogIcon active={currentScreen === 'settings'} />
-                    </ListItemIcon>
-                    <ListItemText style={{ opacity: currentScreen === 'settings' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
-                        {t('SideBar.settings')}
-                    </ListItemText>
-                </ListItem>
             </List>
             <div style={{ flexGrow: 1 }} />
             <List style={{

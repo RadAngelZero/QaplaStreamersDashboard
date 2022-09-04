@@ -297,46 +297,48 @@ const LiveDonations = () => {
     document.body.style.backgroundColor = 'transparent';
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end' }}>
-            <div
-                onAnimationEnd={() => {
-                    setPlayQaplaOnAnimation("false");
-                    if (qaplaOnOpacity === 1)
-                        setQaplaOnOpacity(0)
-                    if (qaplaOnOpacity === 0)
-                        setQaplaOnOpacity(1)
-                    queueAnimation();
-                }}
-                style={{
-                    position: 'fixed',
-                    bottom: '-15px',
-                    left: alertSideRight ? 'auto' : '-12px',
-                    right: alertSideRight ? '-12px' : 'auto',
-                    width: '150px',
-                }}
-                className="qapla-logo-container"
-                playAnimation={playQaplaOnAnimation}
-            >
-                <style>{`
-                @keyframes dissapear {
-                    from {
-                        opacity: ${qaplaOnOpacity === 1 ? 1 : 0};
+            {reactionsEnabled &&
+                <div
+                    onAnimationEnd={() => {
+                        setPlayQaplaOnAnimation("false");
+                        if (qaplaOnOpacity === 1)
+                            setQaplaOnOpacity(0)
+                        if (qaplaOnOpacity === 0)
+                            setQaplaOnOpacity(1)
+                        queueAnimation();
+                    }}
+                    style={{
+                        position: 'fixed',
+                        bottom: '-15px',
+                        left: alertSideRight ? 'auto' : '-12px',
+                        right: alertSideRight ? '-12px' : 'auto',
+                        width: '150px',
+                    }}
+                    className="qapla-logo-container"
+                    playAnimation={playQaplaOnAnimation}
+                >
+                    <style>{`
+                    @keyframes dissapear {
+                        from {
+                            opacity: ${qaplaOnOpacity === 1 ? 1 : 0};
+                        }
+                        to {
+                            opacity: ${qaplaOnOpacity === 1 ? 0 : 1};
+                        }
                     }
-                    to {
-                        opacity: ${qaplaOnOpacity === 1 ? 0 : 1};
+                    .qapla-logo-container{
+                        opacity: ${qaplaOnOpacity};
                     }
-                }
-                .qapla-logo-container{
-                    opacity: ${qaplaOnOpacity};
-                }
-                .qapla-logo-container[playAnimation="true"] {
-                    animation-name: dissapear;
-                    animation-duration: 5s;
-                    animation-iteration-count: 1;
-                    animation-timing-function: ease-in-out;
-                }
-                `}</style>
-                <img src={alertSideRight ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
-            </div>
+                    .qapla-logo-container[playAnimation="true"] {
+                        animation-name: dissapear;
+                        animation-duration: 5s;
+                        animation-iteration-count: 1;
+                        animation-timing-function: ease-in-out;
+                    }
+                    `}</style>
+                    <img src={alertSideRight ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
+                </div>
+            }
             {showEmojiRain &&
                 <div id="animate" style={{
                     position: 'fixed',

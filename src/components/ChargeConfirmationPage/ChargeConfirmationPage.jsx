@@ -174,7 +174,7 @@ const ChargeConfirmationPage = ({ user }) => {
         }
 
         if (user && user.uid) {
-            getDetails();
+            // getDetails();
         }
     }, [user]);
 

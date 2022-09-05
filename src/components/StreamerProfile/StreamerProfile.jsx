@@ -267,32 +267,11 @@ const StreamerProfile = ({ user, games }) => {
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
-                                            <Grid item xs={12} className={styles.balanceContainers}>
-                                                <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
-                                                    <DonatedQoin style={{ width: '35px', height: '35px' }} />
-                                                    <div className={styles.balanceInnerContainer}>
-                                                        <p className={styles.balanceDataTextTitle}>Qlan</p>
-                                                        <p className={styles.balanceDataText}>
-                                                            {qlanQoins.toLocaleString()}
-                                                        </p>
-                                                    </div>
-                                                </BalanceButtonContainer>
-                                            </Grid>
+                                          
                                             <Grid item xs={12}   className={styles.bitBalanceContainer}>
-                                                <div style={{ width: '100%', height: '100px', display: 'flex', alignItems: 'center', cursor: 'pointer'}}
-                                                 onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Bits') }}> 
+                                                <div className={styles.containerBit}> 
                                                 <BitsIcon style={{ width: '35px', height: '35px' }} />
-                                                <BarProgressBit/>
-                                                
-                                                {/* <BalanceButtonContainer >
-                                                    
-                                                    <div className={styles.balanceInnerContainer}>
-                                                        <p className={styles.balanceDataTextTitle}>{t('StreamerProfile.stimatedBits')}</p>
-                                                        <p className={styles.balanceDataText}>
-                                                            {Math.floor(estimatedBits).toLocaleString()}
-                                                        </p>
-                                                    </div>
-                                                </BalanceButtonContainer> */}
+                                                <BarProgressBit setOpenRecordsDialog={setOpenRecordsDialog} setButtonPressed={setButtonPressed}/>
                                                 </div>
                                             </Grid>
                                         </Grid>

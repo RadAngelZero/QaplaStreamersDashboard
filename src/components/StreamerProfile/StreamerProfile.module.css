@@ -111,11 +111,37 @@ body {
     background-color: #141735;
     padding: 22px 24px;
     height: 100px;
-    min-width: 180px !important;
+    min-width: 190px !important;
     max-width: 520px !important;
     border-radius: 20px;
     align-items: center;
 }
+
+.containerBit{
+    width:100%;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+}
+
+@media (max-width: 600px) {
+    .bitBalanceContainer{
+        display: flex;
+        flex-direction: column;
+        height:309px;
+        align-items: start;
+        
+        
+    }
+    .containerBit{
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content:start;
+        height:100%;
+       
+    }
+   }
 
 .balanceInnerContainer {
     display: flex;

@@ -4,7 +4,10 @@
   align-items: center;
   justify-content: space-around;
   flex-wrap: wrap;
+  cursor: pointer;
 }
+
+
 
 .barProgress {
   height: 57px;
@@ -25,10 +28,12 @@
 
 .titulos {
   display: flex;
+  height: 34px;
+  align-items: inherit;
 }
 
 .porcentaje {
-  margin: 0px 0px 0px 10px;
+  margin: 2px 0px 0px 10px;
   font-family: "Inter";
   font-style: normal;
   font-weight: 500;
@@ -49,7 +54,7 @@
 }
 
 .puntos h2 {
-  margin: 5px;
+  margin: 0px;
   font-family: "Inter";
   font-style: normal;
   font-weight: 600;
@@ -61,11 +66,31 @@
 }
 
 .button {
-  width: 90px;
+  width: 110px;
   height: 40px;
   background: #3B4BF9;
   border-radius: 8px;
 color: #FFFFFF;
 border:none;
 outline: none;
+margin-left: 10px;
+cursor: pointer;
+
 }
+
+@media (max-width: 600px) {
+  .container{
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      justify-content:space-around;
+      height:100%;
+  }
+  .button{
+    width: 180px;
+  }
+ }
+
+ .dialog{
+  border-radius:40px;
+ }

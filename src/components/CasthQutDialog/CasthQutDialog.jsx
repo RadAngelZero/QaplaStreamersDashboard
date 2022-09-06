@@ -22,8 +22,8 @@ const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amou
     const qoinsCashOut = amountBits / 10 * 200;
 
     setDisableButton(true);
-    /* await saveStreamerCashOutRequest(user.uid, qoinsCashOut, amountBits);
-    await notifyCashOutToQaplaAdmin(user.uid, user.displayName, qoinsCashOut, amountBits); */
+    await saveStreamerCashOutRequest(user.uid, qoinsCashOut, amountBits);
+    await notifyCashOutToQaplaAdmin(user.uid, user.displayName, qoinsCashOut, amountBits);
     setOpenConfirm(true);
     setConfirmCashOut(true);
     setDisableButton(false);

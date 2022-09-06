@@ -55,7 +55,7 @@ const BitsButtonContainer = withStyles(() => ({
         padding: '22px 24px',
         height: '100px',
         minWidth: '190px !important',
-        maxWidth: '520px !important',
+        maxWidth: 552,
         borderRadius: '20px',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -200,7 +200,7 @@ const StreamerProfile = ({ user, games }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={6}>
                         <Grid item xs={12} sm={9}>
                             <Grid container xs={12}>
                                 <Grid xs={12}>
@@ -271,14 +271,14 @@ const StreamerProfile = ({ user, games }) => {
                                     </div>
                                 </Grid>
                                 <Grid xs={12}>
-                                    <Grid container xs={11}>
+                                    <Grid container xs={12}>
                                         <Grid item xs={12}>
                                             <h1 className={styles.title} style={{ marginBottom: 40 }}>
                                                 {t('StreamerProfile.balance')}
                                             </h1>
                                         </Grid>
-                                        <Grid container xs={12} style={{ gap: '20px' }} >
-                                            <Grid item xs={12} sm={4} className={styles.balanceContainers}>
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between' }}>
+                                            <Grid item xs={12} sm={4} style={{ paddingRight: 24 }}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
                                                     <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
@@ -289,7 +289,7 @@ const StreamerProfile = ({ user, games }) => {
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
-                                            <Grid item xs={12} sm={8} className={styles.bitBalanceContainer}>
+                                            <Grid item xs={12} sm={8}>
                                                 {/* e.currentTarget != e.target Help us to prevent trigger the event if the user clicks the inner button and not this button */}
                                                 <BitsButtonContainer className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
                                                     <BitsIcon style={{ width: '35px', height: '35px' }} />

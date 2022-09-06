@@ -1017,9 +1017,9 @@ export async function getInteractionsRewardData(uid) {
  * Saves the request of cash out for the given streamer
  * @param {string} uid User identifier
  * @param {number} amountQoins Amount of Qoins to remove from the streamer balance
- * @param {number} amountBit Amount of bits to deliver to the streamer
+ * @param {number} amountBits Amount of bits to deliver to the streamer
  */
-export async function saveStreamerCashOutRequest(uid, amountQoins, amountBit) {
+export async function saveStreamerCashOutRequest(uid, amountQoins, amountBits) {
     const date = new Date();
 
     const qoinsRemoved = await userStreamersRef.child(uid).child('qoinsBalance').transaction((qoinsBalance) => {
@@ -1029,7 +1029,7 @@ export async function saveStreamerCashOutRequest(uid, amountQoins, amountBit) {
     if (qoinsRemoved.committed) {
         return await streamerCashOutRef.child(uid).push({
             amountQoins,
-            amountBit,
+            amountBits,
             delivered: false,
             timestamp: date.getTime()
         });

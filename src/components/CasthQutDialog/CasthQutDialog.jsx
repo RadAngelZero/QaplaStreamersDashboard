@@ -8,6 +8,7 @@ import { saveStreamerCashOutRequest } from "../../services/database";
 
 const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amountBits }) => {
   const [bits, setBits] = useState(0);
+  const [disableButton, setDisableButton] = useState(false);
   useEffect(() => {
     if (amountBits > 0 && !bits) {
       setBits(amountBits);
@@ -17,10 +18,12 @@ const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amou
   const confirmCashOut = async () => {
     const qoinsCashOut = amountBits / 10 * 200;
 
+    setDisableButton(true);
     await saveStreamerCashOutRequest(user.uid, qoinsCashOut, amountBits);
     await notifyCashOutToQaplaAdmin(user.uid, user.displayName, qoinsCashOut, amountBits);
     setOpenConfirm(true);
-    setConfirmCashOut(true)
+    setConfirmCashOut(true);
+    setDisableButton(false);
   }
 
   return (
@@ -36,7 +39,7 @@ const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amou
         <p className={style.text}>
           Confirm you are cashing out your Qoins for Bits on Twitch
         </p>
-        <button onClick={confirmCashOut} className={style.button_cash}>Cash Out</button>
+        <button disabled={disableButton} onClick={confirmCashOut} className={style.button_cash}>Cash Out</button>
         <button onClick={() => setOpen(false)} className={style.button_cancel}>
           Cancel
         </button>

@@ -278,7 +278,7 @@ const StreamerProfile = ({ user, games }) => {
                                             </h1>
                                         </Grid>
                                         <Grid container xs={12} style={{ gap: '20px' }} >
-                                            <Grid item xs={12} sm={6} className={styles.balanceContainers}>
+                                            <Grid item xs={12} sm={4} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
                                                     <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
@@ -289,7 +289,7 @@ const StreamerProfile = ({ user, games }) => {
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
-                                            <Grid item xs={12} sm={6} className={styles.bitBalanceContainer}>
+                                            <Grid item xs={12} sm={8} className={styles.bitBalanceContainer}>
                                                 {/* e.currentTarget != e.target Help us to prevent trigger the event if the user clicks the inner button and not this button */}
                                                 <BitsButtonContainer className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
                                                     <BitsIcon style={{ width: '35px', height: '35px' }} />

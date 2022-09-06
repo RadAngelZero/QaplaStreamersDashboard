@@ -23,8 +23,7 @@ import {
     SCHEDULED_EVENT_TYPE,
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE,
-    PREMIUM,
-    FREE_USER
+    PREMIUM
 } from '../../utilities/Constants';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 
@@ -112,13 +111,7 @@ const StreamerProfile = ({ user, games }) => {
 
         async function getValueOfQoins() {
             if (user) {
-                let valueOfQoins = 0;
-
-                if (user.premium || user.freeTrial) {
-                    valueOfQoins = (await getStreamerValueOfQoins(PREMIUM)).val();
-                } else {
-                    valueOfQoins = (await getStreamerValueOfQoins(FREE_USER)).val();
-                }
+                let valueOfQoins = (await getStreamerValueOfQoins(PREMIUM)).val();
 
                 setValueOfQoinsForStreamer(valueOfQoins);
             }
@@ -186,12 +179,16 @@ const StreamerProfile = ({ user, games }) => {
     }
 
     let cheersQoins = 0;
-    let qlanQoins = 0;
+    let availableBits = 0;
+    let nextMilestone = 250;
     let estimatedBits = 0;
+
     if (user) {
         cheersQoins = user.qoinsBalance || 0;
-        qlanQoins = user.qlanBalance || 0;
-        estimatedBits = (cheersQoins / 200) * valueOfQoinsForStreamer;
+        const tensOfBits =  cheersQoins / 200;
+        estimatedBits = (tensOfBits) * valueOfQoinsForStreamer;
+        availableBits = 250 * Math.floor((estimatedBits) / 250);
+        nextMilestone = 250 * Math.ceil((estimatedBits + 1) / 250);
     }
 
     const handleSwitchEvents = () => {
@@ -303,7 +300,10 @@ const StreamerProfile = ({ user, games }) => {
                                                 {/* e.currentTarget != e.target Help us to prevent trigger the event if the user clicks the inner button and not this button */}
                                                 <BitsButtonContainer disableRipple className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
                                                     <BitsIcon style={{ width: '35px', height: '35px' }} />
-                                                    <BarProgressBit amountBits={Math.floor(estimatedBits)}/>
+                                                    <BarProgressBit user={user}
+                                                        estimatedBits={Math.floor(estimatedBits)}
+                                                        availableBits={Math.floor(availableBits)}
+                                                        nextMilestone={nextMilestone}/>
                                                 </BitsButtonContainer>
                                             </Grid>
                                         </Grid>
@@ -374,8 +374,7 @@ const StreamerProfile = ({ user, games }) => {
                         onClose={() => setOpenRecordsDialog(false)}
                         user={user}
                         cheersQoins={cheersQoins}
-                        qlanQoins={qlanQoins}
-                        estimatedBits={estimatedBits}
+                        estimatedBits={availableBits}
                         valueOfQoinsForStreamer={valueOfQoinsForStreamer}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />

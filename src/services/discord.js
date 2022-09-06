@@ -79,3 +79,28 @@ export async function notifyActivationWithReferralCode(referrerStreamerName, ref
         }
     );
 }
+
+export async function notifyCashOutToQaplaAdmin(streamerUid, streamerName, qoinsCashOut, amountBits) {
+	let adminsToTagOnDiscordMessage = ['524674047456444416'];
+
+	let adminTags = '';
+	adminsToTagOnDiscordMessage.forEach((adminId) => {
+		adminTags += `<@${adminId}>`;
+	});
+
+    await fetch(
+		'https://discord.com/api/webhooks/1016735734494920704/aSTJNQzG9Z02bBT9M5i6OpW-z6vcI7AJiCMkjeQYc4pkWZqHeedRuFyvQ7JEMXoPanVA',
+        {
+            method: 'POST',
+            headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				content: `${streamerName} quiere cambiar ${qoinsCashOut} Qoins por ${amountBits} Bits.\nUid: ${streamerUid}\n${adminTags}`,
+            	username: "Qapla Cash Out Notifier",
+				tts: false
+			})
+        }
+    );
+}

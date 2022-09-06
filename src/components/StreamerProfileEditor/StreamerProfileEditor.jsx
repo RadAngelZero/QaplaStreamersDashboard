@@ -495,12 +495,14 @@ const StreamerProfileEditor = ({ user }) => {
                                         </EditBioButton>
                                     </div>
                                 </div>
-                                {/* <div className={styles.twitchURLContainer}>
-                                    <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
-                                    <Tooltip placement='top' open={openTooltip} title='Copiado'>
-                                        <CopyIcon onClick={copyTwitchURL} />
-                                    </Tooltip>
-                                </div> */}
+                                <div className={styles.twitchURLContainer}>
+                                    <div className={styles.twitchURLSubContainer}>
+                                        <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
+                                        <Tooltip placement='top' open={openTooltip} title='Copiado'>
+                                            <CopyIcon onClick={copyTwitchURL} className={styles.copyIcon} />
+                                        </Tooltip>
+                                    </div>
+                                </div>
                                 <div className={styles.bioContainer}>
                                     <p className={styles.bioText} onClick={editBio}>
                                         {streamerBio}
@@ -688,13 +690,13 @@ const StreamerProfileEditor = ({ user }) => {
                             </div>
                         </>
                         :
-                        <StreamerProfileEditorOnBoarding step={onBoardingStep}
-                            user={user}
-                            onBoardingDone={onBoardingDoneByStreamer}
-                            showOnlySpecificStep={editingBio || addingTag}
-                            streamerBio={streamerBio}
-                            streamerTags={streamerTags}
-                            closeOnBoarding={cancelEditing} />
+                    <StreamerProfileEditorOnBoarding step={onBoardingStep}
+                        user={user}
+                        onBoardingDone={onBoardingDoneByStreamer}
+                        showOnlySpecificStep={editingBio || addingTag}
+                        streamerBio={streamerBio}
+                        streamerTags={streamerTags}
+                        closeOnBoarding={cancelEditing} />
                     }
                 </>
             }

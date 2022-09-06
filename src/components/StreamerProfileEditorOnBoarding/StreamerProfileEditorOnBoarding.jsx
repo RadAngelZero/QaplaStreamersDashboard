@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { withStyles, Chip } from '@material-ui/core';
+import { makeStyles, withStyles, Chip, Button, Tooltip, } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditorOnBoarding.module.css';
@@ -11,6 +11,25 @@ import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
 import ProfilesPresentation1 from './../../assets/ProfilesPresentation1.png';
 import ProfilesPresentation2 from './../../assets/ProfilesPresentation2.png';
 import ProfilesPresentation3 from './../../assets/ProfilesPresentation3.png';
+import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
+
+const useStyles = makeStyles((theme) => ({
+    button: {
+        backgroundColor: '#00FFDD',
+        color: '#141833',
+        width: '390px',
+        height: '60px',
+        fontSize: '16px',
+        fontWeight: '600',
+        lineHeight: '22px',
+        letterSpacing: '0.492000013589859px',
+        textTransform: 'none',
+        borderRadius: '16px',
+        '&:hover': {
+            backgroundColor: '#00EACB'
+        },
+    },
+}));
 
 const QaplaChip = withStyles(() => ({
     root: {
@@ -56,13 +75,13 @@ const QaplaDots = ({ index, dots, activeWidth = '30px' }) => {
     for (let i = 0; i < dots; i++) {
         dotsRender.push(
             <div key={`dot-${i}`}
-            style={{
-                backgroundColor: index === i ? '#00FEDF' : '#00FEDF8A',
-                width: index === i ? activeWidth : '8px',
-                height: '8px',
-                margin: '0px 6.5px',
-                borderRadius: '100px'
-            }}>
+                style={{
+                    backgroundColor: index === i ? '#00FEDF' : '#00FEDF8A',
+                    width: index === i ? activeWidth : '8px',
+                    height: '8px',
+                    margin: '0px 6.5px',
+                    borderRadius: '100px'
+                }}>
             </div>
         )
     }
@@ -91,7 +110,7 @@ const DEFUALT_TAGS = [
     createDefaultTag('Valorant')
 ];
 
-const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, user, onBoardingDone, streamerBio = '', streamerTags = [], closeOnBoarding = () => {} }) => {
+const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, user, onBoardingDone, streamerBio = '', streamerTags = [], closeOnBoarding = () => { } }) => {
     const [currentStep, setCurrentStep] = useState(step)
     const [tagSearch, setTagSearch] = useState('')
     const [tagSearchLimit, setTagSearchLimit] = useState(false)
@@ -100,7 +119,10 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
     const [bioError, setBioError] = useState(false);
     const [tagError, setTagError] = useState(false);
     const [showTagHelper, setShowTagHelper] = useState(true);
+    const [qaplaLink, setQaplaLink] = useState('');
+    const [openTooltip, setOpenTooltip] = useState(false);
     const { t } = useTranslation();
+    const classes = useStyles();
 
     const continueButtonForm = async () => {
         const step = currentStep + 1;
@@ -225,10 +247,298 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
         setBio(bio);
     }
 
+    const handleMainButton = async () => {
+        if (currentStep === 1) {
+            if (bio.replace(/\s/g, '').length === 0) {
+                setBioError(true);
+                return;
+            } else {
+                if (bio.length >= MIN_BIO_LENGTH) {
+                    if (showOnlySpecificStep) {
+                        closeOnBoarding();
+                    } else {
+                        setCurrentStep(currentStep + 1);
+                    }
+                    return await saveBio();
+                }
+            }
+            return;
+        }
+        if (currentStep === 2) {
+            setCurrentStep(currentStep + 1);
+            const tagsSelected = tags.filter((tag) => tag.selected);
+            if (tagsSelected.length >= MIN_TAGS) {
+                const tagsLabels = tagsSelected.map((tag) => tag.label);
+                await updateStreamerPublicProfile(user.uid, { tags: tagsLabels });
+
+                // We don´t know how we are going to use this information but we want to save it
+                const tagObject = {};
+                tagsLabels.forEach((tag) => {
+                    tagObject[tag] = true;
+                });
+
+                saveTags(tagObject);
+                if (showOnlySpecificStep) {
+                    return closeOnBoarding();
+                } else {
+                    return onBoardingDone();
+                }
+            } else {
+                setTagError(true);
+            }
+        }
+        if (currentStep === 3) {
+            return console.log('Go to profile');
+        }
+        setCurrentStep(currentStep + 1);
+    }
+
+    const handleQaplaLinkChange = (e) => {
+        setQaplaLink(e.target.value);
+    }
+
+    const copyTwitchURL = () => {
+        navigator.clipboard.writeText(`qapla.app/${qaplaLink}`);
+        setOpenTooltip(true);
+        setTimeout(() => {
+            setOpenTooltip(false);
+        }, 1250);
+    }
+
     const tagsSelected = tags.filter((tag) => tag.selected);
     return (
         <div className={styles.profileOnBoardingContainer}>
-            <div className={styles.profileOnBoardingModalContainer}>
+            {currentStep === 0 &&
+                <>
+                    <img src={`https://media.giphy.com/media/57WAs7bCG9o4lCzEX9/giphy.gif`} alt={`Whats up`}
+                        style={{
+                            zIndex: 10000,
+                            position: 'absolute',
+                            bottom: '64.2vh', // 256 - 23 (height of container - hidden part of the image)
+                            width: '223px',
+                            height: '173px',
+                        }}
+                    />
+                </>
+            }
+            {currentStep === 1 &&
+                <>
+                    <img src={`https://media.giphy.com/media/Ll3URGrGa6EAuibyel/giphy.gif`} alt={`Chill`}
+                        style={{
+                            zIndex: 10000,
+                            position: 'absolute',
+                            bottom: '71vh', // 256 - 23 (height of container - hidden part of the image)
+                            width: '175px',
+                            height: '175px',
+                        }}
+                    />
+                </>
+            }
+            {currentStep === 2 &&
+                <>
+                    <img src={`https://media.giphy.com/media/XGaloBK1MGjo6cWyVD/giphy.gif`} alt={`Umbrella`}
+                        style={{
+                            zIndex: 0,
+                            position: 'absolute',
+                            bottom: '69vh', // 256 - 23 (height of container - hidden part of the image)
+                            width: '181px',
+                            height: '181px',
+                            transform: 'rotate(-30deg)',
+                        }}
+                    />
+                </>
+            }
+            {currentStep === 3 &&
+                <>
+                    <img src={`https://media.giphy.com/media/lRRomMvhcT66FpTwlc/giphy.gif`} alt={`Victory`}
+                        style={{
+                            zIndex: 0,
+                            position: 'absolute',
+                            bottom: '72vh', // 256 - 23 (height of container - hidden part of the image)
+                            width: '142px',
+                            height: '175px',
+                        }}
+                    />
+                </>
+            }
+            <div style={{
+                marginTop: 24,
+                position: 'relative',
+                display: 'flex',
+                backgroundColor: '#141833',
+                width: '450px',
+                height: currentStep >= 1 ? '450px' : '256px',
+                borderRadius: '35px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                zIndex: 500,
+            }}>
+                {currentStep === 0 &&
+                    <>
+                        <p className={styles.headerText}>
+                            {`Increase your interactions`}
+                        </p>
+                        <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                            {`Create and share your profile link to make it easier for your viewers to react on your stream ⚡️`}
+                        </p>
+                        <div className={styles.createLinkContainer}>
+                            <p style={{
+                                color: '#fff',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                lineHeight: '17px',
+                            }}>
+                                {`qapla.app/`}
+                            </p>
+                            <div className={styles.createLinkFieldContainer}>
+                                <div className={styles.createLinkFieldInnerConainer}>
+                                    <input
+                                        className={styles.createLinkText}
+                                        placeholder={`type to create your link`}
+                                        onChange={handleQaplaLinkChange}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </>}
+                {currentStep === 1 &&
+                    <>
+                        <p className={styles.headerText} style={{ marginTop: '18px' }}>
+                            {`Introduce yourself`}
+                        </p>
+                        <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                            {`It’s a bio, you know how it goes 🫶`}
+                        </p>
+                        <BioEditorTextArea bio={bio}
+                            setBio={updateBio}
+                            error={bioError}
+                            minLength={MIN_BIO_LENGTH} />
+                    </>}
+
+                {currentStep === 2 &&
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}>
+                        <p className={styles.headerText} style={{ marginTop: '18px' }}>
+                            {`Tags`}
+                        </p>
+                        <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                            {`Add tags about your content, you as a creator, you as a person, or whatever you want! 💜`}
+                        </p>
+                        <StreamerTextInput
+                            containerClassName={styles.modalTagSearchContainer}
+                            textInputStyle={{ backgroundColor: (tagSearch.length === 43 || tagError) ? '#802750' : '#202750' }}
+                            textInputClassName={styles.modalTagSearchTextInput}
+                            value={tagSearch}
+                            onChange={onTagSearchChange}
+                            placeholder={t('StreamerProfileEditor.addTagPlaceholder')}
+                            fullWidth />
+                        {tagError &&
+                            <p style={{ color: 'rgba(255, 255, 255, .65)', fontSize: 10 }}>
+                                {showTagHelper ?
+                                    t('StreamerProfileEditor.OnBoarding.tagErrorNotSelected')
+                                    :
+                                    t('StreamerProfileEditor.OnBoarding.minTags', { minTags: MIN_TAGS })
+                                }
+                            </p>
+                        }
+                        <ul className={styles.modalTagsList}
+                            style={{
+                                width: '100%',
+                                overflowY: 'auto',
+                                scrollBehavior: 'smooth',
+                            }}>
+                            {tags.map((data, index) => (
+                                <li key={index} className={styles.modalTag}>
+                                    <QaplaChip
+                                        label={data.label.length > 20 ? data.label.slice(0, 20) + '...' : data.label}
+                                        style={{ backgroundColor: data.selected ? '#4040FF' : 'rgba(64, 64, 255, 0.30859)' }}
+                                        onClick={(e) => tagClick(data, index, e)}
+                                    />
+                                </li>
+                            ))}
+                            {tagSearch !== '' &&
+                                <li className={styles.modalTag}>
+                                    <QaplaChip
+                                        label={tagSearch}
+                                        onClick={addNewTag}
+                                    />
+                                </li>
+                            }
+                        </ul>
+                    </div>}
+                {currentStep === 3 &&
+                    <>
+                        <p className={styles.headerText} style={{ marginTop: '18px' }}>
+                            {`Copy and share!`}
+                        </p>
+                        <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                            {`Your viewers can send reactions quick on stream right from your profile, or even download the app! `}
+                        </p>
+                        <div style={{
+                            marginTop: '35px',
+                        }}>
+                            <p className={`${styles.finalListText}`}>
+                                {`Ways of sharing:`}
+                            </p>
+                            <p className={`${styles.finalListText}`} style={{
+                                marginTop: '18px',
+                            }}>
+                                {`🔗 Add it to your Link-in-Bio `}
+                            </p>
+                            <p className={`${styles.finalListText}`} style={{
+                                marginTop: '18px',
+                            }}>
+                                {`🪪 Use it as a Link-in-Bio`}
+                            </p>
+                            <p className={`${styles.finalListText}`} style={{
+                                marginTop: '18px',
+                            }}>
+                                {`🤖 Add it to your Nightbot on Twitch`}
+                            </p>
+                        </div>
+                        <div className={styles.twitchURLContainer}>
+                            <div className={styles.twitchURLSubContainer}>
+                                <a href={`qapla.app/${qaplaLink}`} target='_blank' rel='noreferrer' className={styles.twitchURL} >{`qapla.app/${qaplaLink}`}</a>
+                                <Tooltip placement='top' open={openTooltip} title='Copiado'>
+                                    <CopyIcon onClick={copyTwitchURL} className={styles.copyIcon} />
+                                </Tooltip>
+                            </div>
+                        </div>
+                    </>}
+            </div>
+            <div
+                style={{
+                    marginTop: 24,
+                }}>
+                <Button
+                    disabled={qaplaLink === ''}
+                    onClick={handleMainButton}
+                    className={classes.button}
+                >
+                    {currentStep === 0 &&
+                        <>
+                            {`Create Profile Link`}
+                        </>}
+                    {currentStep === 1 &&
+                        <>
+                            {`Confirm Bio`}
+                        </>}
+                    {currentStep === 2 &&
+                        <>
+                            {`Finish set up`}
+                        </>}
+                    {currentStep === 3 &&
+                        <>
+                            {`Go to profile`}
+                        </>}
+                </Button>
+            </div>
+
+            {/* <div className={styles.profileOnBoardingModalContainer}>
                 {currentStep < 3 &&
                     <>
                         <div className={styles.modalImgContainer} style={{backgroundColor: renderBackgroundColor(currentStep)}}>
@@ -367,7 +677,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                         activeWidth='29px'
                     />
                 </div>
-            }
+            } */}
         </div>
     )
 }

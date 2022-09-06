@@ -3,7 +3,8 @@ import { Button, Card, CardContent, Grid, makeStyles } from '@material-ui/core';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { ReactComponent as ESvg } from './../../assets/e.svg';
+import { ReactComponent as ESvg } from './../../assets/g.svg';
+import {ReactComponent as Closeicon} from './../../assets/Closeicono.svg'
 import HeartHands from './../../assets/HeartHands.png';
 import { getSubscriptionPurchaseDetails } from '../../services/database';
 
@@ -42,7 +43,8 @@ const useStyles = makeStyles(() => ({
     totalPaid: {
         fontSize: 48,
         fontWeight: '600',
-        color: 'rgba(255, 255, 255, .9)'
+        color: 'rgba(255, 255, 255, .9)',
+        lineHeight:'58.09px'
     },
     interval: {
         marginLeft: 6,
@@ -102,7 +104,8 @@ const useStyles = makeStyles(() => ({
         justifyContent: 'center',
         alignItems: 'center',
         paddingLeft: 30,
-        paddingRight: 30
+        paddingRight: 30,
+        maxWidth:'450px'
     },
     thanksTitle: {
         marginTop: 8,
@@ -141,6 +144,11 @@ const useStyles = makeStyles(() => ({
         fontSize: 16,
         fontWeight: '500',
         color: 'rgba(255, 255, 255, .6)'
+    },
+    buttonClose:{
+       position: 'absolute',
+       top:'0px',
+       left:'-10px',
     }
 }));
 
@@ -189,7 +197,9 @@ const ChargeConfirmationPage = ({ user }) => {
     return (
         <Grid container alignContent='center' className={classes.container}>
             <Grid item md={6} className={classes.paymentInfoContainer}>
+                <Closeicon className={classes.buttonClose}/>
                 <div className={classes.eImageContainer}>
+                
                     <ESvg />
                 </div>
                 <p className={classes.subscriptionBought}>

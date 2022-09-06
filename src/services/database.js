@@ -28,11 +28,11 @@ const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
 const qaplaChallengeRef = database.ref('/QaplaChallenge');
-const qaplaChallengeLevelsRef = database.ref('/QaplaChallengeLevels');
 const qStoreRef = database.ref('/QStore');
-const qaplaGoalRef = database.ref('/QaplaGoals');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
+const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
+const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -189,6 +189,19 @@ export async function checkActiveCustomReward(streamId) {
 }
 
 /**
+ * Listen to the value of qoinsEnabled flag
+ * @param {string} streamId Stream identifier
+ * @param {function} callback Function to handle listener results
+ */
+export function listenToQoinsEnabled(streamId, callback) {
+    activeCustomRewardsRef.child(streamId).child('qoinsEnabled').on('value', callback);
+}
+
+export function removeQoinsEnabledListener(streamId) {
+    activeCustomRewardsRef.child(streamId).child('qoinsEnabled').off('value');
+}
+
+/**
  * Create a stream request in the nodes StreamersEvents and StreamsApproval
  * @param {string} uid User identifier
  * @param {object} streamerData Streamer data object
@@ -295,11 +308,13 @@ export async function updateStreamStatus(uid, streamId, status) {
 export async function removeStreamFromEventsData(uid, streamId) {
     const streamData = await streamsRef.child(streamId).once('value');
 
-    // Save a copy in the streamer event history
-    await streamersHistoryEventsDataRef.child(uid).child(streamId).update(streamData.val());
+    if (streamData.exists()) {
+        // Save a copy in the streamer event history
+        await streamersHistoryEventsDataRef.child(uid).child(streamId).update(streamData.val());
+        // Admin copy while we test if everything is working
+        database.ref('EventsDataAdmin').child(streamId).update(streamData.val());
+    }
 
-    // Admin copy while we test if everything is working
-    database.ref('EventsDataAdmin').child(streamId).update(streamData.val());
     return await streamsRef.child(streamId).remove();
 }
 
@@ -543,13 +558,35 @@ export async function writeTestCheer(streamerUid, completeMessage, errorMessage)
         uid: '',
         read: false,
         twitchUserName: 'QAPLA',
+        emojiRain: {
+            emojis: ['👋']
+        },
+        media: {
+            id: 'Iz0eDDbIrrItMCp2lO',
+            type: 'gif',
+            url: 'https://media2.giphy.com/media/bGCwmLDnwL25kCg3FV/giphy.gif?cid=4a0959dab7zzbi4dj9xiwv1dvfbut8y76yk7b08sglwcdltp&rid=giphy.gif&ct=g',
+            height: 480,
+            width: 480
+        },
+        messageExtraData: {
+            voiceAPIName: 'pt-BR-Standard-B',
+            giphyText: {
+                url: 'https://text.media.giphy.com/v1/media/giphy.gif?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiJwcm9kLTIwMjAtMDQtMjIiLCJzdHlsZSI6Im1lbWUiLCJ0ZXh0IjoiQnVlbmFzIGJ1ZW5hcyEiLCJpYXQiOjE2NjE0NDk1NTR9.iDZZaFNXfW7TISZM-eS3ZF76X2RFrp6k5H_BL5BIzU0&cid=025a3d845a80faa3d6f2c679f74e7958b157c9e17aac766e&dynamic_style=meme&rid=giphy.gif&ct=t',
+                height: 300,
+                width: 600
+            }
+        },
         userName: 'QAPLA',
         photoURL: ''
     }, (error) => {
         if (error) {
-            alert(errorMessage);
+            if (errorMessage) {
+                alert(errorMessage);
+            }
         } else {
-            alert(completeMessage);
+            if (completeMessage) {
+                alert(completeMessage);
+            }
         }
     });
 }
@@ -830,14 +867,6 @@ export function listenToStreamerAlertsSettings(uid, callback) {
 }
 
 /**
- * Get the media selected by the streamer to show in their cheers
- * @param {string} uid User identifier
- */
-export async function getStreamerMediaContent(uid) {
-    return await streamerCustomMediaForCheers.child(uid).once('value');
-}
-
-/**
  * QoinsToBitForStreamers
  */
 
@@ -869,7 +898,7 @@ export async function streamerHasQlan(uid) {
  * @param {string} image Image url
  */
 export async function createQlan(uid, code, name, image) {
-    await qreatorsCodesRef.child(uid).update({ code });
+    await qreatorsCodesRef.child(uid).update({ code, codeLowerCase: code.toLowerCase() });
     return await qlanesRef.child(uid).update({ name, image });
 }
 
@@ -899,43 +928,12 @@ export async function getQlanIdWithQreatorCode(qreatorCode) {
     return id;
 }
 
-////////////////////////
-// Qapla Challenge
-////////////////////////
-
-/**
- * Listen to the xq counter of the given streamer for the Qapla Challenge
- * @param {string} streamerUid Streamer identifier
- * @param {function} callback Function to execute when xq node is updated
- */
-export function listenQaplaChallengeXQProgress(streamerUid, callback) {
-    return qaplaChallengeRef.child(streamerUid).child('xq').on('value', callback);
-}
-
 /**
  * Gets the category of the Qapla Challenge in which the user is participating
  * @param {string} streamerUid Streamer identifier
  */
 export async function getStreamerChallengeCategory(streamerUid) {
     return await qaplaChallengeRef.child(streamerUid).child('category').once('value');
-}
-
-/**
- * Get the goal (XQ amount needed to pass to the next level) of the current level
- * @param {number} category Category in which the user is participating
- * @param {number} currentXQ Current ammount of XQ
- */
-export async function getChallengeLevelGoal(category, currentXQ) {
-    return await qaplaChallengeLevelsRef.child(category).orderByValue().startAt(currentXQ).limitToFirst(1).once('value');
-}
-
-/**
- * Get the goal (XQ amount needed to pass) from the previous level
- * @param {number} category Category in which the user is participating
- * @param {number} currentXQ Current ammount of XQ
- */
-export async function getChallengePreviousLevelGoal(category, currentXQ) {
-    return await qaplaChallengeLevelsRef.child(category).orderByValue().endAt(currentXQ).limitToLast(1).once('value');
 }
 
 ////////////////////////
@@ -947,20 +945,6 @@ export async function getChallengePreviousLevelGoal(category, currentXQ) {
  */
 export async function getQStoreItems() {
     return await qStoreRef.once('value');
-}
-
-////////////////////////
-// Qapla Goal
-////////////////////////
-
-/**
- * Listen to all the changes in the Qapla goal children of the
- * given user
- * @param {string} uid User identifier
- * @param {function} callback Handler of listener results
- */
-export function listenQaplaGoal(uid, callback) {
-    return qaplaGoalRef.child(uid).on('value', callback);
 }
 
 ////////////////////////
@@ -993,4 +977,33 @@ export async function giveReferrerRewardsToStreamer(uid, referredDisplayName, en
             await userStreamersRef.child(uid).child('currentPeriod').child('startDate').set(today.getTime());
         }
     }
+}
+
+////////////////////////
+// Channel Point Interactions
+////////////////////////
+
+export async function saveInteractionsRewardData(uid, rewardId, webhookId) {
+    await streamersInteractionsRewardsRef.child(uid).update({ rewardId, webhookId })
+}
+
+/**
+ * Get the interactions reward data of the given user
+ * @param {string} uid User identifier
+ */
+export async function getInteractionsRewardData(uid) {
+    return await streamersInteractionsRewardsRef.child(uid).once('value');
+}
+
+////////////////////////
+// Giphy Text
+////////////////////////
+
+/**
+ * Saves on database the given array of Giphy Texts
+ * @param {string} uid User identifier
+ * @param {array} data Array of Giphy Text gifs
+ */
+ export async function saveGiphyText(uid, data) {
+    return giphyTextRequestsRef.child(uid).set(data);
 }

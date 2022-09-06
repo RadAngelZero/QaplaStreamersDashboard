@@ -15,8 +15,7 @@ import SignInImage from './../../assets/SignIn.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
-import { createStreamerProfile, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
-import QaplaTerms from '../QaplaTerms/QaplaTerms';
+import { createStreamerProfile, getInteractionsRewardData, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 import { getTwitchUserData } from '../../services/twitch';
 
@@ -76,17 +75,22 @@ const StreamersSignin = ({ user, title }) => {
             }
         }
         async function redirectUser(uid) {
-            const userHasBeenRedirectedToCreateProfile = localStorage.getItem('userHasBeenRedirectedToCreateProfile');
+            const interactionsRewardData = await getInteractionsRewardData(user.uid);
+            if (interactionsRewardData.exists()) {
+                const userHasBeenRedirectedToCreateProfile = localStorage.getItem('userHasBeenRedirectedToCreateProfile');
 
-            if (userHasBeenRedirectedToCreateProfile) {
-                history.push('/profile');
-            } else {
-                if (await userHasPublicProfile(uid)) {
+                if (userHasBeenRedirectedToCreateProfile) {
                     history.push('/profile');
                 } else {
-                    history.push('/editProfile');
-                    localStorage.setItem('userHasBeenRedirectedToCreateProfile', 'true');
+                    if (await userHasPublicProfile(uid)) {
+                        history.push('/profile');
+                    } else {
+                        history.push('/editProfile');
+                        localStorage.setItem('userHasBeenRedirectedToCreateProfile', 'true');
+                    }
                 }
+            } else {
+                history.push('/onboarding');
             }
         }
 
@@ -128,9 +132,9 @@ const StreamersSignin = ({ user, title }) => {
                         </Button>
                         <p style={{ marginTop: '38px', color: '#FFF', fontSize: '.8rem' }}>
                             {t('StreamersSignin.termsAndConditionsP1')}
-                            <u style={{ cursor: 'pointer', color: '#3B4BF9' }} onClick={() => setOpenTermsAndConditionsDialog(true)}>
+                            <a style={{ cursor: 'pointer', color: '#3B4BF9' }} href={t('Onboarding.termsOfUseUrl')} target='_blank'>
                                 {t('StreamersSignin.termsAndConditionsP2')}
-                            </u>
+                            </a>
                         </p>
                     </div>
                     <Hidden smDown>
@@ -140,7 +144,6 @@ const StreamersSignin = ({ user, title }) => {
                     </Hidden>
                 </Grid>
                 <Grid item md='1' />
-                <QaplaTerms open={openTermsAndConditionsDialog} onClose={closeTermsAndConditionsModal} />
             </StreamerDashboardContainer>
         );
     }

@@ -1,5 +1,5 @@
 import React, { useState, useReducer, useEffect } from 'react';
-import { makeStyles, Grid, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from '@material-ui/core';
+import { makeStyles, Grid, Button, InputAdornment, InputLabel, CircularProgress } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +8,8 @@ import DayJsUtils from '@date-io/dayjs';
 import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer, updateStreamerProfile } from './../../services/database';
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
-import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
 import BackButton from '../BackButton/BackButton';
 import NewStreamSuccessDialog from './NewStreamSuccessDialog';
@@ -23,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
     label: {
         color: '#FFF',
         fontSize: '14px'
+    },
+    titleLabel: {
+        marginBottom: 8
     },
     datePickerLabel: {
         marginBottom: theme.spacing(1),
@@ -491,110 +492,29 @@ const NewStream = ({ user, games }) => {
                                         }}
                                     />
                                 </Grid>
-                                {/* <Grid item sm={8} style={{ width: '90%', minWidth: '330px' }}>
-                                    <InputLabel className={classes.datePickerLabel}>
-                                        {t('NewStream.confirmDate')}
-                                    </InputLabel>
-                                    <StreamerTextInput placeholder={t('NewStream.confirmDatePlaceholder')}
-                                        fullWidth
-                                        value={stringDate}
-                                        onChange={handleStringDateChange} />
-                                </Grid> */}
                             </Grid>
                         </MuiPickersUtilsProvider>
-                        {/* <h1 className={styles.title}>
-                            {t('NewStream.streamType')}
-                        </h1> */}
-                        {/* <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
-                            <Grid container>
-                                <Grid item sm={2}>
-                                    <FormControlLabel
-                                        value={'exp'}
-                                        classes={{ label: classes.label }}
-                                        control={
-                                            <Radio defaultChecked
-                                                checkedIcon={<CheckedIcon />}
-                                                icon={<UncheckedIcon />}
-                                                style={{ backgroundColor: 'transparent' }} />
-                                        }
-                                        label={t('NewStream.streamTypes.casual')} />
-                                </Grid>
-                            </Grid>
-                        </RadioGroup> */}
-                        <Grid container className={classes.accordionContainer}>
-                            <Accordion
-                                className={classes.accordion}
-                            >
-                                <AccordionSummary
-                                    expandIcon={<ArrowIcon />}
-                                    id={"moreOptions"}
-                                    aria-controls="panel1a-content"
-                                >
-                                    <InputLabel
-                                        className={classes.label}
-                                    >
-                                        {t('NewStream.advanced')}
-                                    </InputLabel>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Grid container direction={'column'} className={classes.accordionGridRoot}>
-                                        <InputLabel className={classes.label}>
-                                            {t('NewStream.feelingCreative')}
-                                        </InputLabel>
-                                        <Grid container>
-                                            <h1 className={styles.title}>
-                                                {t('NewStream.streamTitle')}
-                                            </h1>
-                                            <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
-                                                    <StreamerTextInput
-                                                        label={t('NewStream.streamTitle')}
-                                                        placeholder={t('NewStream.streamTitlePlaceholder')}
-                                                        id='eventTitle'
-                                                        fullWidth={true}
-                                                        value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
-                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                        <h1 className={styles.title}>
-                                            {t('NewStream.streamDescription')}
-                                        </h1>
-                                        {/* <Grid>
-                                            <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem}>
-                                                    <StreamerTextInput
-                                                        label={t('NewStream.subtitle')}
-                                                        id={'eventDescriptionTitle'}
-                                                        placeholder={t('NewStream.subtitle')}
-                                                        fullWidth={true}
-                                                        value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
-                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </Grid> */}
-                                        <Grid>
-                                            <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
-                                                    <StreamerTextInput
-                                                        id={'eventDescription'}
-                                                        label={t('NewStream.streamDescription')}
-                                                        placeholder={t('NewStream.descriptionPlaceholder')}
-                                                        multiline={true}
-                                                        rows={3}
-                                                        rowsMax={30}
-                                                        fullWidth={true}
-                                                        value={optionalData.descriptions ? userLang.toLowerCase().includes('es') ? optionalData.descriptions.es : optionalData.descriptions.en : ''}
-                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                    />
-                                                </Grid>
-                                            </Grid>
+                        <Grid container spacing={4} style={{ marginTop: '2px' }}>
+                            <Grid item sm={5} style={{ maxWidth: '274px', }}>
+                                <Grid container>
+                                    <h1 className={styles.title}>
+                                        {t('NewStream.streamTitle')}
+                                    </h1>
+                                    <Grid container spacing={4}>
+                                        <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
+                                            <StreamerTextInput
+                                                labelClassName={classes.titleLabel}
+                                                label={t('NewStream.streamTitle')}
+                                                placeholder={t('NewStream.streamTitlePlaceholder')}
+                                                id='eventTitle'
+                                                fullWidth={true}
+                                                value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
+                                                onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                            />
                                         </Grid>
                                     </Grid>
-                                </AccordionDetails>
-                            </Accordion>
+                                </Grid>
+                            </Grid>
                         </Grid>
                         <Button
                             disabled={lockSendButton}

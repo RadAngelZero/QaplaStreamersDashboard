@@ -1,5 +1,5 @@
  import React, { useState, useEffect} from "react";
-
+ import { useTranslation } from 'react-i18next';
  import style from "./BarProgressBit.module.css";
 
  import { withStyles } from "@material-ui/core/styles";
@@ -72,6 +72,7 @@ const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) =
   const [confirmCashOut, setConfirmCashOut] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [disabledButon, setDisabledButon] = useState(false);
+  const { t } = useTranslation();
 
   const handleOpenDialod = () => {
     setOpen(true);
@@ -93,7 +94,9 @@ const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) =
       <div className={style.container}>
         <div className={style.barProgress}>
           <div className={style.titulos}>
-            <p className={style.titulo_Porcentaje}>Next Milestone</p>
+            <p className={style.titulo_Porcentaje}>
+              {t('StreamerProfile.BarProgressBit.nextMilestone')}
+            </p>
             <p className={style.porcentaje}>
               {estimatedBits.toLocaleString()} / {nextMilestone.toLocaleString()}
             </p>
@@ -101,14 +104,16 @@ const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) =
           <BorderLinearProgress variant="determinate" value={milestoneProgress} />
         </div>
         <div className={style.puntos}>
-          <p>Available</p>
+          <p>
+            {t('StreamerProfile.BarProgressBit.available')}
+          </p>
           <h2>
             {availableBits.toLocaleString()}
           </h2>
         </div>
       </div>
       <ContButton  disabled={disabledButon} onClick={() =>{ handleOpenDialod(); setConfirmCashOut(false) }}>
-        Cash Out
+        {t('StreamerProfile.BarProgressBit.cashOut')}
       </ContButton>
       {!confirmCashOut ? (
         <Dialog

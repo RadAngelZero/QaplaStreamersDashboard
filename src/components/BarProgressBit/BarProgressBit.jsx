@@ -66,12 +66,11 @@ const ContButton = withStyles((theme) => ({
 
 
 
-const BarProgressBit = ({ setOpenRecordsDialog, setButtonPressed }) => {
+const BarProgressBit = ({ amountBits }) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [confirmCashOut, setConfirmCashOut] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [amountBits, setamountBits] = useState(0)
   const [disabledButon, setDisabledButon] = useState(false);
 
   const handleOpenDialod = () => {
@@ -79,37 +78,38 @@ const BarProgressBit = ({ setOpenRecordsDialog, setButtonPressed }) => {
   };
 
   useEffect(() => {
-  if(amountBits <= 0){
-    setDisabledButon(true)
-  }
-  else{
-    setDisabledButon(false)
-  }
+    if (amountBits <= 0){
+      setDisabledButon(true);
+    }
+    else {
+      setDisabledButon(false);
+    }
   },[disabledButon, amountBits])
+
+  const nextGoal = 250 * Math.ceil((amountBits + 1) / 250);
+  const availableBits = 250 * Math.floor((amountBits) / 250);
 
   return (
     <>
-      <div
-        className={style.container}
-        onClick={() => {
-          setOpenRecordsDialog(true);
-          setButtonPressed("Bits");
-        }}
-      >
+      <div className={style.container}>
         <div className={style.barProgress}>
           <div className={style.titulos}>
             <p className={style.titulo_Porcentaje}>Next Milestone</p>
-            <p className={style.porcentaje}>{amountBits} / 100.000</p>
+            <p className={style.porcentaje}>
+              {amountBits.toLocaleString()} / {nextGoal.toLocaleString()}
+            </p>
           </div>
-          <BorderLinearProgress variant="determinate" value={amountBits} />
+          <BorderLinearProgress variant="determinate" value={((250 - (nextGoal - amountBits)) / 250) * 100} />
         </div>
         <div className={style.puntos}>
           <p>Available</p>
-          <h2>250</h2>
+          <h2>
+            {availableBits.toLocaleString()}
+          </h2>
         </div>
       </div>
-      <ContButton  disabled={disabledButon} onClick={() =>{handleOpenDialod(); setConfirmCashOut(false) }}>
-        Cash Qut
+      <ContButton  disabled={disabledButon} onClick={() =>{ handleOpenDialod(); setConfirmCashOut(false) }}>
+        Cash Out
       </ContButton>
       {!confirmCashOut ? (
         <Dialog
@@ -121,14 +121,14 @@ const BarProgressBit = ({ setOpenRecordsDialog, setButtonPressed }) => {
             paper: classes.paper,
           }}
         >
-          <CasthQutDialog setOpen={setOpen} setOpenConfirm={setOpenConfirm} setConfirmCashOut={setConfirmCashOut} />
+          <CasthQutDialog amountBits={availableBits} setOpen={setOpen} setOpenConfirm={setOpenConfirm} setConfirmCashOut={setConfirmCashOut} />
         </Dialog>
       ) : (
         <Dialog onClose={() => setOpenConfirm(false)} open={openConfirm} classes={{
           container: classes.dialogContainer,
           root: classes.dialogRoot,
-          paper: classes.paper}}> 
-          <CasthQutConfirmDialog setOpenConfirm={setOpenConfirm}/>
+          paper: classes.paper}}>
+          <CasthQutConfirmDialog amountBits={availableBits} setOpenConfirm={setOpenConfirm}/>
         </Dialog>
       )}
     </>

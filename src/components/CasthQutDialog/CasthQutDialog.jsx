@@ -4,13 +4,15 @@ import style from "./CasthQutDialog.module.css";
 
 import { ReactComponent as BitsIcon } from "./../../assets/BitsIcon.svg";
 
-const CasthQutDialog = ({ setOpen, setOpenConfirm, setConfirmCashOut }) => {
+const CasthQutDialog = ({ setOpen, setOpenConfirm, setConfirmCashOut, amountBits }) => {
   return (
     <div className={style.container_Dialog}>
       <div className={style.container}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <BitsIcon style={{ width: "35px", height: "35px" }} />
-          <h1>250</h1>
+          <h1>
+            {amountBits.toLocaleString()}
+          </h1>
         </div>
         <p className={style.calculated_Bit}>200 Qoins = 10 Bits</p>
         <p className={style.text}>

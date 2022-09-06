@@ -46,6 +46,25 @@ const BalanceButtonContainer = withStyles(() => ({
     },
 }))(Button);
 
+const BitsButtonContainer = withStyles(() => ({
+    root: {
+        display: 'flex',
+        backgroundColor: '#141735',
+        width: '100%',
+        padding: '22px 24px',
+        height: '100px',
+        minWidth: '190px !important',
+        maxWidth: '520px !important',
+        borderRadius: '20px',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        textTransform: 'none'
+    },
+    label: {
+        display: 'flex'
+    },
+}))(Button);
+
 const useStyles = makeStyles((theme) => ({
     createCardContentRoot: {
         display: 'flex',
@@ -161,7 +180,7 @@ const StreamerProfile = ({ user, games }) => {
     if (user) {
         cheersQoins = user.qoinsBalance || 0;
         qlanQoins = user.qlanBalance || 0;
-        estimatedBits = ((cheersQoins + qlanQoins) / 200) * valueOfQoinsForStreamer;
+        estimatedBits = (cheersQoins / 200) * valueOfQoinsForStreamer;
     }
 
     const handleSwitchEvents = () => {
@@ -256,7 +275,7 @@ const StreamerProfile = ({ user, games }) => {
                                             </h1>
                                         </Grid>
                                         <Grid container xs={12} style={{ gap: '20px' }} >
-                                            <Grid item xs={12} className={styles.balanceContainers}>
+                                            <Grid item xs={12} sm={6} className={styles.balanceContainers}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
                                                     <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
@@ -267,12 +286,12 @@ const StreamerProfile = ({ user, games }) => {
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
-                                          
-                                            <Grid item xs={12}   className={styles.bitBalanceContainer}>
-                                                <div className={styles.containerBit}> 
-                                                <BitsIcon style={{ width: '35px', height: '35px' }} />
-                                                <BarProgressBit setOpenRecordsDialog={setOpenRecordsDialog} setButtonPressed={setButtonPressed}/>
-                                                </div>
+                                            <Grid item xs={12} sm={6} className={styles.bitBalanceContainer}>
+                                                {/* e.currentTarget != e.target Help us to prevent trigger the event if the user clicks the inner button and not this button */}
+                                                <BitsButtonContainer className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
+                                                    <BitsIcon style={{ width: '35px', height: '35px' }} />
+                                                    <BarProgressBit amountBits={Math.floor(estimatedBits)}/>
+                                                </BitsButtonContainer>
                                             </Grid>
                                         </Grid>
                                     </Grid>

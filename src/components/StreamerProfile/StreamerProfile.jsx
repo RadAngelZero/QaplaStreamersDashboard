@@ -40,7 +40,11 @@ const BalanceButtonContainer = withStyles(() => ({
         borderRadius: '20px',
         alignItems: 'center',
         justifyContent: 'space-between',
-        textTransform: 'none'
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#141735',
+            opacity: 0.7
+        }
     },
     label: {
         display: 'flex'
@@ -59,7 +63,13 @@ const BitsButtonContainer = withStyles(() => ({
         borderRadius: '20px',
         alignItems: 'center',
         justifyContent: 'space-between',
-        textTransform: 'none'
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#141735'
+        },
+        '&:active': {
+            backgroundColor: '#141735'
+        }
     },
     label: {
         display: 'flex'
@@ -291,7 +301,7 @@ const StreamerProfile = ({ user, games }) => {
                                             </Grid>
                                             <Grid item xs={12} sm={8}>
                                                 {/* e.currentTarget != e.target Help us to prevent trigger the event if the user clicks the inner button and not this button */}
-                                                <BitsButtonContainer className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
+                                                <BitsButtonContainer disableRipple className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
                                                     <BitsIcon style={{ width: '35px', height: '35px' }} />
                                                     <BarProgressBit amountBits={Math.floor(estimatedBits)}/>
                                                 </BitsButtonContainer>

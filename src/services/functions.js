@@ -94,6 +94,20 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
 }
 
 /**
+ * Call the cheerMessageTextToSpeechUberDuck to convert the message in audio
+ * @param {string} message Message to convert in audio
+ * @param {string} voiceUuid Uuid code for the selected voice
+ */
+ export async function speakCheerMessageUberDuck(message, voiceUuid) {
+    const cheerMessageTextToSpeechUberDuck = functions.httpsCallable('cheerMessageTextToSpeechUberDuck');
+    try {
+        return await cheerMessageTextToSpeechUberDuck({ message, voiceUuid });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
  * Generate access and refresh token for Twitch API
  * @param {string} code Twitch code to generate user tokens
  */

@@ -8,7 +8,7 @@ import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
-import { speakCheerMessage } from '../../services/functions';
+import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
 import { GIPHY_CLIP, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
@@ -165,11 +165,11 @@ const LiveDonations = () => {
             setIsPlayingAudio(true);
             const donation = popDonation();
 
-            async function showCheer() {
+            async function showCheer(audioUrl) {
                 const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
                 const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
                 audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
-                if (!donation.repeating) {
+                if (audioUrl || !donation.repeating) {
                     const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'en-US-Standard-C';
 
                     if (donation.message) {
@@ -184,7 +184,7 @@ const LiveDonations = () => {
                                 message: messageToRead
                             });
                             const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
-                            voiceBotMessage = new Audio(cheerMessageUrl.data);
+                            voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                         }
                     } else if (bigQoinsDonation) {
                         const messageToRead = `${donation.twitchUserName} has sent you ${donation.amountQoins} Coins`;
@@ -194,7 +194,7 @@ const LiveDonations = () => {
                             containsMessage: false
                         });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
-                        voiceBotMessage = new Audio(cheerMessageUrl.data);
+                        voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                     }
                 } else {
                     try {
@@ -231,7 +231,27 @@ const LiveDonations = () => {
                 }
             }
 
-            showCheer();
+            async function initCheer() {
+                if (donation.messageExtraData && donation.messageExtraData.voiceAPIName && donation.messageExtraData && donation.messageExtraData.voiceAPIName.includes('Uberduck:')) {
+                    // 9 Because the string "Uberduck:" length is 9
+                    const voiceUuid = donation.messageExtraData.voiceAPIName.substring(9);
+                    const messageResponse = await speakCheerMessageUberDuck(donation.message, voiceUuid);
+                    const interval = setInterval(async () => {
+                        const response = await fetch(`https://api.uberduck.ai/speak-status?uuid=${messageResponse.data.uuid}`);
+                        if (response.status) {
+                            const result = await response.json();
+                            if (result.finished_at && result.path) {
+                                showCheer(result.path);
+                                clearInterval(interval);
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    showCheer();
+                }
+            }
+
+            initCheer();
         }
 
         if (!streamerUid) {

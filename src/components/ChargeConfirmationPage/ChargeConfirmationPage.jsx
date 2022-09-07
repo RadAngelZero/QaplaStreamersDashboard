@@ -13,7 +13,7 @@ const useStyles = makeStyles(() => ({
         height: '100vh'
     },
     paymentInfoContainer: {
-        paddingLeft: 32,
+        paddingLeft: 50,
         paddingRight: 64,
         display: 'flex',
         flexDirection: 'column',
@@ -55,7 +55,8 @@ const useStyles = makeStyles(() => ({
     paymentDetails: {
         marginTop: 48,
         display: 'flex',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        maxWidth:'750px'
     },
     subscriptionType: {
         fontSize: 18,
@@ -77,7 +78,8 @@ const useStyles = makeStyles(() => ({
         marginTop: 56,
         color: '#FFF',
         display: 'flex',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        maxWidth:'750px'
     },
     paymentUntilToday: {
         fontSize: 24,
@@ -149,6 +151,18 @@ const useStyles = makeStyles(() => ({
        position: 'absolute',
        top:'0px',
        left:'-10px',
+    },
+
+    paymentPolicy:{
+          marginTop:'80px'
+    },
+    textPaymentPolicy:{
+       color: '#FFFFFF',
+       opacity: '0.6',
+       fontWeight:'500',
+       fontSize: '12px',
+       lineHeight: '15px',
+       letterSpacing:'0.5px'
     }
 }));
 
@@ -161,7 +175,7 @@ function useQuery() {
 const ChargeConfirmationPage = ({ user }) => {
     const [totalPaid, setTotalPaid] = useState(0);
     const [interval, setInterval] = useState('');
-    const [intervalText, setIntervalText] = useState('');
+    const [intervalText, setIntervalText] = useState('monthly');
     const [plan, setPlan] = useState('');
     const classes = useStyles();
     const history = useHistory();
@@ -197,7 +211,10 @@ const ChargeConfirmationPage = ({ user }) => {
     return (
         <Grid container alignContent='center' className={classes.container}>
             <Grid item md={6} className={classes.paymentInfoContainer}>
-                <Closeicon className={classes.buttonClose}/>
+                <Button className={classes.buttonClose}> 
+                    <Closeicon /> 
+                    </Button>
+               
                 <div className={classes.eImageContainer}>
                 
                     <ESvg />
@@ -237,6 +254,9 @@ const ChargeConfirmationPage = ({ user }) => {
                     <p className={classes.paymentUntilToday}>
                         ${(totalPaid).toFixed(2)}
                     </p>
+                </div>
+                <div className={classes.paymentPolicy}>
+                    <p className={classes.textPaymentPolicy}>Powered by Stripe | Terms Privacy</p>
                 </div>
             </Grid>
             <Grid item md={6} className={classes.thanksCardContainer}>

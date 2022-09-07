@@ -8,6 +8,8 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { QUARTERLY, YEARLY } from '../../utilities/Constants';
 
+import CardsPayments from '../CardsPayments/CardsPayments'
+
 const useStyles = makeStyles(() => ({
     toggleButton: {
         borderRadius: '6px',
@@ -125,8 +127,35 @@ const PlanPicker = ({ user }) => {
                         onChange={setPeriod} />
                 ))}
             </Box>
-            <Grid container spacing={0} className={styles.plansContainer} justify='center'>
-                {subscriptions[period] && Object.entries(subscriptions[period].packages).map((plan) => (
+            <Grid container spacing={0}  className={styles.plansContainer} justify='center'>
+                <CardsPayments 
+                    backgroundCards={'#141833'} 
+                    title={'Basic'} 
+                    textButon={'Current'}
+                    subtitle={'Free forever'}
+                    backgroundButon={'#141833'}
+                    colorTextButon={'#FFFFFF'}
+                    price={'0 /month'} 
+                    items={['Qapla Reactions', 'Qoins cash out']}/> 
+                <CardsPayments 
+                    backgroundCards={'#141833'} 
+                    title={'Essential'} 
+                    textButon={'Get visivility'}
+                    subtitle={'$18 Quatertly. You save 15%'}
+                    backgroundButon={'#6C5DD3'}
+                    colorTextButon={'#FFFFFF'}
+                    price={'6 /month'}
+                    items={['200 Qoins Drops per month', 'Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out']}/> 
+                <CardsPayments 
+                    backgroundCards={'#3B4BF9'} 
+                    title={'Growth'}
+                     textButon={'Current'}
+                     subtitle={'$36.99 Quatertly You save 15%'}
+                     backgroundButon={'#0AFFD2'}
+                     colorTextButon={'#4E2D92'}
+                     price={'11.99 /month'}
+                     items={['400 Qoins Drops per month', 'Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out']}/> 
+                {/* {subscriptions[period] && Object.entries(subscriptions[period].packages).map((plan) => (
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/streamerSubscriptionCheckoutIntent' method='post'>
                         <Grid item sm={12} md={6} className={classes.cardGridItem} key={`${plan[0]}-${period}`}>
                             <h1 className={styles.planTypeTitle}>
@@ -269,7 +298,7 @@ const PlanPicker = ({ user }) => {
                             </Card>
                         </Grid>
                     </form>
-                ))}
+                ))} */}
             </Grid>
         </StreamerDashboardContainer>
     );

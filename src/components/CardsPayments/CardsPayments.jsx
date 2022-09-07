@@ -1,0 +1,77 @@
+    import React from 'react';
+
+    import { makeStyles, Button, Box, Grid, Card, CardContent, CardActions } from '@material-ui/core';
+
+    import iconTick from '../../assets/Tickgray.svg'
+
+    const useStyles = makeStyles(() => ({
+        containerCard: {
+            maxWidth:'337px',
+            minWidth:'337px',
+            maxHeight:'513px',
+            minHeight:'513px',
+            margin:'15px'
+        },
+        container: {
+            maxHeight:'447px',
+            minHeight:'447px',
+            marginTop:'30px',
+            borderRadius: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+        },
+        itemContainer: {
+           padding:'34px 40px 0px 40px',
+           maxWidth: '240px',
+           minWidth: '240px',
+        },
+         title:{
+            fontSize:'30px', 
+            lineHeight:'36px',
+            fontWeight:'700',
+            color:'#ffffff',
+            textAlign: 'center',
+            
+         },     
+         items: {
+          marginTop:'40px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap:'15px'
+         },
+         Button:{
+            maxWidth:'257px',
+            minWidth: '257px',
+            marginBottom:'30px',
+            opacity:'0.8',
+            maxHeight:'52px',
+            minHeight: '52px',
+            borderRadius:'10px'
+         },
+    }));
+
+    const CardsPayments = ({title, price, backgroundCards, backgroundButon, textButon, subtitle, colorTextButon, items}) => {
+        const classes = useStyles();
+
+        return (
+              <div className={classes.containerCard}>
+                <h1 className={classes.title}>{title}</h1>
+                <div className={classes.container} style={{ background:backgroundCards}}>
+                    <div className={classes.itemContainer}> 
+                        <h2 style={{color: '#FFF', marginBottom:'6px'}}>${price}</h2>
+                        <p style={{ color: '#FFF', fontSize: '13px'}}>{subtitle}</p>
+                            <div className={classes.items}>
+                                 {items.map(el => <div style={{display: 'flex', gap:'10px'}}><img src={iconTick} alt='icon'/><p  style={{ color: '#FFF', fontSize: '14px'}}>{el}</p></div>)}
+                            </div>
+                    </div>
+                    <Button className={classes.Button} style={{background:backgroundButon, color:colorTextButon}}>
+                        {textButon}
+                    </Button>
+                </div>
+              </div>
+        )
+    }
+
+    export default CardsPayments

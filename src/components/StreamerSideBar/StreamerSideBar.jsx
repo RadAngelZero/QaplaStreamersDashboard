@@ -41,10 +41,8 @@ const useStyles = makeStyles((theme) => ({
 
 const DashboardIcon = ({ active }) => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill={active ? "#0AFFD2" : 'rgba(255, 255, 255, .25)'} d="M1.4526 9.37983C1.76537 6.87768 3.89237 5 6.41399 5H17.5862C20.1078 5 22.2348 6.87768 22.5476 9.37983L23.322 15.5757C23.6821 18.456 21.4363 21 18.5336 21C16.9301 21 15.5005 20.2154 14.6212 19H9.37894C8.4997 20.2154 7.07009 21 5.46656 21C2.5639 21 0.318082 18.456 0.678112 15.5757L1.4526 9.37983Z" />
-        <path fill={active ? "#4040FF" : '#FFF'} d="M8 9C7.44772 9 7 9.44772 7 10V11H6C5.44772 11 5 11.4477 5 12C5 12.5523 5.44772 13 6 13H7V14C7 14.5523 7.44772 15 8 15C8.55229 15 9 14.5523 9 14V13H10C10.5523 13 11 12.5523 11 12C11 11.4477 10.5523 11 10 11H9V10C9 9.44772 8.55229 9 8 9Z" />
-        <path fill={active ? "#4040FF" : '#FFF'} d="M18 11C18.5523 11 19 10.5523 19 10C19 9.44771 18.5523 9 18 9C17.4477 9 17 9.44771 17 10C17 10.5523 17.4477 11 18 11Z" />
-        <path fill={active ? "#4040FF" : '#FFF'} d="M16 15C16.5523 15 17 14.5523 17 14C17 13.4477 16.5523 13 16 13C15.4477 13 15 13.4477 15 14C15 14.5523 15.4477 15 16 15Z" />
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.92 2H4.54C3.14 2 2 3.15 2 4.561V7.97C2 9.39 3.14 10.53 4.54 10.53H7.92C9.33 10.53 10.46 9.39 10.46 7.97V4.561C10.46 3.15 9.33 2 7.92 2ZM7.92 13.4697H4.54C3.14 13.4697 2 14.6107 2 16.0307V19.4397C2 20.8497 3.14 21.9997 4.54 21.9997H7.92C9.33 21.9997 10.46 20.8497 10.46 19.4397V16.0307C10.46 14.6107 9.33 13.4697 7.92 13.4697ZM16.0801 13.4697H19.4601C20.8601 13.4697 22.0001 14.6107 22.0001 16.0307V19.4397C22.0001 20.8497 20.8601 21.9997 19.4601 21.9997H16.0801C14.6701 21.9997 13.5401 20.8497 13.5401 19.4397V16.0307C13.5401 14.6107 14.6701 13.4697 16.0801 13.4697Z" fill={active ? "#00FFDD" : 'rgba(255, 255, 255, .25)'} />
+        <path d="M19.46 2H16.08C14.67 2 13.54 3.15 13.54 4.561V7.97C13.54 9.39 14.67 10.53 16.08 10.53H19.46C20.86 10.53 22 9.39 22 7.97V4.561C22 3.15 20.86 2 19.46 2Z" fill={active ? "#3B4BF9" : '#FFF'} />
     </svg>
 );
 
@@ -66,15 +64,6 @@ const MembershipIcon = ({ active }) => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill={active ? '#00FFDD' : 'rgba(255, 255, 255, .25)'} d="M21.25 13.4764C20.429 13.4764 19.761 12.8145 19.761 12.001C19.761 11.1875 20.429 10.5256 21.25 10.5256C21.45 10.5256 21.64 10.4473 21.781 10.3076C21.921 10.1689 22 9.97864 22 9.78245L21.999 7.10514C21.999 4.84201 20.14 3 17.856 3H6.144C3.86 3 2.002 4.84201 2.002 7.10514L2 9.86866C2 10.0648 2.079 10.2541 2.22 10.3938C2.361 10.5335 2.551 10.6118 2.75 10.6118C3.599 10.6118 4.24 11.2083 4.24 12.001C4.24 12.8145 3.572 13.4764 2.75 13.4764C2.336 13.4764 2 13.8093 2 14.2195V16.8958C2 19.159 3.859 21 6.143 21H17.858C20.142 21 22 19.159 22 16.8958V14.2195C22 13.8093 21.664 13.4764 21.25 13.4764Z" />
         <path fill={active ? '#4040FF' : '#FFF'} d="M15.4311 11.5105L14.2521 12.648L14.5311 14.2562C14.5791 14.5336 14.4661 14.8091 14.2351 14.9735C14.0061 15.14 13.7071 15.1608 13.4551 15.0271L12.0001 14.27L10.5421 15.029C10.4341 15.0855 10.3161 15.1142 10.1991 15.1142C10.0461 15.1142 9.89507 15.0667 9.76507 14.9745C9.53507 14.8091 9.42207 14.5336 9.47007 14.2562L9.74807 12.648L8.56907 11.5105C8.36507 11.3143 8.29407 11.025 8.38207 10.7574C8.47107 10.4899 8.70107 10.2996 8.98207 10.26L10.6081 10.0252L11.3371 8.56168C11.4641 8.31 11.7181 8.15344 12.0001 8.15344H12.0021C12.2851 8.15443 12.5391 8.31099 12.6641 8.56267L13.3931 10.0252L15.0221 10.261C15.3001 10.2996 15.5301 10.4899 15.6181 10.7574C15.7071 11.025 15.6361 11.3143 15.4311 11.5105Z" />
-    </svg>
-);
-
-const StoreIcon = ({ active }) => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.9133 16.3147L20.1444 10.1201C19.676 7.90964 18.3503 7 17.0865 7H6.93171C5.65022 7 4.28034 7.84597 3.88264 10.1201L3.1049 16.3147C2.46858 20.8629 4.81062 22 7.86853 22H16.1585C19.2075 22 21.4789 20.3535 20.9133 16.3147ZM9.097 12.1486C8.60889 12.1486 8.21321 11.7413 8.21321 11.2389C8.21321 10.7366 8.60889 10.3293 9.097 10.3293C9.5851 10.3293 9.98079 10.7366 9.98079 11.2389C9.98079 11.7413 9.5851 12.1486 9.097 12.1486ZM14.002 11.2389C14.002 11.7413 14.3977 12.1486 14.8858 12.1486C15.3739 12.1486 15.7696 11.7413 15.7696 11.2389C15.7696 10.7366 15.3739 10.3293 14.8858 10.3293C14.3977 10.3293 14.002 10.7366 14.002 11.2389Z" fill={active ? "#00FFDD" : '#FFF'} opacity={active ? '1' : '0.25'}/>
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.9133 16.3147L20.1444 10.1201C19.676 7.90964 18.3503 7 17.0865 7H6.93171C5.65022 7 4.28034 7.84597 3.88264 10.1201L3.1049 16.3147C2.46858 20.8629 4.81062 22 7.86853 22H16.1585C19.2075 22 21.4789 20.3535 20.9133 16.3147ZM9.097 12.1486C8.60889 12.1486 8.21321 11.7413 8.21321 11.2389C8.21321 10.7366 8.60889 10.3293 9.097 10.3293C9.5851 10.3293 9.98079 10.7366 9.98079 11.2389C9.98079 11.7413 9.5851 12.1486 9.097 12.1486ZM14.002 11.2389C14.002 11.7413 14.3977 12.1486 14.8858 12.1486C15.3739 12.1486 15.7696 11.7413 15.7696 11.2389C15.7696 10.7366 15.3739 10.3293 14.8858 10.3293C14.3977 10.3293 14.002 10.7366 14.002 11.2389Z" />
-        <path d="M16.9739 6.77432C16.977 6.85189 16.9621 6.92913 16.9303 7H15.4932C15.4654 6.92794 15.4506 6.85153 15.4497 6.77432C15.4497 4.85682 13.8899 3.30238 11.9657 3.30238C10.0416 3.30238 8.48184 4.85682 8.48184 6.77432C8.49502 6.84898 8.49502 6.92535 8.48184 7H7.00989C6.9967 6.92535 6.9967 6.84898 7.00989 6.77432C7.12172 4.10591 9.32499 2 12.0049 2C14.6849 2 16.8882 4.10591 17 6.77432H16.9739Z" fill="white"/>
-        <path d="M16.9739 6.77432C16.977 6.85189 16.9621 6.92913 16.9303 7H15.4932C15.4654 6.92794 15.4506 6.85153 15.4497 6.77432C15.4497 4.85682 13.8899 3.30238 11.9657 3.30238C10.0416 3.30238 8.48184 4.85682 8.48184 6.77432C8.49502 6.84898 8.49502 6.92535 8.48184 7H7.00989C6.9967 6.92535 6.9967 6.84898 7.00989 6.77432C7.12172 4.10591 9.32499 2 12.0049 2C14.6849 2 16.8882 4.10591 17 6.77432H16.9739Z" fill={active ? "#4830FF" : '#FFF'}/>
     </svg>
 );
 
@@ -133,14 +122,6 @@ const StreamerSideBar = ({ user }) => {
                         {t('SideBar.dashboard')}
                     </ListItemText>
                 </ListItem>
-                <ListItem button onClick={() => history.push('/store')} className={classes.listItem}>
-                    <ListItemIcon style={{ minWidth: 40 }}>
-                        <StoreIcon active={currentScreen === 'store'} />
-                    </ListItemIcon>
-                    <ListItemText style={{ opacity: currentScreen === 'store' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
-                        Q Store
-                    </ListItemText>
-                </ListItem>
                 <ListItem button onClick={goToUniversalProfile} className={classes.listItem}>
                     <ListItemIcon style={{ minWidth: 40 }}>
                         <ProfileIcon active={currentScreen === 'editProfile'} />
@@ -156,6 +137,14 @@ const StreamerSideBar = ({ user }) => {
                         </div>
                     }
                 </ListItem>
+                <ListItem button onClick={goToSettings} className={classes.listItem}>
+                    <ListItemIcon style={{ minWidth: 40 }}>
+                        <CogIcon active={currentScreen === 'settings'} />
+                    </ListItemIcon>
+                    <ListItemText style={{ opacity: currentScreen === 'settings' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
+                        {t('SideBar.settings')}
+                    </ListItemText>
+                </ListItem>
                 {user && user.stripeCustomerId && user.premium ?
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal' method='post' onSubmit={() => setLoadingStripeCustomerPortal(true)}>
                         <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
@@ -165,7 +154,7 @@ const StreamerSideBar = ({ user }) => {
                             </ListItemIcon>
                             <ListItemText style={{ opacity: currentScreen === 'membership' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
                                 {!loadingStripeCustomerPortal ?
-                                    t('SideBar.membership')
+                                    t('SideBar.billing')
                                     :
                                     <CircularProgress className={classes.circularProgress} size={25} />
                                 }
@@ -182,14 +171,6 @@ const StreamerSideBar = ({ user }) => {
                         </ListItemText>
                     </ListItem>
                 }
-                <ListItem button onClick={goToSettings} className={classes.listItem}>
-                    <ListItemIcon style={{ minWidth: 40 }}>
-                        <CogIcon active={currentScreen === 'settings'} />
-                    </ListItemIcon>
-                    <ListItemText style={{ opacity: currentScreen === 'settings' ? 1 : 0.6 }} classes={{ primary: classes.listItemsText }}>
-                        {t('SideBar.settings')}
-                    </ListItemText>
-                </ListItem>
             </List>
             <div style={{ flexGrow: 1 }} />
             <List style={{

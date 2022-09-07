@@ -1,0 +1,38 @@
+.container {
+  width: 212px;
+  height: 212px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.img {
+  width: 85px;
+  height: 85px;
+  margin: 15px;
+}
+
+.p {
+  padding: 16px 24px;
+  background: rgba(29, 29, 27, 0.5);
+  border-radius: 8px;
+  font-family: "SF Pro Rounded";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 21px;
+  display: flex;
+  align-items: center;
+  color: #FFFFFF;
+  max-width: 100px;
+  overflow: hidden;
+}
+
+.modal{
+  backdrop-filter: blur(20px);
+    display: flex;
+    justify-content:center;
+    align-items:center;
+}

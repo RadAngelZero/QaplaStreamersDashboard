@@ -68,7 +68,6 @@ body {
     padding: 24px 30px !important;
     text-transform: none !important;
     max-height: 48px !important;
-    margin-right: 20px !important;
 }
 
 @media (max-width: 766px) {
@@ -101,7 +100,6 @@ body {
     /* padding: 22px 24px; */
     height: 100px;
     min-width: 180px !important;
-    max-width: 230px !important;
     border-radius: 20px;
     align-items: center;
 }
@@ -109,18 +107,16 @@ body {
 .bitBalanceContainer{
     display: flex;
     background-color: #141735;
-    padding: 22px 24px;
     height: 100px;
     min-width: 190px !important;
-    max-width: 520px !important;
     border-radius: 20px;
-    align-items: center;
+    align-items: flex-end;
+    cursor: pointer;
 }
 
 .containerBit{
     width:100%;
     display: flex;
-    cursor: pointer;
     align-items: center;
 }
 
@@ -130,8 +126,6 @@ body {
         flex-direction: column;
         height:309px;
         align-items: start;
-        
-        
     }
     .containerBit{
         display: flex;
@@ -139,7 +133,6 @@ body {
         align-items: start;
         justify-content:start;
         height:100%;
-       
     }
    }
 

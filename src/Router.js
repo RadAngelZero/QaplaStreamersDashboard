@@ -25,8 +25,9 @@ import PlanPicker from './components/PlanPicker/PlanPicker';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
 import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeConfirmationPage';
-import QStore from './components/QStore/QStore';
 import { useTranslation } from 'react-i18next'
+import OnBoarding from './components/OnBoarding/OnBoarding';
+import GiphyTextGenerator from './components/GiphyTextGenerator/GiphyTextGenerator';
 
 window.onbeforeunload = function () {
     return true;
@@ -67,9 +68,6 @@ const Routes = ({ user, games }) => {
             <Route exact path='/profile'>
                 <StreamerProfile user={user} games={games} />
             </Route>
-            <Route exact path='/store'>
-                <QStore user={user} />
-            </Route>
             <Route exact path='/success'>
                 <EventSent user={user} />
             </Route>
@@ -90,6 +88,12 @@ const Routes = ({ user, games }) => {
             </Route>
             <Route exact path='/successCheckout'>
                 <ChargeConfirmationPage user={user} />
+            </Route>
+            <Route exact path='/onboarding'>
+                <OnBoarding user={user} />
+            </Route>
+            <Route exact path='/giphyTextGenerator/:uid/:text'>
+                <GiphyTextGenerator user={user} />
             </Route>
             {/* <Route exact path='/lottery'>
                 <Lottery user={user} />

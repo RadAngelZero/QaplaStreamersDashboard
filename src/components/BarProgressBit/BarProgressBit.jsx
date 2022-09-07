@@ -1,5 +1,5 @@
  import React, { useState, useEffect} from "react";
-
+ import { useTranslation } from 'react-i18next';
  import style from "./BarProgressBit.module.css";
 
  import { withStyles } from "@material-ui/core/styles";
@@ -66,50 +66,54 @@ const ContButton = withStyles((theme) => ({
 
 
 
-const BarProgressBit = ({ setOpenRecordsDialog, setButtonPressed }) => {
+const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [confirmCashOut, setConfirmCashOut] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [amountBits, setamountBits] = useState(0)
   const [disabledButon, setDisabledButon] = useState(false);
+  const { t } = useTranslation();
 
   const handleOpenDialod = () => {
     setOpen(true);
   };
 
   useEffect(() => {
-  if(amountBits <= 0){
-    setDisabledButon(true)
-  }
-  else{
-    setDisabledButon(false)
-  }
-  },[disabledButon, amountBits])
+    if (availableBits <= 0){
+      setDisabledButon(true);
+    }
+    else {
+      setDisabledButon(false);
+    }
+  },[disabledButon, availableBits])
+
+  const milestoneProgress = ((250 - (nextMilestone - estimatedBits)) / 250) * 100;
 
   return (
     <>
-      <div
-        className={style.container}
-        onClick={() => {
-          setOpenRecordsDialog(true);
-          setButtonPressed("Bits");
-        }}
-      >
+      <div className={style.container}>
         <div className={style.barProgress}>
           <div className={style.titulos}>
-            <p className={style.titulo_Porcentaje}>Next Milestone</p>
-            <p className={style.porcentaje}>{amountBits} / 100.000</p>
+            <p className={style.titulo_Porcentaje}>
+              {t('StreamerProfile.BarProgressBit.nextMilestone')}
+            </p>
+            <p className={style.porcentaje}>
+              {estimatedBits.toLocaleString()} / {nextMilestone.toLocaleString()}
+            </p>
           </div>
-          <BorderLinearProgress variant="determinate" value={amountBits} />
+          <BorderLinearProgress variant="determinate" value={milestoneProgress} />
         </div>
         <div className={style.puntos}>
-          <p>Available</p>
-          <h2>250</h2>
+          <p>
+            {t('StreamerProfile.BarProgressBit.available')}
+          </p>
+          <h2>
+            {availableBits.toLocaleString()}
+          </h2>
         </div>
       </div>
-      <ContButton  disabled={disabledButon} onClick={() =>{handleOpenDialod(); setConfirmCashOut(false) }}>
-        Cash Qut
+      <ContButton  disabled={disabledButon} onClick={() =>{ handleOpenDialod(); setConfirmCashOut(false) }}>
+        {t('StreamerProfile.BarProgressBit.cashOut')}
       </ContButton>
       {!confirmCashOut ? (
         <Dialog
@@ -121,14 +125,18 @@ const BarProgressBit = ({ setOpenRecordsDialog, setButtonPressed }) => {
             paper: classes.paper,
           }}
         >
-          <CasthQutDialog setOpen={setOpen} setOpenConfirm={setOpenConfirm} setConfirmCashOut={setConfirmCashOut} />
+          <CasthQutDialog user={user}
+            amountBits={availableBits}
+            setOpen={setOpen}
+            setOpenConfirm={setOpenConfirm}
+            setConfirmCashOut={setConfirmCashOut} />
         </Dialog>
       ) : (
         <Dialog onClose={() => setOpenConfirm(false)} open={openConfirm} classes={{
           container: classes.dialogContainer,
           root: classes.dialogRoot,
-          paper: classes.paper}}> 
-          <CasthQutConfirmDialog setOpenConfirm={setOpenConfirm}/>
+          paper: classes.paper}}>
+          <CasthQutConfirmDialog amountBits={availableBits} setOpenConfirm={setOpenConfirm}/>
         </Dialog>
       )}
     </>

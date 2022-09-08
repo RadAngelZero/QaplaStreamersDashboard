@@ -135,25 +135,25 @@ const PlanPicker = ({ user }) => {
                     subtitle={'Free forever'}
                     backgroundButon={'#141833'}
                     colorTextButon={'#FFFFFF'}
-                    price={'0 /month'} 
+                    price={'0'} 
                     items={['Qapla Reactions', 'Qoins cash out']}/> 
                 <CardsPayments 
                     backgroundCards={'#141833'} 
                     title={'Essential'} 
-                    textButon={'Get visivility'}
+                    textButon={'Get visivility for your content'}
                     subtitle={'$18 Quatertly. You save 15%'}
                     backgroundButon={'#6C5DD3'}
                     colorTextButon={'#FFFFFF'}
-                    price={'6 /month'}
+                    price={'6'}
                     items={['200 Qoins Drops per month', 'Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out']}/> 
                 <CardsPayments 
                     backgroundCards={'#3B4BF9'} 
                     title={'Growth'}
-                     textButon={'Current'}
-                     subtitle={'$36.99 Quatertly You save 15%'}
+                     textButon={'reward your community'}
+                     subtitle={'$36.99 Quatertly. You save 15%'}
                      backgroundButon={'#0AFFD2'}
                      colorTextButon={'#4E2D92'}
-                     price={'11.99 /month'}
+                     price={'11.99'}
                      items={['400 Qoins Drops per month', 'Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out']}/> 
                 {/* {subscriptions[period] && Object.entries(subscriptions[period].packages).map((plan) => (
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/streamerSubscriptionCheckoutIntent' method='post'>

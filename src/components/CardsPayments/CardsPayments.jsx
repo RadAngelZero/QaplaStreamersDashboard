@@ -36,10 +36,10 @@
             
          },     
          items: {
-          marginTop:'40px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap:'15px'
+            marginTop:'40px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap:'15px'
          },
          Button:{
             maxWidth:'257px',
@@ -48,8 +48,19 @@
             opacity:'0.8',
             maxHeight:'52px',
             minHeight: '52px',
-            borderRadius:'10px'
+            borderRadius:'10px',
+            textTransform: 'capitalize',
          },
+         price:{
+            color: '#FFF',
+            marginBottom:'6px'
+         },
+         text:{
+            display: 'flex',
+            alignItems: 'end',
+            color:'#FFFFFF',
+            fontWeight:'500'
+         }
     }));
 
     const CardsPayments = ({title, price, backgroundCards, backgroundButon, textButon, subtitle, colorTextButon, items}) => {
@@ -60,8 +71,11 @@
                 <h1 className={classes.title}>{title}</h1>
                 <div className={classes.container} style={{ background:backgroundCards}}>
                     <div className={classes.itemContainer}> 
-                        <h2 style={{color: '#FFF', marginBottom:'6px'}}>${price}</h2>
-                        <p style={{ color: '#FFF', fontSize: '13px'}}>{subtitle}</p>
+                        <div style={{display: 'flex', height:'45px', marginBottom:'10px'}}>
+                            <h2 className={classes.price}>${price}</h2>
+                            <p className={classes.text}>/month</p>
+                        </div>
+                             <p style={{ color: '#FFF', fontSize: '13px'}}>{subtitle}</p>
                             <div className={classes.items}>
                                  {items.map(el => <div style={{display: 'flex', gap:'10px'}}><img src={iconTick} alt='icon'/><p  style={{ color: '#FFF', fontSize: '14px'}}>{el}</p></div>)}
                             </div>

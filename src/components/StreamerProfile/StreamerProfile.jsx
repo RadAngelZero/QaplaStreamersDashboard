@@ -63,7 +63,7 @@ const StreamerProfile = ({ user, games }) => {
     const [streams, setStreams] = useState({});
     const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
     const [buttonPressed, setButtonPressed] = useState('Qoins');
-    const [pendingMessages, setPendingMessages] = useState(0);
+    const [pendingMessages, setPendingMessages] = useState(4);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
     const [switchState, setSwitchState] = useState(false);
     const [qreatorCode, setQreatorCode] = useState('');
@@ -180,7 +180,7 @@ const StreamerProfile = ({ user, games }) => {
             {user &&
                 <>
                     <Grid style={{ maxWidth:'1180px'}} container xs={12} spacing={3}>
-                        <Grid style={{ maxWidth:'800px'}} item xs={9} >
+                        <Grid style={{maxWidth:'800px'}}  item xs={9} >
                             <Grid container xs={12}>
                                 <Grid xs={12}>
                                     <div className={styles.header}>
@@ -213,7 +213,7 @@ const StreamerProfile = ({ user, games }) => {
                                  
                                 </Grid>
                                 <Grid xs={12}>
-                                    <Grid container xs={11}>
+                                    <Grid container xs={12}>
                                         <Grid item xs={12}>
                                             <h1 className={styles.title} style={{ marginBottom: 40 }}>
                                                 {t('StreamerProfile.balance')}
@@ -314,33 +314,33 @@ const StreamerProfile = ({ user, games }) => {
                             </Grid>
                         </Grid>
                         <Grid style={{maxWidth:'260px'}} xs={3}> 
-                                    <Button variant='contained'
-                                            className={styles.messagesButton}
-                                            style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735' }}
-                                            onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
-                                            endIcon={
-                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <MessageIcon style={{ width: '32px', height: '32px' }} />
-                                                    {pendingMessages > 0 &&
-                                                        <div style={{
-                                                            display: 'flex',
-                                                            marginLeft: '12px',
-                                                            backgroundColor: '#FF007A',
-                                                            width: '27px',
-                                                            height: '27px',
-                                                            borderRadius: '30px',
-                                                            justifyContent: 'center'
+                                <Button variant='contained'
+                                    className={styles.messagesButton}
+                                    style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735',marginBottom:'50px' }}
+                                    onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
+                                    endIcon={
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <MessageIcon style={{ width: '32px', height: '32px' }} />
+                                                {pendingMessages > 0 &&
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        marginLeft: '12px',
+                                                        backgroundColor: '#FF007A',
+                                                        width: '27px',
+                                                        height: '27px',
+                                                        borderRadius: '30px',
+                                                        justifyContent: 'center'
                                                         }}>
-                                                            <p style={{
-                                                                display: 'flex',
-                                                                fontSize: '11px',
-                                                                lineHeight: '24px',
-                                                                fontWeight: '600',
-                                                                marginTop: '2px'
+                                                    <p style={{
+                                                         display: 'flex',
+                                                         fontSize: '11px',
+                                                         lineHeight: '24px',
+                                                         fontWeight: '600',
+                                                         marginTop: '2px'
                                                             }}>
                                                                 {pendingMessages}
                                                             </p>
-                                                        </div>
+                                                     </div>
 
                                                     }
                                                 </div>

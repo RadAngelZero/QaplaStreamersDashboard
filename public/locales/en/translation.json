@@ -351,8 +351,8 @@
         "acquire": "Acquire"
     },
     "StreamsLeft": {
-        "streams": "Remaining posts: ",
-        "leftStreams": "{{available}} of {{total}}",
+        "drops": "Remaining drops: ",
+        "dropsLeft": "{{available}} of {{total}}",
         "renewsOn": "Renews on {{month}} {{date}}",
         "membershipExpired": "Membership expired on {{month}} {{date}}"
     },

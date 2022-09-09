@@ -33,6 +33,7 @@ const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
+const userStreamerDropsRef = database.ref('//UserStreamerDrops');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1006,4 +1007,25 @@ export async function getInteractionsRewardData(uid) {
  */
  export async function saveGiphyText(uid, data) {
     return giphyTextRequestsRef.child(uid).set(data);
+}
+
+////////////////////////
+// User Streamer Drops
+////////////////////////
+
+/**
+ * Listen to changes for streamer Qoins drops
+ * @param {string} uid User identifier
+ * @param {function} callback Function to handle the response of the listener
+ */
+export function listenToStreamerDrops(uid, callback) {
+    return userStreamerDropsRef.child(uid).child('qoinsDrops').on('value', callback);
+}
+
+/**
+ * Remove the listener for streamer Qoins drops
+ * @param {string} uid User identifier
+ */
+export function removeListenerFromStreamerDrops(uid) {
+    return userStreamerDropsRef.child(uid).child('qoinsDrops').off('value');
 }

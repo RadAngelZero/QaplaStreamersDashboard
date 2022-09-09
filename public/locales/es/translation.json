@@ -347,8 +347,8 @@
         "acquire": "Adquirir"
     },
     "StreamsLeft": {
-        "streams": "Publicaciones disponibles: ",
-        "leftStreams": "{{available}} de {{total}}",
+        "drops": "Drops disponibles: ",
+        "dropsLeft": "{{available}} de {{total}}",
         "renewsOn": "Renueva el {{date}} de {{month}}",
         "membershipExpired": "Venció el {{date}} de {{month}}"
     },

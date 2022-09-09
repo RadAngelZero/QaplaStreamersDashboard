@@ -303,8 +303,8 @@ const StreamerProfile = ({ user, games }) => {
                                                 <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
                                             </Grid>
                                             <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px', marginLeft: 'auto', marginRight: '-2px', minWidth: 'fit-content' }}>
-                                                {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
-                                                    <StreamsLeft subscriptionDetails={user.subscriptionDetails}
+                                                {(user.premium || user.freeTrial) && user.currentPeriod &&
+                                                    <StreamsLeft uid={user.uid}
                                                         renovationDate={user.currentPeriod.endDate} />
                                                 }
                                             </Grid>

@@ -1,6 +1,6 @@
     import React from 'react';
 
-    import { makeStyles, Button, Box, Grid, Card, CardContent, CardActions } from '@material-ui/core';
+    import { makeStyles, Button } from '@material-ui/core';
 
     import iconTick from '../../assets/Tickgray.svg'
 
@@ -67,8 +67,8 @@
         const classes = useStyles();
 
         return (
-              <div className={classes.containerCard}>
-                <h1 className={classes.title}>{title}</h1>
+            <div className={classes.containerCard}>
+                    <h1 className={classes.title}>{title}</h1>
                 <div className={classes.container} style={{ background:backgroundCards}}>
                     <div className={classes.itemContainer}> 
                         <div style={{display: 'flex', height:'45px', marginBottom:'10px'}}>
@@ -76,15 +76,15 @@
                             <p className={classes.text}>/month</p>
                         </div>
                              <p style={{ color: '#FFF', fontSize: '13px'}}>{subtitle}</p>
-                            <div className={classes.items}>
-                                 {items.map(el => <div style={{display: 'flex', gap:'10px'}}><img src={iconTick} alt='icon'/><p  style={{ color: '#FFF', fontSize: '14px'}}>{el}</p></div>)}
-                            </div>
+                        <div className={classes.items}>
+                            {items.map(el => <div style={{display: 'flex', gap:'10px'}}><img src={iconTick} alt='icon'/><p  style={{ color: '#FFF', fontSize: '14px'}}>{el}</p></div>)}
+                        </div>
                     </div>
                     <Button className={classes.Button} style={{background:backgroundButon, color:colorTextButon}}>
                         {textButon}
                     </Button>
                 </div>
-              </div>
+            </div>
         )
     }
 

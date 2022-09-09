@@ -18,7 +18,8 @@ import {
     getPastStreamTitle,
     checkActiveCustomReward,
     listenToQoinsEnabled,
-    removeQoinsEnabledListener
+    removeQoinsEnabledListener,
+    getStreamerDropsLeft
 } from '../../services/database';
 import { closeQaplaStream, enableStreamQoinsReward, startQaplaStream } from '../../services/streamQapla';
 import EventManagementDialog from '../QaplaStreamDialogs/EventManagementDialog';
@@ -278,33 +279,37 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const startStream = async (enableIn) => {
         try {
             setStartingStream(true);
-            const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, user.subscriptionDetails.redemptionsPerStream, enableIn);
+            const dropsLeft = await getStreamerDropsLeft(user.uid);
+            if (dropsLeft.exists()) {
+                // If the user has 50 or more drops just allow 50 drops as maximum value, otherwise set the number of remaining drops (for example: 40) as the maximum
+                const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, dropsLeft.val() < 50 ? dropsLeft.val() : 50, enableIn);
 
-            if (enableIn) {
-                listenToQoinsEnabled(streamId, (qoinsEnabled) => {
-                    if (qoinsEnabled.val()) {
-                        setStream({
-                            ...stream,
-                            qoinsEnabled: qoinsEnabled.val()
-                        });
+                if (enableIn) {
+                    listenToQoinsEnabled(streamId, (qoinsEnabled) => {
+                        if (qoinsEnabled.val()) {
+                            setStream({
+                                ...stream,
+                                qoinsEnabled: qoinsEnabled.val()
+                            });
 
-                        removeQoinsEnabledListener(streamId);
-                    }
+                            removeQoinsEnabledListener(streamId);
+                        }
+                    });
+                }
+
+                window.analytics.track('Stream started', {
+                    streamId,
+                    uid: user.uid,
+                    timestamp: (new Date()).getTime()
                 });
-            }
+                setStream(streamData);
+                if (!openStreamDialog) {
+                    setOpenStreamStartedDialog(true);
+                }
+                setStartingStream(false);
 
-            window.analytics.track('Stream started', {
-                streamId,
-                uid: user.uid,
-                timestamp: (new Date()).getTime()
-            });
-            setStream(streamData);
-            if (!openStreamDialog) {
-                setOpenStreamStartedDialog(true);
+                return streamData;
             }
-            setStartingStream(false);
-
-            return streamData;
         } catch (error) {
             if (error && error.status === 401) {
                 handleExpiredSession();

@@ -1018,6 +1018,15 @@ export async function getInteractionsRewardData(uid) {
  * @param {string} uid User identifier
  * @param {function} callback Function to handle the response of the listener
  */
+ export async function getStreamerDropsLeft(uid) {
+    return await userStreamerDropsRef.child(uid).child('qoinsDrops').child('left').once('value');
+}
+
+/**
+ * Listen to changes for streamer Qoins drops
+ * @param {string} uid User identifier
+ * @param {function} callback Function to handle the response of the listener
+ */
 export function listenToStreamerDrops(uid, callback) {
     return userStreamerDropsRef.child(uid).child('qoinsDrops').on('value', callback);
 }

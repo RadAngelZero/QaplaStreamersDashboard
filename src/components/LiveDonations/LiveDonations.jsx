@@ -5,7 +5,7 @@ import { Video } from '@giphy/react-components';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
@@ -235,17 +235,18 @@ const LiveDonations = () => {
                 if (donation.messageExtraData && donation.messageExtraData.voiceAPIName && donation.messageExtraData && donation.messageExtraData.voiceAPIName.includes('Uberduck:')) {
                     // 9 Because the string "Uberduck:" length is 9
                     const voiceUuid = donation.messageExtraData.voiceAPIName.substring(9);
-                    const messageResponse = await speakCheerMessageUberDuck(donation.message, voiceUuid);
-                    const interval = setInterval(async () => {
-                        const response = await fetch(`https://api.uberduck.ai/speak-status?uuid=${messageResponse.data.uuid}`);
-                        if (response.status) {
-                            const result = await response.json();
-                            if (result.finished_at && result.path) {
-                                showCheer(result.path);
-                                clearInterval(interval);
+                    await speakCheerMessageUberDuck(donation.id, donation.message, voiceUuid);
+                    listenForUberduckAudio(donation.id, (url) => {
+                        if (url.exists()) {
+                            if (url.val() !== 'error') {
+                                showCheer(url.val());
+                            } else {
+                                showCheer();
                             }
+
+                            removeListenerForUberduckAudio(donation.id);
                         }
-                    }, 1000);
+                    });
                 } else {
                     showCheer();
                 }

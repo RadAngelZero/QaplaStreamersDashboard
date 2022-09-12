@@ -63,7 +63,7 @@ const StreamerProfile = ({ user, games }) => {
     const [streams, setStreams] = useState({});
     const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
     const [buttonPressed, setButtonPressed] = useState('Qoins');
-    const [pendingMessages, setPendingMessages] = useState(4);
+    const [pendingMessages, setPendingMessages] = useState(0);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
     const [switchState, setSwitchState] = useState(false);
     const [qreatorCode, setQreatorCode] = useState('');

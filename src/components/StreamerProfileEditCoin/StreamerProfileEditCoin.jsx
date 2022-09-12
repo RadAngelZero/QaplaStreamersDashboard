@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+
 const StreamerProfileEditCoin = ({ user }) => {
     const [ActiveEditTitle, setActiveEditTitle] = useState(false);
     const [ActiveEditCoins, setActiveEditCoins] = useState(false);
@@ -32,6 +33,7 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [modal, setModal] = useState(false);
     const [titleCheckbox, setTitleCheckbox] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
+    const [qoinsReaction, setQoinsReaction] = useState(false);
     const classes = useStyles();
     const { t } = useTranslation();
     const history = useHistory();
@@ -142,6 +144,15 @@ const StreamerProfileEditCoin = ({ user }) => {
             setTitleCheckbox(t('StreamerProfile.StreamerProfileEditCoin.enabled'));
             toggleReward();
         }
+    }
+    const handleQoinsReactions = (e) => {
+        if(!e.target.checked){
+            setQoinsReaction(false)
+        }
+        else{
+            setQoinsReaction(true)
+        }
+       
     }
 
     const toggleReward = async () => {
@@ -263,6 +274,16 @@ const StreamerProfileEditCoin = ({ user }) => {
                             onChange={(e) => handleCheckbox(e)}
                         />
                         <label for="boton"></label>
+                    </div>
+                    <div className={style.onlyQoinsReaction}> 
+                        <p className={style.p}>Only Qoins Reactions</p>
+                        <input
+                            className={style.input_checkbox}
+                            type="checkbox" 
+                            id="switch"
+                            checked={qoinsReaction}
+                            onChange={(e)=>handleQoinsReactions(e)}/>
+                            <label for="switch"></label>
                     </div>
                 </div>
                 </>

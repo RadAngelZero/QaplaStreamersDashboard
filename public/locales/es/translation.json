@@ -15,8 +15,8 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
-        "membership": "Membresía",
-        "billing": "Membresía",
+        "membership": "Subscripción",
+        "billing": "Subscripción",
         "universalProfile": "Perfil",
         "settings": "Ajustes",
         "new": "Nuevo",
@@ -95,6 +95,15 @@
             "disable": "Deshabilitar reacciones",
             "dontDisable": "No deshabilitar",
             "dontShowAgain": "No mostrar este mensaje de nuevo"
+        },
+        "BarProgressBit": {
+            "nextMilestone": "Siguiente Milestone",
+            "available": "Disponible",
+            "cashOut": "Cash Out",
+            "confirmCashOut": "Confirma que quieres cambiar tus Qoins por Bits en Twitch",
+            "cancel": "Cancelar",
+            "weGotYouRequestP1": "¡Tenemos tu solicitud! Te enviaremos ",
+            "weGotYouRequestP2": " bits en tu próximo stream"
         }
     },
     "StreamCard": {
@@ -329,7 +338,7 @@
         "descriptionP1": "Activa tu ",
         "descriptionHiglight": "Free Trial",
         "descriptionP2": " con tu código de referido\npara poder publicar tus streams",
-        "buyAMembership": "Recompensa a tu comunidad y dale visibilidad a tu contenido con una membresía de Qapla",
+        "buyAMembership": "Recompensa a tu comunidad y dale visibilidad a tu contenido con una subscripción de Qapla",
         "referralCode": "Código de referido",
         "startFreeTrial": "Activar Free Trial",
         "dontHaveACode": "¿No tienes código de referido?",

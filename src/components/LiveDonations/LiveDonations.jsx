@@ -170,7 +170,7 @@ const LiveDonations = () => {
                 const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
                 audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
                 if (audioUrl || !donation.repeating) {
-                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'en-US-Standard-C';
+                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
 
                     if (donation.message) {
                         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {

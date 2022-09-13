@@ -220,13 +220,13 @@ const LiveDonations = () => {
                     audioAlert.onended = () => {
                         setTimeout(() => {
                             finishReaction(donation);
-                        }, 4000);
+                        }, 5000);
                     }
                 } else {
                     voiceBotMessage.onended = () => {
                         setTimeout(() => {
                             finishReaction(donation);
-                        }, 4000);
+                        }, 5000);
                     }
                 }
             }
@@ -283,7 +283,7 @@ const LiveDonations = () => {
         }
         setTimeout(() => {
             setIsPlayingAudio(false);
-        }, 2000);
+        }, 750);
     }
 
     const queueAnimation = () => {
@@ -384,6 +384,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
     const [mediaReady, setMediaReady] = useState(false);
     const [giphyTextReady, setGiphyTextReady] = useState(false);
     const [showDonation, setShowDonation] = useState(false);
+    const [muteClip, setMuteClip] = useState(false);
     const donation = donationToShow;
 
     useEffect(() => {
@@ -419,16 +420,21 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
         startDonation();
     }
 
-    const onClipEnded = () => {
-        const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
-        const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
+    const onClipEnded = (count) => {
+        if (count === 1) {
+            setMuteClip(true);
+            const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
+            const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
 
-        if (bigQoinsDonation) {
-            setTimeout(() => {
-                startDonation(donation);
-            }, 100);
-        } else {
-            finishReaction(donation);
+            if (bigQoinsDonation) {
+                setTimeout(() => {
+                    startDonation(donation);
+                }, 100);
+            } else {
+                setTimeout(() => {
+                    finishReaction(donation);
+                }, 5000);
+            }
         }
     }
 
@@ -464,7 +470,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                             maxHeight: '250px',
                             objectFit: 'scale-down'
                         }}>
-                            <Video hideAttribution gif={clip} height={250} muted={false} loop={false} onEnded={onClipEnded} />
+                            <Video hideAttribution gif={clip} height={250} muted={muteClip} loop onLoop={onClipEnded} />
                         </div>
                     :
                     null

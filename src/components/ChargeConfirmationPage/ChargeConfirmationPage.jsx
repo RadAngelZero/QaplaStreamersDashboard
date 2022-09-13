@@ -196,7 +196,7 @@ const ChargeConfirmationPage = ({ user }) => {
         }
 
         if (user && user.uid) {
-            // getDetails();
+            getDetails();
         }
     }, [user]);
 
@@ -211,12 +211,10 @@ const ChargeConfirmationPage = ({ user }) => {
     return (
         <Grid container alignContent='center' className={classes.container}>
             <Grid item md={6} className={classes.paymentInfoContainer}>
-                <Button className={classes.buttonClose}> 
-                    <Closeicon /> 
+                <Button className={classes.buttonClose}>
+                    <Closeicon />
                     </Button>
-               
                 <div className={classes.eImageContainer}>
-                
                     <ESvg />
                 </div>
                 <p className={classes.subscriptionBought}>

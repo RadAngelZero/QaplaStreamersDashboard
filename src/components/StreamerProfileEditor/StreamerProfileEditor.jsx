@@ -13,7 +13,6 @@ import { getStreamerDeepLink, getStreamerLinks, listenStreamerPublicProfile, sav
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
-import { ReactComponent as XIcon } from './../../assets/xIcon.svg';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import { uploadImage } from '../../services/storage';
 import { MIN_TAGS, PROFILE_BACKGROUND_GRADIENTS } from '../../utilities/Constants';
@@ -248,14 +247,20 @@ const StreamerProfileEditor = ({ user }) => {
             listenStreamerPublicProfile(user.uid, async (info) => {
                 if (info.exists()) {
                     const { bio, tags, backgroundUrl, backgroundGradient, badge } = info.val();
+                    const link = await getStreamerDeepLink(user.uid);
+                    if (!link.exists()) {
+                        setOnBoardingDone(false);
+                        setOnBoardingStep(0);
+                    }
+
                     if (!tags || tags.length < MIN_TAGS) {
                         setOnBoardingDone(false);
-                        setOnBoardingStep(4);
+                        setOnBoardingStep(2);
                     }
 
                     if (!bio) {
                         setOnBoardingDone(false);
-                        setOnBoardingStep(3);
+                        setOnBoardingStep(1);
                     }
                     setStreamerBio(bio || '');
                     setBackgroundGradient(backgroundGradient);

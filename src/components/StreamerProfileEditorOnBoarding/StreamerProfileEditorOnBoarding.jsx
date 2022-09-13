@@ -259,6 +259,10 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                     const linkData = await linkResponse.json();
                     await saveStreamerDeepLink(user.uid, linkData.url);
                     setQaplaLink(linkData.url);
+
+                    if (showOnlySpecificStep) {
+                        closeOnBoarding();
+                    }
                 } else if (linkResponse.status === 409) {
                     return setLinkError('Link duplicado');
                 }

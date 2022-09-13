@@ -33,6 +33,7 @@ const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
+const streamersDeepLinksRef = database.ref('/StreamersDeepLinks');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1006,4 +1007,21 @@ export async function getInteractionsRewardData(uid) {
  */
  export async function saveGiphyText(uid, data) {
     return giphyTextRequestsRef.child(uid).set(data);
+}
+
+////////////////////////
+// Streamer Deep Links
+////////////////////////
+
+/**
+ * Save the deep link of the streamer on database
+ * @param {string} uid User identifier
+ * @param {string} url Deep link to save
+ */
+export async function saveStreamerDeepLink(uid, url) {
+    return await streamersDeepLinksRef.child(uid).set(url);
+}
+
+export async function getStreamerDeepLink(uid) {
+    return await streamersDeepLinksRef.child(uid).once('value');
 }

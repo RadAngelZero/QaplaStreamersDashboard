@@ -293,7 +293,6 @@ input::placeholder {
 .twitchURLContainer {
     background: linear-gradient(91deg, #881CEE -1.34%, #FF4BA2 50.99%, #FFBD8B 100.15%);
     padding: 2px;
-    /* background-color: #202750; */
     display: flex;
     border-radius: 8px;
     margin-top: 53px;
@@ -301,13 +300,13 @@ input::placeholder {
     width: fit-content;
     overflow: hidden;
   }
-  
+
   .twitchURLSubContainer {
     display: flex;
     background-color: #202750;
     border-radius: 8px;
   }
-  
+
   .twitchURL {
     display: flex;
     color: #00FFDD;

@@ -9,7 +9,7 @@ import styles from './StreamerProfileEditor.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { ReactComponent as FounderBadge } from './../../assets/FounderBadge.svg'
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getStreamerLinks, listenStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
+import { getStreamerDeepLink, getStreamerLinks, listenStreamerPublicProfile, saveStreamerLinks, updateStreamerPublicProfile } from '../../services/database';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { ReactComponent as EditIcon } from './../../assets/Edit.svg';
 import { ReactComponent as CameraIcon } from './../../assets/Camera.svg';
@@ -238,6 +238,7 @@ const StreamerProfileEditor = ({ user }) => {
     const [onBoardingDone, setOnBoardingDone] = useState(true);
     const [onBoardingStep, setOnBoardingStep] = useState(0);
     const [badge, setBadge] = useState(false);
+    const [qaplaLink, setQaplaLink] = useState('');
     const [chipHover, setChipHover] = useState({});
     const { t } = useTranslation();
     const twitchURL = `https://www.twitch.tv/${user && user.login ? user.login : ''}`;
@@ -263,6 +264,11 @@ const StreamerProfileEditor = ({ user }) => {
                     setBadge(badge);
                 } else {
                     setOnBoardingDone(false);
+                }
+
+                const qaplaLink = await getStreamerDeepLink(user.uid);
+                if (qaplaLink.exists()) {
+                    setQaplaLink(qaplaLink.val());
                 }
 
                 const links = await getStreamerLinks(user.uid);
@@ -384,8 +390,8 @@ const StreamerProfileEditor = ({ user }) => {
         }
     }
 
-    const copyTwitchURL = () => {
-        navigator.clipboard.writeText(twitchURL);
+    const copyQaplaLink = () => {
+        navigator.clipboard.writeText(qaplaLink);
         setOpenTooltip(true);
         setTimeout(() => {
             setOpenTooltip(false);
@@ -497,9 +503,11 @@ const StreamerProfileEditor = ({ user }) => {
                                 </div>
                                 <div className={styles.twitchURLContainer}>
                                     <div className={styles.twitchURLSubContainer}>
-                                        <a href={twitchURL} target='_blank' rel='noreferrer' className={styles.twitchURL} >{twitchURL}</a>
+                                        <a href={qaplaLink} target='_blank' rel='noreferrer' className={styles.twitchURL}>
+                                            {qaplaLink}
+                                        </a>
                                         <Tooltip placement='top' open={openTooltip} title='Copiado'>
-                                            <CopyIcon onClick={copyTwitchURL} className={styles.copyIcon} />
+                                            <CopyIcon onClick={copyQaplaLink} className={styles.copyIcon} />
                                         </Tooltip>
                                     </div>
                                 </div>

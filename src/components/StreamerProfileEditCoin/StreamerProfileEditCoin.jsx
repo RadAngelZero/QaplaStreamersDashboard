@@ -209,33 +209,33 @@ const StreamerProfileEditCoin = ({ user }) => {
             <h1 className={style.Titulo}>
                 {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
             </h1>
-            {rewardId == '' && !savingChanges ?
+            {rewardId !== '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
-                <div className={style.content_input}>
-                    <div className={style.input}>
-                        {ActiveEditTitle ?
+                    <div className={style.content_input}>
+                        <div className={style.input}>
+                            {ActiveEditTitle ?
                             <>
-                            <input
-                                className={style.Visibility_input}
-                                type="text"
-                                maxLength={18}
-                                autoFocus
-                                value={rewardName}
-                                onChange={(event) => setRewardName(event.target.value)}
-                                onKeyPress={saveData} />
-                            <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <ConfirmChange />
-                            </Button>
+                                <input
+                                    className={style.Visibility_input}
+                                    type="text"
+                                    maxLength={18}
+                                    autoFocus
+                                    value={rewardName}
+                                    onChange={(event) => setRewardName(event.target.value)}
+                                    onKeyPress={saveData} />
+                                <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                    <ConfirmChange />
+                                </Button>
                             </>
                             :
                             <>
-                            <p className={style.p}>
-                                {rewardName}
-                            </p>
-                            <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <img src={iconEdit} alt="icons-edit" />
-                            </Button>
+                                <p className={style.p}>
+                                    {rewardName}
+                                </p>
+                                <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                    <img src={iconEdit} alt="icons-edit" />
+                                </Button>
                             </>
                         }
                     </div>

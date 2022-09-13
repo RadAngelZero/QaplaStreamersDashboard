@@ -11,30 +11,17 @@ import CasthQutDialog from "../CasthQutDialog/CasthQutDialog";
 import CasthQutConfirmDialog from "../CasthQutConfirmDialog/CasthQutConfirmDialog";
 
 const BorderLinearProgress = withStyles((theme) => ({
-  root: {
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#0D1021",
-  },
-  bar: {
-    borderRadius: 5,
-    background:
-      "linear-gradient(270deg, #4FF4FF 0%, #924FFF 52.52%, #FF8ADE 100%), #0AFFD2;",
-  },
+    root: {
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: "#0D1021",
+    },
+    bar: {
+        borderRadius: 5,
+        background:
+        "linear-gradient(270deg, #4FF4FF 0%, #924FFF 52.52%, #FF8ADE 100%), #0AFFD2;",
+    },
 }))(LinearProgress);
-
-const useStyles = makeStyles((theme) => ({
-    dialogContainer: {
-    backdropFilter: "blur(20px)",
-  },
-  dialogRoot: {},
-  paper: {
-    backgroundColor: "#141833",
-    color: "#FFF",
-    overflow: "visible",
-    borderRadius: "35px",
-  },
-}));
 
 const ContButton = withStyles((theme) => ({
   root: {
@@ -71,7 +58,6 @@ const BarProgressBit = ({
   const [confirmCashOut, setConfirmCashOut] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [disabledButon, setDisabledButon] = useState(false);
-  const classes = useStyles();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -131,20 +117,15 @@ const BarProgressBit = ({
             setConfirmCashOut={setConfirmCashOut}
           />
       ) : (
-        <Dialog
+        <CasthQutDialog
             onClose={() => setOpenConfirm(false)}
             open={openConfirm}
-            classes={{
-            container: classes.dialogContainer,
-            root: classes.dialogRoot,
-            paper: classes.paper,
-          }}
         >
           <CasthQutConfirmDialog
                 amountBits={availableBits}
                 setOpenConfirm={setOpenConfirm}
             />
-        </Dialog>
+        </CasthQutDialog>
       )}
     </>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Dialog } from "@material-ui/core";
+import { Dialog, makeStyles } from "@material-ui/core";
 
 import style from "./CasthQutDialog.module.css";
 
@@ -8,16 +8,30 @@ import { ReactComponent as BitsIcon } from "./../../assets/BitsIcon.svg";
 import { notifyCashOutToQaplaAdmin } from "../../services/discord";
 import { saveStreamerCashOutRequest } from "../../services/database";
 
-const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amountBits, open, onClose }) => {
-  const [bits, setBits] = useState(0);
-  const [disableButton, setDisableButton] = useState(false);
-  const { t } = useTranslation();
+    const useStyles = makeStyles((theme) => ({
+        dialogContainer: {
+        backdropFilter: "blur(20px)",
+        },
+        dialogRoot: {},
+        paper: {
+        backgroundColor: "#141833",
+        color: "#FFF",
+        overflow: "visible",
+        borderRadius: "35px",
+        },
+    }));
 
-  useEffect(() => {
-    if (amountBits > 0 && !bits) {
-      setBits(amountBits);
-    }
-  }, [amountBits]);
+    const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amountBits, open, onClose }) => {
+    const [bits, setBits] = useState(0);
+    const [disableButton, setDisableButton] = useState(false);
+    const classes = useStyles();
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        if (amountBits > 0 && !bits) {
+        setBits(amountBits);
+        }
+    }, [amountBits]);
 
   const confirmCashOut = async () => {
     const qoinsCashOut = amountBits / 10 * 200;

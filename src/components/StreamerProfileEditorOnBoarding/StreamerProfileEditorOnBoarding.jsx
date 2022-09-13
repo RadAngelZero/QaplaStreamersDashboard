@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import styles from './StreamerProfileEditorOnBoarding.module.css';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { getQreatorCode, saveStreamerDeepLink, saveTags, updateStreamerPublicProfile } from '../../services/database';
-import ContainedButton from '../ContainedButton/ContainedButton';
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
-import { CHEERS_URI, MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
+import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
 import ProfilesPresentation1 from './../../assets/ProfilesPresentation1.png';
 import ProfilesPresentation2 from './../../assets/ProfilesPresentation2.png';
 import ProfilesPresentation3 from './../../assets/ProfilesPresentation3.png';
@@ -367,7 +366,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                             style={{
                                 zIndex: -1,
                                 position: 'absolute',
-                                bottom: 450, // 450 - 70 (height of container - hidden part of the image)
+                                bottom: 450, // (height of container)
                                 width: '181px',
                                 height: '118px',
                             }}

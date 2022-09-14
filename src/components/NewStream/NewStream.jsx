@@ -128,6 +128,7 @@ const NewStream = ({ user, games }) => {
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [gamesData, setGamesData] = useState([]);
     const [showAccountActviation, setShowAccountActviation] = useState(false);
+    const [dropsForStream, setDropsForStream] = useState(50);
     const [lockSendButton, setLockSendButton] = useState(false);
 
     useEffect(() => {
@@ -314,7 +315,7 @@ const NewStream = ({ user, games }) => {
                         });
                     }
 
-                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate, dropsForStream);
 
                     window.analytics.track('Stream requested', {
                         selectedGame,
@@ -364,7 +365,7 @@ const NewStream = ({ user, games }) => {
             });
         }
 
-        await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+        await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate, dropsForStream);
         await addToStreamsRequestedOnSubscriptionDetails(user.uid);
 
         updateStreamerProfile(user.uid, streamerData);

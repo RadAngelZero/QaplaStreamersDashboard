@@ -214,39 +214,63 @@ export function removeQoinsEnabledListener(streamId) {
  * @param {object} optionalData Customizable data for events
  * @param {number} createdAt timestamp of when the request was created
  * @param {string} stringDate Temporary field just to detect a bug
+ * @param {number} drops Max number of drops to use in the stream
  */
-export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, optionalData, createdAt, stringDate) {
-    const event = await streamersEventsDataRef.child(uid).push({
-        date,
-        hour,
-        game,
-        status: 1,
-        streamType,
-        timestamp,
-        optionalData,
-        createdAt,
-        stringDate
+export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, optionalData, createdAt, stringDate, drops) {
+    const dropsReservedBeforeTransaction = await userStreamerDropsRef.child(uid).child('qoinsDrops').child('reserved').once('value');
+
+    const transactionResult = await userStreamerDropsRef.child(uid).child('qoinsDrops').transaction((qoinsDrops) => {
+        if (qoinsDrops) {
+            if (qoinsDrops.reserved >= 0) {
+                if ((qoinsDrops.reserved + drops) <= qoinsDrops.original) {
+                    qoinsDrops.reserved += drops;
+                }
+
+                return qoinsDrops;
+            }
+
+            return { ...qoinsDrops, reserved: drops };
+        }
+
+        return qoinsDrops;
     });
 
-    await premiumEventsSubscriptionRef.child(uid).child(event.key).set({
-        approved: false,
-        timestamp
-    });
+    if (transactionResult.commited && (!dropsReservedBeforeTransaction.exists() || transactionResult.snapshot.val().reserved !== dropsReservedBeforeTransaction.val())) {
+        const event = await streamersEventsDataRef.child(uid).push({
+            date,
+            hour,
+            game,
+            status: 1,
+            streamType,
+            timestamp,
+            optionalData,
+            createdAt,
+            stringDate,
+            drops
+        });
 
-    return await streamsApprovalRef.child(event.key).set({
-        date,
-        hour,
-        game,
-        idStreamer: uid,
-        streamerName: streamerData.displayName,
-        streamType,
-        timestamp,
-        streamerChannelLink: 'https://twitch.tv/' + streamerData.login,
-        streamerPhoto: streamerData.photoUrl,
-        optionalData,
-        createdAt,
-        stringDate
-    });
+        await premiumEventsSubscriptionRef.child(uid).child(event.key).set({
+            approved: false,
+            timestamp
+        });
+
+        return await streamsApprovalRef.child(event.key).set({
+            date,
+            hour,
+            game,
+            idStreamer: uid,
+            streamerName: streamerData.displayName,
+            streamType,
+            timestamp,
+            streamerChannelLink: 'https://twitch.tv/' + streamerData.login,
+            streamerPhoto: streamerData.photoUrl,
+            optionalData,
+            createdAt,
+            stringDate
+        });
+    } else {
+        alert('No publicado');
+    }
 }
 
 export async function getUserDisplayName(uid) {

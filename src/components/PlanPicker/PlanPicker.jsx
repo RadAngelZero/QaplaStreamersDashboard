@@ -132,7 +132,6 @@ const PlanPicker = ({ user }) => {
                     backgroundCards={'#141833'} 
                     title={'Basic'} 
                     textButon={'Current'}
-                    // subtitle={}
                     textGreen={'Free forever'}
                     backgroundButon={'#141833'}
                     colorTextButon={'#FFFFFF'}

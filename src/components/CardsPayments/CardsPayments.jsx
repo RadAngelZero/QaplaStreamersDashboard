@@ -80,7 +80,6 @@ const CardsPayments = ({
     colorTextButon,
     items,
     textGreen,
-    itemsGreen,
 }) => {
   const classes = useStyles();
 

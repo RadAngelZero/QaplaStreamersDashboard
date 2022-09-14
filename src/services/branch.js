@@ -2,7 +2,7 @@
  * Creates a deep link with branch API
  * @param {string} streamerId Streamer identifier
  * @param {string} qreatorCode Qreator code (reference for Qapla web)
- * @param {string} alias Alias for url (http://qapla.app.link/${alias})
+ * @param {string} alias Alias for url (http://myqap.la/${alias})
  * @returns Branch API response
  */
 export async function createLink(streamerId, qreatorCode, alias) {

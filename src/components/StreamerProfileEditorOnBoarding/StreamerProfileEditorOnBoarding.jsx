@@ -406,7 +406,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                                 fontWeight: '600',
                                 lineHeight: '17px',
                             }}>
-                                qapla.app.link/
+                                myqap.la/
                             </p>
                             <div className={styles.createLinkFieldContainer}>
                                 <div className={styles.createLinkFieldInnerConainer}>

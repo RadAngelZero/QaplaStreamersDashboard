@@ -1,93 +1,93 @@
 .container {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    cursor: pointer;
 }
 
 .barProgress {
-  height: 57px;
+    height: 57px;
 }
 
 .percentageTitle {
-  padding-bottom: 13px;
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
-  display: flex;
-  align-items: center;
-  text-align: right;
-  color: #6c5dd3;
+    padding-bottom: 13px;
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    display: flex;
+    align-items: center;
+    text-align: right;
+    color: #6c5dd3;
 }
 
-.titulos {
-  display: flex;
-  height: 34px;
-  align-items: inherit;
+.titles {
+    display: flex;
+    height: 34px;
+    align-items: inherit;
 }
 
-.porcentaje {
-  margin: 2px 0px 0px 10px;
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
-  letter-spacing: -0.864px;
-  color: #ffffff;
+.percentage {
+    margin: 2px 0px 0px 10px;
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: -0.864px;
+    color: #ffffff;
 }
 
-.puntos p {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
-  text-align: center;
-  color: #6c5dd3;
+.available p {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    text-align: center;
+    color: #6c5dd3;
 }
 
-.puntos h2 {
-  margin: 0px;
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 600;
-  font-size: 30px;
-  line-height: 36px;
-  text-align: center;
-  letter-spacing: -0.864px;
-  color: #ffffff;
+.available h2 {
+    margin: 0px;
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 36px;
+    text-align: center;
+    letter-spacing: -0.864px;
+    color: #ffffff;
 }
 
 .button {
-  width: 110px;
-  height: 40px;
-  background: #3B4BF9;
-  border-radius: 8px;
-  color: #FFFFFF;
-  border:none;
-  outline: none;
-  margin-left: 10px;
-  cursor: pointer;
+    width: 110px;
+    height: 40px;
+    background: #3B4BF9;
+    border-radius: 8px;
+    color: #FFFFFF;
+    border:none;
+    outline: none;
+    margin-left: 10px;
+    cursor: pointer;
 }
 
 @media (max-width: 600px) {
-  .container{
-      display: flex;
-      flex-direction: column;
-      align-items: start;
-      justify-content:space-around;
-      height:100%;
-  }
-  .button{
-    width: 180px;
-  }
+    .container{
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content:space-around;
+        height:100%;
+    }
+    .button{
+        width: 180px;
+    }
  }
 
  .dialog{
-  border-radius:40px;
+    border-radius:40px;
  }

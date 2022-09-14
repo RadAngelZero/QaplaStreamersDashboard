@@ -79,7 +79,7 @@ const CardsPayments = ({
     subtitle,
     colorTextButon,
     items,
-    textGreen,
+    paymentPerMonth,
 }) => {
   const classes = useStyles();
 
@@ -97,13 +97,13 @@ const CardsPayments = ({
                 </div>
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <p style={{ color: "#FFF", fontSize: "13px" }}>{subtitle}</p>
-                    <p style={{ color: "#00FFDD", fontSize: "13px" }}>{textGreen}</p>
+                    <p style={{ color: "#00FFDD", fontSize: "13px" }}>{paymentPerMonth}</p>
                 </div>
                 <div className={classes.items}>
                     {items.map((el) => (
                         <div style={{ display: "flex", gap: "10px" }}>
                             <img src={iconTick} alt="icon" />
-                            <p className={el.includes('Qoins Drops per month')? classes.textGreen: classes.textWhite}>{el}</p>
+                            <p className={el.color? classes.textGreen : classes.textWhite}>{el.text}</p>
                         </div>
                 ))}
                 </div>

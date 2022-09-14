@@ -33,6 +33,7 @@ const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
+const uberduckRequestsRef = database.ref('/UberduckRequests');
 const streamerCashOutRef = database.ref('/StreamersCashOut');
 
 /**
@@ -1009,6 +1010,26 @@ export async function getInteractionsRewardData(uid) {
     return giphyTextRequestsRef.child(uid).set(data);
 }
 
+////////////////////////
+// Uberduck requests
+////////////////////////
+
+/**
+ * Listen for the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ * @param {function} callback Handler for listener results
+ */
+export async function listenForUberduckAudio(donationId, callback) {
+    uberduckRequestsRef.child(donationId).on('value', callback);
+}
+
+/**
+ * Remove the listene from the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ */
+export async function removeListenerForUberduckAudio(donationId) {
+    uberduckRequestsRef.child(donationId).off('value');
+}
 ////////////////////////
 // Streamer Cash Out
 ////////////////////////

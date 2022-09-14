@@ -5,10 +5,10 @@ import { Video } from '@giphy/react-components';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
-import { speakCheerMessage } from '../../services/functions';
+import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
 import { GIPHY_CLIP, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
@@ -165,12 +165,12 @@ const LiveDonations = () => {
             setIsPlayingAudio(true);
             const donation = popDonation();
 
-            async function showCheer() {
+            async function showCheer(audioUrl) {
                 const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
                 const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
                 audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
-                if (!donation.repeating) {
-                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'en-US-Standard-C';
+                if (audioUrl || !donation.repeating) {
+                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
 
                     if (donation.message) {
                         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
@@ -184,7 +184,7 @@ const LiveDonations = () => {
                                 message: messageToRead
                             });
                             const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
-                            voiceBotMessage = new Audio(cheerMessageUrl.data);
+                            voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                         }
                     } else if (bigQoinsDonation) {
                         const messageToRead = `${donation.twitchUserName} has sent you ${donation.amountQoins} Coins`;
@@ -194,7 +194,7 @@ const LiveDonations = () => {
                             containsMessage: false
                         });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
-                        voiceBotMessage = new Audio(cheerMessageUrl.data);
+                        voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                     }
                 } else {
                     try {
@@ -220,18 +220,39 @@ const LiveDonations = () => {
                     audioAlert.onended = () => {
                         setTimeout(() => {
                             finishReaction(donation);
-                        }, 4000);
+                        }, 5000);
                     }
                 } else {
                     voiceBotMessage.onended = () => {
                         setTimeout(() => {
                             finishReaction(donation);
-                        }, 4000);
+                        }, 5000);
                     }
                 }
             }
 
-            showCheer();
+            async function initCheer() {
+                if (donation.messageExtraData && donation.messageExtraData.voiceAPIName && donation.messageExtraData && donation.messageExtraData.voiceAPIName.includes('Uberduck:')) {
+                    // 9 Because the string "Uberduck:" length is 9
+                    const voiceUuid = donation.messageExtraData.voiceAPIName.substring(9);
+                    await speakCheerMessageUberDuck(donation.id, donation.message, voiceUuid);
+                    listenForUberduckAudio(donation.id, (url) => {
+                        if (url.exists()) {
+                            if (url.val() !== 'error') {
+                                showCheer(url.val());
+                            } else {
+                                showCheer();
+                            }
+
+                            removeListenerForUberduckAudio(donation.id);
+                        }
+                    });
+                } else {
+                    showCheer();
+                }
+            }
+
+            initCheer();
         }
 
         if (!streamerUid) {
@@ -262,7 +283,7 @@ const LiveDonations = () => {
         }
         setTimeout(() => {
             setIsPlayingAudio(false);
-        }, 2000);
+        }, 750);
     }
 
     const queueAnimation = () => {
@@ -363,6 +384,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
     const [mediaReady, setMediaReady] = useState(false);
     const [giphyTextReady, setGiphyTextReady] = useState(false);
     const [showDonation, setShowDonation] = useState(false);
+    const [muteClip, setMuteClip] = useState(false);
     const donation = donationToShow;
 
     useEffect(() => {
@@ -398,16 +420,21 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
         startDonation();
     }
 
-    const onClipEnded = () => {
-        const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
-        const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
+    const onClipEnded = (count) => {
+        if (count === 1) {
+            setMuteClip(true);
+            const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
+            const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
 
-        if (bigQoinsDonation) {
-            setTimeout(() => {
-                startDonation(donation);
-            }, 100);
-        } else {
-            finishReaction(donation);
+            if (bigQoinsDonation) {
+                setTimeout(() => {
+                    startDonation(donation);
+                }, 100);
+            } else {
+                setTimeout(() => {
+                    finishReaction(donation);
+                }, 5000);
+            }
         }
     }
 
@@ -443,7 +470,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                             maxHeight: '250px',
                             objectFit: 'scale-down'
                         }}>
-                            <Video hideAttribution gif={clip} height={250} muted={false} loop={false} onEnded={onClipEnded} />
+                            <Video hideAttribution gif={clip} height={250} muted={muteClip} loop onLoop={onClipEnded} />
                         </div>
                     :
                     null

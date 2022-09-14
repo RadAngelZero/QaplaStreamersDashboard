@@ -268,9 +268,9 @@ const RecordsHeader = ({ value, Icon, showPeriod, onPeriodChange }) => {
     );
 }
 
-const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, qlanBalance }) => {
+const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages }) => {
     const classes = useStyles();
-    const [balance, setBalance] = useState(qoinsBalance + qlanBalance);
+    const [balance, setBalance] = useState(qoinsBalance);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -306,10 +306,6 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages, 
                         <div style={{ display: 'flex' }}>
                             <p style={{ display: 'flex', width: '62px' }}> Cheers </p>
                             <p style={{ display: 'flex', }}> {qoinsBalance.toLocaleString()} </p>
-                        </div>
-                        <div style={{ display: 'flex', marginTop: '30px' }}>
-                            <p style={{ display: 'flex', width: '62px' }}> Qlan </p>
-                            <p style={{ display: 'flex', }}> {qlanBalance.toLocaleString()} </p>
                         </div>
                         <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>
                             {t('CheersBitsRecordDialog.cheersReceivedAt', { date: showDate() })}
@@ -501,8 +497,7 @@ const CheersBitsRecordDialog = ({ user, cheersQoins, qlanQoins, estimatedBits, v
                 {value === 'Qoins' &&
                     <QoinsCheers uid={user.uid}
                         qoinsBalance={cheersQoins}
-                        cheers={qoinsCheers}
-                        qlanBalance={qlanQoins} />
+                        cheers={qoinsCheers} />
                 }
                 {value === 'Bits' &&
                     <PaidBits bitsBalance={estimatedBits}

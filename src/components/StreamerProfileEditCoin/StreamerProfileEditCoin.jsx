@@ -60,7 +60,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                         }
                     }
                 } else {
-                    // history.push('/onboarding');
+                    history.push('/onboarding');
                 }
             } catch (error) {
                 console.log(error);
@@ -146,10 +146,10 @@ const StreamerProfileEditCoin = ({ user }) => {
         }
     }
     const handleQoinsReactions = (e) => {
-        if(!e.target.checked){
+        if (!e.target.checked) {
             setQoinsReaction(false)
         }
-        else{
+        else {
             setQoinsReaction(true)
         }
        

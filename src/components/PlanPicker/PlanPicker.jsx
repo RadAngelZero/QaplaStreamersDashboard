@@ -132,29 +132,32 @@ const PlanPicker = ({ user }) => {
                     backgroundCards={'#141833'} 
                     title={'Basic'} 
                     textButon={'Current'}
-                    subtitle={'Free forever'}
+                    // subtitle={}
+                    textGreen={'Free forever'}
                     backgroundButon={'#141833'}
                     colorTextButon={'#FFFFFF'}
                     price={'0'} 
                     items={['Qapla Reactions', 'Qoins cash out']}/> 
                 <CardsPayments 
-                    backgroundCards={'#141833'} 
+                    backgroundCards={'#141833'}
+                    textGreen={'You save 15%'}
                     title={'Essential'} 
                     textButon={'Get visivility for your content'}
-                    subtitle={'$18 Quatertly. You save 15%'}
+                    subtitle={'$18 Quatertly.'}
                     backgroundButon={'#6C5DD3'}
                     colorTextButon={'#FFFFFF'}
                     price={'6'}
-                    items={['200 Qoins Drops per month', 'Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out']}/> 
+                    items={['200 Qoins Drops per month','Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out', ]}/> 
                 <CardsPayments 
                     backgroundCards={'#3B4BF9'} 
                     title={'Growth'}
-                     textButon={'reward your community'}
-                     subtitle={'$36.99 Quatertly. You save 15%'}
-                     backgroundButon={'#0AFFD2'}
-                     colorTextButon={'#4E2D92'}
-                     price={'11.99'}
-                     items={['400 Qoins Drops per month', 'Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out']}/> 
+                    textGreen={'You save 15%'}
+                    textButon={'reward your community'}
+                    subtitle={'$36.99 Quatertly.'}
+                    backgroundButon={'#0AFFD2'}
+                    colorTextButon={'#4E2D92'}
+                    price={'11.99'}
+                    items={['400 Qoins Drops per month','Post streams on Qapla as long as you have drops', 'Qapla reactions', 'Qoins cash out']}/> 
                 {/* {subscriptions[period] && Object.entries(subscriptions[period].packages).map((plan) => (
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/streamerSubscriptionCheckoutIntent' method='post'>
                         <Grid item sm={12} md={6} className={classes.cardGridItem} key={`${plan[0]}-${period}`}>

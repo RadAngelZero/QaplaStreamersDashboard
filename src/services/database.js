@@ -23,7 +23,6 @@ const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
 const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
 const tagsRef = database.ref('/Tags');
 const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
-const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers');
 const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
@@ -31,7 +30,6 @@ const qaplaChallengeRef = database.ref('/QaplaChallenge');
 const qStoreRef = database.ref('/QStore');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
-const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
 const userStreamerDropsRef = database.ref('//UserStreamerDrops');
 
@@ -571,12 +569,7 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  * @param {string} errorMessage Message to show if the write operation fails
  */
 export async function writeTestCheer(streamerUid, completeMessage, errorMessage) {
-    const testMediaArrayLength = await streamerReactionTestMediaRef.child('length').once('value');
-    const index = Math.floor(Math.random() * testMediaArrayLength.val());
-    const media = (await streamerReactionTestMediaRef.child('media').child(index).once('value')).val();
-
     streamersDonationsTestRef.child(streamerUid).push({
-        media,
         amountQoins: 0,
         message: 'Test',
         timestamp: (new Date()).getTime(),

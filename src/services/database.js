@@ -306,13 +306,13 @@ export async function loadStreamsByStatus(uid, status) {
  * @param {string} streamId Identifier of the stream to remove
  */
 export async function cancelStreamRequest(uid, streamId) {
+    // Remove drops from reserved when stream is canceled
+    const drops = await streamersEventsDataRef.child(uid).child(streamId).child('drops').once('value');
+    await userStreamerDropsRef.child(uid).child('qoinsDrops').child('reserved').set(databaseServerValue.increment(-1 * drops.val()));
+
+    // Delete stream
     await streamersEventsDataRef.child(uid).child(streamId).remove();
     await streamsApprovalRef.child(streamId).remove();
-    userStreamersRef.child(uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
-        if (numberOfRequests) {
-            return numberOfRequests - 1;
-        }
-    });
 }
 
 /**

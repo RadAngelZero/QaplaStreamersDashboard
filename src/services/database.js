@@ -235,7 +235,7 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
         return qoinsDrops;
     });
 
-    if (transactionResult.commited && (!dropsReservedBeforeTransaction.exists() || transactionResult.snapshot.val().reserved !== dropsReservedBeforeTransaction.val())) {
+    if (transactionResult.committed && (!dropsReservedBeforeTransaction.exists() || transactionResult.snapshot.val().reserved !== dropsReservedBeforeTransaction.val())) {
         const event = await streamersEventsDataRef.child(uid).push({
             date,
             hour,

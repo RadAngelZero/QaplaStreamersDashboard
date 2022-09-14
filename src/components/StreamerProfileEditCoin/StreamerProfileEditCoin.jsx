@@ -58,7 +58,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                         }
                     }
                 } else {
-                    history.push('/onboarding');
+                    // history.push('/onboarding');
                 }
             } catch (error) {
                 console.log(error);
@@ -198,7 +198,7 @@ const StreamerProfileEditCoin = ({ user }) => {
             <h1 className={style.Titulo}>
                 {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
             </h1>
-            {rewardId !== '' && !savingChanges ?
+            {rewardId == '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
                 <div className={style.content_input}>

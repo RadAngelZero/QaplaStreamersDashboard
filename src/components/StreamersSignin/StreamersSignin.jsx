@@ -90,7 +90,7 @@ const StreamersSignin = ({ user, title }) => {
                     }
                 }
             } else {
-                history.push('/onboarding');
+                history.push('/profile');
             }
         }
 
@@ -109,7 +109,7 @@ const StreamersSignin = ({ user, title }) => {
 
     const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
 
-    if (user === undefined) {
+    // if (user === undefined) {
         return (
             <StreamerDashboardContainer>
                 <Grid item md='1' />
@@ -148,7 +148,7 @@ const StreamersSignin = ({ user, title }) => {
         );
     }
 
-    return null;
-}
+    // return null;
+// }
 
 export default StreamersSignin;

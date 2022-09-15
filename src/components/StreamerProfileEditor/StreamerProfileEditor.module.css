@@ -104,14 +104,21 @@
 }
 
 .twitchURLContainer {
-  background-color: #202750;
+  background: linear-gradient(91deg, #881CEE -1.34%, #FF4BA2 50.99%, #FFBD8B 100.15%);
+  padding: 2px;
+  /* background-color: #202750; */
   display: flex;
   border-radius: 8px;
   margin-top: 42px;
-  min-height: 28px;
-  /* padding: 0.25rem; */
+  height: 28px;
   width: fit-content;
   overflow: hidden;
+}
+
+.twitchURLSubContainer {
+  display: flex;
+  background-color: #202750;
+  border-radius: 8px;
 }
 
 .twitchURL {
@@ -127,8 +134,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-width: 28px;
+  height: 28px;
   cursor: pointer;
+}
+
+.copyIcon {
+  height: 28px;
+  width: 28px;
 }
 
 .bioContainer {

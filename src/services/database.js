@@ -33,6 +33,8 @@ const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
+const streamersDeepLinksRef = database.ref('/StreamersDeepLinks');
+const dashboardStreamersVisitsCounterRef = database.ref('/DashboardStreamersVisitsCounter');
 const uberduckRequestsRef = database.ref('/UberduckRequests');
 const streamerCashOutRef = database.ref('/StreamersCashOut');
 
@@ -1011,6 +1013,47 @@ export async function getInteractionsRewardData(uid) {
 }
 
 ////////////////////////
+// Streamer Deep Links
+////////////////////////
+
+/**
+ * Save the deep link of the streamer on database
+ * @param {string} uid User identifier
+ * @param {string} url Deep link to save
+ */
+export async function saveStreamerDeepLink(uid, url) {
+    return await streamersDeepLinksRef.child(uid).set(url);
+}
+
+/**
+ * Gets the streamer deep link
+ * @param {string} uid User identifier
+ */
+export async function getStreamerDeepLink(uid) {
+    return await streamersDeepLinksRef.child(uid).once('value');
+}
+
+////////////////////////
+// Visits counter
+////////////////////////
+
+/**
+ * Set the number of visits the user has done to the dashboard (used to show optional profile-link onboarding every 3 times the
+ * user enters the dashboard)
+ * @param {string} uid User identifier
+ * @param {number} count Number of visits to set
+ */
+export async function setVisitsCounter(uid, count) {
+    return await dashboardStreamersVisitsCounterRef.child(uid).set(count);
+}
+
+/**
+ * Gets the number of visits of the user
+ * @param {string} uid User identifier
+ */
+export async function getNumberOfVisits(uid) {
+    return await dashboardStreamersVisitsCounterRef.child(uid).once('value');
+}
 // Uberduck requests
 ////////////////////////
 

@@ -95,6 +95,15 @@
             "disable": "Disable reactions",
             "dontDisable": "Don't disable",
             "dontShowAgain": "Don't show this message again"
+        },
+        "BarProgressBit": {
+            "nextMilestone": "Next Milestone",
+            "available": "Available",
+            "cashOut": "Cash Out",
+            "confirmCashOut": "Confirm you are cashing out your Qoins for Bits on Twitch",
+            "cancel": "Cancel",
+            "weGotYouRequestP1": "We got your request! We'll send you ",
+            "weGotYouRequestP2": " bits on your next stream"
         }
     },
     "StreamCard": {

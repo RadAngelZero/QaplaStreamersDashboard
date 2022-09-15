@@ -195,68 +195,68 @@ const StreamerProfileEditCoin = ({ user }) => {
 
     return (
         <div className={style.containerItereractions}>
-            <h1 className={style.Titulo}>
+            <h1 className={style.title}>
                 {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
             </h1>
             {rewardId !== '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
-                <div className={style.content_input}>
+                <div className={style.contentInput}>
                     <div className={style.input}>
                         {ActiveEditTitle ?
                             <>
-                            <input
-                                className={style.Visibility_input}
-                                type="text"
-                                maxLength={18}
-                                autoFocus
-                                value={rewardName}
-                                onChange={(event) => setRewardName(event.target.value)}
-                                onKeyPress={saveData} />
-                            <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <ConfirmChange />
-                            </Button>
-                            </>
-                            :
-                            <>
-                            <p className={style.p}>
-                                {rewardName}
-                            </p>
-                            <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <img src={iconEdit} alt="icons-edit" />
-                            </Button>
-                            </>
-                        }
-                    </div>
-                    <div className={style.input}>
-                        {ActiveEditCoins ?
-                            <>
-                            <input
-                                className={style.Visibility_input}
-                                type="number"
-                                autoFocus
-                                value={rewardCost}
-                                onChange={(event) => setRewardCost(event.target.value || 0)}
-                                onKeyPress={saveData} />
+                                <input
+                                    className={style.VisibilityInput}
+                                    type="text"
+                                    maxLength={18}
+                                    autoFocus
+                                    value={rewardName}
+                                    onChange={(event) => setRewardName(event.target.value)}
+                                    onKeyPress={saveData} />
                                 <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
                                     <ConfirmChange />
                                 </Button>
                             </>
                             :
                             <>
-                            <p className={style.p}>
-                                {rewardCost.toLocaleString()}
-                            </p>
-                            <Button onClick={() => setActiveEditCoins(!ActiveEditCoins)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <img src={iconEdit} alt="icons-edit" />
-                            </Button>
+                                <p className={style.p}>
+                                    {rewardName}
+                                </p>
+                                <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                    <img src={iconEdit} alt="icons-edit" />
+                                </Button>
+                            </>
+                        }
+                    </div>
+                    <div className={style.input}>
+                        {ActiveEditCoins ?
+                            <>
+                                <input
+                                    className={style.VisibilityInput}
+                                    type="number"
+                                    autoFocus
+                                    value={rewardCost}
+                                    onChange={(event) => setRewardCost(event.target.value || 0)}
+                                    onKeyPress={saveData} />
+                                    <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                        <ConfirmChange />
+                                    </Button>
+                            </>
+                            :
+                            <>
+                                <p className={style.p}>
+                                    {rewardCost.toLocaleString()}
+                                </p>
+                                <Button onClick={() => setActiveEditCoins(!ActiveEditCoins)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                    <img src={iconEdit} alt="icons-edit" />
+                                </Button>
                             </>
                         }
                     </div>
                     <div className={style.disableInteractions}>
                         <p className={style.p}>{t('StreamerProfile.StreamerProfileEditCoin.reactions')} {titleCheckbox}</p>
                         <input
-                            className={style.input_checkbox}
+                            className={style.inputCheckbox}
                             type="checkbox"
                             id="boton"
                             checked={reactionsEnabled}

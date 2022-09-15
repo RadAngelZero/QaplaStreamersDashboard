@@ -117,7 +117,6 @@ export const QOINS = 'qoins';
  * Type of users
  */
 export const PREMIUM = 'premium';
-export const FREE_USER = 'freeUser';
 
 /**
  * Twitch PubSub connections status

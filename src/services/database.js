@@ -35,6 +35,8 @@ const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
 const streamersDeepLinksRef = database.ref('/StreamersDeepLinks');
 const dashboardStreamersVisitsCounterRef = database.ref('/DashboardStreamersVisitsCounter');
+const uberduckRequestsRef = database.ref('/UberduckRequests');
+const streamerCashOutRef = database.ref('/StreamersCashOut');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1051,4 +1053,49 @@ export async function setVisitsCounter(uid, count) {
  */
 export async function getNumberOfVisits(uid) {
     return await dashboardStreamersVisitsCounterRef.child(uid).once('value');
+}
+// Uberduck requests
+////////////////////////
+
+/**
+ * Listen for the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ * @param {function} callback Handler for listener results
+ */
+export async function listenForUberduckAudio(donationId, callback) {
+    uberduckRequestsRef.child(donationId).on('value', callback);
+}
+
+/**
+ * Remove the listene from the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ */
+export async function removeListenerForUberduckAudio(donationId) {
+    uberduckRequestsRef.child(donationId).off('value');
+}
+////////////////////////
+// Streamer Cash Out
+////////////////////////
+
+/**
+ * Saves the request of cash out for the given streamer
+ * @param {string} uid User identifier
+ * @param {number} amountQoins Amount of Qoins to remove from the streamer balance
+ * @param {number} amountBits Amount of bits to deliver to the streamer
+ */
+export async function saveStreamerCashOutRequest(uid, amountQoins, amountBits) {
+    const date = new Date();
+
+    const qoinsRemoved = await userStreamersRef.child(uid).child('qoinsBalance').transaction((qoinsBalance) => {
+        return qoinsBalance - amountQoins;
+    });
+
+    if (qoinsRemoved.committed) {
+        return await streamerCashOutRef.child(uid).push({
+            amountQoins,
+            amountBits,
+            delivered: false,
+            timestamp: date.getTime()
+        });
+    }
 }

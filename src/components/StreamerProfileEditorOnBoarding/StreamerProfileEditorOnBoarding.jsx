@@ -126,50 +126,6 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
     const { t } = useTranslation();
     const classes = useStyles();
 
-    const continueButtonForm = async () => {
-        const step = currentStep + 1;
-
-        if (step <= 3) {
-            setCurrentStep(step);
-            return;
-        } else if (step === 4) {
-            if (bio.replace(/\s/g, '').length === 0) {
-                setBioError(true);
-                return;
-            } else {
-                if (bio.length >= MIN_BIO_LENGTH) {
-                    if (showOnlySpecificStep) {
-                        closeOnBoarding();
-                    } else {
-                        setCurrentStep(step);
-                    }
-                    return await saveBio();
-                }
-            }
-        } else {
-            const tagsSelected = tags.filter((tag) => tag.selected);
-            if (tagsSelected.length >= MIN_TAGS) {
-                const tagsLabels = tagsSelected.map((tag) => tag.label);
-                await updateStreamerPublicProfile(user.uid, { tags: tagsLabels });
-
-                // We don´t know how we are going to use this information but we want to save it
-                const tagObject = {};
-                tagsLabels.forEach((tag) => {
-                    tagObject[tag] = true;
-                });
-
-                saveTags(tagObject);
-                if (showOnlySpecificStep) {
-                    return closeOnBoarding();
-                } else {
-                    return onBoardingDone();
-                }
-            } else {
-                setTagError(true);
-            }
-        }
-    }
-
     const onTagSearchChange = (e) => {
         setTagError(false);
         let input = e.target.value
@@ -219,31 +175,6 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
         }
     }
 
-    const renderBackgroundColor = (index) => {
-        switch (index) {
-            case 0:
-                return '#4BFFD4'
-            case 1:
-                return '#FBFE6C'
-            case 2:
-                return '#4BFFD4'
-            default:
-                break;
-        }
-    }
-    const renderImage = (index) => {
-        switch (index) {
-            case 0:
-                return ProfilesPresentation1
-            case 1:
-                return ProfilesPresentation2
-            case 2:
-                return ProfilesPresentation3
-            default:
-                break;
-        }
-    }
-
     const updateBio = (bio) => {
         setBioError(false);
         setBio(bio);
@@ -264,7 +195,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                         closeOnBoarding();
                     }
                 } else if (linkResponse.status === 409) {
-                    return setLinkError('Link duplicado');
+                    return setLinkError(t('StreamerProfileEditor.OnBoarding.duplicatedLink'));
                 }
                 break;
             case 1:
@@ -394,10 +325,10 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                 {currentStep === 0 &&
                     <>
                         <p className={styles.headerText}>
-                            {`Increase your interactions`}
+                            {t('StreamerProfileEditor.OnBoarding.header1')}
                         </p>
                         <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                            {`Create and share your profile link to make it easier for your viewers to react on your stream ⚡️`}
+                            {t('StreamerProfileEditor.OnBoarding.body1')}
                         </p>
                         <div className={styles.createLinkContainer}>
                             <p style={{
@@ -412,7 +343,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                                 <div className={styles.createLinkFieldInnerConainer}>
                                     <input
                                         className={styles.createLinkText}
-                                        placeholder={`type to create your link`}
+                                        placeholder={t('StreamerProfileEditor.OnBoarding.typeToCreateLink')}
                                         onChange={handleQaplaLinkAliasChange}
                                     />
                                 </div>
@@ -426,10 +357,10 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                 {currentStep === 1 &&
                     <>
                         <p className={styles.headerText} style={{ marginTop: '18px' }}>
-                            {`Introduce yourself`}
+                            {t('StreamerProfileEditor.OnBoarding.header2')}
                         </p>
                         <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                            {`It’s a bio, you know how it goes 🫶`}
+                            {t('StreamerProfileEditor.OnBoarding.body2')}
                         </p>
                         <BioEditorTextArea bio={bio}
                             setBio={updateBio}
@@ -444,10 +375,10 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                         alignItems: 'center',
                     }}>
                         <p className={styles.headerText} style={{ marginTop: '18px' }}>
-                            {`Tags`}
+                            {t('StreamerProfileEditor.OnBoarding.header3')}
                         </p>
                         <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                            {`Add tags about your content, you as a creator, you as a person, or whatever you want! 💜`}
+                            {t('StreamerProfileEditor.OnBoarding.body3')}
                         </p>
                         <StreamerTextInput
                             containerClassName={styles.modalTagSearchContainer}
@@ -495,31 +426,31 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                 {currentStep === 3 &&
                     <>
                         <p className={styles.headerText} style={{ marginTop: '18px' }}>
-                            {`Copy and share!`}
+                            {t('StreamerProfileEditor.OnBoarding.header4')}
                         </p>
                         <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                            {`Your viewers can send reactions quick on stream right from your profile, or even download the app! `}
+                            {t('StreamerProfileEditor.OnBoarding.body4')}
                         </p>
                         <div style={{
                             marginTop: '35px',
                         }}>
                             <p className={`${styles.finalListText}`}>
-                                {`Ways of sharing:`}
+                                {t('StreamerProfileEditor.OnBoarding.waysOfSharing')}
                             </p>
                             <p className={`${styles.finalListText}`} style={{
                                 marginTop: '18px',
                             }}>
-                                {`🔗 Add it to your Link-in-Bio `}
+                                {t('StreamerProfileEditor.OnBoarding.addToYourBio')}
                             </p>
                             <p className={`${styles.finalListText}`} style={{
                                 marginTop: '18px',
                             }}>
-                                {`🪪 Use it as a Link-in-Bio`}
+                                {t('StreamerProfileEditor.OnBoarding.useItAsLinkInBio')}
                             </p>
                             <p className={`${styles.finalListText}`} style={{
                                 marginTop: '18px',
                             }}>
-                                {`🤖 Add it to your Nightbot on Twitch`}
+                                {t('StreamerProfileEditor.OnBoarding.addToNightbot')}
                             </p>
                         </div>
                         <div className={styles.twitchURLContainer}>
@@ -545,21 +476,17 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                     className={classes.button}
                 >
                     {currentStep === 0 &&
-                        <>
-                            {`Create Profile Link`}
-                        </>}
+                        t('StreamerProfileEditor.OnBoarding.createProfileLink')
+                    }
                     {currentStep === 1 &&
-                        <>
-                            {`Confirm Bio`}
-                        </>}
+                        t('StreamerProfileEditor.OnBoarding.confirmBio')
+                    }
                     {currentStep === 2 &&
-                        <>
-                            {`Finish set up`}
-                        </>}
+                        t('StreamerProfileEditor.OnBoarding.finish')
+                    }
                     {currentStep === 3 &&
-                        <>
-                            {`Go to profile`}
-                        </>}
+                        t('StreamerProfileEditor.OnBoarding.goToProfile')
+                    }
                 </Button>
             </div>
         </div>

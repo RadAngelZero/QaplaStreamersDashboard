@@ -99,6 +99,7 @@ export const GIPHY_STICKERS = 'stickers';
 export const GIPHY_GIF = 'gif';
 export const GIPHY_STICKER = 'sticker';
 export const GIPHY_CLIP = 'video';
+export const GIPHY_CLIPS = 'videos';
 
 /**
  * Streams Status

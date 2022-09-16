@@ -9,7 +9,7 @@ import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnrea
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
-import { GIPHY_CLIP, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
@@ -271,6 +271,7 @@ const LiveDonations = () => {
 
             listenToOverlayStatus();
         }
+        console.log(donationQueue);
     }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio, reactionsEnabled]);
 
     function finishReaction(donation) {
@@ -303,7 +304,7 @@ const LiveDonations = () => {
         const bigQoinsDonation = Boolean(qoinsDonation && donationToShow.amountQoins >= 1000).valueOf();
         if (bigQoinsDonation) {
             voiceBotMessage.play();
-        } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIP)) {
+        } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIP || donationToShow.media.type !== GIPHY_CLIPS)) {
             audioAlert.play();
             if (donationToShow.message) {
                 audioAlert.onended = () => {
@@ -394,7 +395,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
             setShowDonation(true);
         }
 
-        if ((donation.media && donation.media.type === GIPHY_CLIP && donation.media.id) && !clip) {
+        if ((donation.media && (donation.media.type === GIPHY_CLIP || donation.media.type === GIPHY_CLIPS) && donation.media.id) && !clip) {
             getClip();
         } else {
             if (donation.media && donation.messageExtraData && donation.messageExtraData.giphyText && mediaReady && giphyTextReady) {
@@ -462,7 +463,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                     }}
                     onLoad={() => setMediaReady(true)} />
                     :
-                    donation.media && donation.media.type === GIPHY_CLIP && clip ?
+                    donation.media && (donation.media.type === GIPHY_CLIP || donation.media.type === GIPHY_CLIPS) && clip ?
                         <div style={{
                             display: 'flex',
                             aspectRatio: donation.media.width / donation.media.height,

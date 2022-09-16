@@ -52,12 +52,14 @@ const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) =
     const [confirmCashOut, setConfirmCashOut] = useState(false);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [disabledButon, setDisabledButon] = useState(false);
+    const [bitsToDeliver, setBitsToDeliver] = useState(0);
     const { t } = useTranslation();
 
     useEffect(() => {
         if (availableBits <= 0) {
             setDisabledButon(true);
         } else {
+            setBitsToDeliver(availableBits);
             setDisabledButon(false);
         }
     }, [disabledButon, availableBits]);
@@ -77,8 +79,8 @@ const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) =
                         {t("StreamerProfile.BarProgressBit.nextMilestone")}
                     </p>
                     <p className={style.percentage}>
-                                    {estimatedBits.toLocaleString()} /{" "}
-                                    {nextMilestone.toLocaleString()}
+                        {estimatedBits.toLocaleString()} /{" "}
+                        {nextMilestone.toLocaleString()}
                     </p>
                 </div>
                 <BorderLinearProgress
@@ -113,7 +115,7 @@ const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) =
             <CasthQutConfirmDialog
                 onClose={() => setOpenConfirm(false)}
                 open={openConfirm}
-                amountBits={availableBits}
+                amountBits={bitsToDeliver}
                 setOpenConfirm={setOpenConfirm}
             />
         )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, CircularProgress, makeStyles } from "@material-ui/core";
+import { Button, CircularProgress, FormControlLabel, makeStyles, Switch, withStyles } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { Modal } from "@material-ui/core";
@@ -20,6 +20,20 @@ const useStyles = makeStyles((theme) => ({
         alignSelf: 'center'
     }
 }));
+
+const GreenSwitch = withStyles({
+    switchBase: {
+      color: 'rgb(156, 156, 156)',
+      '&$checked': {
+        color: '#2ce9d2',
+      },
+      '&$checked + $track': {
+        backgroundColor: '#2ce9d2',
+      },
+    },
+    checked: {},
+    track: {},
+  })(Switch);
 
 const StreamerProfileEditCoin = ({ user }) => {
     const [ActiveEditTitle, setActiveEditTitle] = useState(false);
@@ -254,15 +268,11 @@ const StreamerProfileEditCoin = ({ user }) => {
                         }
                     </div>
                     <div className={style.disableInteractions}>
-                        <p className={style.p}>{t('StreamerProfile.StreamerProfileEditCoin.reactions')} {titleCheckbox}</p>
-                        <input
-                            className={style.inputCheckbox}
-                            type="checkbox"
-                            id="boton"
-                            checked={reactionsEnabled}
-                            onChange={(e) => handleCheckbox(e)}
-                        />
-                        <label for="boton"></label>
+                        <p className={style.p}>
+                            {t('StreamerProfile.StreamerProfileEditCoin.reactions')} {titleCheckbox}
+                        </p>
+                        <GreenSwitch checked={reactionsEnabled}
+                            onChange={(e) => handleCheckbox(e)} />
                     </div>
                 </div>
                 </>

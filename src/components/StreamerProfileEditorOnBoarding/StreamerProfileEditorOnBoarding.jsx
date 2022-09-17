@@ -4,12 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfileEditorOnBoarding.module.css';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
-import { getQreatorCode, saveStreamerDeepLink, saveTags, updateStreamerPublicProfile } from '../../services/database';
+import { saveStreamerDeepLink, saveTags, updateStreamerPublicProfile } from '../../services/database';
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
-import ProfilesPresentation1 from './../../assets/ProfilesPresentation1.png';
-import ProfilesPresentation2 from './../../assets/ProfilesPresentation2.png';
-import ProfilesPresentation3 from './../../assets/ProfilesPresentation3.png';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { createLink } from '../../services/branch';
 
@@ -183,8 +180,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
     const handleMainButton = async () => {
         switch (currentStep) {
             case 0:
-                const code = await getQreatorCode(user.uid);
-                const linkResponse = await createLink(user.uid, code.val(), qaplaLinkAlias);
+                const linkResponse = await createLink(user.uid, qaplaLinkAlias);
 
                 if (linkResponse.status === 200) {
                     const linkData = await linkResponse.json();

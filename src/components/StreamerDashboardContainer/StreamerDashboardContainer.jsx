@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
     content: {
         flexGrow: 1,
         paddingLeft: theme.spacing(6),
+        paddingRight: theme.spacing(6),
         paddingTop: theme.spacing(6),
     }
 }));

@@ -1,13 +1,13 @@
 import React from "react";
-
 import { makeStyles, Button } from "@material-ui/core";
+import { useTranslation } from "react-i18next";
 
 import iconTick from "../../assets/Tickgray.svg";
 
 const useStyles = makeStyles(() => ({
     containerCard: {
-        maxWidth: "337px",
-        minWidth: "337px",
+        maxWidth: "320px",
+        minWidth: "320px",
         maxHeight: "513px",
         minHeight: "513px",
         margin: "15px",
@@ -44,11 +44,17 @@ const useStyles = makeStyles(() => ({
         maxWidth: "257px",
         minWidth: "257px",
         marginBottom: "30px",
-        opacity: "0.8",
         maxHeight: "52px",
         minHeight: "52px",
         borderRadius: "10px",
-        textTransform: "capitalize",
+        textTransform: "none",
+        fontWeight: '700',
+        '&:hover': {
+            opacity: 0.9
+        },
+        '&:disabled': {
+            opacity: 0.4
+        }
     },
     price: {
         color: "#FFF",
@@ -61,10 +67,12 @@ const useStyles = makeStyles(() => ({
         fontWeight: "500",
     },
     textGreen:{
+        fontWeight: '600',
         color:'#00FFDD',
         fontSize: "14px"
     },
     textWhite: {
+        fontWeight: '400',
         color:'#FFFFFF',
         fontSize: "14px"
     }
@@ -73,15 +81,17 @@ const useStyles = makeStyles(() => ({
 const CardsPayments = ({
     title,
     price,
-    backgroundCards,
+    backgroundCards = '#141833',
     backgroundButon,
     textButon,
     subtitle,
     colorTextButon,
     items,
     paymentPerMonth,
+    disableButton = false
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <div className={classes.containerCard}>
@@ -92,12 +102,14 @@ const CardsPayments = ({
       >
             <div className={classes.itemContainer}>
                 <div style={{ display: "flex", height: "45px", marginBottom: "10px" }}>
-                    <h2 className={classes.price}>${price}</h2>
-                    <p className={classes.text}>/month</p>
+                    <h2 className={classes.price}>${Number.isInteger(price) ? price : price.toString().substring(0, price.toString().indexOf('.') + 3)}</h2>
+                    <p className={classes.text}>/{t('PlanPicker.plansPeriods.monthly')}</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                    <p style={{ color: "#FFF", fontSize: "13px" }}>{subtitle}</p>
-                    <p style={{ color: "#00FFDD", fontSize: "13px" }}>{paymentPerMonth}</p>
+                    <p style={{ color: "rgba(255, 255, 255, .8)", fontSize: "13px", marginRight: '4px' }}>
+                        {subtitle}
+                    </p>
+                    <p style={{ color: "#00FFDD", fontSize: "13px", fontWeight: '600' }}>{paymentPerMonth}</p>
                 </div>
                 <div className={classes.items}>
                     {items.map((el) => (
@@ -108,10 +120,10 @@ const CardsPayments = ({
                 ))}
                 </div>
             </div>
-            <Button
-            className={classes.Button}
-            style={{ background: backgroundButon, color: colorTextButon }}
-            >
+            <Button className={classes.Button}
+                disabled={disableButton}
+                type='submit'
+                style={{ background: backgroundButon, color: colorTextButon }}>
             {textButon}
             </Button>
         </div>

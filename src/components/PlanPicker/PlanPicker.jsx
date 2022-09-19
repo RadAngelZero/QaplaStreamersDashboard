@@ -6,9 +6,10 @@ import styles from './PlanPicker.module.css';
 import { getSubscriptionsDetails } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import ContainedButton from '../ContainedButton/ContainedButton';
-import { QUARTERLY, YEARLY } from '../../utilities/Constants';
+import { MONTHLY, QUARTERLY, YEARLY } from '../../utilities/Constants';
 
 import CardsPayments from '../CardsPayments/CardsPayments'
+import { getCurrentLanguage } from '../../utilities/i18n';
 
 const useStyles = makeStyles(() => ({
     toggleButton: {
@@ -96,12 +97,11 @@ const PlanPicker = ({ user }) => {
         }
 
         return (
-            <p className={styles.planSavingPeriod}>
-                {`${t('PlanPicker.totalPeriodPayment', { totalPayment: Number.isInteger(totalPayment) ? totalPayment : totalPayment.toFixed(2) })} ${t(`PlanPicker.plansPeriods.${period}`)}.`}
-            </p>
+            `${t('PlanPicker.totalPeriodPayment', { totalPayment: Number.isInteger(totalPayment) ? totalPayment : totalPayment.toFixed(2) })} ${t(`PlanPicker.plansPeriods.${period}`)}.`
         );
     }
 
+    const userLanguage = getCurrentLanguage();
     return (
         <StreamerDashboardContainer user={user} containerStyle={styles.backgroundContainer}>
             <div className={styles.backgroundFilter}/>
@@ -128,179 +128,40 @@ const PlanPicker = ({ user }) => {
                 ))}
             </Box>
             <Grid container spacing={0}  className={styles.plansContainer} justify='center'>
-                <CardsPayments 
-                    backgroundCards={'#141833'} 
-                    title={'Basic'} 
+                <CardsPayments
+                    title={'Basic'}
                     textButon={'Current'}
-                    paymentPerMonth={'Free forever'}
+                    subtitle={'Free forever'}
                     backgroundButon={'#141833'}
                     colorTextButon={'#FFFFFF'}
-                    price={'0'} 
-                    items={[{text:'Qapla Reactions'}, {text:'Qoins cash out'}]}/> 
-                <CardsPayments 
-                    backgroundCards={'#141833'}
-                    paymentPerMonth={'You save 15%'}
-                    title={'Essential'} 
-                    textButon={'Get visivility for your content'}
-                    subtitle={'$18 Quatertly.'}
-                    backgroundButon={'#6C5DD3'}
-                    colorTextButon={'#FFFFFF'}
-                    price={'6'}
-                    items={[{text: '200 Qoins Drops per month', color:'#0AFFD2'},{text:'Post streams on Qapla as long as you have drops'}, {text:'Qapla reactions'}, {text:'Qoins cash out'}]}/> 
-                <CardsPayments 
-                    backgroundCards={'#3B4BF9'} 
-                    title={'Growth'}
-                    paymentPerMonth={'You save 15%'}
-                    textButon={'reward your community'}
-                    subtitle={'$36.99 Quatertly.'}
-                    backgroundButon={'#0AFFD2'}
-                    colorTextButon={'#4E2D92'}
-                    price={'11.99'}
-                    items={[{text:'400 Qoins Drops per month',color:'#0AFFD2'},{text:'Post streams on Qapla as long as you have drops'}, {text:'Qapla reactions'}, {text:'Qoins cash out'}]}/> 
-                {/* {subscriptions[period] && Object.entries(subscriptions[period].packages).map((plan) => (
+                    price={0}
+                    disableButton
+                    period={period}
+                    items={[{ text: 'Qapla Reactions' }, { text: 'Qoins cash out' }]} />
+                {subscriptions[period] && Object.keys(subscriptions[period].packages).map((plan) => (
                     <form action='https://us-central1-qapplaapp.cloudfunctions.net/streamerSubscriptionCheckoutIntent' method='post'>
-                        <Grid item sm={12} md={6} className={classes.cardGridItem} key={`${plan[0]}-${period}`}>
-                            <h1 className={styles.planTypeTitle}>
-                                {plan[0] === 'essential' ?
-                                    'Essential'
-                                    :
-                                    'Growth'
-                                }
-                            </h1>
-                            <p className={styles.planTypeDescription}>
-                                {t(`PlanPicker.plansDescriptions.${plan[0]}`)}
-                            </p>
-                            <Card className={plan[0] === 'essential' ? classes.essentialPlanContainer : classes.growthPlanContainer}>
-                                <CardContent className={classes.planBody}>
-                                    <div className={styles.planTitle}>
-                                        <div className={styles.planTitleText}>
-                                            ${Number.isInteger(plan[1].cost) ? plan[1].cost : plan[1].cost.toString().substring(0, plan[1].cost.toString().indexOf('.') + 3)}
-                                            <span className={styles.planTitleSmallElement}>
-                                                /{t('PlanPicker.month')}
-                                            </span>
-                                        </div>
-                                        <div className={styles.planSavingContainer}>
-                                            {period === 'monthly' ?
-                                                <p className={styles.planSavingPeriod}>
-                                                    {`${t('PlanPicker.payment')} ${t(`PlanPicker.plansPeriods.${period}`)}`}
-                                                    {plan[1].saving && '.'}
-                                                </p>
-                                                :
-                                                renderTotalPayment(period, plan[1].cost)
-                                            }
-                                            {plan[1].saving &&
-                                                <span className={styles.planSavingPercentage}>
-                                                    {t(`PlanPicker.saving`, { saving: plan[1].saving })}
-                                                </span>
-                                            }
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <ul className={styles.benefitsList}>
-                                            <li className={styles.listItemContainer}>
-                                                <Box display='flex' flexDirection='row' alignItems='center'>
-                                                    <img src="https://uploads-ssl.webflow.com/6056686ebaee8b4212769569/6056686fbaee8b77b0769611_icon-check-small.svg" alt='' className={styles.smallIcon} />
-                                                    <div className={styles.listItemDescription}>
-                                                        <div className={styles.listItem}>
-                                                            {t('PlanPicker.monthlyPublications', { numberOfPublications: plan[1].streamsIncluded })}
-                                                            {plan[0] === 'growth' && ` ${t('PlanPicker.with')}`}
-                                                            {plan[0] === 'growth' &&
-                                                                <span className={styles.growthExtraBenefit}>
-                                                                    {t('PlanPicker.doubleXQ')}
-                                                                </span>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </Box>
-                                            </li>
-                                            <li className={styles.listItemContainer}>
-                                                <Box display='flex' flexDirection='row' alignItems='center'>
-                                                    <img src="https://uploads-ssl.webflow.com/6056686ebaee8b4212769569/6056686fbaee8b77b0769611_icon-check-small.svg" alt='' className={styles.smallIcon} />
-                                                    <div className={styles.listItemDescription}>
-                                                        <div className={styles.listItem}>
-                                                            {t('PlanPicker.redemptions', { numberOfRedemptions: plan[1].redemptionsPerStream })}
-                                                        </div>
-                                                    </div>
-                                                </Box>
-                                            </li>
-                                            <li className={styles.listItemContainer}>
-                                                <Box display='flex' flexDirection='row' alignItems='center'>
-                                                    <img src="https://uploads-ssl.webflow.com/6056686ebaee8b4212769569/6056686fbaee8b77b0769611_icon-check-small.svg" alt='' className={styles.smallIcon} />
-                                                    <div className={styles.listItemDescription}>
-                                                        <div className={styles.listItem}>
-                                                            {t('PlanPicker.cheers')}
-                                                        </div>
-                                                    </div>
-                                                </Box>
-                                            </li>
-                                            {plan[0] === 'growth' &&
-                                                <li className={styles.listItemContainer}>
-                                                    <Box display='flex' flexDirection='row' alignItems='center'>
-                                                        <img src="https://uploads-ssl.webflow.com/6056686ebaee8b4212769569/6056686fbaee8b77b0769611_icon-check-small.svg" alt='' className={styles.smallIcon} />
-                                                        <div className={styles.listItemDescription}>
-                                                            <div className={styles.listItem}>
-                                                                {t('PlanPicker.extraPublications')}
-                                                                <span className={styles.growthExtraBenefit}>
-                                                                    {t('PlanPicker.doubleXQ')}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </Box>
-                                                </li>
-                                            }
-                                            <li className={styles.listItemContainer}>
-                                                <Box display='flex' flexDirection='row' alignItems='center'>
-                                                    <img src="https://uploads-ssl.webflow.com/6056686ebaee8b4212769569/6056686fbaee8b77b0769611_icon-check-small.svg" alt='' className={styles.smallIcon} />
-                                                    <div className={styles.listItemDescription}>
-                                                        <div className={styles.listItem}>
-                                                            {t('PlanPicker.noQoinsMinimum')}
-                                                        </div>
-                                                    </div>
-                                                </Box>
-                                            </li>
-                                            <li className={styles.listItemContainer}>
-                                                <Box display='flex' flexDirection='row' alignItems='center'>
-                                                    <img src="https://uploads-ssl.webflow.com/6056686ebaee8b4212769569/6056686fbaee8b77b0769611_icon-check-small.svg" alt='' className={styles.smallIcon} />
-                                                    <div className={styles.listItemDescription}>
-                                                        <div className={styles.listItem}>
-                                                            {t('PlanPicker.qoinsStore')}
-                                                        </div>
-                                                    </div>
-                                                </Box>
-                                            </li>
-                                            {plan[0] === 'growth' &&
-                                                <li className={styles.listItemContainer}>
-                                                    <Box display='flex' flexDirection='row' alignItems='center'>
-                                                        <img src="https://uploads-ssl.webflow.com/6056686ebaee8b4212769569/6056686fbaee8b77b0769611_icon-check-small.svg" alt='' className={styles.smallIcon} />
-                                                        <div className={styles.listItemDescription}>
-                                                            <div className={styles.listItem}>
-                                                                {t('PlanPicker.discounts')}
-                                                            </div>
-                                                        </div>
-                                                    </Box>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </CardContent>
-                                <input type='hidden' name='uid' value={user.uid} />
-                                <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
-                                <input type='hidden' name='email' value={user.email} />
-                                <input type='hidden' name='lookupKey' value={plan[1].lookupKey} />
-                                <input type='hidden' name='plan' value={plan[0]} />
-                                <input type='hidden' name='interval' value={period} />
-                                <CardActions className={styles.actionArea}>
-                                    <ContainedButton size='large'
-                                        buttonColor={plan[0] === 'growth' ? 1 : 0}
-                                        type='submit'
-                                        className={`${classes.subscribeButton} ${plan[0] === 'growth' ? styles.growthSubscribeButton : ''}`}>
-                                        {plan[0] === 'growth' ? t('PlanPicker.rewardYourCommunity') : t('PlanPicker.getVisibility')}
-                                    </ContainedButton>
-                                </CardActions>
-                            </Card>
-                        </Grid>
+                        <CardsPayments backgroundCards={plan === 'growth' ? '#3B4BF9' : '#141833'}
+                            title={subscriptions[period].packages[plan].title[userLanguage]}
+                            textButon={plan === 'growth' ? t('PlanPicker.rewardYourCommunity') : t('PlanPicker.getVisibility')}
+                            subtitle={period === MONTHLY ? `${t('PlanPicker.payment')} ${t(`PlanPicker.plansPeriods.${period}`)}` : renderTotalPayment(period, subscriptions[period].packages[plan].cost)}
+                            paymentPerMonth={period === MONTHLY ? '' : t('PlanPicker.saving', { saving: subscriptions[period].packages[plan].saving })}
+                            backgroundButon={plan === 'growth' ? '#0AFFD2' : '#6C5DD3'}
+                            colorTextButon={plan === 'growth' ? '#4E2D92' : '#FFF'}
+                            price={subscriptions[period].packages[plan].cost}
+                            items={[
+                                { text: t('PlanPicker.drops', { numberOfDrops: plan === 'growth' ? 400 : 200 }), color:'#0AFFD2' },
+                                { text: t('PlanPicker.postAlways') },
+                                { text: t('PlanPicker.qaplaReactions') },
+                                { text: t('PlanPicker.cashOut') }
+                            ]} />
+                        <input type='hidden' name='uid' value={user.uid} />
+                        <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
+                        <input type='hidden' name='email' value={user.email} />
+                        <input type='hidden' name='lookupKey' value={subscriptions[period].packages[plan].lookupKey} />
+                        <input type='hidden' name='plan' value={plan} />
+                        <input type='hidden' name='interval' value={period} />
                     </form>
-                ))} */}
+                ))}
             </Grid>
         </StreamerDashboardContainer>
     );

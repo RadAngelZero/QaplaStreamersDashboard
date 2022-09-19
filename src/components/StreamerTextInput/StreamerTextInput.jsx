@@ -20,7 +20,9 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#141833',
         borderRadius: '.5rem',
         color: '#FFF',
-        fontSize: '14px'
+        fontSize: '14px',
+        height: '56px',
+        minWidth: '274px'
     }
 }));
 

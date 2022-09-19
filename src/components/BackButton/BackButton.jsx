@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
         width: '40px',
         marginRight: '16px',
         "&:hover": {
-            backgroundColor: '#242731'
+            backgroundColor: '#141833'
         }
     },
     label: {

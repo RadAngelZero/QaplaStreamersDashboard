@@ -29,7 +29,8 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: theme.spacing(1),
         fontSize: '12px',
         color: '#B2B3BD',
-        lineHeight: '16px'
+        lineHeight: '16px',
+        width:'274px'
     },
     button: {
         color: '#FFF',
@@ -51,7 +52,8 @@ const useStyles = makeStyles((theme) => ({
             width: '20px',
             marginLeft: '-6px',
             marginRight: '18px',
-            zIndex: '10'
+            zIndex: '10',
+            height: '56px',
         }
     },
     popover: {
@@ -387,8 +389,8 @@ const NewStream = ({ user, games }) => {
                         <h1 className={styles.title}>
                             {t('NewStream.whatAreYouPlaying')}
                         </h1>
-                        <Grid container spacing={4} style={{ marginTop: '2px' }}>
-                            <Grid item sm={5} style={{ width: '274px', maxWidth: '274px', }}>
+                        <Grid container spacing={4} style={{width: '800px',marginTop: '2px' }}>
+                            <Grid item sm={5} style={{ width: '274px', maxWidth: '308px', }}>
                                 <InputLabel className={classes.datePickerLabel}>
                                     {t('NewStream.pickACategory')}
                                 </InputLabel>
@@ -403,6 +405,7 @@ const NewStream = ({ user, games }) => {
                                     styling={{
                                         zIndex: 999,
                                         height: '56px',
+                                        width: '274px',
                                         color: '#FFF',
                                         hoverBackgroundColor: 'rgba(255, 255, 255, 0.25)',
                                         fontSize: '1rem',
@@ -412,8 +415,10 @@ const NewStream = ({ user, games }) => {
                                         borderRadius: '8px',
                                         placeholderColor: 'rgba(255, 255, 255, 0.5)',
                                         fontFamily: 'Inter',
-                                        lineColor: 'transparent'
+                                        lineColor: 'transparent',
+                                        
                                     }}
+                                    
                                     showIcon={false}
                                     formatResults={(item) => <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>} />
                             </Grid>
@@ -423,7 +428,7 @@ const NewStream = ({ user, games }) => {
                         </h1>
                         <MuiPickersUtilsProvider utils={DayJsUtils}>
                             <Grid container spacing={4} style={{ marginTop: '2px' }}>
-                                <Grid item sm={5} style={{ maxWidth: '274px', }}>
+                                <Grid item sm={5} style={{ maxWidth: '304px', }}>
                                     <InputLabel className={classes.datePickerLabel} >
                                         {t('NewStream.date')}
                                     </InputLabel>
@@ -443,6 +448,7 @@ const NewStream = ({ user, games }) => {
                                         minDate={minDate}
                                         minDateMessage={t('NewStream.alerts.before24h')}
                                         format='DD-MM-YY ddd'
+                                        style={{width:'274px', height:'56px'}}
                                         keyboardIcon={
                                             <InputAdornment position='end' >
                                                 <CalendarIcon />
@@ -475,6 +481,7 @@ const NewStream = ({ user, games }) => {
                                         value={displayDate}
                                         placeholder='08:00 AM'
                                         onChange={handleDateChange}
+                                        style={{width:'274px',height:'56px'}}
                                         // mask='__:__ _M'
                                         keyboardIcon={
                                             <InputAdornment position='end' >
@@ -495,14 +502,15 @@ const NewStream = ({ user, games }) => {
                                 </Grid>
                             </Grid>
                         </MuiPickersUtilsProvider>
-                        <Grid container spacing={4} style={{ marginTop: '2px' }}>
-                            <Grid item sm={5} style={{ maxWidth: '274px', }}>
-                                <Grid container>
+                        <Grid  spacing={4} style={{ marginTop: '2px' }}>
+                            <Grid item sm={5}  style={{display: 'flex'}}>
+                                <Grid >
                                     <h1 className={styles.title}>
                                         {t('NewStream.streamTitle')}
                                     </h1>
-                                    <Grid container spacing={4}>
-                                        <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
+                                    <p className={styles.subTitle}>Give your stream a personal touch to make it more sppealing</p>
+                                    <Grid container spacing={4} style={{ marginTop:'10px'}}>
+                                        <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px'}}>
                                             <StreamerTextInput
                                                 labelClassName={classes.titleLabel}
                                                 label={t('NewStream.streamTitle')}
@@ -511,6 +519,26 @@ const NewStream = ({ user, games }) => {
                                                 fullWidth={true}
                                                 value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
                                                 onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid  style={{marginLeft:'30px'}}>
+                                    <h1 className={styles.title}>
+                                        Drops limit
+                                    </h1>
+                                    <p className={styles.subTitle}>This the max amount of Qoins drops that couid be redeemed during your live stream</p>
+                                    <Grid container spacing={4} style={{ marginTop:'10px'}}>
+                                        <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px'}}>
+                                            <StreamerTextInput
+                                                labelClassName={classes.titleLabel}
+                                                label='Max limit'
+                                                placeholder='Number'
+                                                id='eventTitle'
+                                                fullWidth={true}
+                                                value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
+                                                onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                                type={'Number'}
                                             />
                                         </Grid>
                                     </Grid>

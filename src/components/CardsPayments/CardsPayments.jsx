@@ -124,7 +124,7 @@ const CardsPayments = ({
                 disabled={disableButton}
                 type='submit'
                 style={{ background: backgroundButon, color: colorTextButon }}>
-            {textButon}
+                {textButon}
             </Button>
         </div>
     </div>

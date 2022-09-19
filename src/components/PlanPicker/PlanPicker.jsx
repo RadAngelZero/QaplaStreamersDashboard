@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, Button, Box, Grid, Card, CardContent, CardActions } from '@material-ui/core';
+import { makeStyles, Button, Box, Grid } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import styles from './PlanPicker.module.css';
 import { getSubscriptionsDetails } from '../../services/database';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import ContainedButton from '../ContainedButton/ContainedButton';
 import { MONTHLY, QUARTERLY, YEARLY } from '../../utilities/Constants';
 
 import CardsPayments from '../CardsPayments/CardsPayments'

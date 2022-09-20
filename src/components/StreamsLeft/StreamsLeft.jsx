@@ -3,29 +3,7 @@ import styles from './StreamsLeft.module.css'
 import { useTranslation } from 'react-i18next'
 import { listenToStreamerDrops, removeListenerFromStreamerDrops } from '../../services/database';
 
-const StreamsLeft = ({ uid, renovationDate }) => {
-    const [qoinsDrops, setQoinsDrops] = useState({ left: 0, original: 0 });
-
-    useEffect(() => {
-        async function getDropsLeft() {
-            listenToStreamerDrops(uid, (drops) => {
-                if (drops.exists()) {
-                    setQoinsDrops(drops.val());
-                }
-            });
-        }
-
-        if (uid) {
-            getDropsLeft();
-        }
-
-        return () => {
-            if (uid) {
-                removeListenerFromStreamerDrops(uid);
-            }
-        };
-    }, [uid]);
-
+const StreamsLeft = ({ uid, renovationDate, qoinsDrops }) => {
     const dateRenovation = new Date(renovationDate);
     const renovationDay = (dateRenovation.getDate().toString().length < 2 ? '0' : '') + dateRenovation.getDate().toString();
     const renovationMonth = dateRenovation.getMonth();

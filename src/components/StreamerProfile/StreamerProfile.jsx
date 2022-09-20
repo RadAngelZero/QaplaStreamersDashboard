@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerProfile = ({ user, games }) => {
+const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const classes = useStyles();
     const history = useHistory();
     const [streams, setStreams] = useState({});
@@ -305,6 +305,7 @@ const StreamerProfile = ({ user, games }) => {
                                             <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px', marginLeft: 'auto', marginRight: '-2px', minWidth: 'fit-content' }}>
                                                 {(user.premium || user.freeTrial) && user.currentPeriod &&
                                                     <StreamsLeft uid={user.uid}
+                                                        qoinsDrops={qoinsDrops}
                                                         renovationDate={user.currentPeriod.endDate} />
                                                 }
                                             </Grid>

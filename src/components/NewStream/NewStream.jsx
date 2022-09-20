@@ -117,7 +117,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const NewStream = ({ user, games }) => {
+const NewStream = ({ user, games, qoinsDrops }) => {
     const userLang = navigator.language || navigator.userLanguage;
     const classes = useStyles();
     const history = useHistory();
@@ -224,10 +224,6 @@ const NewStream = ({ user, games }) => {
         setDisplayDate(date)
     };
 
-    const openSuccessWindow = () => {
-        submitEvent();
-    };
-
     const submitEvent = async () => {
         setLockSendButton(true);
         if (user.broadcasterType === '') {
@@ -259,28 +255,7 @@ const NewStream = ({ user, games }) => {
              */
             if (selectedDate.getTime() <= endDate) {
 
-                const numberOfStreamsInTheSelectedPeriod = user.subscriptionDetails.streamsRequested || 0;
-
-                let userCanCreateStream = numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded);
-
-                if (!userCanCreateStream) {
-                    if (user.boughtStreams) {
-                        /**
-                         * Check for packages of streams bought by the streamer, if some package has not expired and has not used the total amount of streams bought
-                         * the user can create the stream, this function will also remove expired packages or packages that has been already used
-                         */
-                        userCanCreateStream = Object.keys(user.boughtStreams).some((streamsPackageId) => {
-                            if (selectedDate.getTime() <= user.boughtStreams[streamsPackageId].expirationTimestamp && (!user.boughtStreams[streamsPackageId].streamsRequested || user.boughtStreams[streamsPackageId].streamsRequested + 1 <= user.boughtStreams[streamsPackageId].boughtStreams)) {
-                                addToStreamsRequestedOnStreamsPackage(user.uid, streamsPackageId);
-                                return true;
-                            } else {
-                                removeStreamPackageOfStreamer(user.uid, streamsPackageId);
-                            }
-                        });
-                    }
-                } else {
-                    addToStreamsRequestedOnSubscriptionDetails(user.uid);
-                }
+                const userCanCreateStream = qoinsDrops.original;
 
                 /**
                  * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
@@ -333,6 +308,12 @@ const NewStream = ({ user, games }) => {
             }
         } else {
             setShowAccountActviation(true);
+        }
+    }
+
+    const setDrops = (drops) => {
+        if (drops > 0) {
+            setDropsForStream(drops);
         }
     }
 
@@ -416,9 +397,7 @@ const NewStream = ({ user, games }) => {
                                         placeholderColor: 'rgba(255, 255, 255, 0.5)',
                                         fontFamily: 'Inter',
                                         lineColor: 'transparent',
-                                        
                                     }}
-                                    
                                     showIcon={false}
                                     formatResults={(item) => <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>} />
                             </Grid>
@@ -527,17 +506,18 @@ const NewStream = ({ user, games }) => {
                                     <h1 className={styles.title}>
                                         Drops limit
                                     </h1>
-                                    <p className={styles.subTitle}>This the max amount of Qoins drops that couid be redeemed during your live stream</p>
+                                    <p className={styles.subTitle}>
+                                        This the max amount of Qoins drops that couid be redeemed during your live stream
+                                    </p>
                                     <Grid container spacing={4} style={{ marginTop:'10px'}}>
                                         <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px'}}>
                                             <StreamerTextInput
                                                 labelClassName={classes.titleLabel}
                                                 label='Max limit'
-                                                placeholder='Number'
                                                 id='eventTitle'
                                                 fullWidth={true}
-                                                value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
-                                                onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                                value={dropsForStream}
+                                                onChange={(e) => setDrops(Number(e.target.value))}
                                                 type={'Number'}
                                             />
                                         </Grid>
@@ -548,7 +528,7 @@ const NewStream = ({ user, games }) => {
                         <Button
                             disabled={lockSendButton}
                             className={styles.button}
-                            onClick={openSuccessWindow}>
+                            onClick={submitEvent}>
                             {lockSendButton ?
                                 <CircularProgress
                                     style={{

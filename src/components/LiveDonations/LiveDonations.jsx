@@ -86,6 +86,17 @@ const LiveDonations = () => {
             }, delay);
          }
 
+         function addEmoteCircle(delay, range, color) {
+            setTimeout(function () {
+               let c = new EmoteCircle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
+                   x: -0.15 + Math.random() * 0.3,
+                   y: 1 + Math.random() * 10
+               }, range);
+
+               circles.push(c);
+           }, delay);
+        }
+
          class Circle {
             constructor(x, y, color, velocity, range) {
                 let _this = this;
@@ -101,6 +112,43 @@ const LiveDonations = () => {
                 this.element.style.fontSize = '26px';
                 this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
                 this.element.innerHTML = color;
+                const container = document.getElementById('animate');
+                if (container) {
+                    container.appendChild(this.element);
+                }
+
+                this.update = function () {
+                    if (_this.y > 800) {
+                        _this.y = 80 + Math.random() * 4;
+                        _this.x = _this.range[0] + Math.random() * _this.range[1];
+                    }
+                    _this.y += _this.velocity.y;
+                    _this.x += _this.velocity.x;
+                    this.element.style.opacity = 1;
+                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                };
+            }
+        }
+
+        class EmoteCircle {
+            constructor(x, y, color, velocity, range) {
+                let _this = this;
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = velocity;
+                this.range = range;
+                this.element = document.createElement('img');
+                /*this.element.style.display = 'block';*/
+                this.element.style.opacity = 0;
+                this.element.style.position = 'absolute';
+                // this.element.style.fontSize = '26px';
+                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
+                this.element.style.width = '30px'
+                this.element.style.height = '30px'
+                this.element.src = color;
                 const container = document.getElementById('animate');
                 if (container) {
                     container.appendChild(this.element);
@@ -147,6 +195,24 @@ const LiveDonations = () => {
             animate();
         }
 
+        function executeEmoteRain(emote) {
+            setShowEmojiRain(true);
+            for (let i = 0; i < 10; i++) {
+                addEmoteCircle(i * 350, [10 + 0, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 0, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 - 200, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 200, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 - 400, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 400, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 - 600, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+            }
+
+            animate();
+        }
+
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
@@ -160,6 +226,8 @@ const LiveDonations = () => {
                 }
             });
         }
+        // executeEmojiRain(['🙀'])
+        // executeEmoteRain(['https://cdn.frankerfacez.com/emoticon/162146/1']);
 
         if (donationQueue.length > 0 && !isPlayingAudio && reactionsEnabled) {
             setIsPlayingAudio(true);

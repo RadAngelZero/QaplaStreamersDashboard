@@ -25,6 +25,7 @@ const LiveDonations = () => {
     const [donationToShow, setDonationToShow] = useState(null);
     const [listenersAreSetted, setListenersAreSetted] = useState(false);
     const [alertSideRight, setAlertSideRight] = useState(false);
+    const [alertOnTop, setAlertOnTop] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
     const [qaplaOnOpacity, setQaplaOnOpacity] = useState(1);
     const [playQaplaOnAnimation, setPlayQaplaOnAnimation] = useState("false");
@@ -209,6 +210,7 @@ const LiveDonations = () => {
                 }
 
                 donation.isRightSide = alertSideRight;
+                donation.isOnTop = alertOnTop;
 
                 setDonationToShow(donation);
 
@@ -331,7 +333,8 @@ const LiveDonations = () => {
                     }}
                     style={{
                         position: 'fixed',
-                        bottom: '-15px',
+                        top: alertOnTop ? '-15px' : 'auto',
+                        bottom: alertOnTop ? 'auto' : '-15px',
                         left: alertSideRight ? 'auto' : '-12px',
                         right: alertSideRight ? '-12px' : 'auto',
                         width: '150px',

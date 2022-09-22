@@ -10,8 +10,8 @@ import {
     updateActiveCustomReward,
     updateStreamerProfile,
     updateStreamStatus,
-    increaseUsedDrops,
-    increaseDropsLeft
+    decreaseUsedDrops,
+    decreaseDropsLeft
 } from './database';
 import { notifyBugToDevelopTeam } from './discord';
 import { refreshUserAccessToken, subscribeStreamerToTwitchWebhook, unsubscribeStreamerToTwitchWebhook } from './functions';
@@ -74,8 +74,8 @@ export async function closeQaplaStream(uid, twitchId, refreshToken, streamId, qo
          * We add a negative amount to the used drops because we want to return drops if not all were redeemed during
          * stream
          */
-        await increaseUsedDrops(uid, drops - dropsRedeemed);
-        await increaseDropsLeft(uid, dropsRedeemed);
+        await decreaseUsedDrops(uid, drops - dropsRedeemed);
+        await decreaseDropsLeft(uid, dropsRedeemed);
 
         /** This fragment will be used temporary */
 

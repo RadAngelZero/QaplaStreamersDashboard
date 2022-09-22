@@ -344,6 +344,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     date={formatDate(streams[streamId].timestamp)}
                                                     hour={formatHour(streams[streamId].timestamp)}
                                                     timestamp={streams[streamId].timestamp}
+                                                    drops={streams[streamId].drops}
                                                     onRemoveStream={onRemoveStream} />
                                             </Grid>
                                         ))}

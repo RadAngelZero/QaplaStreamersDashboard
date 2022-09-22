@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DayJsUtils from '@date-io/dayjs';
 
-import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer, updateStreamerProfile } from './../../services/database';
+import { addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, updateStreamerProfile } from './../../services/database';
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
@@ -152,55 +152,13 @@ const NewStream = ({ user, games, qoinsDrops }) => {
     }, [games.allGames, user]);
 
     const optionalDataReducer = (state, action) => {
+        // We don´t need this to be a reducer anymore, we should change it later
         switch (action.target.id) {
             case 'eventTitle':
-                if (userLang.toLowerCase().includes('es')) {
-                    return ({
-                        ...state,
-                        title: {
-                            es: action.target.value
-                        }
-                    })
-                } else {
-                    return ({
-                        ...state,
-                        title: {
-                            en: action.target.value
-                        }
-                    })
-                }
-            case 'eventDescriptionTitle':
-                if (userLang.toLowerCase().includes('es')) {
-                    return ({
-                        ...state,
-                        descriptionsTitle: {
-                            es: action.target.value
-                        }
-                    })
-                } else {
-                    return ({
-                        ...state,
-                        descriptionsTitle: {
-                            en: action.target.value
-                        }
-                    })
-                }
-            case 'eventDescription':
-                if (userLang.toLowerCase().includes('es')) {
-                    return ({
-                        ...state,
-                        descriptions: {
-                            es: action.target.value
-                        }
-                    })
-                } else {
-                    return ({
-                        ...state,
-                        descriptions: {
-                            en: action.target.value
-                        }
-                    })
-                }
+                return ({
+                    ...state,
+                    title: action.target.value
+                });
             default:
                 break;
         }
@@ -312,7 +270,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
     }
 
     const setDrops = (drops) => {
-        if (drops > 0) {
+        if (drops >= 0 && drops <= qoinsDrops.left) {
             setDropsForStream(drops);
         }
     }
@@ -487,7 +445,9 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                     <h1 className={styles.title}>
                                         {t('NewStream.streamTitle')}
                                     </h1>
-                                    <p className={styles.subTitle}>Give your stream a personal touch to make it more sppealing</p>
+                                    <p className={styles.subTitle}>
+                                        Give your stream a personal touch to make it more appealing
+                                    </p>
                                     <Grid container spacing={4} style={{ marginTop:'10px'}}>
                                         <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px'}}>
                                             <StreamerTextInput
@@ -507,7 +467,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                         Drops limit
                                     </h1>
                                     <p className={styles.subTitle}>
-                                        This the max amount of Qoins drops that couid be redeemed during your live stream
+                                        This the max amount of Qoins drops that could be redeemed during your live stream
                                     </p>
                                     <Grid container spacing={4} style={{ marginTop:'10px'}}>
                                         <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px'}}>

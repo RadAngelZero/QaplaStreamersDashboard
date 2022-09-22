@@ -106,7 +106,7 @@ const Routes = ({ user, games, qoinsDrops }) => {
 const Router = () => {
     const [games, setGames] = useState({});
     const [user, setUser] = useState(null);
-    const [qoinsDrops, setQoinsDrops] = useState({ left: 0, original: 0, reserved: 0 });
+    const [qoinsDrops, setQoinsDrops] = useState({ left: 0, original: 0, used: 0 });
 
     useEffect(() => {
 

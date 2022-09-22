@@ -1,9 +1,8 @@
-import React, {  useState, useEffect} from 'react'
+import React from 'react'
 import styles from './StreamsLeft.module.css'
 import { useTranslation } from 'react-i18next'
-import { listenToStreamerDrops, removeListenerFromStreamerDrops } from '../../services/database';
 
-const StreamsLeft = ({ uid, renovationDate, qoinsDrops }) => {
+const StreamsLeft = ({ renovationDate, qoinsDrops }) => {
     const dateRenovation = new Date(renovationDate);
     const renovationDay = (dateRenovation.getDate().toString().length < 2 ? '0' : '') + dateRenovation.getDate().toString();
     const renovationMonth = dateRenovation.getMonth();

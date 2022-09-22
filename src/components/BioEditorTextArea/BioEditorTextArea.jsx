@@ -19,9 +19,10 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#202750',
         borderRadius: 15,
         width: '90%',
-        marginTop: 24,
+        marginTop: '32px',
         overflow: 'hidden',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        height: '218px',
     },
     buttonsContainer: {
         display: 'flex',

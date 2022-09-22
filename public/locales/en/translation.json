@@ -95,6 +95,15 @@
             "disable": "Disable reactions",
             "dontDisable": "Don't disable",
             "dontShowAgain": "Don't show this message again"
+        },
+        "BarProgressBit": {
+            "nextMilestone": "Next Milestone",
+            "available": "Available",
+            "cashOut": "Cash Out",
+            "confirmCashOut": "Confirm you are cashing out your Qoins for Bits on Twitch",
+            "cancel": "Cancel",
+            "weGotYouRequestP1": "We got your request! We'll send you ",
+            "weGotYouRequestP2": " bits on your next stream"
         }
     },
     "StreamCard": {
@@ -280,18 +289,27 @@
         "showUpcomingStreams": "Show upcoming streams",
         "social": "Social",
         "OnBoarding": {
-            "header1": "Increase your visibility",
-            "header2": "Improve live interaction",
-            "header3": "Amplify your reach",
-            "body1": "Welcome to your Qapla profile 😍. Connect with more members of the community by enabling your profile",
-            "body2": "Share what you like, what your content is about, or whatever you want!, to increase the chances of matching with the people who come by your stream 💜",
-            "body3": "Drive valuable traffic to all your online content. One place for your schedule streams and your communication channels 🎙",
-            "presentYourself": "Introduce yourself to the community",
-            "addTags": "Add tags that represent you as the creator, your persona, your content, etc.",
-            "yourIntro": "Your intro is a glimpse of yourself and your content. Make it nice 😉",
+            "header1": "Increase your interactions",
+            "header2": "Introduce yourself",
+            "header3": "Tags",
+            "header4": "Copy and share!",
+            "body1": "Create and share your profile link to make it easier for your viewers to react on your stream ⚡️",
+            "body2": "It’s a bio, you know how it goes 🫶",
+            "body3": "Add tags about your content, you as a creator, you as a person, or whatever you want! 💜",
+            "body4": "Your viewers can send reactions quick on stream right from your profile, or even download the app!",
+            "waysOfSharing": "Ways of sharing:",
+            "addToYourBio": "🔗 Add it to your Link-in-Bio",
+            "useItAsLinkInBio": "🪪 Use it as a Link-in-Bio",
+            "addToNightbot": "🤖 Add it to your Nightbot on Twitch",
+            "typeToCreateLink": "type to create your link",
+            "createProfileLink": "Create Profile Link",
+            "confirmBio": "Confirm Bio",
+            "finish": "Finish set up",
+            "goToProfile": "Go to my profile",
             "minChars": "Min. Characters",
             "tagErrorNotSelected": "To add a tag write and/or click on it",
-            "minTags": "Add at least {{minTags}} tags to continue"
+            "minTags": "Add at least {{minTags}} tags to continue",
+            "duplicatedLink": "Link already in use, try with other"
         },
         "confirmations": {
             "saveImage": "Image saved successfully"

@@ -15,14 +15,15 @@ import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg'
 import { ReactComponent as GiftIcon } from './../../assets/Gift.svg';
 import StreamerProfileEditCoin from '../StreamerProfileEditCoin/StreamerProfileEditCoin'
 
+import BarProgressBit from '../BarProgressBit/BarProgressBit';
+
 import { getQreatorCode, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE,
-    PREMIUM,
-    FREE_USER
+    PREMIUM
 } from '../../utilities/Constants';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 
@@ -34,11 +35,40 @@ const BalanceButtonContainer = withStyles(() => ({
         padding: '22px 24px',
         height: '100px',
         minWidth: '180px !important',
-        maxWidth: '230px !important',
+        maxWidth: '330px !important',
         borderRadius: '20px',
         alignItems: 'center',
         justifyContent: 'space-between',
-        textTransform: 'none'
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#141735',
+            opacity: 0.7
+        }
+    },
+    label: {
+        display: 'flex'
+    },
+}))(Button);
+
+const BitsButtonContainer = withStyles(() => ({
+    root: {
+        display: 'flex',
+        backgroundColor: '#141735',
+        width: '100%',
+        padding: '22px 24px',
+        height: '100px',
+        minWidth: '190px !important',
+        maxWidth: 552,
+        borderRadius: '20px',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#141735'
+        },
+        '&:active': {
+            backgroundColor: '#141735'
+        }
     },
     label: {
         display: 'flex'
@@ -81,13 +111,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
         async function getValueOfQoins() {
             if (user) {
-                let valueOfQoins = 0;
-
-                if (user.premium || user.freeTrial) {
-                    valueOfQoins = (await getStreamerValueOfQoins(PREMIUM)).val();
-                } else {
-                    valueOfQoins = (await getStreamerValueOfQoins(FREE_USER)).val();
-                }
+                let valueOfQoins = (await getStreamerValueOfQoins(PREMIUM)).val();
 
                 setValueOfQoinsForStreamer(valueOfQoins);
             }
@@ -160,12 +184,16 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     let cheersQoins = 0;
-    let qlanQoins = 0;
+    let availableBits = 0;
+    let nextMilestone = 250;
     let estimatedBits = 0;
+
     if (user) {
         cheersQoins = user.qoinsBalance || 0;
-        qlanQoins = user.qlanBalance || 0;
-        estimatedBits = ((cheersQoins + qlanQoins) / 200) * valueOfQoinsForStreamer;
+        const tensOfBits =  cheersQoins / 200;
+        estimatedBits = (tensOfBits) * valueOfQoinsForStreamer;
+        availableBits = 250 * Math.floor((estimatedBits) / 250);
+        nextMilestone = 250 * Math.ceil((estimatedBits + 1) / 250);
     }
 
     const handleSwitchEvents = () => {
@@ -184,8 +212,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                {}
-                    <Grid container spacing={2}>
+                    <Grid container spacing={6}>
                         <Grid item xs={12} sm={9}>
                             <Grid container xs={12}>
                                 <Grid xs={12}>
@@ -256,14 +283,14 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                     </div>
                                 </Grid>
                                 <Grid xs={12}>
-                                    <Grid container xs={11}>
+                                    <Grid container xs={12}>
                                         <Grid item xs={12}>
                                             <h1 className={styles.title} style={{ marginBottom: 40 }}>
                                                 {t('StreamerProfile.balance')}
                                             </h1>
                                         </Grid>
-                                        <Grid container xs={12} style={{ gap: '20px' }} >
-                                            <Grid item xs={12} className={styles.balanceContainers}>
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between' }}>
+                                            <Grid item xs={12} sm={4} style={{ paddingRight: 24 }}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
                                                     <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
@@ -274,27 +301,15 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     </div>
                                                 </BalanceButtonContainer>
                                             </Grid>
-                                            <Grid item xs={12} className={styles.balanceContainers}>
-                                                <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
-                                                    <DonatedQoin style={{ width: '35px', height: '35px' }} />
-                                                    <div className={styles.balanceInnerContainer}>
-                                                        <p className={styles.balanceDataTextTitle}>Qlan</p>
-                                                        <p className={styles.balanceDataText}>
-                                                            {qlanQoins.toLocaleString()}
-                                                        </p>
-                                                    </div>
-                                                </BalanceButtonContainer>
-                                            </Grid>
-                                            <Grid item xs={12} className={styles.balanceContainers}>
-                                                <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Bits') }}>
+                                            <Grid item xs={12} sm={8}>
+                                                {/* e.currentTarget != e.target Help us to prevent trigger the event if the user clicks the inner button and not this button */}
+                                                <BitsButtonContainer disableRipple className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
                                                     <BitsIcon style={{ width: '35px', height: '35px' }} />
-                                                    <div className={styles.balanceInnerContainer}>
-                                                        <p className={styles.balanceDataTextTitle}>{t('StreamerProfile.stimatedBits')}</p>
-                                                        <p className={styles.balanceDataText}>
-                                                            {Math.floor(estimatedBits).toLocaleString()}
-                                                        </p>
-                                                    </div>
-                                                </BalanceButtonContainer>
+                                                    <BarProgressBit user={user}
+                                                        estimatedBits={Math.floor(estimatedBits)}
+                                                        availableBits={Math.floor(availableBits)}
+                                                        nextMilestone={nextMilestone}/>
+                                                </BitsButtonContainer>
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -366,8 +381,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         onClose={() => setOpenRecordsDialog(false)}
                         user={user}
                         cheersQoins={cheersQoins}
-                        qlanQoins={qlanQoins}
-                        estimatedBits={estimatedBits}
+                        estimatedBits={availableBits}
                         valueOfQoinsForStreamer={valueOfQoinsForStreamer}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />

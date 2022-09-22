@@ -15,8 +15,8 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
-        "membership": "Membresía",
-        "billing": "Membresía",
+        "membership": "Subscripción",
+        "billing": "Subscripción",
         "universalProfile": "Perfil",
         "settings": "Ajustes",
         "new": "Nuevo",
@@ -95,6 +95,15 @@
             "disable": "Deshabilitar reacciones",
             "dontDisable": "No deshabilitar",
             "dontShowAgain": "No mostrar este mensaje de nuevo"
+        },
+        "BarProgressBit": {
+            "nextMilestone": "Siguiente Milestone",
+            "available": "Disponible",
+            "cashOut": "Cash Out",
+            "confirmCashOut": "Confirma que quieres cambiar tus Qoins por Bits en Twitch",
+            "cancel": "Cancelar",
+            "weGotYouRequestP1": "¡Tenemos tu solicitud! Te enviaremos ",
+            "weGotYouRequestP2": " bits en tu próximo stream"
         }
     },
     "StreamCard": {
@@ -281,18 +290,27 @@
         "showUpcomingStreams": "Mostar próximos streams",
         "social": "Social",
         "OnBoarding": {
-            "header1": "Incrementa tu visibilidad",
-            "header2": "Mejora la interacción en vivo",
-            "header3": "Amplifica tu alcance",
-            "body1": "Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil",
-            "body2": "Comparte tus gustos, de que trata tu contenido, ó ¡lo que tu quieras!, para incrementar las posibilidades hacer match con la gente que se pasa a tu stream 💜",
-            "body3": "Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y tus diferentes canales de comunicación 🎙",
-            "presentYourself": "Preséntate con la comunidad",
-            "addTags": "Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.",
-            "yourIntro": "Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉",
+            "header1": "Incrementa tus interacciones",
+            "header2": "Preséntate",
+            "header3": "Tags",
+            "header4": "¡Copia y comparte!",
+            "body1": "Crea y comparte tu link de perfil para hacer mas fácil a tus viewers reaccionar en tu stream ⚡️",
+            "body2": "Es una bio, tu sabes como funciona 🫶",
+            "body3": "¡Agrega tags sobre tu contenido, tu como creador, como persona o sobre lo que quieras! 💜",
+            "body4": "¡Tus viewers pueden enviar reacciones rápido en tu stream desde tu perfil, o inclusive descargar la app!",
+            "waysOfSharing": "Formas de compartir:",
+            "addToYourBio": "🔗 Agregalo a tu Link-in-Bio",
+            "useItAsLinkInBio": "🪪 Usalo como un Link-in-Bio",
+            "addToNightbot": "🤖 Agregalo a tu Nightbot en Twitch",
+            "typeToCreateLink": "escribe para crear tu link",
+            "createProfileLink": "Crear Link de Perfil",
+            "confirmBio": "Confirmar Bio",
+            "finish": "Finalizar",
+            "goToProfile": "Ir a mi perfil",
             "minChars": "Min. Caracteres",
             "tagErrorNotSelected": "Para agregar un tag escribelo y/o da click en el",
-            "minTags": "Agrega al menos {{minTags}} tags para continuar"
+            "minTags": "Agrega al menos {{minTags}} tags para continuar",
+            "duplicatedLink": "Link en uso, prueba con otro"
         },
         "confirmations": {
             "saveImage": "Imagen guardada correctamente"

@@ -15,7 +15,7 @@ import SignInImage from './../../assets/SignIn.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
-import { createStreamerProfile, getInteractionsRewardData, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
+import { createStreamerProfile, getInteractionsRewardData, getNumberOfVisits, getStreamerDeepLink, setVisitsCounter, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 import { getTwitchUserData } from '../../services/twitch';
 
@@ -75,14 +75,25 @@ const StreamersSignin = ({ user, title }) => {
             }
         }
         async function redirectUser(uid) {
-            const interactionsRewardData = await getInteractionsRewardData(user.uid);
+            const interactionsRewardData = await getInteractionsRewardData(uid);
             if (interactionsRewardData.exists()) {
+                const userHasProfile = await userHasPublicProfile(uid);
+                const userHasLink = await getStreamerDeepLink(uid);
+
+                /**
+                 * This flag ensures that the next time the user enters after creating their interactions reward they will be redirected
+                 * to create their profile
+                 */
                 const userHasBeenRedirectedToCreateProfile = localStorage.getItem('userHasBeenRedirectedToCreateProfile');
 
-                if (userHasBeenRedirectedToCreateProfile) {
+                // We use this to know if the user must be redirected again to create a profile
+                const numberOfTimesUserEnterDashboard = await getNumberOfVisits(uid);
+                await setVisitsCounter(uid, numberOfTimesUserEnterDashboard.val() < 2 ? numberOfTimesUserEnterDashboard.val() + 1 : 0);
+
+                if (userHasBeenRedirectedToCreateProfile && numberOfTimesUserEnterDashboard.val() < 2) {
                     history.push('/profile');
                 } else {
-                    if (await userHasPublicProfile(uid)) {
+                    if ((userHasProfile && userHasLink.exists()) || numberOfTimesUserEnterDashboard.val() < 2) {
                         history.push('/profile');
                     } else {
                         history.push('/editProfile');

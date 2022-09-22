@@ -312,7 +312,7 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
             drops
         });
 
-        const event = await streamersEventsDataRef.child(uid).child(streamRef.key).set({
+        await streamersEventsDataRef.child(uid).child(streamRef.key).set({
             date,
             hour,
             game,

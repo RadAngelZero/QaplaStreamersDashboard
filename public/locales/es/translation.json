@@ -172,7 +172,7 @@
             "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
         },
         "whatAreYouPlaying": "¿Qué vas a transmitir?",
-        "pickACategory": "Selecciona una categoría",
+        "pickACategory": "Elige una categoría",
         "categoryPickerPlaceholder": "Ej: Just Chatting",
         "when": "¿Cuando?",
         "date": "Fecha",
@@ -186,20 +186,16 @@
         },
         "advanced": "Avanzado (Opcional)",
         "feelingCreative": "¿Te sientes creativo? Dale un nombre genial a tu stream",
-        "streamTitle": "Título del stream",
+        "streamTitle": "Título del stream ",
+        "optional": "(opcional)",
+        "streamTitleDescription": "Dale un toque personal a tu publicación para hacerla más atractiva",
         "streamTitlePlaceholder": "Manqueando en Fall Guys",
-        "streamDescription": "Descripción del stream",
-        "subtitle": "Subtitulo",
-        "descriptionPlaceholder": "Describe lo que tienes planeado para tu stream",
+        "dropsTitle": "Límite de Drops",
+        "dropsDescription": "Cantidad máxima de Drops de Qoins que se podrán canjear durante tu transmisión",
+        "maxLimit": "Límite máximo",
         "submit": "Enviar",
-        "confirmDialog": {
-            "almostDone": "Ya casi terminamos",
-            "confirmDetails": "Sólo confirma los detalles para continuar",
-            "dateAndHour": "Fecha y hora",
-            "localTime": "Tiempo local"
-        },
         "successDialog": {
-            "description": "Recibimos tu publicación, la aprobaremos lo más pronto posible"
+            "description": "¡Stream agendado! Tu stream ha sido publicado en la app"
         }
     },
     "CheersSettings": {
@@ -325,18 +321,13 @@
         "backToDashboard": "Volver al dashboard"
     },
     "RequestActivation": {
-        "title": "¡Tu publicación está lista\npara ser enviada!",
-        "descriptionP1": "Activa tu ",
-        "descriptionHiglight": "Free Trial",
-        "descriptionP2": " con tu código de referido\npara poder publicar tus streams",
-        "buyAMembership": "Recompensa a tu comunidad y dale visibilidad a tu contenido con una membresía de Qapla",
-        "referralCode": "Código de referido",
-        "startFreeTrial": "Activar Free Trial",
-        "dontHaveACode": "¿No tienes código de referido?",
-        "subscribe": "Suscríbete para publicar",
-        "referralProgramP1": "ó invita a otros streamers con tu ",
-        "qreatorCode": "Código de Qreador",
-        "referralProgramP2": " y recibe 2 publicaciones por cada streamer que invites"
+        "title": "Agenda tu stream en\nla app de Qapla 🚀",
+        "startTrial": "Inicia tu Free Trial. ",
+        "noCardRequired": "No requiere tarjeta.",
+        "drops": "🪂 Recompensa a tu audiencia con Drops de Qoins",
+        "customAlerts": "🫡 Agrega valor a tus suscriptores en Twitch con alertas personalizadas",
+        "visibility": "👁 Visibilidad para tu contenido fuera de Twitch",
+        "startFreeTrial": "Activar Free Trial"
     },
     "QStore": {
         "QStore": "Q Store",

@@ -833,21 +833,6 @@ export async function addBoughtStreamsToStreamer(streamerUid, boughtStreams, exp
 }
 
 /**
- * Add one to the streamsRequested node of the given streamer in their subscriptionDetails
- * (streamsRequested in this node is the counter of events for their included on their subscription streams)
- * @param {string} streamerUid Streamer user identifier
- */
-export async function addToStreamsRequestedOnSubscriptionDetails(streamerUid) {
-    userStreamersRef.child(streamerUid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
-        if (!numberOfRequests) {
-            return 1;
-        }
-
-        return numberOfRequests + 1;
-    });
-}
-
-/**
  * Add one to the streamsRequested node of the given streamer in their boughtStreams/{package}
  * (streamsRequested in this node is the counter of events for their package that the user bought)
  * @param {string} streamerUid Streamer user identifier

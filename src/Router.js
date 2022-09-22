@@ -29,6 +29,7 @@ import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeCo
 import { useTranslation } from 'react-i18next'
 import OnBoarding from './components/OnBoarding/OnBoarding';
 import GiphyTextGenerator from './components/GiphyTextGenerator/GiphyTextGenerator';
+import RequestActivation from './components/RequestActivation/RequestActivation';
 
 window.onbeforeunload = function () {
     return true;
@@ -92,6 +93,9 @@ const Routes = ({ user, games, qoinsDrops }) => {
             </Route>
             <Route exact path='/onboarding'>
                 <OnBoarding user={user} />
+            </Route>
+            <Route exact path='/freeTrial'>
+                <RequestActivation user={user} />
             </Route>
             <Route exact path='/giphyTextGenerator/:uid/:text'>
                 <GiphyTextGenerator user={user} />

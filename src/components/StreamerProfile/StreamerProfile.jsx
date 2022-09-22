@@ -120,7 +120,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }, [switchState, user, history]);
 
     const createStream = () => {
-        history.push('/create');
+        // User never has been premium and has never used a Free Trial
+        if (user.premium === undefined && user.freeTrial === undefined) {
+            history.push('/freeTrial');
+        } else {
+            history.push('/create');
+        }
     }
 
     /**
@@ -179,6 +184,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
+                {}
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={9}>
                             <Grid container xs={12}>

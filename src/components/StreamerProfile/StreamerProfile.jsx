@@ -87,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamerProfile = ({ user, games }) => {
+const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const classes = useStyles();
     const history = useHistory();
     const [streams, setStreams] = useState({});
@@ -144,7 +144,12 @@ const StreamerProfile = ({ user, games }) => {
     }, [switchState, user, history]);
 
     const createStream = () => {
-        history.push('/create');
+        // User never has been premium and has never used a Free Trial
+        if (user.premium === undefined && user.freeTrial === undefined) {
+            history.push('/freeTrial');
+        } else {
+            history.push('/create');
+        }
     }
 
     /**
@@ -280,8 +285,9 @@ const StreamerProfile = ({ user, games }) => {
                                                 <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
                                             </Grid>
                                             <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px', marginLeft: 'auto', marginRight: '-2px', minWidth: 'fit-content' }}>
-                                                {(user.premium || user.freeTrial) && user.subscriptionDetails && user.currentPeriod &&
-                                                    <StreamsLeft subscriptionDetails={user.subscriptionDetails}
+                                                {(user.premium || user.freeTrial) && user.currentPeriod &&
+                                                    <StreamsLeft uid={user.uid}
+                                                        qoinsDrops={qoinsDrops}
                                                         renovationDate={user.currentPeriod.endDate} />
                                                 }
                                             </Grid>
@@ -320,6 +326,7 @@ const StreamerProfile = ({ user, games }) => {
                                                     date={formatDate(streams[streamId].timestamp)}
                                                     hour={formatHour(streams[streamId].timestamp)}
                                                     timestamp={streams[streamId].timestamp}
+                                                    drops={streams[streamId].drops}
                                                     onRemoveStream={onRemoveStream} />
                                             </Grid>
                                         ))}

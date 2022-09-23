@@ -101,7 +101,7 @@ const StreamersSignin = ({ user, title }) => {
                     }
                 }
             } else {
-                history.push('/onboarding');
+                history.push('/profile');
             }
         }
 

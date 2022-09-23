@@ -167,10 +167,24 @@ export async function subscribeStreamerToMailerLiteGroup(email, name) {
  * Subscribes a streamer to MailerLite group
  * @param {number} userTwitchId Twitch id of the user
  */
- export async function getTwitchUserDataCloudFunction(userTwitchId) {
+export async function getTwitchUserDataCloudFunction(userTwitchId) {
     const getTwitchUserData = functions.httpsCallable('getTwitchUserData');
     try {
         return await getTwitchUserData({ userTwitchId });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Activates a essential monthly subscription Free Trial for the given user
+ * @param {string} uid User identifier
+ * @param {string} email Email of the user
+ */
+export async function activateUserFreeTrial(uid, email) {
+    const activateFreeTrial = functions.httpsCallable('activateUserFreeTrial');
+    try {
+        return await activateFreeTrial({ uid, email });
     } catch (error) {
         console.log(error);
     }

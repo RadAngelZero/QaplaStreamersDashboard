@@ -162,9 +162,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image }) => {
-    // This information is not longer visible in the card but maybe in the future we would want to show it again
-    // const [participantsNumber, setParticipantsNumber] = useState(null);
+const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image, drops }) => {
     const [title, setTitle] = useState({ en: '', es: '' });
     const [stream, setStream] = useState(null);
     const [showRewardsOptions, setShowRewardsOptions] = useState(false);
@@ -183,23 +181,16 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const { t } = useTranslation();
 
     useEffect(() => {
-        async function getParticipantsNumber() {
+        async function getTitle() {
             if (streamType === SCHEDULED_EVENT_TYPE) {
-                /* const participants = await getStreamParticipantsNumber(streamId);
-                let participantsNumber = participants.exists() ? participants.val() : 0;
-                setParticipantsNumber(participantsNumber); */
-
                 const title = await getStreamTitle(streamId);
+
                 if (title.exists()) {
                     setTitle(title.val());
                 } else if (games['allGames'] && games['allGames'][game] && games['allGames'][game].gameName) {
                     setTitle({ en: games['allGames'][game].gameName });
                 }
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
-                /* const participants = await getPastStreamParticipantsNumber(user.uid, streamId);
-                let participantsNumber = participants.exists() ? participants.val() : 0;
-                setParticipantsNumber(participantsNumber); */
-
                 const title = await getPastStreamTitle(user.uid, streamId);
                 setTitle(title.val());
             } else if (streamType === PENDING_APPROVAL_EVENT_TYPE) {
@@ -237,7 +228,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
 
 
-        getParticipantsNumber();
+        getTitle();
         checkStreamStatus();
 
         if (streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions) {
@@ -278,7 +269,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const startStream = async (enableIn) => {
         try {
             setStartingStream(true);
-            const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, user.subscriptionDetails.redemptionsPerStream, enableIn);
+            const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, drops, enableIn);
 
             if (enableIn) {
                 listenToQoinsEnabled(streamId, (qoinsEnabled) => {
@@ -293,16 +284,17 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 });
             }
 
-            window.analytics.track('Stream started', {
-                streamId,
-                uid: user.uid,
-                timestamp: (new Date()).getTime()
-            });
             setStream(streamData);
             if (!openStreamDialog) {
                 setOpenStreamStartedDialog(true);
             }
             setStartingStream(false);
+
+            window.analytics.track('Stream started', {
+                streamId,
+                uid: user.uid,
+                timestamp: (new Date()).getTime()
+            });
 
             return streamData;
         } catch (error) {
@@ -321,7 +313,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
 
         try {
             setClosingStream(true);
-            await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward, stream.qoinsRewardWebhookId);
+            await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward, stream.qoinsRewardWebhookId, drops);
 
             window.analytics.track('Stream finished', {
                 streamId,

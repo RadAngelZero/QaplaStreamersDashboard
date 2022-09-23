@@ -180,7 +180,7 @@
             "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
         },
         "whatAreYouPlaying": "What are you going to stream?",
-        "pickACategory": "Pick a category",
+        "pickACategory": "Choose a category",
         "categoryPickerPlaceholder": "E.g., Just Chatting",
         "when": "When?",
         "date": "Date",
@@ -194,20 +194,16 @@
         },
         "advanced": "Advenced (Optional)",
         "feelingCreative": "Feeling creative? Give your stream a cool name",
-        "streamTitle": "Stream title (optional)",
-        "streamTitlePlaceholder": "Trolling on Apex Arena",
-        "streamDescription": "Stream description",
-        "subtitle": "Subtitle",
-        "descriptionPlaceholder": "Share what your stream is going to be about",
+        "streamTitle": "Stream title ",
+        "optional": "(optional)",
+        "streamTitleDescription": "Give your stream a personal touch to increase engagement",
+        "streamTitlePlaceholder": "i.e., Reacting to cat videos",
+        "dropsTitle": "Drops limit",
+        "dropsDescription": "Set the max amount of Qoins Drops that could be redeemed during your live stream",
+        "maxLimit": "Max limit",
         "submit": "Submit",
-        "confirmDialog": {
-            "almostDone": "We are almost done",
-            "confirmDetails": "Just confirm the details to continue",
-            "dateAndHour": "Date and hour",
-            "localTime": "Local time"
-        },
         "successDialog": {
-            "description": "Request sent for approval successfully. We’ll post it as soon as possible"
+            "description": "Your stream has been scheduled successfully and is posted in the app"
         }
     },
     "CheersSettings": {
@@ -344,18 +340,13 @@
         "backToDashboard": "Back to dashboard"
     },
     "RequestActivation": {
-        "title": "Your publication is\nready to be sent!",
-        "descriptionP1": "Start your ",
-        "descriptionHiglight": "Free Trial",
-        "descriptionP2": " with your referral code\nto be able to publish your streams",
-        "buyAMembership": "Reward your community and give your content visibility with a Qapla membership",
-        "referralCode": "Referral code",
-        "startFreeTrial": "Start Free Trial",
-        "dontHaveACode": "Don't have a code?",
-        "subscribe": "Subscribe to publish",
-        "referralProgramP1": "or invite other streamers with you ",
-        "qreatorCode": "Qreator code",
-        "referralProgramP2": " and receive 2 posts for each streamer you invite"
+        "title": "Schedule your streams on\nthe Qapla app 🚀",
+        "startTrial": "Start Free Trial. ",
+        "noCardRequired": "No credit card required.",
+        "drops": "🪂 Reward your audience with Qoins Drops",
+        "customAlerts": "🫡 Add value to your Twitch subscribers with custom alerts",
+        "visibility": "👁 Visibility for your content outside of Twitch",
+        "startFreeTrial": "Start Free Trial"
     },
     "QStore": {
         "QStore": "Q Store",
@@ -366,8 +357,8 @@
         "acquire": "Acquire"
     },
     "StreamsLeft": {
-        "streams": "Remaining posts: ",
-        "leftStreams": "{{available}} of {{total}}",
+        "drops": "Remaining drops: ",
+        "dropsLeft": "{{available}} of {{total}}",
         "renewsOn": "Renews on {{month}} {{date}}",
         "membershipExpired": "Membership expired on {{month}} {{date}}"
     },

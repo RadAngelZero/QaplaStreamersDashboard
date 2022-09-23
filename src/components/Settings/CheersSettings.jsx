@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Checkbox, makeStyles, Grid, Card, CardMedia, Tooltip, FormControlLabel } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
+import GridSelector from '../GridSelector/GridSelector';
+
 import {
     CHEERS_URI,
     LEFT,
@@ -15,6 +17,9 @@ import Step1 from './../../assets/addCheersTutorial1.jpg';
 import Step2 from './../../assets/addCheersTutorial2.jpg';
 import Step3 from './../../assets/addCheersTutorial3.jpg';
 import Step4 from './../../assets/addCheersTutorial4.jpg';
+import interactionImage from '../../assets/Interaction.png';
+import qaplaLogoLeft from '../../assets/Qapla-On-Overlay-Left.png';
+import qaplaLogoRight from '../../assets/Qapla-On-Overlay-Right.png';
 import ContainedButton from '../ContainedButton/ContainedButton';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import { getStreamerAlertsSettings, getStreamerChallengeCategory, setAlertSetting, writeTestCheer } from './../../services/database';
@@ -92,6 +97,8 @@ const CheersSettings = ({ uid, twitchId }) => {
     const [side, setSide] = useState(LEFT);
     const [showQaplaChallengeProgress, setShowQaplaChallengeProgress] = useState(false);
     const [isUserParticipantOfQaplaChallenge, setIsUserParticipantOfQaplaChallenge] = useState(false);
+    const [overlayAreaSelected, setOverlayAreaSelected] = useState(0);
+    const [overlayAreaSelectedQaplaLogo, setOverlayAreaSelectedQaplaLogo] = useState(0);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -208,6 +215,91 @@ const CheersSettings = ({ uid, twitchId }) => {
                             value={cheersURL} />
                     </Grid>
                 </Grid>
+            </Grid>
+            <Grid container className={classes.instructionsMargin}>
+                <div style={{
+                    width: '640px',
+                    height: '480px',
+                    display: 'flex',
+                }}>
+                    <GridSelector
+                        selected={overlayAreaSelected}
+                        onAreaClick={setOverlayAreaSelected}
+                        rows={2}
+                        columns={2}
+                        backgroundImage="https://static.bandainamcoent.eu/high/elden-ring/elden-ring/03-news/Starter_Guide/Elden_Ring_game_screen.jpg"
+                        Chilren={() => (<img src={interactionImage} alt='Interaction'
+                            style={{
+                                flex: 1,
+                                objectFit: 'contain',
+                                width: '100%',
+                                height: '100%',
+                                padding: '42px',
+                                webkitBoxSizing: 'border-box',
+                                mozBoxSizing: 'border-box',
+                                boxSizing: 'border-box',
+                            }}
+                        />)}
+                    />
+                </div>
+            </Grid>
+            <Grid container className={classes.instructionsMargin}>
+                <div style={{
+                    width: '640px',
+                    height: '480px',
+                    display: 'flex',
+                }}>
+                    <GridSelector
+                        selected={overlayAreaSelectedQaplaLogo}
+                        onAreaClick={setOverlayAreaSelectedQaplaLogo}
+                        columns={2}
+                        backgroundImage="https://static.bandainamcoent.eu/high/elden-ring/elden-ring/03-news/Starter_Guide/Elden_Ring_game_screen.jpg"
+                        // Chilren={() => (<img src={interactionImage} alt='Interaction'
+                        //     style={{
+                        //         flex: 1,
+                        //         objectFit: 'contain',
+                        //         width: '100%',
+                        //         height: '100%',
+                        //         padding: '42px',
+                        //         webkitBoxSizing: 'border-box',
+                        //         mozBoxSizing: 'border-box',
+                        //         boxSizing: 'border-box',
+                        //     }}
+                        // />)}
+                        Variants={[
+                            () => (
+                                <div style={{
+                                    display: 'flex',
+                                    flex: 1,
+                                    height: '100%',
+                                    alignItems: 'flex-end',
+                                }}>
+                                    <img src={qaplaLogoLeft} alt="qapla logo left"
+                                        style={{
+                                            width: '20%',
+                                            objectFit: 'scale-down',
+                                        }} />
+                                </div>
+                            )
+                            ,
+                            () => (
+                                <div style={{
+                                    display: 'flex',
+                                    flex: 1,
+                                    height: '100%',
+                                    alignItems: 'flex-end',
+                                    justifyContent: 'flex-end',
+                                }}>
+                                    <img src={qaplaLogoRight} alt="qapla logo right"
+                                        style={{
+                                            width: '20%',
+                                            objectFit: 'scale-down',
+                                        }} />
+                                </div>
+                            )
+                        ]}
+                    />
+                </div>
             </Grid>
             <InstructionSection title={t('CheersSettings.instruction0.title')}
                 description={<>{t('CheersSettings.instruction0.description')} <b>{t('CheersSettings.instruction0.descriptionBold')}</b></>} />

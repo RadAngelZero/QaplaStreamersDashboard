@@ -291,7 +291,6 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
             console.log(error);
         }
 
-        console.log(backgroundImage.val());
         streamsRef.child(streamRef.key).set({
             idStreamer: uid,
             title: { en: optionalData.title, es: optionalData.title } ,
@@ -326,7 +325,8 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
             optionalData,
             createdAt,
             stringDate,
-            drops
+            drops,
+            image: backgroundImage.val()
         });
 
         return await premiumEventsSubscriptionRef.child(uid).child(streamRef.key).set({
@@ -1131,6 +1131,8 @@ export function listenToStreamerDrops(uid, callback) {
 export function removeListenerFromStreamerDrops(uid) {
     return userStreamerDropsRef.child(uid).child('qoinsDrops').off('value');
 }
+
+////////////////////////
 // Streamer Deep Links
 ////////////////////////
 

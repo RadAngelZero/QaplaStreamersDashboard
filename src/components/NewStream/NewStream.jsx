@@ -254,7 +254,19 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                         });
                     }
 
-                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate, dropsForStream);
+                    let titles = {
+                        es: '🪂 Únete y obtén Drops de Qoins',
+                        en: '🪂 Join to get Qoins Drops'
+                    };
+
+                    if (optionalData.title) {
+                        titles = {
+                            es: optionalData.title,
+                            en: optionalData.title
+                        };
+                    }
+
+                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), titles, (new Date()).getTime(), stringDate, dropsForStream);
 
                     window.analytics.track('Stream requested', {
                         selectedGame,

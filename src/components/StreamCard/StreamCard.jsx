@@ -30,6 +30,7 @@ import { auth } from '../../services/firebase';
 import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
 import { sendCustomMessage } from '../../services/functions';
 import { generateStreamDynamicLink } from '../../services/dynamicLinks';
+import { getCurrentLanguage } from '../../utilities/i18n';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -416,6 +417,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     }
 
     if (game && !hideStream) {
+        const currentLanguage = getCurrentLanguage();
         return (
             <Card className={classes.eventCard} style={style}>
                 <div className={classes.relativeContainer}>
@@ -439,7 +441,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 </div>
                 <div className={classes.eventCardContent}>
                     <p className={classes.eventCardTitle}>
-                        {title && title['en'] ? title['en'] : ''}
+                        {title && title[currentLanguage] ? title[currentLanguage] : ''}
                     </p>
                     {streamType !== PAST_STREAMS_EVENT_TYPE && !showRewardsOptions &&
                         <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>

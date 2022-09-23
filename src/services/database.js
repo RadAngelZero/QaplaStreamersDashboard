@@ -1,4 +1,5 @@
 import { SCHEDULED_EVENT_TYPE } from '../utilities/Constants';
+import { getCurrentLanguage } from '../utilities/i18n';
 import { database, databaseServerValue } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
@@ -215,12 +216,14 @@ export function removeQoinsEnabledListener(streamId) {
  * @param {string} hour Hour in format hh:mm
  * @param {string} streamType One of 'exp' or 'tournament'
  * @param {timestamp} timestamp Timestamp based on the given date and hour
- * @param {object} optionalData Customizable data for events
+ * @param {object} titles Object with titles in differente languages. { en: 'Title', es: 'Titulo' }
+ * @param {string} titles.es Spanish version of the title
+ * * @param {string} titles.en English version of the title
  * @param {number} createdAt timestamp of when the request was created
  * @param {string} stringDate Temporary field just to detect a bug
  * @param {number} drops Max number of drops to use in the stream
  */
-export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, optionalData, createdAt, stringDate, drops) {
+export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, titles, createdAt, stringDate, drops) {
     const dropsUsedBeforeTransaction = await userStreamerDropsRef.child(uid).child('qoinsDrops').child('used').once('value');
 
     /**
@@ -254,6 +257,7 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
         await streamsCardsImagesRef.child(game).child('front').set(imageIndex.val() + 1);
     }
 
+    const userLanguage = getCurrentLanguage();
     if (transactionResult.committed && (!dropsUsedBeforeTransaction.exists() || transactionResult.snapshot.val().used !== dropsUsedBeforeTransaction.val())) {
         const streamRef = streamsRef.push();
         let data = { shortLink: '' };
@@ -275,8 +279,8 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
                             iosAppStoreId: '1485332229'
                         },
                         socialMetaTagInfo: {
-                            socialTitle: optionalData.eventTitle,
-                            socialDescription: 'Evento Qapla',
+                            socialTitle: titles[userLanguage],
+                            socialDescription: userLanguage === 'es' ? 'Evento Qapla' : 'Qapla Event',
                             socialImageLink: backgroundImage.val()
                         }
                     },
@@ -293,8 +297,8 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
 
         streamsRef.child(streamRef.key).set({
             idStreamer: uid,
-            title: { en: optionalData.title, es: optionalData.title } ,
-            titulo: optionalData.title,
+            title: titles,
+            titulo: titles[userLanguage],
             platform: 'allGames',
             game,
             streamingPlatformImage: 'https://cdn.discordapp.com/attachments/696141270757933086/717152413819077050/Logo_Twitch.png',
@@ -322,7 +326,6 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
             status: SCHEDULED_EVENT_TYPE,
             streamType,
             timestamp,
-            optionalData,
             createdAt,
             stringDate,
             drops,

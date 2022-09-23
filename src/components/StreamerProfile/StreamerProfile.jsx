@@ -295,7 +295,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                     </Grid>
                                 </Grid>
                                 <Grid item xs={12} className={styles.streamsCardContainer}>
-                                    <Grid container justifyContent='center' spacing={4} className={styles.innerStreamsCardContainer}>
+                                    <Grid container spacing={4} className={styles.innerStreamsCardContainer}>
                                         <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
                                             <Card className={styles.createEventCard} onClick={createStream}>
                                                 <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>

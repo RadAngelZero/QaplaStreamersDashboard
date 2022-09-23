@@ -284,7 +284,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                         <GreenSwitch checked={reactionsEnabled}
                             onChange={(e) => handleCheckbox(e)} />
                     </div>
-                    <div className={style.onlyQoinsReaction}> 
+                    {/* <div className={style.onlyQoinsReaction}> 
                         <p className={style.p}>Only Qoins Reactions</p>
                         <input
                             className={style.input_checkbox}
@@ -293,7 +293,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                             checked={qoinsReaction}
                             onChange={(e)=>handleQoinsReactions(e)}/>
                             <label for="switch"></label>
-                    </div>
+                    </div> */}
                 </div>
                 </>
             :

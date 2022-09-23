@@ -202,6 +202,11 @@
         "dropsTitle": "Límite de Drops",
         "dropsDescription": "Cantidad máxima de Drops de Qoins que se podrán canjear durante tu transmisión",
         "maxLimit": "Límite máximo",
+        "dropsAboveLimitErrorP1": "Tienes ",
+        "dropsAboveLimitErrorP2": "{{drops}} drops disponibles. ",
+        "dropsAboveLimitErrorP3": "Por favor reduce el límite de drops.",
+        "setValidAmountOfDropsP1": "El límite de drops no puede ser 0. Tienes ",
+        "setValidAmountOfDropsP2": "{{drops}} drops disponibles",
         "submit": "Enviar",
         "successDialog": {
             "description": "¡Stream agendado! Tu stream ha sido publicado en la app"

@@ -201,6 +201,11 @@
         "dropsTitle": "Drops limit",
         "dropsDescription": "Set the max amount of Qoins Drops that could be redeemed during your live stream",
         "maxLimit": "Max limit",
+        "dropsAboveLimitErrorP1": "You have ",
+        "dropsAboveLimitErrorP2": "{{drops}} drops available. ",
+        "dropsAboveLimitErrorP3": "Please lower the drops limit.",
+        "setValidAmountOfDropsP1": "Drops limit can’t be set to 0. You still have ",
+        "setValidAmountOfDropsP2": "{{drops}} drops available",
         "submit": "Submit",
         "successDialog": {
             "description": "Your stream has been scheduled successfully and is posted in the app"

@@ -223,7 +223,7 @@ export function removeQoinsEnabledListener(streamId) {
  * @param {string} stringDate Temporary field just to detect a bug
  * @param {number} drops Max number of drops to use in the stream
  */
-export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, titles, createdAt, stringDate, drops) {
+export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, titles, createdAt, stringDate, drops, onSuccess) {
     const dropsUsedBeforeTransaction = await userStreamerDropsRef.child(uid).child('qoinsDrops').child('used').once('value');
 
     /**
@@ -332,10 +332,12 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
             image: backgroundImage.val()
         });
 
-        return await premiumEventsSubscriptionRef.child(uid).child(streamRef.key).set({
+        await premiumEventsSubscriptionRef.child(uid).child(streamRef.key).set({
             approved: true,
             timestamp
         });
+
+        return onSuccess();
     }
 }
 

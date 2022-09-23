@@ -128,8 +128,9 @@ const NewStream = ({ user, games, qoinsDrops }) => {
     const [clockOpen, setClockOpen] = useState(false);
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [gamesData, setGamesData] = useState([]);
-    const [dropsForStream, setDropsForStream] = useState(qoinsDrops.left && qoinsDrops.left < 50 ? qoinsDrops.left : 50);
+    const [dropsForStream, setDropsForStream] = useState(null);
     const [lockSendButton, setLockSendButton] = useState(false);
+    const [dropsError, setDropsError] = useState(null);
 
     useEffect(() => {
         let gameList = [];
@@ -147,7 +148,11 @@ const NewStream = ({ user, games, qoinsDrops }) => {
 
             setGamesData(tempGamesData);
         }
-    }, [games.allGames, user]);
+
+        if (dropsForStream === null && qoinsDrops.original > 0) {
+            setDropsForStream(qoinsDrops.original - qoinsDrops.used < 50 ? qoinsDrops.original - qoinsDrops.used : 50);
+        }
+    }, [games.allGames, user, qoinsDrops, dropsForStream]);
 
     const optionalDataReducer = (state, action) => {
         // We don´t need this to be a reducer anymore, we should change it later
@@ -181,7 +186,30 @@ const NewStream = ({ user, games, qoinsDrops }) => {
     };
 
     const setDrops = (drops) => {
-        if (drops >= 0 && drops <= qoinsDrops.left) {
+        if (drops >= 0) {
+            if (drops > qoinsDrops.original - qoinsDrops.used) {
+                setDropsError(
+                    <p style={{ fontSize: 12, fontWeight: '400', color: '#FF0000', marginTop: 8 }}>
+                        {t('NewStream.dropsAboveLimitErrorP1')}
+                        <span style={{ color: '#00FFDD', fontSize: 12 }}>
+                            {t('NewStream.dropsAboveLimitErrorP2', { drops: qoinsDrops.original - qoinsDrops.used })}
+                        </span>
+                        {t('NewStream.dropsAboveLimitErrorP3')}
+                    </p>
+                );
+            } else if (drops === 0) {
+                setDropsError(
+                    <p style={{ fontSize: 12, fontWeight: '400', color: '#FF0000', marginTop: 8 }}>
+                        {t('NewStream.setValidAmountOfDropsP1')}
+                        <span style={{ color: '#00FFDD', fontSize: 12 }}>
+                            {t('NewStream.setValidAmountOfDropsP2', { drops: qoinsDrops.original - qoinsDrops.used })}
+                        </span>
+                    </p>
+                );
+            } else {
+                setDropsError(null);
+            }
+
             setDropsForStream(drops);
         }
     }
@@ -266,14 +294,27 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                         };
                     }
 
-                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), titles, (new Date()).getTime(), stringDate, dropsForStream);
-
-                    window.analytics.track('Stream requested', {
+                    await createNewStreamRequest(
+                        user.uid,
+                        streamerData,
                         selectedGame,
-                        selectedDate: selectedDate.getTime(),
-                        uid: user.uid
-                    });
-                    setOpenSuccessDialog(true);
+                        UTCDate,
+                        UTCTime,
+                        selectedEvent,
+                        selectedDate.getTime(),
+                        titles,
+                        (new Date()).getTime(),
+                        stringDate,
+                        dropsForStream,
+                        () => {
+                            window.analytics.track('Stream requested', {
+                                selectedGame,
+                                selectedDate: selectedDate.getTime(),
+                                uid: user.uid
+                            });
+                            setOpenSuccessDialog(true);
+                        }
+                    );
                 }
             } else {
                 alert(t('NewStream.alerts.beforePlanExpiration'));
@@ -444,15 +485,16 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                             fullWidth={true}
                                             value={dropsForStream}
                                             onChange={(e) => setDrops(Number(e.target.value))}
-                                            type={'Number'}
+                                            type='Number'
                                         />
+                                        {dropsError}
                                     </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
                     <Button
-                        disabled={lockSendButton}
+                        disabled={lockSendButton || dropsError || !dropsForStream}
                         className={styles.button}
                         onClick={submitEvent}>
                         {lockSendButton ?

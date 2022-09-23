@@ -33,6 +33,10 @@ const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
+const streamersDeepLinksRef = database.ref('/StreamersDeepLinks');
+const dashboardStreamersVisitsCounterRef = database.ref('/DashboardStreamersVisitsCounter');
+const uberduckRequestsRef = database.ref('/UberduckRequests');
+const streamerCashOutRef = database.ref('/StreamersCashOut');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1006,4 +1010,92 @@ export async function getInteractionsRewardData(uid) {
  */
  export async function saveGiphyText(uid, data) {
     return giphyTextRequestsRef.child(uid).set(data);
+}
+
+////////////////////////
+// Streamer Deep Links
+////////////////////////
+
+/**
+ * Save the deep link of the streamer on database
+ * @param {string} uid User identifier
+ * @param {string} url Deep link to save
+ */
+export async function saveStreamerDeepLink(uid, url) {
+    return await streamersDeepLinksRef.child(uid).set(url);
+}
+
+/**
+ * Gets the streamer deep link
+ * @param {string} uid User identifier
+ */
+export async function getStreamerDeepLink(uid) {
+    return await streamersDeepLinksRef.child(uid).once('value');
+}
+
+////////////////////////
+// Visits counter
+////////////////////////
+
+/**
+ * Set the number of visits the user has done to the dashboard (used to show optional profile-link onboarding every 3 times the
+ * user enters the dashboard)
+ * @param {string} uid User identifier
+ * @param {number} count Number of visits to set
+ */
+export async function setVisitsCounter(uid, count) {
+    return await dashboardStreamersVisitsCounterRef.child(uid).set(count);
+}
+
+/**
+ * Gets the number of visits of the user
+ * @param {string} uid User identifier
+ */
+export async function getNumberOfVisits(uid) {
+    return await dashboardStreamersVisitsCounterRef.child(uid).once('value');
+}
+// Uberduck requests
+////////////////////////
+
+/**
+ * Listen for the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ * @param {function} callback Handler for listener results
+ */
+export async function listenForUberduckAudio(donationId, callback) {
+    uberduckRequestsRef.child(donationId).on('value', callback);
+}
+
+/**
+ * Remove the listene from the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ */
+export async function removeListenerForUberduckAudio(donationId) {
+    uberduckRequestsRef.child(donationId).off('value');
+}
+////////////////////////
+// Streamer Cash Out
+////////////////////////
+
+/**
+ * Saves the request of cash out for the given streamer
+ * @param {string} uid User identifier
+ * @param {number} amountQoins Amount of Qoins to remove from the streamer balance
+ * @param {number} amountBits Amount of bits to deliver to the streamer
+ */
+export async function saveStreamerCashOutRequest(uid, amountQoins, amountBits) {
+    const date = new Date();
+
+    const qoinsRemoved = await userStreamersRef.child(uid).child('qoinsBalance').transaction((qoinsBalance) => {
+        return qoinsBalance - amountQoins;
+    });
+
+    if (qoinsRemoved.committed) {
+        return await streamerCashOutRef.child(uid).push({
+            amountQoins,
+            amountBits,
+            delivered: false,
+            timestamp: date.getTime()
+        });
+    }
 }

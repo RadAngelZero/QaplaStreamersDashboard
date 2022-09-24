@@ -169,8 +169,8 @@ const NewStream = ({ user, games, qoinsDrops }) => {
 
     const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
 
-    // Minimum valid date is 24 hours since the current date
-    const minDate = new Date((new Date()).getTime() + 86400000);
+    // Minimum valid date is 5 minutes from the current date
+    const minDate = new Date((new Date()).getTime() + 300000);
 
     // The default date is the minDate + 15 minutes, to avoid show the error feedback when the streamer open the screen
     const [selectedDate, setSelectedDate] = useState(new Date(minDate.getTime() + 900000));
@@ -228,7 +228,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
 
         if (selectedDate < minDate) {
             setLockSendButton(false);
-            alert(t('NewStream.alerts.before24h'));
+            alert(t('NewStream.alerts.beforeXminutes'));
             return;
         }
         if (!selectedGame) {
@@ -387,7 +387,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                     onChange={handleDateChange}
                                     defaultValue={new Date()}
                                     minDate={minDate}
-                                    minDateMessage={t('NewStream.alerts.before24h')}
+                                    minDateMessage={t('NewStream.alerts.beforeXminutes')}
                                     format='DD-MM-YY ddd'
                                     style={{width:'274px', height:'56px'}}
                                     keyboardIcon={
@@ -418,7 +418,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                     onClose={() => setClockOpen(false)}
                                     autoOk
                                     error={selectedDate <= minDate}
-                                    helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.before24h')}
+                                    helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.beforeXminutes')}
                                     value={displayDate}
                                     placeholder='08:00 AM'
                                     onChange={handleDateChange}

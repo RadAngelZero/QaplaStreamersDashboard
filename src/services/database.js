@@ -29,7 +29,6 @@ const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
 const qaplaChallengeRef = database.ref('/QaplaChallenge');
-const qStoreRef = database.ref('/QStore');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
@@ -1015,17 +1014,6 @@ export async function getQlanIdWithQreatorCode(qreatorCode) {
  */
 export async function getStreamerChallengeCategory(streamerUid) {
     return await qaplaChallengeRef.child(streamerUid).child('category').once('value');
-}
-
-////////////////////////
-// Q Store
-////////////////////////
-
-/**
- * Gets all the items in the Q-Store
- */
-export async function getQStoreItems() {
-    return await qStoreRef.once('value');
 }
 
 ////////////////////////

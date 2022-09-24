@@ -174,7 +174,7 @@
     "NewStream": {
         "alerts": {
             "noChannelPoints": "Apparently you don't have channel points on Twitch 😦 Get your affiliate so you can give rewards and post your streams on Qapla :D\n\nhttps://help.twitch.tv/s/article/joining-the-affiliate-program",
-            "before24h": "All requests must be sent at least 24 hours before the stream",
+            "beforeXminutes": "All requests must be sent at least 5 minutes before the stream",
             "missingData": "Verify that all fields have been filled correctly",
             "streamsLimit": "You have reached the limit of streams for your subscription",
             "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
@@ -352,14 +352,6 @@
         "customAlerts": "🫡 Add value to your Twitch subscribers with custom alerts",
         "visibility": "👁 Visibility for your content outside of Twitch",
         "startFreeTrial": "Start Free Trial"
-    },
-    "QStore": {
-        "QStore": "Q Store",
-        "description": "Earn rewards for your community with your $QOINS, or set a Qoins goal to reach a reward.",
-        "legend": "🇲🇽 Mexico  🇺🇸 USA  🌐 International",
-        "requestBits": "Request Bits",
-        "setGoal": "Create a goal of Qoins",
-        "acquire": "Acquire"
     },
     "StreamsLeft": {
         "drops": "Remaining drops: ",

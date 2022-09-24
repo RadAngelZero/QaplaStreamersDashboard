@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { Video } from '@giphy/react-components';
 
@@ -271,7 +271,6 @@ const LiveDonations = () => {
 
             listenToOverlayStatus();
         }
-        console.log(donationQueue);
     }, [streamerId, streamerUid, donationQueue, listenersAreSetted, isPlayingAudio, reactionsEnabled]);
 
     function finishReaction(donation) {

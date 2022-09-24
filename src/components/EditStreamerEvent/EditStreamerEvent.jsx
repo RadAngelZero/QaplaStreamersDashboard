@@ -15,7 +15,7 @@ import {
     InputAdornment
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { useParams, useLocation } from 'react-router';
+import { useParams, useLocation } from 'react-router-dom';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import DayJsUtils from '@date-io/dayjs';
 import { useTranslation } from 'react-i18next'

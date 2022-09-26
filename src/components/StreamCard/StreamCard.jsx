@@ -438,248 +438,148 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         return (
             <Card className={classes.eventCard} style={style}>
                 <div className={classes.relativeContainer}>
-                    <div
-                        onAnimationEnd={() => {
-                            setShareGrowAnimationPlay("false");
-                            setCopiedEnterAnimationPlay("false");
-                            setShareShrinkAnimationPlay("false");
-                            setCopiedExitAnimationPlay("false");
-                            setPlayBothEnterAnimation("false");
-                            setPlayBothExitAnimation("false");
-                        }}
-                        playGrowAnimation={shareGrowAnimationPlay}
-                        playShrinkAnimation={shareShrinkAnimationPlay}
-                        playCopiedEnterAnimation={copiedEnterAnimationPlay}
-                        playCopiedExitAnimetion={copiedExitAnimationPlay}
-                        playBothEnterAnimation={playBothEnterAnimation}
-                        playBothExitAnimation={playBothExitAnimation}
-                        className="share-container"
-                        style={{
-                            position: 'absolute',
-                            display: 'flex',
-                            backgroundColor: shareCopied ? '#3B4BF9' : '#1B1D21',
-                            borderRadius: '5px',
-                            height: '28px',
-                            bottom: '18px',
-                            left: '18px',
-                            width: shareHover || shareCopied ? '86px' : '28px',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                        onMouseEnter={() => {
-                            if (isTouch) return;
-                            setShareHover(true);
-                            actualShareHover.current = true;
-                            if (!shareCopied) {
-                                setShareGrowAnimationPlay("true");
-                            }
-                        }}
-                        onMouseLeave={() => {
-                            setShareHover(false);
-                            actualShareHover.current = false;
-                            if (shareCopied || isTouch) return;
-                            setShareShrinkAnimationPlay("true");
-                        }}
-                        onMouseDown={() => {
-                            if (shareCopied) return;
-                            setShareCopied(true);
-                            if (isTouch) {
-                                setPlayBothEnterAnimation("true");
-                            } else {
-                                setCopiedEnterAnimationPlay("true");
-                            }
-                            copiedLink();
-                        }}
-                        onMouseUp={() => {
-                            if (shareCopied) return;
-                            setShareCopied(false);
-                        }}
-                        onTouchStart={() => {
-                            setIsTouch(true);
-                        }}
-                        onTouchEnd={() => {
-                            setIsTouch(true);
-                            setShareHover(false);
-                        }}
-                    >
-                        <style>{`
-                            @keyframes widthGrow {
-                                from {
-                                    width: 28px;
-                                    }
-                                to {
-                                    width: 86px;
-                                }
-                            }
-                            @keyframes widthShrink {
-                                from {
-                                    width: 86px;
-                                    }
-                                to {
-                                    width: 28px;
-                                }
-                            }
-                            @keyframes copiedEnter {
-                                from {
-                                    background-color: #1B1D21;
-                                    }
-                                to {
-                                    background-color: #3B4BF9;
-                                }
-                            }
-                            @keyframes copiedExit {
-                                from {
-                                    background-color: #3B4BF9;
-                                    }
-                                to {
-                                    background-color: #1B1D21;
-                                }
-                            }
-                            @keyframes bothEnter {
-                                from {
-                                    background-color: #1B1D21;
-                                    width: 28px;
-                                    }
-                                to {
-                                    background-color: #3B4BF9;
-                                    width: 86px;
-                                }
-                            }
-                            @keyframes bothExit {
-                                from {
-                                    background-color: #3B4BF9;
-                                    width: 86px;
-                                    }
-                                to {
-                                    background-color: #1B1D21;
-                                    width: 28px;
-                                }
-                            }
-                            .share-container[playBothEnterAnimation="true"] {
-                                animation: bothEnter 0.5s ease-in-out 1;
-                            }
-                            .share-container[playBothExitAnimation="true"] {
-                                animation: bothExit 0.5s ease-in-out 1;
-                            }
-                            .share-container[playGrowAnimation="true"] {
-                                animation: widthGrow 0.5s ease-in-out 1;
-                            }
-                            .share-container[playShrinkAnimation="true"] {
-                                animation: widthShrink 0.5s ease-in-out 1;
-                            }
-                            .share-container[playCopiedEnterAnimation="true"] {
-                                animation: copiedEnter 0.5s ease-in-out 1;
-                            }
-                            .share-container[playCopiedExitAnimetion="true"] {
-                                animation: copiedExit 0.5s ease-in-out 1;
-                            }
-
-                `}</style>
-                        <p
-                            playCopiedEnterAnimation={copiedEnterAnimationPlay}
-                            playCopiedExitAnimation={copiedExitAnimationPlay}
-                            playBothEnterAnimation={playBothEnterAnimation}
-                            playBothExitAnimation={playBothExitAnimation}
-                            style={{
-                                display: 'flex',
-                                color: '#fff',
-                                fontSize: '11px',
-                                fontWeight: '700',
-                                lineHeight: '13px',
-                                letterSpacing: '0px',
-                                textAlign: 'center',
-                                width: shareCopied ? '100%' : '0%',
-                                overflow: 'hidden',
-                                justifyContent: 'center',
-                                whiteSpace: 'nowrap',
-                            }}
-                            className="copied-text">
-                            <style>{`
-
-                                @keyframes copiedTextGrow {
-                                    from {
-                                        width: 0%;
-                                        }
-                                    to {
-                                        width: 100%;
-                                    }
-                                }
-                                @keyframes copiedTextShrink {
-                                    from {
-                                        width: 100%;
-                                        }
-                                    to {
-                                        width: 0%;
-                                    }
-                                }
-
-                                .copied-text[playCopiedEnterAnimation="true"] {
-                                    animation: copiedTextGrow 0.5s ease-in-out 1;
-                                }
-                                .copied-text[playCopiedExitAnimation="true"] {
-                                    animation: copiedTextShrink 0.5s ease-in-out 1;
-                                }
-                                .copied-text[playBothEnterAnimation="true"] {
-                                    animation: copiedTextGrow 0.5s ease-in-out 1;
-                                }
-                                .copied-text[playBothExitAnimation="true"] {
-                                    animation: copiedTextShrink 0.5s ease-in-out 1;
-                                }
-                                `}</style>
-                            {'🔗 Copiado'}
-                        </p>
+                    {streamType === SCHEDULED_EVENT_TYPE &&
                         <div
+                            onAnimationEnd={() => {
+                                setShareGrowAnimationPlay("false");
+                                setCopiedEnterAnimationPlay("false");
+                                setShareShrinkAnimationPlay("false");
+                                setCopiedExitAnimationPlay("false");
+                                setPlayBothEnterAnimation("false");
+                                setPlayBothExitAnimation("false");
+                            }}
+                            playGrowAnimation={shareGrowAnimationPlay}
+                            playShrinkAnimation={shareShrinkAnimationPlay}
                             playCopiedEnterAnimation={copiedEnterAnimationPlay}
-                            playCopiedExitAnimation={copiedExitAnimationPlay}
+                            playCopiedExitAnimetion={copiedExitAnimationPlay}
                             playBothEnterAnimation={playBothEnterAnimation}
                             playBothExitAnimation={playBothExitAnimation}
+                            className="share-container"
                             style={{
+                                position: 'absolute',
                                 display: 'flex',
-                                flex: 1,
-                                flexDirection: 'row',
-                                flexWrap: 'nowrap',
+                                backgroundColor: shareCopied ? '#3B4BF9' : '#1B1D21',
+                                borderRadius: '5px',
+                                height: '28px',
+                                bottom: '18px',
+                                left: '18px',
+                                width: shareHover || shareCopied ? '86px' : '28px',
                                 justifyContent: 'center',
-                                // margin: '0px 15px',
-                                width: shareCopied ? '0%' : '100%',
+                                alignItems: 'center',
                             }}
-                            className="share-display-container"
+                            onMouseEnter={() => {
+                                if (isTouch) return;
+                                setShareHover(true);
+                                actualShareHover.current = true;
+                                if (!shareCopied) {
+                                    setShareGrowAnimationPlay("true");
+                                }
+                            }}
+                            onMouseLeave={() => {
+                                setShareHover(false);
+                                actualShareHover.current = false;
+                                if (shareCopied || isTouch) return;
+                                setShareShrinkAnimationPlay("true");
+                            }}
+                            onMouseDown={() => {
+                                if (shareCopied) return;
+                                setShareCopied(true);
+                                if (isTouch) {
+                                    setPlayBothEnterAnimation("true");
+                                } else {
+                                    setCopiedEnterAnimationPlay("true");
+                                }
+                                copiedLink();
+                            }}
+                            onMouseUp={() => {
+                                if (shareCopied) return;
+                                setShareCopied(false);
+                            }}
+                            onTouchStart={() => {
+                                setIsTouch(true);
+                            }}
+                            onTouchEnd={() => {
+                                setIsTouch(true);
+                                setShareHover(false);
+                            }}
                         >
                             <style>{`
-                            @keyframes shareDisplayGrow {
-                                from {
-                                    width: 0%;
+                                @keyframes widthGrow {
+                                    from {
+                                        width: 28px;
+                                        }
+                                    to {
+                                        width: 86px;
                                     }
-                                to {
-                                    width: 100%;
                                 }
-                            }
-                            @keyframes shareDisplayShrink {
-                                from {
-                                    width: 100%;
+                                @keyframes widthShrink {
+                                    from {
+                                        width: 86px;
+                                        }
+                                    to {
+                                        width: 28px;
                                     }
-                                to {
-                                    width: 0%;
                                 }
-                            }
-
-                            .share-display-container[playCopiedEnterAnimation="true"] {
-                                animation: shareDisplayShrink 0.5s ease-in-out 1;
-                            }
-                            .share-display-container[playCopiedExitAnimation="true"] {
-                                animation: shareDisplayGrow 0.5s ease-in-out 1;
-                            }
-                            .share-display-container[playBothEnterAnimation="true"] {
-                                animation: shareDisplayShrink 0.5s ease-in-out 1;
-                            }
-                            .share-display-container[playBothExitAnimation="true"] {
-                                animation: shareDisplayGrow 0.5s ease-in-out 1;
-                            }
+                                @keyframes copiedEnter {
+                                    from {
+                                        background-color: #1B1D21;
+                                        }
+                                    to {
+                                        background-color: #3B4BF9;
+                                    }
+                                }
+                                @keyframes copiedExit {
+                                    from {
+                                        background-color: #3B4BF9;
+                                        }
+                                    to {
+                                        background-color: #1B1D21;
+                                    }
+                                }
+                                @keyframes bothEnter {
+                                    from {
+                                        background-color: #1B1D21;
+                                        width: 28px;
+                                        }
+                                    to {
+                                        background-color: #3B4BF9;
+                                        width: 86px;
+                                    }
+                                }
+                                @keyframes bothExit {
+                                    from {
+                                        background-color: #3B4BF9;
+                                        width: 86px;
+                                        }
+                                    to {
+                                        background-color: #1B1D21;
+                                        width: 28px;
+                                    }
+                                }
+                                .share-container[playBothEnterAnimation="true"] {
+                                    animation: bothEnter 0.5s ease-in-out 1;
+                                }
+                                .share-container[playBothExitAnimation="true"] {
+                                    animation: bothExit 0.5s ease-in-out 1;
+                                }
+                                .share-container[playGrowAnimation="true"] {
+                                    animation: widthGrow 0.5s ease-in-out 1;
+                                }
+                                .share-container[playShrinkAnimation="true"] {
+                                    animation: widthShrink 0.5s ease-in-out 1;
+                                }
+                                .share-container[playCopiedEnterAnimation="true"] {
+                                    animation: copiedEnter 0.5s ease-in-out 1;
+                                }
+                                .share-container[playCopiedExitAnimetion="true"] {
+                                    animation: copiedExit 0.5s ease-in-out 1;
+                                }
                             `}</style>
                             <p
-                                playGrowAnimation={shareGrowAnimationPlay}
-                                playShrinkAnimation={shareShrinkAnimationPlay}
                                 playCopiedEnterAnimation={copiedEnterAnimationPlay}
                                 playCopiedExitAnimation={copiedExitAnimationPlay}
+                                playBothEnterAnimation={playBothEnterAnimation}
+                                playBothExitAnimation={playBothExitAnimation}
                                 style={{
                                     display: 'flex',
                                     color: '#fff',
@@ -687,95 +587,184 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                     fontWeight: '700',
                                     lineHeight: '13px',
                                     letterSpacing: '0px',
-                                    marginRight: shareHover ? '4px' : '0px',
-                                    width: shareHover ? '64%' : '0%',
+                                    textAlign: 'center',
+                                    width: shareCopied ? '100%' : '0%',
                                     overflow: 'hidden',
+                                    justifyContent: 'center',
+                                    whiteSpace: 'nowrap',
                                 }}
-                                className="share-text">
+                                className="copied-text">
                                 <style>{`
 
-                                @keyframes shareTextGrow {
+                                    @keyframes copiedTextGrow {
+                                        from {
+                                            width: 0%;
+                                            }
+                                        to {
+                                            width: 100%;
+                                        }
+                                    }
+                                    @keyframes copiedTextShrink {
+                                        from {
+                                            width: 100%;
+                                            }
+                                        to {
+                                            width: 0%;
+                                        }
+                                    }
+
+                                    .copied-text[playCopiedEnterAnimation="true"] {
+                                        animation: copiedTextGrow 0.5s ease-in-out 1;
+                                    }
+                                    .copied-text[playCopiedExitAnimation="true"] {
+                                        animation: copiedTextShrink 0.5s ease-in-out 1;
+                                    }
+                                    .copied-text[playBothEnterAnimation="true"] {
+                                        animation: copiedTextGrow 0.5s ease-in-out 1;
+                                    }
+                                    .copied-text[playBothExitAnimation="true"] {
+                                        animation: copiedTextShrink 0.5s ease-in-out 1;
+                                    }
+                                    `}</style>
+                                {'🔗 Copiado'}
+                            </p>
+                            <div
+                                playCopiedEnterAnimation={copiedEnterAnimationPlay}
+                                playCopiedExitAnimation={copiedExitAnimationPlay}
+                                playBothEnterAnimation={playBothEnterAnimation}
+                                playBothExitAnimation={playBothExitAnimation}
+                                style={{
+                                    display: 'flex',
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    flexWrap: 'nowrap',
+                                    justifyContent: 'center',
+                                    // margin: '0px 15px',
+                                    width: shareCopied ? '0%' : '100%',
+                                }}
+                                className="share-display-container"
+                            >
+                                <style>{`
+                                @keyframes shareDisplayGrow {
                                     from {
                                         width: 0%;
-                                        margin-right: 0px;
                                         }
                                     to {
-                                        width: 64%;
-                                        margin-right: 4px;
+                                        width: 100%;
                                     }
                                 }
-                                @keyframes shareTextShrink {
+                                @keyframes shareDisplayShrink {
                                     from {
-                                        width: 64%;
-                                        margin-right: 4px;
+                                        width: 100%;
                                         }
                                     to {
                                         width: 0%;
-                                        margin-right: 0px;
                                     }
                                 }
 
-                                .share-text[playGrowAnimation="true"] {
-                                    animation: shareTextGrow 0.5s ease-in-out 1;
+                                .share-display-container[playCopiedEnterAnimation="true"] {
+                                    animation: shareDisplayShrink 0.5s ease-in-out 1;
                                 }
-                                .share-text[playShrinkAnimation="true"] {
-                                    animation: shareTextShrink 0.5s ease-in-out 1;
+                                .share-display-container[playCopiedExitAnimation="true"] {
+                                    animation: shareDisplayGrow 0.5s ease-in-out 1;
+                                }
+                                .share-display-container[playBothEnterAnimation="true"] {
+                                    animation: shareDisplayShrink 0.5s ease-in-out 1;
+                                }
+                                .share-display-container[playBothExitAnimation="true"] {
+                                    animation: shareDisplayGrow 0.5s ease-in-out 1;
                                 }
                                 `}</style>
-                                {'Compartir'}
-                            </p>
-                            <ShareArrow
-                                playGrowAnimation={shareGrowAnimationPlay}
-                                playShrinkAnimation={shareShrinkAnimationPlay}
-                                style={shareHover ?
-                                    {
-                                        transform: 'scale(0.8)',
-                                    }
-                                    :
-                                    {
-                                        transform: 'scale(1)'
-                                    }
-                                } className="share-icon">
-                                <style>{`
-                                        @keyframes shareIconShrink {
-                                            from {
-                                                transform: scale(1);
-                                                }
-                                            to {
-                                                transform: scale(0.8);
-                                            }
-                                        }
-                                        @keyframes shareIconNormal {
-                                            from {
-                                                transform: scale(0.8);
-                                                }
-                                            to {
-                                                transform: scale(1);
-                                            }
-                                        }
+                                <p
+                                    playGrowAnimation={shareGrowAnimationPlay}
+                                    playShrinkAnimation={shareShrinkAnimationPlay}
+                                    playCopiedEnterAnimation={copiedEnterAnimationPlay}
+                                    playCopiedExitAnimation={copiedExitAnimationPlay}
+                                    style={{
+                                        display: 'flex',
+                                        color: '#fff',
+                                        fontSize: '11px',
+                                        fontWeight: '700',
+                                        lineHeight: '13px',
+                                        letterSpacing: '0px',
+                                        marginRight: shareHover ? '4px' : '0px',
+                                        width: shareHover ? '64%' : '0%',
+                                        overflow: 'hidden',
+                                    }}
+                                    className="share-text">
+                                    <style>{`
 
-                                        .share-icon[playGrowAnimation="true"] {
-                                            animation: shareIconShrink 0.5s ease-in-out 1;
+                                    @keyframes shareTextGrow {
+                                        from {
+                                            width: 0%;
+                                            margin-right: 0px;
+                                            }
+                                        to {
+                                            width: 64%;
+                                            margin-right: 4px;
                                         }
-                                        .share-icon[playShrinkAnimation="true"] {
-                                            animation: shareIconNormal 0.5s ease-in-out 1;
+                                    }
+                                    @keyframes shareTextShrink {
+                                        from {
+                                            width: 64%;
+                                            margin-right: 4px;
+                                            }
+                                        to {
+                                            width: 0%;
+                                            margin-right: 0px;
                                         }
+                                    }
+
+                                    .share-text[playGrowAnimation="true"] {
+                                        animation: shareTextGrow 0.5s ease-in-out 1;
+                                    }
+                                    .share-text[playShrinkAnimation="true"] {
+                                        animation: shareTextShrink 0.5s ease-in-out 1;
+                                    }
                                     `}</style>
-                            </ShareArrow>
-                        </div>
+                                    {'Compartir'}
+                                </p>
+                                <ShareArrow
+                                    playGrowAnimation={shareGrowAnimationPlay}
+                                    playShrinkAnimation={shareShrinkAnimationPlay}
+                                    style={shareHover ?
+                                        {
+                                            transform: 'scale(0.8)',
+                                        }
+                                        :
+                                        {
+                                            transform: 'scale(1)'
+                                        }
+                                    } className="share-icon">
+                                    <style>{`
+                                            @keyframes shareIconShrink {
+                                                from {
+                                                    transform: scale(1);
+                                                    }
+                                                to {
+                                                    transform: scale(0.8);
+                                                }
+                                            }
+                                            @keyframes shareIconNormal {
+                                                from {
+                                                    transform: scale(0.8);
+                                                    }
+                                                to {
+                                                    transform: scale(1);
+                                                }
+                                            }
 
-                        {/* {shareHover && <p style={{
-                            color: '#fff',
-                            fontSize: '11px',
-                            fontWeight: '700',
-                            lineHeight: '13px',
-                            letterSpacing: '0px',
-                            textAlign: 'left',
-                            marginRight: '4px',
-                        }}>
-                            {shareCopied ? '🔗 Copiado' : 'Compartir'}
-                        </p>} */}
-                    </div>
+                                            .share-icon[playGrowAnimation="true"] {
+                                                animation: shareIconShrink 0.5s ease-in-out 1;
+                                            }
+                                            .share-icon[playShrinkAnimation="true"] {
+                                                animation: shareIconNormal 0.5s ease-in-out 1;
+                                            }
+                                        `}</style>
+                                </ShareArrow>
+                            </div>
+                        </div>
+                    }
                     <div className={classes.hourContainer}>
                         <p className={classes.hourText}>
                             {hour}

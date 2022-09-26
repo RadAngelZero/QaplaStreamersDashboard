@@ -3,7 +3,8 @@ import { Button, Card, CardContent, Grid, makeStyles } from '@material-ui/core';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { ReactComponent as ESvg } from './../../assets/e.svg';
+import { ReactComponent as ESvg } from './../../assets/g.svg';
+import {ReactComponent as Closeicon} from './../../assets/Closeicono.svg'
 import HeartHands from './../../assets/HeartHands.png';
 import { getSubscriptionPurchaseDetails } from '../../services/database';
 
@@ -12,7 +13,7 @@ const useStyles = makeStyles(() => ({
         height: '100vh'
     },
     paymentInfoContainer: {
-        paddingLeft: 32,
+        paddingLeft: 50,
         paddingRight: 64,
         display: 'flex',
         flexDirection: 'column',
@@ -42,7 +43,8 @@ const useStyles = makeStyles(() => ({
     totalPaid: {
         fontSize: 48,
         fontWeight: '600',
-        color: 'rgba(255, 255, 255, .9)'
+        color: 'rgba(255, 255, 255, .9)',
+        lineHeight:'58.09px'
     },
     interval: {
         marginLeft: 6,
@@ -53,7 +55,8 @@ const useStyles = makeStyles(() => ({
     paymentDetails: {
         marginTop: 48,
         display: 'flex',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        maxWidth:'750px'
     },
     subscriptionType: {
         fontSize: 18,
@@ -75,7 +78,8 @@ const useStyles = makeStyles(() => ({
         marginTop: 56,
         color: '#FFF',
         display: 'flex',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        maxWidth:'750px'
     },
     paymentUntilToday: {
         fontSize: 24,
@@ -102,7 +106,8 @@ const useStyles = makeStyles(() => ({
         justifyContent: 'center',
         alignItems: 'center',
         paddingLeft: 30,
-        paddingRight: 30
+        paddingRight: 30,
+        maxWidth:'450px'
     },
     thanksTitle: {
         marginTop: 8,
@@ -141,6 +146,23 @@ const useStyles = makeStyles(() => ({
         fontSize: 16,
         fontWeight: '500',
         color: 'rgba(255, 255, 255, .6)'
+    },
+    buttonClose:{
+       position: 'absolute',
+       top:'0px',
+       left:'-10px',
+    },
+
+    paymentPolicy:{
+          marginTop:'80px'
+    },
+    textPaymentPolicy:{
+       color: '#FFFFFF',
+       opacity: '0.6',
+       fontWeight:'500',
+       fontSize: '12px',
+       lineHeight: '15px',
+       letterSpacing:'0.5px'
     }
 }));
 
@@ -153,7 +175,7 @@ function useQuery() {
 const ChargeConfirmationPage = ({ user }) => {
     const [totalPaid, setTotalPaid] = useState(0);
     const [interval, setInterval] = useState('');
-    const [intervalText, setIntervalText] = useState('');
+    const [intervalText, setIntervalText] = useState('monthly');
     const [plan, setPlan] = useState('');
     const classes = useStyles();
     const history = useHistory();
@@ -189,6 +211,9 @@ const ChargeConfirmationPage = ({ user }) => {
     return (
         <Grid container alignContent='center' className={classes.container}>
             <Grid item md={6} className={classes.paymentInfoContainer}>
+                <Button className={classes.buttonClose}>
+                    <Closeicon />
+                    </Button>
                 <div className={classes.eImageContainer}>
                     <ESvg />
                 </div>
@@ -227,6 +252,9 @@ const ChargeConfirmationPage = ({ user }) => {
                     <p className={classes.paymentUntilToday}>
                         ${(totalPaid).toFixed(2)}
                     </p>
+                </div>
+                <div className={classes.paymentPolicy}>
+                    <p className={classes.textPaymentPolicy}>Powered by Stripe | Terms Privacy</p>
                 </div>
             </Grid>
             <Grid item md={6} className={classes.thanksCardContainer}>

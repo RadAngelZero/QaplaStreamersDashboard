@@ -73,6 +73,7 @@ export async function signUpOrSignInTwitchUser(twitchUserData, tokensData) {
                 email: twitchUserData.email,
                 twitchAccessToken: tokensData.access_token,
                 refreshToken: tokensData.refresh_token,
+                broadcasterType: twitchUserData.broadcaster_type,
                 scope: tokensData.scope,
                 isNewUser,
                 termsAndConditions: true

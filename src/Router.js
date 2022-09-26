@@ -9,7 +9,8 @@ import {
 import './App.css';
 import {
     loadStreamerProfile,
-    loadQaplaGames
+    loadQaplaGames,
+    listenToStreamerDrops
 } from './services/database';
 import { handleUserAuthentication } from './services/auth';
 import StreamersSignin from './components/StreamersSignin/StreamersSignin';
@@ -25,8 +26,10 @@ import PlanPicker from './components/PlanPicker/PlanPicker';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
 import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeConfirmationPage';
-import QStore from './components/QStore/QStore';
 import { useTranslation } from 'react-i18next'
+import OnBoarding from './components/OnBoarding/OnBoarding';
+import GiphyTextGenerator from './components/GiphyTextGenerator/GiphyTextGenerator';
+import RequestActivation from './components/RequestActivation/RequestActivation';
 
 window.onbeforeunload = function () {
     return true;
@@ -35,7 +38,7 @@ window.onbeforeunload = function () {
 // Remove navigation prompt
 window.onbeforeunload = null;
 
-const Routes = ({ user, games }) => {
+const Routes = ({ user, games, qoinsDrops }) => {
     const history = useHistory();
     const { t } = useTranslation();
 
@@ -59,16 +62,13 @@ const Routes = ({ user, games }) => {
                 <StreamerOnBoarding user={user} />
             </Route>
             <Route exact path='/create'>
-                <NewStream user={user} games={games} />
+                <NewStream user={user} games={games} qoinsDrops={qoinsDrops} />
             </Route>
             <Route exact path='/edit/:streamId'>
                 <EditStreamerEvent user={user} games={games} />
             </Route>
             <Route exact path='/profile'>
-                <StreamerProfile user={user} games={games} />
-            </Route>
-            <Route exact path='/store'>
-                <QStore user={user} />
+                <StreamerProfile user={user} games={games} qoinsDrops={qoinsDrops} />
             </Route>
             <Route exact path='/success'>
                 <EventSent user={user} />
@@ -91,6 +91,15 @@ const Routes = ({ user, games }) => {
             <Route exact path='/successCheckout'>
                 <ChargeConfirmationPage user={user} />
             </Route>
+            <Route exact path='/onboarding'>
+                <OnBoarding user={user} />
+            </Route>
+            <Route exact path='/freeTrial'>
+                <RequestActivation user={user} />
+            </Route>
+            <Route exact path='/giphyTextGenerator/:uid/:text'>
+                <GiphyTextGenerator user={user} />
+            </Route>
             {/* <Route exact path='/lottery'>
                 <Lottery user={user} />
             </Route> */}
@@ -101,6 +110,7 @@ const Routes = ({ user, games }) => {
 const Router = () => {
     const [games, setGames] = useState({});
     const [user, setUser] = useState(null);
+    const [qoinsDrops, setQoinsDrops] = useState({ left: 0, original: 0, used: 0 });
 
     useEffect(() => {
 
@@ -111,10 +121,19 @@ const Router = () => {
             setGames(await loadQaplaGames());
         }
 
+        async function getDropQoins(uid) {
+            listenToStreamerDrops(uid, (drops) => {
+                if (drops.exists()) {
+                    setQoinsDrops(drops.val());
+                }
+            });
+        }
+
         function checkIfUserIsAuthenticated() {
             handleUserAuthentication((user) => {
                 loadStreamerProfile(user.uid, (userData) => {
                     setUser({ ...userData, admin: false, streamer: true, uid: user.uid });
+                    getDropQoins(user.uid);
                 });
             }, () => {
                 setUser(undefined);
@@ -129,7 +148,7 @@ const Router = () => {
 
     return (
         <RouterPackage>
-            <Routes user={user} games={games} />
+            <Routes user={user} games={games} qoinsDrops={qoinsDrops} />
         </RouterPackage>
     );
 }

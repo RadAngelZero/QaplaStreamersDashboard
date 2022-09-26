@@ -1,0 +1,43 @@
+.container{
+    width: 227px;
+    height: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.container p{
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 18px;
+line-height: 24px;
+text-align: center;
+letter-spacing: -0.02em;
+color: #FFFFFF;
+}
+
+.tick{
+    width: 90px;
+    height: 90px;
+    left: calc(50% - 90px/2 - 0.5px);
+    top: calc(50% - 90px/2 - 107px);
+}
+
+.container button{
+background: linear-gradient(0deg, #3B4BF9, #3B4BF9), #FF006B;
+ box-shadow: 0px 20px 40px -10px rgba(59, 75, 249, 0.4);
+border-radius: 16px;
+height:56px;
+width:202px;
+ border:none;
+ font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 22px;
+letter-spacing: 0.492px;
+color: #FFFFFF;
+cursor: pointer;
+}

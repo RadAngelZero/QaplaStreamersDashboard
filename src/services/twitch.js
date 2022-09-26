@@ -1,5 +1,9 @@
 import { TWITCH_CLIENT_ID } from '../utilities/Constants';
 
+///////////////
+// Custom rewards
+///////////////
+
 /**
  * Create a custom reward in the user´s twitch
  * @param {string} uid User identifier
@@ -127,6 +131,64 @@ export async function deleteCustomReward(twitchId, accessToken, rewardId) {
     }
 }
 
+/**
+ * Returns the specified reward if found or null otherwise
+ * See more on: https://dev.twitch.tv/docs/api/reference#get-custom-reward
+ * @param {string} rewardId Reward identifier
+ * @param {string} twitchId Twitch identifier
+ * @param {string} accessToken Twitch access token
+ */
+export async function getCustomReward(rewardId, twitchId, accessToken) {
+    try {
+        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
+            method: 'GET',
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        });
+
+        if (response.status === 200) {
+            const result = (await response.json());
+
+            return result.data && result.data[0] ? result.data[0] : null;
+        } else {
+            return response.status;
+        }
+    } catch (error) {
+        return error;
+    }
+}
+
+/**
+ * Updates a reward on Twitch and returns the updated reward object
+ * See more on: https://dev.twitch.tv/docs/api/reference#update-custom-reward
+ * @param {string} rewardId Reward identifier
+ * @param {string} twitchId Twitch identifier
+ * @param {string} accessToken Twitch access token
+ * @param {object} dataToUpdate Data to send to Twitch (see Twitch docs for more details)
+ */
+ export async function updateCustomReward(twitchId, accessToken, rewardId, dataToUpdate) {
+    let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&id=${rewardId}`, {
+        method: 'PATCH',
+        headers: {
+            'Client-Id': TWITCH_CLIENT_ID,
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToUpdate)
+    });
+
+    const result = await response.json();
+
+    return response.status === 200 ? { status: response.status, ...result.data[0] } : { status: response.status };
+}
+
+///////////////
+// Custom rewards redemptions
+///////////////
+
 export async function getAllRewardRedemptions(twitchId, accessToken, rewardId) {
     let response = await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?' +
     `broadcaster_id=${twitchId}` +
@@ -176,6 +238,10 @@ async function getRewardRedemptionsWithCursor(cursor, twitchId, accessToken, rew
 
     return await response.json();
 }
+
+///////////////
+// Users
+///////////////
 
 /**
  * Get the info of the given twitch user

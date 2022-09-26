@@ -15,8 +15,7 @@ import SignInImage from './../../assets/SignIn.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
-import { createStreamerProfile, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
-import QaplaTerms from '../QaplaTerms/QaplaTerms';
+import { createStreamerProfile, getInteractionsRewardData, getNumberOfVisits, getStreamerDeepLink, setVisitsCounter, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 import { getTwitchUserData } from '../../services/twitch';
 
@@ -64,7 +63,8 @@ const StreamersSignin = ({ user, title }) => {
                             twitchAccessToken: tokenData.data.access_token,
                             refreshToken: tokenData.data.refresh_token,
                             displayName: user.userData.displayName,
-                            photoUrl: user.userData.photoUrl
+                            photoUrl: user.userData.photoUrl,
+                            broadcasterType: user.userData.broadcasterType
                         });
                     } catch (error) {
                         console.log(error);
@@ -75,17 +75,33 @@ const StreamersSignin = ({ user, title }) => {
             }
         }
         async function redirectUser(uid) {
-            const userHasBeenRedirectedToCreateProfile = localStorage.getItem('userHasBeenRedirectedToCreateProfile');
+            const interactionsRewardData = await getInteractionsRewardData(uid);
+            if (interactionsRewardData.exists()) {
+                const userHasProfile = await userHasPublicProfile(uid);
+                const userHasLink = await getStreamerDeepLink(uid);
 
-            if (userHasBeenRedirectedToCreateProfile) {
-                history.push('/profile');
-            } else {
-                if (await userHasPublicProfile(uid)) {
+                /**
+                 * This flag ensures that the next time the user enters after creating their interactions reward they will be redirected
+                 * to create their profile
+                 */
+                const userHasBeenRedirectedToCreateProfile = localStorage.getItem('userHasBeenRedirectedToCreateProfile');
+
+                // We use this to know if the user must be redirected again to create a profile
+                const numberOfTimesUserEnterDashboard = await getNumberOfVisits(uid);
+                await setVisitsCounter(uid, numberOfTimesUserEnterDashboard.val() < 2 ? numberOfTimesUserEnterDashboard.val() + 1 : 0);
+
+                if (userHasBeenRedirectedToCreateProfile && numberOfTimesUserEnterDashboard.val() < 2) {
                     history.push('/profile');
                 } else {
-                    history.push('/editProfile');
-                    localStorage.setItem('userHasBeenRedirectedToCreateProfile', 'true');
+                    if ((userHasProfile && userHasLink.exists()) || numberOfTimesUserEnterDashboard.val() < 2) {
+                        history.push('/profile');
+                    } else {
+                        history.push('/editProfile');
+                        localStorage.setItem('userHasBeenRedirectedToCreateProfile', 'true');
+                    }
                 }
+            } else {
+                history.push('/profile');
             }
         }
 
@@ -101,8 +117,6 @@ const StreamersSignin = ({ user, title }) => {
         signInWithTwitch();
         setIsLoadingAuth(false);
     }
-
-    const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
 
     if (user === undefined) {
         return (
@@ -127,9 +141,9 @@ const StreamersSignin = ({ user, title }) => {
                         </Button>
                         <p style={{ marginTop: '38px', color: '#FFF', fontSize: '.8rem' }}>
                             {t('StreamersSignin.termsAndConditionsP1')}
-                            <u style={{ cursor: 'pointer', color: '#3B4BF9' }} onClick={() => setOpenTermsAndConditionsDialog(true)}>
+                            <a style={{ cursor: 'pointer', color: '#3B4BF9' }} href={t('Onboarding.termsOfUseUrl')} target='_blank' rel="noreferrer">
                                 {t('StreamersSignin.termsAndConditionsP2')}
-                            </u>
+                            </a>
                         </p>
                     </div>
                     <Hidden smDown>
@@ -139,7 +153,6 @@ const StreamersSignin = ({ user, title }) => {
                     </Hidden>
                 </Grid>
                 <Grid item md='1' />
-                <QaplaTerms open={openTermsAndConditionsDialog} onClose={closeTermsAndConditionsModal} />
             </StreamerDashboardContainer>
         );
     }

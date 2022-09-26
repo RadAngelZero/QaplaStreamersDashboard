@@ -76,6 +76,7 @@ const EventConfirmStartDialog = ({ open, onClose, manageRewards }) => {
                     </div>
                     <div style={{ height: '34px' }} />
                     <p className={classes.miniDialogTitle}>
+                        {/* We must change this text */}
                         {t('QaplaStreamDialogs.EventConfirmStartDialog.xqAvailable')}
                     </p>
                     <div style={{ height: '28px' }} />

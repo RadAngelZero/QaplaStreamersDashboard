@@ -15,8 +15,9 @@
     },
     "SideBar": {
         "dashboard": "Dashboard",
-        "membership": "Membresía",
-        "universalProfile": "Perfil Universal",
+        "membership": "Subscripción",
+        "billing": "Subscripción",
+        "universalProfile": "Perfil",
         "settings": "Ajustes",
         "new": "Nuevo",
         "signOut": "Cerrar sesión"
@@ -37,6 +38,36 @@
             "errorSignIn": "Hubo un problema al iniciar sesión, intentalo de nuevo o reportalo a soporte técnico"
         }
     },
+    "Onboarding": {
+        "letsSetUp": " Vamos a configurar tu cuenta",
+        "processDescriptionP1": "🔗 Crearemos una recompensa en tu canal con un click",
+        "processDescriptionP2": "🪪 Agregaremos una fuente de navegador a tu OBS/Streamlabs",
+        "setRewardCost": "Define el “costo” de la recompensa",
+        "setRewardCostDescription": "Esto seran los puntos que tus viewers gastaran por reacción. Siempre puedes cambiarlo después",
+        "workingOnRequest": "Estoy trabajando en tu solicitud adorable humano",
+        "rewardCreated": "Recompensa creada exitosamente!",
+        "addReactionsToOverlay": "Agrega el overlay de reacciones",
+        "copyLink": "Copia el link y agregalo en una fuente de navegador en tu OBS/Streamlabs",
+        "width": "Ancho",
+        "height": "Alto",
+        "testOverlay": "Probar Overlay",
+        "goToDiscord": "Ir a soporte en Discord",
+        "letsGo": "Vamos",
+        "createCustomReward": "Crear Recompensa",
+        "waitABit": "Espera un poco",
+        "finishSetUp": "Finalizar configuración",
+        "done": "¡Se ve genial!Looks awesome! Estoy listo",
+        "copyToTest": "Copia el link para probar el overlay",
+        "goToDashboard": "Ir al dashboard",
+        "errorTitle": "¡Oh no! Error {{errorCode}}",
+        "errorDescription": "No te preocupes. ¡Intentemos de nuevo! Asegurate de que tus recompensas de canal no esten llenas",
+        "policiesP1": "Al continuar acepto los",
+        "policiesP2": "Terminos de uso",
+        "policiesP3": "y la",
+        "policiesP4": "Política de Privacidad",
+        "termsOfUseUrl": "https://www.qapla.gg/es/terminos-y-condiciones-creadores",
+        "privacyPolicy": "https://www.qapla.gg/es/aviso-de-privacidad"
+    },
     "StreamerProfile": {
         "balance": "Balance",
         "stimatedBits": "Bits estimados",
@@ -52,14 +83,37 @@
             "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
         },
         "learnMore": "¿Qué es el balance?",
-        "postStream": "Publicar un\nStream"
+        "postStream": "Publicar un\nStream",
+        "StreamerProfileEditCoin": {
+            "reactions": "Reacciones",
+            "enabled": "habilitadass",
+            "disabled": "deshabilitadas"
+        },
+        "StreamerProfileModalDisableInteractions": {
+            "title": "Deshabilitar las reacciones esconde la recompensa de canal y el overlay en tus streams",
+            "subtitle": "Siempre puedes habilitarlas de nuevo cuando quieras ;)",
+            "disable": "Deshabilitar reacciones",
+            "dontDisable": "No deshabilitar",
+            "dontShowAgain": "No mostrar este mensaje de nuevo"
+        },
+        "BarProgressBit": {
+            "nextMilestone": "Siguiente Milestone",
+            "available": "Disponible",
+            "cashOut": "Cash Out",
+            "confirmCashOut": "Confirma que quieres cambiar tus Qoins por Bits en Twitch",
+            "cancel": "Cancelar",
+            "weGotYouRequestP1": "¡Tenemos tu solicitud! Te enviaremos ",
+            "weGotYouRequestP2": " bits en tu próximo stream"
+        }
     },
     "StreamCard": {
         "deleteConfirmation": "¿Estas seguro que deseas eliminar este stream?",
         "participants": "participantes",
         "pendingReview": "Pendiente de revisión",
         "posted": "Publicado",
-        "start": "Iniciar stream",
+        "enableDrops": "Habilitar drops de Qoins",
+        "dropsScheduled": "🪂 Drops programados",
+        "end": "Finalizar stream",
         "finish": "Terminar stream",
         "creatingRewards": "Creando recompensas",
         "manageRewards": "Gestionar recompensas",
@@ -77,7 +131,6 @@
             "manageRewards": "Gestiona las recompensas de tu stream.",
             "start": "Iniciar stream",
             "creatingRewards": "Creando recompensas",
-            "xqEnabled": "XQ habilitados",
             "enablingQoins": "Habilitando Qoins",
             "qoinsEnabled": "Qoins habilitados",
             "finish": "Terminar stream",
@@ -105,18 +158,30 @@
         "EventCustomMessageSentConfirmation": {
             "title": "¡Mensaje enviado!",
             "manageRewards": "Gestionar recompensas"
+        },
+        "ModalQoinsDrops": {
+            "drops": "🪂 Drops de Qoins'",
+            "setTimer": "Escoge un tiempo para que la recompensa de Qoins se muestre en tu stream",
+            "rightAway": "De inmediato",
+            "in30Min": "en 30 min",
+            "in45Min": "en 45 min",
+            "in1Hour": "en 1 hour",
+            "enableDrops": "Habilitar Drops",
+            "settingDrops": "Configurando drops",
+            "qoinsDropIn": "Los Qoins se mostraran en {{selectedTime}} mins",
+            "dropsEnabled": "Drops habilitados"
         }
     },
     "NewStream": {
         "alerts": {
             "noChannelPoints": "Al parecer no tienes puntos del canal en Twitch 😦 Consigue tu afiliado para que puedas dar recompensas y puedas publicar tus directos en Qapla :D\n\nhttps://help.twitch.tv/s/article/joining-the-affiliate-program",
-            "before24h": "Las solicitudes deben ser enviadas al menos 24 horas antes del stream",
+            "beforeXminutes": "Las solicitudes deben ser enviadas al menos 5 minutos antes del stream",
             "missingData": "Verifica que toda la información haya sido llenada correctamente",
             "streamsLimit": "Ha alcanzado el límite de streams para su suscripción",
             "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
         },
         "whatAreYouPlaying": "¿Qué vas a transmitir?",
-        "pickACategory": "Selecciona una categoría",
+        "pickACategory": "Elige una categoría",
         "categoryPickerPlaceholder": "Ej: Just Chatting",
         "when": "¿Cuando?",
         "date": "Fecha",
@@ -130,20 +195,21 @@
         },
         "advanced": "Avanzado (Opcional)",
         "feelingCreative": "¿Te sientes creativo? Dale un nombre genial a tu stream",
-        "streamTitle": "Título del stream",
+        "streamTitle": "Título del stream ",
+        "optional": "(opcional)",
+        "streamTitleDescription": "Dale un toque personal a tu publicación para hacerla más atractiva",
         "streamTitlePlaceholder": "Manqueando en Fall Guys",
-        "streamDescription": "Descripción del stream",
-        "subtitle": "Subtitulo",
-        "descriptionPlaceholder": "Describe lo que tienes planeado para tu stream",
+        "dropsTitle": "Límite de Drops",
+        "dropsDescription": "Cantidad máxima de Drops de Qoins que se podrán canjear durante tu transmisión",
+        "maxLimit": "Límite máximo",
+        "dropsAboveLimitErrorP1": "Tienes ",
+        "dropsAboveLimitErrorP2": "{{drops}} drops disponibles. ",
+        "dropsAboveLimitErrorP3": "Por favor reduce el límite de drops.",
+        "setValidAmountOfDropsP1": "El límite de drops no puede ser 0. Tienes ",
+        "setValidAmountOfDropsP2": "{{drops}} drops disponibles",
         "submit": "Enviar",
-        "confirmDialog": {
-            "almostDone": "Ya casi terminamos",
-            "confirmDetails": "Sólo confirma los detalles para continuar",
-            "dateAndHour": "Fecha y hora",
-            "localTime": "Tiempo local"
-        },
         "successDialog": {
-            "description": "Recibimos tu publicación, la aprobaremos lo más pronto posible"
+            "description": "¡Stream agendado! Tu stream ha sido publicado en la app"
         }
     },
     "CheersSettings": {
@@ -206,17 +272,14 @@
         },
         "month": "mes",
         "payment": "Pago",
-        "totalPeriodPayment": "${{totalPayment}} Pago",
+        "totalPeriodPayment": "${{totalPayment}}",
         "saving": "Ahorras {{saving}}%",
         "monthlyPublications": "{{numberOfPublications}} publicaciones al mes",
         "with": "con",
-        "doubleXQ": "XQ doble",
-        "redemptions": "{{numberOfRedemptions}} canjes de Qoins y XQ por stream",
-        "cheers": "Recibe cheers de Qoins.",
-        "extraPublications": "Publicaciones extras incluyen",
-        "noQoinsMinimum": "Sin mínimo de retiro de Qoins",
-        "qoinsStore": "Tienda de Qoins",
-        "discounts": "Descuento en tienda de Qoins",
+        "qaplaReactions": "Reacciones Qapla",
+        "cashOut": "Cash out de Qoins",
+        "drops": "{{numberOfDrops}} Drops de Qoins por mes",
+        "postAlways": "Publica en Qapla mientras tengas drops",
         "getVisibility": "Dale visibilidad a tu contenido",
         "rewardYourCommunity": "Recompensa a tu comunidad"
     },
@@ -229,18 +292,27 @@
         "showUpcomingStreams": "Mostar próximos streams",
         "social": "Social",
         "OnBoarding": {
-            "header1": "Incrementa tu visibilidad",
-            "header2": "Mejora la interacción en vivo",
-            "header3": "Amplifica tu alcance",
-            "body1": "Bienvenido a tu perfil Qapla 😍. Conecta con más miembros de la comunidad habilitando tu perfil",
-            "body2": "Comparte tus gustos, de que trata tu contenido, ó ¡lo que tu quieras!, para incrementar las posibilidades hacer match con la gente que se pasa a tu stream 💜",
-            "body3": "Lleva tráfico a tus redes desde tu perfil Qapla. Un mismo lugar para tus próximos streams y tus diferentes canales de comunicación 🎙",
-            "presentYourself": "Preséntate con la comunidad",
-            "addTags": "Agrega etiquetas que te representen a ti como creador, tu persona, tu contenido, etc.",
-            "yourIntro": "Tu intro es un vistazo de ti mismo y tu contenido. Hazlo ameno 😉",
+            "header1": "Incrementa tus interacciones",
+            "header2": "Preséntate",
+            "header3": "Tags",
+            "header4": "¡Copia y comparte!",
+            "body1": "Crea y comparte tu link de perfil para hacer mas fácil a tus viewers reaccionar en tu stream ⚡️",
+            "body2": "Es una bio, tu sabes como funciona 🫶",
+            "body3": "¡Agrega tags sobre tu contenido, tu como creador, como persona o sobre lo que quieras! 💜",
+            "body4": "¡Tus viewers pueden enviar reacciones rápido en tu stream desde tu perfil, o inclusive descargar la app!",
+            "waysOfSharing": "Formas de compartir:",
+            "addToYourBio": "🔗 Agregalo a tu Link-in-Bio",
+            "useItAsLinkInBio": "🪪 Usalo como un Link-in-Bio",
+            "addToNightbot": "🤖 Agregalo a tu Nightbot en Twitch",
+            "typeToCreateLink": "escribe para crear tu link",
+            "createProfileLink": "Crear Link de Perfil",
+            "confirmBio": "Confirmar Bio",
+            "finish": "Finalizar",
+            "goToProfile": "Ir a mi perfil",
             "minChars": "Min. Caracteres",
             "tagErrorNotSelected": "Para agregar un tag escribelo y/o da click en el",
-            "minTags": "Agrega al menos {{minTags}} tags para continuar"
+            "minTags": "Agrega al menos {{minTags}} tags para continuar",
+            "duplicatedLink": "Link en uso, prueba con otro"
         },
         "confirmations": {
             "saveImage": "Imagen guardada correctamente"
@@ -269,31 +341,19 @@
         "backToDashboard": "Volver al dashboard"
     },
     "RequestActivation": {
-        "title": "¡Tu publicación está lista\npara ser enviada!",
-        "descriptionP1": "Activa tu ",
-        "descriptionHiglight": "Free Trial",
-        "descriptionP2": " con tu código de referido\npara poder publicar tus streams",
-        "buyAMembership": "Recompensa a tu comunidad y dale visibilidad a tu contenido con una membresía de Qapla",
-        "referralCode": "Código de referido",
-        "startFreeTrial": "Activar Free Trial",
-        "dontHaveACode": "¿No tienes código de referido?",
-        "subscribe": "Suscríbete para publicar",
-        "referralProgramP1": "ó invita a otros streamers con tu ",
-        "qreatorCode": "Código de Qreador",
-        "referralProgramP2": " y recibe 2 publicaciones por cada streamer que invites"
-    },
-    "QStore": {
-        "QStore": "Q Store",
-        "description": "Adquiere recompensas para tu comunidad con tus $QOINS, o pon un meta de Qoins para alcanzar una recompensa.",
-        "legend": "🇲🇽 México  🇺🇸 USA  🌐 Internacional",
-        "requestBits": "Solicitar Bits",
-        "setGoal": "Crea una meta de Qoins",
-        "acquire": "Adquirir"
+        "title": "Agenda tu stream en\nla app de Qapla 🚀",
+        "startTrial": "Inicia tu Free Trial. ",
+        "noCardRequired": "No requiere tarjeta.",
+        "drops": "🪂 Recompensa a tu audiencia con Drops de Qoins",
+        "customAlerts": "🫡 Agrega valor a tus suscriptores en Twitch con alertas personalizadas",
+        "visibility": "👁 Visibilidad para tu contenido fuera de Twitch",
+        "startFreeTrial": "Activar Free Trial"
     },
     "StreamsLeft": {
-        "streams": "Publicaciones disponibles: ",
-        "leftStreams": "{{available}} de {{total}}",
-        "renewsOn": "Renueva el {{date}} de {{month}}"
+        "drops": "Drops disponibles: ",
+        "dropsLeft": "{{available}} de {{total}}",
+        "renewsOn": "Renueva el {{date}} de {{month}}",
+        "membershipExpired": "Venció el {{date}} de {{month}}"
     },
     "EditStream": {
         "change" : "Cambiar fecha u hora",
@@ -309,7 +369,7 @@
         },
         "alerts": {
             "updated": "Horario actualizado",
-            "errorDate": "Por favor verifica que has selecionado una fecha y/o hora valida",
+            "errorDate": "Por favor verifica que has selecionado una fecha y/o hora válida",
             "sent": "Notificación enviada",
             "errorSend": "Error al enviar la notificación. Intenta de nuevo mas tarde",
             "updatesPolicy": "Se permite cambiar de horario hasta 5 minutos antes de la fecha programada"

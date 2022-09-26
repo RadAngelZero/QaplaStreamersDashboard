@@ -1,21 +1,18 @@
 import React, { useState, useReducer, useEffect } from 'react';
-import { makeStyles, Grid, Button, InputAdornment, InputLabel, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from '@material-ui/core';
+import { makeStyles, Grid, Button, InputAdornment, InputLabel, CircularProgress } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DayJsUtils from '@date-io/dayjs';
 
-import { addToStreamsRequestedOnStreamsPackage, addToStreamsRequestedOnSubscriptionDetails, createNewStreamRequest, removeStreamPackageOfStreamer, updateStreamerProfile } from './../../services/database';
+import { createNewStreamRequest, updateStreamerProfile } from './../../services/database';
 import styles from './NewStream.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import StreamerSelect from '../StreamerSelect/StreamerSelect';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
-import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
 import BackButton from '../BackButton/BackButton';
 import NewStreamSuccessDialog from './NewStreamSuccessDialog';
-import RequestActivation from '../RequestActivation/RequestActivation';
 import { getTwitchUserDataCloudFunction } from '../../services/functions';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 
@@ -24,11 +21,15 @@ const useStyles = makeStyles((theme) => ({
         color: '#FFF',
         fontSize: '14px'
     },
+    titleLabel: {
+        marginBottom: 8
+    },
     datePickerLabel: {
         marginBottom: theme.spacing(1),
         fontSize: '12px',
         color: '#B2B3BD',
-        lineHeight: '16px'
+        lineHeight: '16px',
+        width:'274px'
     },
     button: {
         color: '#FFF',
@@ -50,7 +51,8 @@ const useStyles = makeStyles((theme) => ({
             width: '20px',
             marginLeft: '-6px',
             marginRight: '18px',
-            zIndex: '10'
+            zIndex: '10',
+            height: '56px',
         }
     },
     popover: {
@@ -114,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const NewStream = ({ user, games }) => {
+const NewStream = ({ user, games, qoinsDrops }) => {
     const userLang = navigator.language || navigator.userLanguage;
     const classes = useStyles();
     const history = useHistory();
@@ -126,8 +128,9 @@ const NewStream = ({ user, games }) => {
     const [clockOpen, setClockOpen] = useState(false);
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [gamesData, setGamesData] = useState([]);
-    const [showAccountActviation, setShowAccountActviation] = useState(false);
+    const [dropsForStream, setDropsForStream] = useState(null);
     const [lockSendButton, setLockSendButton] = useState(false);
+    const [dropsError, setDropsError] = useState(null);
 
     useEffect(() => {
         let gameList = [];
@@ -145,58 +148,20 @@ const NewStream = ({ user, games }) => {
 
             setGamesData(tempGamesData);
         }
-    }, [games.allGames, user]);
+
+        if (dropsForStream === null && qoinsDrops.original > 0) {
+            setDropsForStream(qoinsDrops.original - qoinsDrops.used < 50 ? qoinsDrops.original - qoinsDrops.used : 50);
+        }
+    }, [games.allGames, user, qoinsDrops, dropsForStream]);
 
     const optionalDataReducer = (state, action) => {
+        // We don´t need this to be a reducer anymore, we should change it later
         switch (action.target.id) {
             case 'eventTitle':
-                if (userLang.toLowerCase().includes('es')) {
-                    return ({
-                        ...state,
-                        title: {
-                            es: action.target.value
-                        }
-                    })
-                } else {
-                    return ({
-                        ...state,
-                        title: {
-                            en: action.target.value
-                        }
-                    })
-                }
-            case 'eventDescriptionTitle':
-                if (userLang.toLowerCase().includes('es')) {
-                    return ({
-                        ...state,
-                        descriptionsTitle: {
-                            es: action.target.value
-                        }
-                    })
-                } else {
-                    return ({
-                        ...state,
-                        descriptionsTitle: {
-                            en: action.target.value
-                        }
-                    })
-                }
-            case 'eventDescription':
-                if (userLang.toLowerCase().includes('es')) {
-                    return ({
-                        ...state,
-                        descriptions: {
-                            es: action.target.value
-                        }
-                    })
-                } else {
-                    return ({
-                        ...state,
-                        descriptions: {
-                            en: action.target.value
-                        }
-                    })
-                }
+                return ({
+                    ...state,
+                    title: action.target.value
+                });
             default:
                 break;
         }
@@ -204,8 +169,8 @@ const NewStream = ({ user, games }) => {
 
     const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
 
-    // Minimum valid date is 24 hours since the current date
-    const minDate = new Date((new Date()).getTime() + 86400000);
+    // Minimum valid date is 5 minutes from the current date
+    const minDate = new Date((new Date()).getTime() + 300000);
 
     // The default date is the minDate + 15 minutes, to avoid show the error feedback when the streamer open the screen
     const [selectedDate, setSelectedDate] = useState(new Date(minDate.getTime() + 900000));
@@ -220,9 +185,34 @@ const NewStream = ({ user, games }) => {
         setDisplayDate(date)
     };
 
-    const openSuccessWindow = () => {
-        submitEvent();
-    };
+    const setDrops = (drops) => {
+        if (drops >= 0) {
+            if (drops > qoinsDrops.original - qoinsDrops.used) {
+                setDropsError(
+                    <p style={{ fontSize: 12, fontWeight: '400', color: '#FF0000', marginTop: 8 }}>
+                        {t('NewStream.dropsAboveLimitErrorP1')}
+                        <span style={{ color: '#00FFDD', fontSize: 12 }}>
+                            {t('NewStream.dropsAboveLimitErrorP2', { drops: qoinsDrops.original - qoinsDrops.used })}
+                        </span>
+                        {t('NewStream.dropsAboveLimitErrorP3')}
+                    </p>
+                );
+            } else if (drops === 0) {
+                setDropsError(
+                    <p style={{ fontSize: 12, fontWeight: '400', color: '#FF0000', marginTop: 8 }}>
+                        {t('NewStream.setValidAmountOfDropsP1')}
+                        <span style={{ color: '#00FFDD', fontSize: 12 }}>
+                            {t('NewStream.setValidAmountOfDropsP2', { drops: qoinsDrops.original - qoinsDrops.used })}
+                        </span>
+                    </p>
+                );
+            } else {
+                setDropsError(null);
+            }
+
+            setDropsForStream(drops);
+        }
+    }
 
     const submitEvent = async () => {
         setLockSendButton(true);
@@ -231,14 +221,14 @@ const NewStream = ({ user, games }) => {
             return alert(t('NewStream.alerts.noChannelPoints'));
         }
 
-        if (!user.premium && !user.freeTrial) {
-            setLockSendButton(false);
-            return setShowAccountActviation(true);
+        // User is not premium and don´t have a Free Trial
+        if (user.premium === undefined && user.freeTrial === undefined) {
+            return setLockSendButton(false);
         }
 
         if (selectedDate < minDate) {
             setLockSendButton(false);
-            alert(t('NewStream.alerts.before24h'));
+            alert(t('NewStream.alerts.beforeXminutes'));
             return;
         }
         if (!selectedGame) {
@@ -255,28 +245,7 @@ const NewStream = ({ user, games }) => {
              */
             if (selectedDate.getTime() <= endDate) {
 
-                const numberOfStreamsInTheSelectedPeriod = user.subscriptionDetails.streamsRequested || 0;
-
-                let userCanCreateStream = numberOfStreamsInTheSelectedPeriod + 1 <= parseInt(user.subscriptionDetails.streamsIncluded);
-
-                if (!userCanCreateStream) {
-                    if (user.boughtStreams) {
-                        /**
-                         * Check for packages of streams bought by the streamer, if some package has not expired and has not used the total amount of streams bought
-                         * the user can create the stream, this function will also remove expired packages or packages that has been already used
-                         */
-                        userCanCreateStream = Object.keys(user.boughtStreams).some((streamsPackageId) => {
-                            if (selectedDate.getTime() <= user.boughtStreams[streamsPackageId].expirationTimestamp && (!user.boughtStreams[streamsPackageId].streamsRequested || user.boughtStreams[streamsPackageId].streamsRequested + 1 <= user.boughtStreams[streamsPackageId].boughtStreams)) {
-                                addToStreamsRequestedOnStreamsPackage(user.uid, streamsPackageId);
-                                return true;
-                            } else {
-                                removeStreamPackageOfStreamer(user.uid, streamsPackageId);
-                            }
-                        });
-                    }
-                } else {
-                    addToStreamsRequestedOnSubscriptionDetails(user.uid);
-                }
+                const userCanCreateStream = qoinsDrops.original;
 
                 /**
                  * If the number of streams in the selected period plus 1 (to count the event the streamer is trying to create)
@@ -313,325 +282,241 @@ const NewStream = ({ user, games }) => {
                         });
                     }
 
-                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
+                    let titles = {
+                        es: '🪂 Únete y obtén Drops de Qoins',
+                        en: '🪂 Join to get Qoins Drops'
+                    };
 
-                    window.analytics.track('Stream requested', {
+                    if (optionalData.title) {
+                        titles = {
+                            es: optionalData.title,
+                            en: optionalData.title
+                        };
+                    }
+
+                    await createNewStreamRequest(
+                        user.uid,
+                        streamerData,
                         selectedGame,
-                        selectedDate: selectedDate.getTime(),
-                        uid: user.uid
-                    });
-                    setOpenSuccessDialog(true);
-                } else {
-                    setShowAccountActviation(true);
+                        UTCDate,
+                        UTCTime,
+                        selectedEvent,
+                        selectedDate.getTime(),
+                        titles,
+                        (new Date()).getTime(),
+                        stringDate,
+                        dropsForStream,
+                        () => {
+                            window.analytics.track('Stream requested', {
+                                selectedGame,
+                                selectedDate: selectedDate.getTime(),
+                                uid: user.uid
+                            });
+                            setOpenSuccessDialog(true);
+                        }
+                    );
                 }
             } else {
                 alert(t('NewStream.alerts.beforePlanExpiration'));
             }
-        } else {
-            setShowAccountActviation(true);
         }
     }
 
-    const successActivation = async () => {
-        const UTCDay = selectedDate.getUTCDate() < 10 ? `0${selectedDate.getUTCDate()}` : selectedDate.getUTCDate();
-        const UTCMonth = selectedDate.getUTCMonth() + 1 < 10 ? `0${selectedDate.getUTCMonth() + 1}` : selectedDate.getUTCMonth() + 1;
-        let UTCDate = `${UTCDay}-${UTCMonth}-${selectedDate.getUTCFullYear()}`;
-
-        const UTCHour = selectedDate.getUTCHours() < 10 ? `0${selectedDate.getUTCHours()}` : selectedDate.getUTCHours();
-        const UTCMinutes = selectedDate.getUTCMinutes() < 10 ? `0${selectedDate.getUTCMinutes()}` : selectedDate.getUTCMinutes();
-        let UTCTime = `${UTCHour}:${UTCMinutes}`;
-
-        let streamerData = {
-            displayName: user.displayName,
-            login: user.login,
-            photoUrl: user.photoUrl
-        };
-
-        const userData = await getTwitchUserDataCloudFunction(user.id);
-        if (userData && userData.data) {
-            streamerData = {
-                displayName: userData.data.display_name,
-                login: userData.data.login,
-                photoUrl: userData.data.profile_image_url
-            };
-
-            await updateStreamerProfile(user.uid, {
-                displayName: userData.data.display_name,
-                login: userData.data.login,
-                photoUrl: userData.data.profile_image_url,
-                broadcasterType: userData.data.broadcaster_type
-            });
-        }
-
-        await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate);
-        await addToStreamsRequestedOnSubscriptionDetails(user.uid);
-
-        updateStreamerProfile(user.uid, streamerData);
-
-        window.analytics.track('Free trial started', {
-            uid: user.uid
-        });
-        setOpenSuccessDialog(true);
-    }
-
-    if (!showAccountActviation) {
-        return (
-            <StreamerDashboardContainer user={user}>
-                <Grid container>
-                    <Grid item xs={12}>
-                        <BackButton onClick={history.goBack} />
-                    </Grid>
-                    <Grid item sm={8}>
-                        <h1 className={styles.title}>
-                            {t('NewStream.whatAreYouPlaying')}
-                        </h1>
-                        <Grid container spacing={4} style={{ marginTop: '2px' }}>
-                            <Grid item sm={5} style={{ width: '274px', maxWidth: '274px', }}>
-                                <InputLabel className={classes.datePickerLabel}>
-                                    {t('NewStream.pickACategory')}
-                                </InputLabel>
-                                <ReactSearchAutocomplete
-                                    items={gamesData}
-                                    autofocus
-                                    placeholder={t('NewStream.categoryPickerPlaceholder')}
-                                    showItemsOnFocus
-                                    maxResults={5}
-                                    onSelect={(game) => setSelectedGame(game.id)}
-                                    onClear={() => setSelectedGame(null)}
-                                    styling={{
-                                        zIndex: 999,
-                                        height: '56px',
-                                        color: '#FFF',
-                                        hoverBackgroundColor: 'rgba(255, 255, 255, 0.25)',
-                                        fontSize: '1rem',
-                                        fontWeight: 'bold',
-                                        backgroundColor: '#141833',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        placeholderColor: 'rgba(255, 255, 255, 0.5)',
-                                        fontFamily: 'Inter',
-                                        lineColor: 'transparent'
-                                    }}
-                                    showIcon={false}
-                                    formatResults={(item) => <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>} />
-                            </Grid>
-                        </Grid>
-                        <h1 className={styles.title}>
-                            {t('NewStream.when')}
-                        </h1>
-                        <MuiPickersUtilsProvider utils={DayJsUtils}>
-                            <Grid container spacing={4} style={{ marginTop: '2px' }}>
-                                <Grid item sm={5} style={{ maxWidth: '274px', }}>
-                                    <InputLabel className={classes.datePickerLabel} >
-                                        {t('NewStream.date')}
-                                    </InputLabel>
-                                    <KeyboardDatePicker
-                                        open={calendarOpen}
-                                        onClick={() => setCalendarOpen(true)}
-                                        onOpen={() => { }}
-                                        onClose={() => setCalendarOpen(false)}
-                                        clearable
-                                        disablePast
-                                        disableToolbar
-                                        autoOk
-                                        value={displayDate}
-                                        placeholder='10-10-2021'
-                                        onChange={handleDateChange}
-                                        defaultValue={new Date()}
-                                        minDate={minDate}
-                                        minDateMessage={t('NewStream.alerts.before24h')}
-                                        format='DD-MM-YY ddd'
-                                        keyboardIcon={
-                                            <InputAdornment position='end' >
-                                                <CalendarIcon />
-                                            </InputAdornment>
-                                        }
-                                        InputProps={{
-                                            disableUnderline: true,
-                                            className: classes.dateInput
-                                        }}
-                                        variant={'inline'}
-                                        PopoverProps={{
-                                            PaperProps: {
-                                                className: classes.popover,
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item sm={5} style={{ maxWidth: '274px', }}>
-                                    <InputLabel className={classes.datePickerLabel}>
-                                        {t('NewStream.time')}
-                                    </InputLabel>
-                                    <KeyboardTimePicker
-                                        open={clockOpen}
-                                        onClick={() => setClockOpen(true)}
-                                        onOpen={() => { }}
-                                        onClose={() => setClockOpen(false)}
-                                        autoOk
-                                        error={selectedDate <= minDate}
-                                        helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.before24h')}
-                                        value={displayDate}
-                                        placeholder='08:00 AM'
-                                        onChange={handleDateChange}
-                                        // mask='__:__ _M'
-                                        keyboardIcon={
-                                            <InputAdornment position='end' >
-                                                <TimeIcon />
-                                            </InputAdornment>
-                                        }
-                                        InputProps={{
-                                            disableUnderline: true,
-                                            className: classes.dateInput
-                                        }}
-                                        variant={'inline'}
-                                        PopoverProps={{
-                                            PaperProps: {
-                                                className: classes.popover,
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                {/* <Grid item sm={8} style={{ width: '90%', minWidth: '330px' }}>
-                                    <InputLabel className={classes.datePickerLabel}>
-                                        {t('NewStream.confirmDate')}
-                                    </InputLabel>
-                                    <StreamerTextInput placeholder={t('NewStream.confirmDatePlaceholder')}
-                                        fullWidth
-                                        value={stringDate}
-                                        onChange={handleStringDateChange} />
-                                </Grid> */}
-                            </Grid>
-                        </MuiPickersUtilsProvider>
-                        {/* <h1 className={styles.title}>
-                            {t('NewStream.streamType')}
-                        </h1> */}
-                        {/* <RadioGroup name={'eventType'} value={selectedEvent} onChange={(event) => { handleEventTypeChange(event) }}>
-                            <Grid container>
-                                <Grid item sm={2}>
-                                    <FormControlLabel
-                                        value={'exp'}
-                                        classes={{ label: classes.label }}
-                                        control={
-                                            <Radio defaultChecked
-                                                checkedIcon={<CheckedIcon />}
-                                                icon={<UncheckedIcon />}
-                                                style={{ backgroundColor: 'transparent' }} />
-                                        }
-                                        label={t('NewStream.streamTypes.casual')} />
-                                </Grid>
-                            </Grid>
-                        </RadioGroup> */}
-                        <Grid container className={classes.accordionContainer}>
-                            <Accordion
-                                className={classes.accordion}
-                            >
-                                <AccordionSummary
-                                    expandIcon={<ArrowIcon />}
-                                    id={"moreOptions"}
-                                    aria-controls="panel1a-content"
-                                >
-                                    <InputLabel
-                                        className={classes.label}
-                                    >
-                                        {t('NewStream.advanced')}
-                                    </InputLabel>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Grid container direction={'column'} className={classes.accordionGridRoot}>
-                                        <InputLabel className={classes.label}>
-                                            {t('NewStream.feelingCreative')}
-                                        </InputLabel>
-                                        <Grid container>
-                                            <h1 className={styles.title}>
-                                                {t('NewStream.streamTitle')}
-                                            </h1>
-                                            <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
-                                                    <StreamerTextInput
-                                                        label={t('NewStream.streamTitle')}
-                                                        placeholder={t('NewStream.streamTitlePlaceholder')}
-                                                        id='eventTitle'
-                                                        fullWidth={true}
-                                                        value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
-                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                        <h1 className={styles.title}>
-                                            {t('NewStream.streamDescription')}
-                                        </h1>
-                                        {/* <Grid>
-                                            <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem}>
-                                                    <StreamerTextInput
-                                                        label={t('NewStream.subtitle')}
-                                                        id={'eventDescriptionTitle'}
-                                                        placeholder={t('NewStream.subtitle')}
-                                                        fullWidth={true}
-                                                        value={optionalData.descriptionsTitle ? userLang.toLowerCase().includes('es') ? optionalData.descriptionsTitle.es : optionalData.descriptionsTitle.en : ''}
-                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </Grid> */}
-                                        <Grid>
-                                            <Grid container spacing={4}>
-                                                <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px' }}>
-                                                    <StreamerTextInput
-                                                        id={'eventDescription'}
-                                                        label={t('NewStream.streamDescription')}
-                                                        placeholder={t('NewStream.descriptionPlaceholder')}
-                                                        multiline={true}
-                                                        rows={3}
-                                                        rowsMax={30}
-                                                        fullWidth={true}
-                                                        value={optionalData.descriptions ? userLang.toLowerCase().includes('es') ? optionalData.descriptions.es : optionalData.descriptions.en : ''}
-                                                        onChange={(e) => optionalDataDispatcher({ target: e.target })}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </AccordionDetails>
-                            </Accordion>
-                        </Grid>
-                        <Button
-                            disabled={lockSendButton}
-                            className={styles.button}
-                            onClick={openSuccessWindow}>
-                            {lockSendButton ?
-                                <CircularProgress
-                                    style={{
-                                        color: '#fff7',
-                                        alignSelf: 'center'
-                                    }}
-                                    size={25} />
-                                :
-                                t('NewStream.submit')
-                            }
-                        </Button>
-                    </Grid>
+    return (
+        <StreamerDashboardContainer user={user}>
+            <Grid container>
+                <Grid item xs={12}>
+                    <BackButton onClick={history.goBack} />
                 </Grid>
-                <NewStreamSuccessDialog
-                    open={openSuccessDialog}
-                    onClose={() => history.push('/profile')}
-                    mainPage={() => history.push('/profile')}
-                />
-            </StreamerDashboardContainer>
-        );
-    } else {
-        return (
-            <>
-                <RequestActivation user={user} onSuccessActivation={successActivation} />
-                <NewStreamSuccessDialog
-                    open={openSuccessDialog}
-                    onClose={() => history.push('/profile')}
-                    mainPage={() => history.push('/profile')}
-                />
-            </>
-        )
-    }
+                <Grid item sm={8}>
+                    <h1 className={styles.title}>
+                        {t('NewStream.whatAreYouPlaying')}
+                    </h1>
+                    <Grid container spacing={4} style={{width: '800px',marginTop: '2px' }}>
+                        <Grid item sm={5} style={{ width: '274px', maxWidth: '308px', }}>
+                            <InputLabel className={classes.datePickerLabel}>
+                                {t('NewStream.pickACategory')}
+                            </InputLabel>
+                            <ReactSearchAutocomplete
+                                items={gamesData}
+                                autofocus
+                                placeholder={t('NewStream.categoryPickerPlaceholder')}
+                                showItemsOnFocus
+                                maxResults={gamesData.length}
+                                onSelect={(game) => setSelectedGame(game.id)}
+                                onClear={() => setSelectedGame(null)}
+                                styling={{
+                                    zIndex: 999,
+                                    height: '56px',
+                                    width: '274px',
+                                    color: '#FFF',
+                                    hoverBackgroundColor: 'rgba(255, 255, 255, 0.25)',
+                                    fontSize: '1rem',
+                                    fontWeight: 'bold',
+                                    backgroundColor: '#141833',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    placeholderColor: 'rgba(255, 255, 255, 0.5)',
+                                    fontFamily: 'Inter',
+                                    lineColor: 'transparent',
+                                }}
+                                showIcon={false}
+                                formatResults={(item) => <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>} />
+                        </Grid>
+                    </Grid>
+                    <h1 className={styles.title}>
+                        {t('NewStream.when')}
+                    </h1>
+                    <MuiPickersUtilsProvider utils={DayJsUtils}>
+                        <Grid container spacing={4} style={{ marginTop: '2px' }}>
+                            <Grid item sm={5} style={{ maxWidth: '304px', }}>
+                                <InputLabel className={classes.datePickerLabel} >
+                                    {t('NewStream.date')}
+                                </InputLabel>
+                                <KeyboardDatePicker
+                                    open={calendarOpen}
+                                    onClick={() => setCalendarOpen(true)}
+                                    onOpen={() => { }}
+                                    onClose={() => setCalendarOpen(false)}
+                                    clearable
+                                    disablePast
+                                    disableToolbar
+                                    autoOk
+                                    value={displayDate}
+                                    placeholder='10-10-2021'
+                                    onChange={handleDateChange}
+                                    defaultValue={new Date()}
+                                    minDate={minDate}
+                                    minDateMessage={t('NewStream.alerts.beforeXminutes')}
+                                    format='DD-MM-YY ddd'
+                                    style={{width:'274px', height:'56px'}}
+                                    keyboardIcon={
+                                        <InputAdornment position='end' >
+                                            <CalendarIcon />
+                                        </InputAdornment>
+                                    }
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        className: classes.dateInput
+                                    }}
+                                    variant={'inline'}
+                                    PopoverProps={{
+                                        PaperProps: {
+                                            className: classes.popover,
+                                        }
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item sm={5} style={{ maxWidth: '274px', }}>
+                                <InputLabel className={classes.datePickerLabel}>
+                                    {t('NewStream.time')}
+                                </InputLabel>
+                                <KeyboardTimePicker
+                                    open={clockOpen}
+                                    onClick={() => setClockOpen(true)}
+                                    onOpen={() => { }}
+                                    onClose={() => setClockOpen(false)}
+                                    autoOk
+                                    error={selectedDate <= minDate}
+                                    helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.beforeXminutes')}
+                                    value={displayDate}
+                                    placeholder='08:00 AM'
+                                    onChange={handleDateChange}
+                                    style={{width:'274px',height:'56px'}}
+                                    // mask='__:__ _M'
+                                    keyboardIcon={
+                                        <InputAdornment position='end' >
+                                            <TimeIcon />
+                                        </InputAdornment>
+                                    }
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        className: classes.dateInput
+                                    }}
+                                    variant={'inline'}
+                                    PopoverProps={{
+                                        PaperProps: {
+                                            className: classes.popover,
+                                        }
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+                    </MuiPickersUtilsProvider>
+                    <Grid  spacing={4} style={{ marginTop: '2px' }}>
+                        <Grid item sm={5}  style={{display: 'flex'}}>
+                            <Grid >
+                                <h1 className={styles.title}>
+                                    {t('NewStream.streamTitle')}
+                                    <span style={{ fontSize: 16 }}>
+                                        {t('NewStream.optional')}
+                                    </span>
+                                </h1>
+                                <p className={styles.subTitle}>
+                                    {t('NewStream.streamTitleDescription')}
+                                </p>
+                                <Grid container spacing={4} style={{ marginTop:'10px'}}>
+                                    <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px'}}>
+                                        <StreamerTextInput
+                                            labelClassName={classes.titleLabel}
+                                            label={t('NewStream.streamTitle')}
+                                            placeholder={t('NewStream.streamTitlePlaceholder')}
+                                            id='eventTitle'
+                                            fullWidth={true}
+                                            value={optionalData.title ? userLang.toLowerCase().includes('es') ? optionalData.title.es : optionalData.title.en : ''}
+                                            onChange={(e) => optionalDataDispatcher({ target: e.target })}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <Grid  style={{marginLeft:'30px'}}>
+                                <h1 className={styles.title}>
+                                    {t('NewStream.dropsTitle')}
+                                </h1>
+                                <p className={styles.subTitle}>
+                                    {t('NewStream.dropsDescription')}
+                                </p>
+                                <Grid container spacing={4} style={{ marginTop:'10px'}}>
+                                    <Grid item className={classes.accordionGridItem} style={{ marginTop: '10px'}}>
+                                        <StreamerTextInput
+                                            labelClassName={classes.titleLabel}
+                                            label={t('NewStream.maxLimit')}
+                                            id='eventTitle'
+                                            fullWidth={true}
+                                            value={dropsForStream}
+                                            onChange={(e) => setDrops(Number(e.target.value))}
+                                            type='Number'
+                                        />
+                                        {dropsError}
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Button
+                        disabled={lockSendButton || dropsError || !dropsForStream}
+                        className={styles.button}
+                        onClick={submitEvent}>
+                        {lockSendButton ?
+                            <CircularProgress
+                                style={{
+                                    color: '#fff7',
+                                    alignSelf: 'center'
+                                }}
+                                size={25} />
+                            :
+                            t('NewStream.submit')
+                        }
+                    </Button>
+                </Grid>
+            </Grid>
+            <NewStreamSuccessDialog
+                open={openSuccessDialog}
+                onClose={() => history.push('/profile')}
+                mainPage={() => history.push('/profile')}
+            />
+        </StreamerDashboardContainer>
+    );
 }
 
 export default NewStream;

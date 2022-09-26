@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { makeStyles, Card, Button, CircularProgress } from '@material-ui/core';
+import { makeStyles, Card, Button } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as ShareArrow } from './../../assets/ShareArrow.svg';
+import { ReactComponent as TimerIcon } from './../../assets/Timer.svg';
 import {
     streamsPlaceholderImages,
     SCHEDULED_EVENT_TYPE,
@@ -16,7 +17,9 @@ import {
     cancelStreamRequest,
     getStreamTitle,
     getPastStreamTitle,
-    checkActiveCustomReward
+    checkActiveCustomReward,
+    listenToQoinsEnabled,
+    removeQoinsEnabledListener
 } from '../../services/database';
 import { closeQaplaStream, enableStreamQoinsReward, startQaplaStream } from '../../services/streamQapla';
 import EventManagementDialog from '../QaplaStreamDialogs/EventManagementDialog';
@@ -28,6 +31,7 @@ import { auth } from '../../services/firebase';
 import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
 import { sendCustomMessage } from '../../services/functions';
 import { generateStreamDynamicLink } from '../../services/dynamicLinks';
+import { getCurrentLanguage } from '../../utilities/i18n';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -160,9 +164,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image }) => {
-    // This information is not longer visible in the card but maybe in the future we would want to show it again
-    // const [participantsNumber, setParticipantsNumber] = useState(null);
+const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image, drops }) => {
     const [title, setTitle] = useState({ en: '', es: '' });
     const [stream, setStream] = useState(null);
     const [showRewardsOptions, setShowRewardsOptions] = useState(false);
@@ -191,23 +193,16 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const { t } = useTranslation();
 
     useEffect(() => {
-        async function getParticipantsNumber() {
+        async function getTitle() {
             if (streamType === SCHEDULED_EVENT_TYPE) {
-                /* const participants = await getStreamParticipantsNumber(streamId);
-                let participantsNumber = participants.exists() ? participants.val() : 0;
-                setParticipantsNumber(participantsNumber); */
-
                 const title = await getStreamTitle(streamId);
+
                 if (title.exists()) {
                     setTitle(title.val());
                 } else if (games['allGames'] && games['allGames'][game] && games['allGames'][game].gameName) {
                     setTitle({ en: games['allGames'][game].gameName });
                 }
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
-                /* const participants = await getPastStreamParticipantsNumber(user.uid, streamId);
-                let participantsNumber = participants.exists() ? participants.val() : 0;
-                setParticipantsNumber(participantsNumber); */
-
                 const title = await getPastStreamTitle(user.uid, streamId);
                 setTitle(title.val());
             } else if (streamType === PENDING_APPROVAL_EVENT_TYPE) {
@@ -220,7 +215,23 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         async function checkStreamStatus() {
             const streamStatus = await checkActiveCustomReward(streamId);
             if (streamStatus.exists()) {
-                setStream({ key: streamStatus.key, ...streamStatus.val() });
+                if (streamStatus.val().enableIn && !streamStatus.val().qoinsEnabled) {
+                    listenToQoinsEnabled(streamId, (qoinsEnabled) => {
+                        if (qoinsEnabled.val()) {
+                            setStream({
+                                ...{ key: streamStatus.key, ...streamStatus.val() },
+                                qoinsEnabled: qoinsEnabled.val()
+                            });
+
+                            removeQoinsEnabledListener(streamId);
+                        } else {
+                            setStream({ key: streamStatus.key, ...streamStatus.val() });
+                        }
+                    });
+                } else {
+                    setStream({ key: streamStatus.key, ...streamStatus.val() });
+                }
+
                 setShowRewardsOptions(true);
                 setHideStream(false);
             } else {
@@ -229,7 +240,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
 
 
-        getParticipantsNumber();
+        getTitle();
         checkStreamStatus();
 
         if (streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions) {
@@ -267,27 +278,43 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
     }
 
-    const startStream = async (e) => {
-        if (e) {
-            e.stopPropagation();
-        }
-
+    const startStream = async (enableIn) => {
         try {
             setStartingStream(true);
-            const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, user.subscriptionDetails.redemptionsPerStream);
+            const streamData = await startQaplaStream(user.uid, user.id, user.displayName, user.refreshToken, streamId, drops, enableIn);
+
+            if (enableIn) {
+                listenToQoinsEnabled(streamId, (qoinsEnabled) => {
+                    if (qoinsEnabled.val()) {
+                        setStream({
+                            ...stream,
+                            qoinsEnabled: qoinsEnabled.val()
+                        });
+
+                        removeQoinsEnabledListener(streamId);
+                    }
+                });
+            }
+
+            setStream(streamData);
+            if (!openStreamDialog) {
+                setOpenStreamStartedDialog(true);
+            }
+            setStartingStream(false);
 
             window.analytics.track('Stream started', {
                 streamId,
                 uid: user.uid,
                 timestamp: (new Date()).getTime()
             });
-            setStream(streamData);
-            if (!openStreamDialog) {
-                setOpenStreamStartedDialog(true);
-            }
-            setStartingStream(false);
+
+            return streamData;
         } catch (error) {
-            handleExpiredSession();
+            if (error && error.status === 401) {
+                handleExpiredSession();
+            } else {
+                alert('Hubo un problema al iniciar, si el problema persiste contacta con soporte tecnico');
+            }
         }
     }
 
@@ -298,7 +325,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
 
         try {
             setClosingStream(true);
-            await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.xqReward, stream.xqRewardWebhookId, stream.qoinsReward, stream.qoinsRewardWebhookId);
+            await closeQaplaStream(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward, stream.qoinsRewardWebhookId, drops);
 
             window.analytics.track('Stream finished', {
                 streamId,
@@ -312,6 +339,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             setOpenQoinsWarningDialog(false);
             setOpenStreamDialog(false);
         } catch (error) {
+            console.log(error);
             handleExpiredSession();
         }
     }
@@ -333,17 +361,22 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
     }
 
-    const enableQoinsReward = async () => {
+    /**
+     * When reward created inmediately from modal stream can be undefined and give problems for that case we
+     * have streamObject as parameter with a default value of stream state
+     */
+    const enableQoinsReward = async (streamObject = stream) => {
         try {
-            await enableStreamQoinsReward(user.uid, user.id, user.refreshToken, streamId, stream.qoinsReward);
+            await enableStreamQoinsReward(user.uid, user.id, user.refreshToken, streamId, streamObject.qoinsReward);
 
             window.analytics.track('Qoins enabled', {
                 streamId,
                 uid: user.uid,
                 timestamp: (new Date()).getTime()
             });
-            setStream({ ...stream, qoinsEnabled: true });
+            setStream({ ...streamObject, qoinsEnabled: true });
         } catch (error) {
+            console.log(error);
             handleExpiredSession();
         }
     }
@@ -408,6 +441,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     }
 
     if (game && !hideStream) {
+        const currentLanguage = getCurrentLanguage();
         return (
             <Card className={classes.eventCard} style={style}>
                 <div className={classes.relativeContainer}>
@@ -769,7 +803,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                 </div>
                 <div className={classes.eventCardContent}>
                     <p className={classes.eventCardTitle}>
-                        {title && title['en'] ? title['en'] : ''}
+                        {title && title[currentLanguage] ? title[currentLanguage] : ''}
                     </p>
                     {streamType !== PAST_STREAMS_EVENT_TYPE && !showRewardsOptions &&
                         <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
@@ -789,21 +823,22 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                         {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
                             (!startingStream ?
                                 (stream ?
-                                    (!closingStream ?
+                                    (!closingStream && stream.qoinsEnabled ?
                                         <Button size='medium' className={classes.endButton}
                                             disabled={closingStream}
                                             onClick={checkIfCloseStreamDialogMustBeShown}>
                                             {t('StreamCard.end')}
                                         </Button>
                                         :
-                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                            <CircularProgress style={{ color: '#3B4BF9' }} />
-                                        </div>
+                                        <p style={{ color: '#FFF', textAlign: 'center' }}>
+                                            {t('StreamCard.dropsScheduled')}
+                                        </p>
                                     )
                                     :
                                     <Button size='medium' className={classes.startButton}
-                                        onClick={startStream}>
-                                        {t('StreamCard.start')}
+                                        startIcon={<TimerIcon />}
+                                        onClick={() => setOpenStreamDialog(true)}>
+                                        {t('StreamCard.enableDrops')}
                                     </Button>
                                 )
                                 :
@@ -813,13 +848,9 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                             )
                         }
                         <div style={{ height: '11px' }} />
-                        {streamType === SCHEDULED_EVENT_TYPE &&
-                            <Button size='medium' className={classes.manageButton} onClick={showRewardsOptions ? setOpenStreamDialog : manageStream}>
-                                {showRewardsOptions ?
-                                    t('StreamCard.manageRewards')
-                                    :
-                                    t('StreamCard.manageStream')
-                                }
+                        {streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions &&
+                            <Button size='medium' className={classes.manageButton} onClick={manageStream}>
+                                {t('StreamCard.manageStream')}
                             </Button>
                         }
                         {streamType === PENDING_APPROVAL_EVENT_TYPE &&

@@ -261,6 +261,7 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
         const streamRef = streamsRef.push();
         let data = { shortLink: '' };
         try {
+            // TODO: Replace with dinamycLinks methods
             const streamLinkRequest = await fetch(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyAwrwwTRiyYV7-SzOvE6kEteE0lmYhBe8c`, {
                 method: 'POST',
                 headers: {

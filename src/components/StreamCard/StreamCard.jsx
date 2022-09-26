@@ -19,7 +19,8 @@ import {
     getPastStreamTitle,
     checkActiveCustomReward,
     listenToQoinsEnabled,
-    removeQoinsEnabledListener
+    removeQoinsEnabledListener,
+    getStreamLink
 } from '../../services/database';
 import { closeQaplaStream, enableStreamQoinsReward, startQaplaStream } from '../../services/streamQapla';
 import EventManagementDialog from '../QaplaStreamDialogs/EventManagementDialog';
@@ -187,6 +188,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
     const [playBothEnterAnimation, setPlayBothEnterAnimation] = useState("false");
     const [playBothExitAnimation, setPlayBothExitAnimation] = useState("false");
     const [isTouch, setIsTouch] = useState(false);
+    const [streamLink, setStreamLink] = useState('');
     const actualShareHover = useRef(null);
     const history = useHistory();
     const classes = useStyles();
@@ -210,6 +212,11 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                     setTitle({ en: games['allGames'][game].gameName });
                 }
             }
+        }
+
+        async function getLink() {
+            const link = await getStreamLink(streamId);
+            setStreamLink(link.val());
         }
 
         async function checkStreamStatus() {
@@ -239,7 +246,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
             }
         }
 
-
+        getLink();
         getTitle();
         checkStreamStatus();
 
@@ -414,22 +421,8 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
         }
     }
 
-    const shareStreamLink = async () => {
-        const link = await generateStreamDynamicLink(streamId, {
-            title: title && title['en'] ? title['en'] : '',
-            description: `Evento de ${user.displayName}`,
-            image: image ? image : ''
-        });
-
-        // This does not work on Safari for some reason
-        if (link) {
-            navigator.clipboard.writeText(link);
-        }
-    }
-
-
     const copiedLink = () => {
-        navigator.clipboard.writeText('stream url');
+        navigator.clipboard.writeText(streamLink);
         setTimeout(() => {
             setShareCopied(false);
             if (actualShareHover.current && !isTouch) {
@@ -602,7 +595,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                             }}
                             className="copied-text">
                             <style>{`
-                                
+
                                 @keyframes copiedTextGrow {
                                     from {
                                         width: 0%;
@@ -700,7 +693,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                 }}
                                 className="share-text">
                                 <style>{`
-                                
+
                                 @keyframes shareTextGrow {
                                     from {
                                         width: 0%;
@@ -760,7 +753,7 @@ const StreamCard = ({ user, streamId, streamType, game, games, date, hour, onRem
                                                 transform: scale(1);
                                             }
                                         }
-        
+
                                         .share-icon[playGrowAnimation="true"] {
                                             animation: shareIconShrink 0.5s ease-in-out 1;
                                         }

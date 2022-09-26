@@ -427,6 +427,14 @@ export async function getStreamTitle(streamId) {
 }
 
 /**
+ * Returns the value of the stream link node of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamLink(streamId) {
+    return await streamsRef.child(streamId).child('streamLink').once('value');
+}
+
+/**
  * Returns the value of the timestamp node of the given stream
  * @param {string} streamId Stream unique identifier
  */

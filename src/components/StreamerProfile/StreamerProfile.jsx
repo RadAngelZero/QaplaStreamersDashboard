@@ -315,20 +315,19 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </Card>
                                         </Grid>
                                         {streams && Object.keys(streams).map((streamId) => (
-                                            <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
-                                                <StreamCard
-                                                    streamType={streams[streamId].status}
-                                                    streamId={streamId}
-                                                    image={streams[streamId].image}
-                                                    user={user}
-                                                    game={streams[streamId].game}
-                                                    games={games}
-                                                    date={formatDate(streams[streamId].timestamp)}
-                                                    hour={formatHour(streams[streamId].timestamp)}
-                                                    timestamp={streams[streamId].timestamp}
-                                                    drops={streams[streamId].drops}
-                                                    onRemoveStream={onRemoveStream} />
-                                            </Grid>
+                                            <StreamCard
+                                                key={streamId}
+                                                streamType={streams[streamId].status}
+                                                streamId={streamId}
+                                                image={streams[streamId].image}
+                                                user={user}
+                                                game={streams[streamId].game}
+                                                games={games}
+                                                date={formatDate(streams[streamId].timestamp)}
+                                                hour={formatHour(streams[streamId].timestamp)}
+                                                timestamp={streams[streamId].timestamp}
+                                                drops={streams[streamId].drops}
+                                                onRemoveStream={onRemoveStream} />
                                         ))}
                                     </Grid>
                                 </Grid>

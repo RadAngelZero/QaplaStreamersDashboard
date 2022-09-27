@@ -9,7 +9,7 @@ import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnrea
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
-import { GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { EMOTE, GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
@@ -144,7 +144,6 @@ const LiveDonations = () => {
                 /*this.element.style.display = 'block';*/
                 this.element.style.opacity = 0;
                 this.element.style.position = 'absolute';
-                // this.element.style.fontSize = '26px';
                 this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
                 this.element.style.width = '30px'
                 this.element.style.height = '30px'
@@ -226,8 +225,6 @@ const LiveDonations = () => {
                 }
             });
         }
-        // executeEmojiRain(['🙀'])
-        // executeEmoteRain(['https://cdn.frankerfacez.com/emoticon/162146/1']);
 
         if (donationQueue.length > 0 && !isPlayingAudio && reactionsEnabled) {
             setIsPlayingAudio(true);
@@ -281,7 +278,11 @@ const LiveDonations = () => {
                 setDonationToShow(donation);
 
                 if (donation.emojiRain && donation.emojiRain.emojis) {
-                    executeEmojiRain(donation.emojiRain.emojis);
+                    if (donation.emojiRain.type === EMOTE) {
+                        executeEmoteRain(donation.emojiRain.emojis);
+                    } else {
+                        executeEmojiRain(donation.emojiRain.emojis);
+                    }
                 }
 
                 if (!donation.message && !bigQoinsDonation) {

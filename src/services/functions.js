@@ -94,6 +94,21 @@ export async function distributeStreamRedemptionsRewards(streamerId, streamerNam
 }
 
 /**
+ * Call the cheerMessageTextToSpeechUberDuck to convert the message in audio
+ * @param {string} donationId Donation id
+ * @param {string} message Message to convert in audio
+ * @param {string} voiceUuid Uuid code for the selected voice
+ */
+ export async function speakCheerMessageUberDuck(donationId, message, voiceUuid) {
+    const cheerMessageTextToSpeechUberDuck = functions.httpsCallable('cheerMessageTextToSpeechUberDuck');
+    try {
+        return await cheerMessageTextToSpeechUberDuck({ donationId, message, voiceUuid });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
  * Generate access and refresh token for Twitch API
  * @param {string} code Twitch code to generate user tokens
  */
@@ -152,10 +167,24 @@ export async function subscribeStreamerToMailerLiteGroup(email, name) {
  * Subscribes a streamer to MailerLite group
  * @param {number} userTwitchId Twitch id of the user
  */
- export async function getTwitchUserDataCloudFunction(userTwitchId) {
+export async function getTwitchUserDataCloudFunction(userTwitchId) {
     const getTwitchUserData = functions.httpsCallable('getTwitchUserData');
     try {
         return await getTwitchUserData({ userTwitchId });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Activates a essential monthly subscription Free Trial for the given user
+ * @param {string} uid User identifier
+ * @param {string} email Email of the user
+ */
+export async function activateUserFreeTrial(uid, email) {
+    const activateFreeTrial = functions.httpsCallable('activateUserFreeTrial');
+    try {
+        return await activateFreeTrial({ uid, email });
     } catch (error) {
         console.log(error);
     }

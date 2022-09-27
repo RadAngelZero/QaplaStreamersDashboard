@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import { saveGiphyText } from '../../services/database';
 

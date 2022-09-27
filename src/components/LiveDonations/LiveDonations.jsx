@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { Video } from '@giphy/react-components';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
-import { speakCheerMessage } from '../../services/functions';
-import { GIPHY_CLIP, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
+import { EMOTE, GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
@@ -86,6 +86,17 @@ const LiveDonations = () => {
             }, delay);
          }
 
+         function addEmoteCircle(delay, range, color) {
+            setTimeout(function () {
+               let c = new EmoteCircle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
+                   x: -0.15 + Math.random() * 0.3,
+                   y: 1 + Math.random() * 10
+               }, range);
+
+               circles.push(c);
+           }, delay);
+        }
+
          class Circle {
             constructor(x, y, color, velocity, range) {
                 let _this = this;
@@ -101,6 +112,42 @@ const LiveDonations = () => {
                 this.element.style.fontSize = '26px';
                 this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
                 this.element.innerHTML = color;
+                const container = document.getElementById('animate');
+                if (container) {
+                    container.appendChild(this.element);
+                }
+
+                this.update = function () {
+                    if (_this.y > 800) {
+                        _this.y = 80 + Math.random() * 4;
+                        _this.x = _this.range[0] + Math.random() * _this.range[1];
+                    }
+                    _this.y += _this.velocity.y;
+                    _this.x += _this.velocity.x;
+                    this.element.style.opacity = 1;
+                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                };
+            }
+        }
+
+        class EmoteCircle {
+            constructor(x, y, color, velocity, range) {
+                let _this = this;
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = velocity;
+                this.range = range;
+                this.element = document.createElement('img');
+                /*this.element.style.display = 'block';*/
+                this.element.style.opacity = 0;
+                this.element.style.position = 'absolute';
+                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
+                this.element.style.width = '30px'
+                this.element.style.height = '30px'
+                this.element.src = color;
                 const container = document.getElementById('animate');
                 if (container) {
                     container.appendChild(this.element);
@@ -147,6 +194,24 @@ const LiveDonations = () => {
             animate();
         }
 
+        function executeEmoteRain(emote) {
+            setShowEmojiRain(true);
+            for (let i = 0; i < 10; i++) {
+                addEmoteCircle(i * 350, [10 + 0, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 0, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 - 200, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 200, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 - 400, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 400, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 - 600, -300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+            }
+
+            animate();
+        }
+
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
@@ -165,12 +230,12 @@ const LiveDonations = () => {
             setIsPlayingAudio(true);
             const donation = popDonation();
 
-            async function showCheer() {
+            async function showCheer(audioUrl) {
                 const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
                 const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
                 audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
-                if (!donation.repeating) {
-                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'en-US-Standard-C';
+                if (audioUrl || !donation.repeating) {
+                    const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
 
                     if (donation.message) {
                         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
@@ -184,7 +249,7 @@ const LiveDonations = () => {
                                 message: messageToRead
                             });
                             const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
-                            voiceBotMessage = new Audio(cheerMessageUrl.data);
+                            voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                         }
                     } else if (bigQoinsDonation) {
                         const messageToRead = `${donation.twitchUserName} has sent you ${donation.amountQoins} Coins`;
@@ -194,7 +259,7 @@ const LiveDonations = () => {
                             containsMessage: false
                         });
                         const cheerMessageUrl = await speakCheerMessage(streamerUid, donation.id, messageToRead, voiceToUse, 'en-US');
-                        voiceBotMessage = new Audio(cheerMessageUrl.data);
+                        voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                     }
                 } else {
                     try {
@@ -213,25 +278,50 @@ const LiveDonations = () => {
                 setDonationToShow(donation);
 
                 if (donation.emojiRain && donation.emojiRain.emojis) {
-                    executeEmojiRain(donation.emojiRain.emojis);
+                    if (donation.emojiRain.type === EMOTE) {
+                        executeEmoteRain(donation.emojiRain.emojis);
+                    } else {
+                        executeEmojiRain(donation.emojiRain.emojis);
+                    }
                 }
 
                 if (!donation.message && !bigQoinsDonation) {
                     audioAlert.onended = () => {
                         setTimeout(() => {
                             finishReaction(donation);
-                        }, 4000);
+                        }, 5000);
                     }
                 } else {
                     voiceBotMessage.onended = () => {
                         setTimeout(() => {
                             finishReaction(donation);
-                        }, 4000);
+                        }, 5000);
                     }
                 }
             }
 
-            showCheer();
+            async function initCheer() {
+                if (donation.messageExtraData && donation.messageExtraData.voiceAPIName && donation.messageExtraData && donation.messageExtraData.voiceAPIName.includes('Uberduck:')) {
+                    // 9 Because the string "Uberduck:" length is 9
+                    const voiceUuid = donation.messageExtraData.voiceAPIName.substring(9);
+                    await speakCheerMessageUberDuck(donation.id, donation.message, voiceUuid);
+                    listenForUberduckAudio(donation.id, (url) => {
+                        if (url.exists()) {
+                            if (url.val() !== 'error') {
+                                showCheer(url.val());
+                            } else {
+                                showCheer();
+                            }
+
+                            removeListenerForUberduckAudio(donation.id);
+                        }
+                    });
+                } else {
+                    showCheer();
+                }
+            }
+
+            initCheer();
         }
 
         if (!streamerUid) {
@@ -262,7 +352,7 @@ const LiveDonations = () => {
         }
         setTimeout(() => {
             setIsPlayingAudio(false);
-        }, 2000);
+        }, 750);
     }
 
     const queueAnimation = () => {
@@ -282,7 +372,7 @@ const LiveDonations = () => {
         const bigQoinsDonation = Boolean(qoinsDonation && donationToShow.amountQoins >= 1000).valueOf();
         if (bigQoinsDonation) {
             voiceBotMessage.play();
-        } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIP)) {
+        } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIP || donationToShow.media.type !== GIPHY_CLIPS)) {
             audioAlert.play();
             if (donationToShow.message) {
                 audioAlert.onended = () => {
@@ -363,6 +453,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
     const [mediaReady, setMediaReady] = useState(false);
     const [giphyTextReady, setGiphyTextReady] = useState(false);
     const [showDonation, setShowDonation] = useState(false);
+    const [muteClip, setMuteClip] = useState(false);
     const donation = donationToShow;
 
     useEffect(() => {
@@ -372,7 +463,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
             setShowDonation(true);
         }
 
-        if ((donation.media && donation.media.type === GIPHY_CLIP && donation.media.id) && !clip) {
+        if ((donation.media && (donation.media.type === GIPHY_CLIP || donation.media.type === GIPHY_CLIPS) && donation.media.id) && !clip) {
             getClip();
         } else {
             if (donation.media && donation.messageExtraData && donation.messageExtraData.giphyText && mediaReady && giphyTextReady) {
@@ -398,16 +489,21 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
         startDonation();
     }
 
-    const onClipEnded = () => {
-        const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
-        const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
+    const onClipEnded = (count) => {
+        if (count === 1) {
+            setMuteClip(true);
+            const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
+            const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
 
-        if (bigQoinsDonation) {
-            setTimeout(() => {
-                startDonation(donation);
-            }, 100);
-        } else {
-            finishReaction(donation);
+            if (bigQoinsDonation) {
+                setTimeout(() => {
+                    startDonation(donation);
+                }, 100);
+            } else {
+                setTimeout(() => {
+                    finishReaction(donation);
+                }, 5000);
+            }
         }
     }
 
@@ -435,7 +531,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                     }}
                     onLoad={() => setMediaReady(true)} />
                     :
-                    donation.media && donation.media.type === GIPHY_CLIP && clip ?
+                    donation.media && (donation.media.type === GIPHY_CLIP || donation.media.type === GIPHY_CLIPS) && clip ?
                         <div style={{
                             display: 'flex',
                             aspectRatio: donation.media.width / donation.media.height,
@@ -443,7 +539,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                             maxHeight: '250px',
                             objectFit: 'scale-down'
                         }}>
-                            <Video hideAttribution gif={clip} height={250} muted={false} loop={false} onEnded={onClipEnded} />
+                            <Video hideAttribution gif={clip} height={250} muted={muteClip} loop onLoop={onClipEnded} />
                         </div>
                     :
                     null

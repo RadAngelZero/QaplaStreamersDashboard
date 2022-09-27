@@ -1,17 +1,30 @@
 import { PAST_STREAMS_EVENT_TYPE, QoinsRewardRedemption, QOINS_REWARD } from '../utilities/Constants';
-import { addListToStreamRedemptionList, checkActiveCustomReward, removeActiveCustomRewardFromList, removeStreamFromEventsData, saveStreamTwitchCustomReward, setStreamInRedemptionsLists, updateActiveCustomReward, updateStreamerProfile, updateStreamStatus } from './database';
+import {
+    addListToStreamRedemptionList,
+    checkActiveCustomReward,
+    getStreamQoinsRedemptionsCounter,
+    removeActiveCustomRewardFromList,
+    removeStreamFromEventsData,
+    saveStreamTwitchCustomReward,
+    setStreamInRedemptionsLists,
+    updateActiveCustomReward,
+    updateStreamerProfile,
+    updateStreamStatus,
+    decreaseUsedDrops,
+    decreaseDropsLeft
+} from './database';
 import { notifyBugToDevelopTeam } from './discord';
 import { refreshUserAccessToken, subscribeStreamerToTwitchWebhook, unsubscribeStreamerToTwitchWebhook } from './functions';
 import { createCustomReward, deleteCustomReward, disableCustomReward, enableCustomReward, getAllRewardRedemptions } from './twitch';
 
-export async function startQaplaStream(uid, twitchId, streamerName, refreshToken, streamId, redemptionsPerStream, enableIn) {
+export async function startQaplaStream(uid, twitchId, streamerName, refreshToken, streamId, drops, enableIn) {
     const userTokensUpdated = await refreshUserAccessToken(refreshToken);
 
     if (userTokensUpdated.data.status === 200) {
         const userCredentialsUpdated = userTokensUpdated.data;
         updateStreamerProfile(uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
 
-        const qoinsReward = await createCustomReward(twitchId, userCredentialsUpdated.access_token, 'Qoins Qapla', 500, false, true, 1, true, redemptionsPerStream);
+        const qoinsReward = await createCustomReward(twitchId, userCredentialsUpdated.access_token, 'Qoins Qapla', 500, false, true, 1, true, drops);
         if (qoinsReward.status !== 200) {
             // Problem creating reward
 
@@ -30,7 +43,7 @@ export async function startQaplaStream(uid, twitchId, streamerName, refreshToken
             // Save webhook id on database
             await saveStreamTwitchCustomReward(uid, QOINS_REWARD, qoinsReward.data.id, streamId, qoinsWebhookSubscription.data.id);
 
-            await updateActiveCustomReward(streamId, { qoinsEnabled: false, enableIn });
+            await updateActiveCustomReward(streamId, { qoinsEnabled: false, enableIn, drops });
 
             // Get the recently created ActiveCustomReward node
             const streamStatus = await checkActiveCustomReward(streamId);
@@ -48,12 +61,21 @@ export async function startQaplaStream(uid, twitchId, streamerName, refreshToken
     }
 }
 
-export async function closeQaplaStream(uid, twitchId, refreshToken, streamId, qoinsRewardId, qoinsWebhookId) {
+export async function closeQaplaStream(uid, twitchId, refreshToken, streamId, qoinsRewardId, qoinsWebhookId, drops) {
     const userTokensUpdated = await refreshUserAccessToken(refreshToken);
 
     if (userTokensUpdated.data.status === 200) {
         const userCredentialsUpdated = userTokensUpdated.data;
         updateStreamerProfile(uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+
+        const dropsRedeemed = (await getStreamQoinsRedemptionsCounter(streamId)).val() || 0;
+
+        /**
+         * We add a negative amount to the used drops because we want to return drops if not all were redeemed during
+         * stream
+         */
+        await decreaseUsedDrops(uid, drops - dropsRedeemed);
+        await decreaseDropsLeft(uid, dropsRedeemed);
 
         /** This fragment will be used temporary */
 

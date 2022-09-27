@@ -1,3 +1,5 @@
+import { SCHEDULED_EVENT_TYPE } from '../utilities/Constants';
+import { getCurrentLanguage } from '../utilities/i18n';
 import { database, databaseServerValue } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
@@ -23,16 +25,19 @@ const streamersPublicProfilesRef = database.ref('/StreamersPublicProfiles');
 const subscriptionPurchaseDetailsRef = database.ref('/SubscriptionPurchaseDetails');
 const tagsRef = database.ref('/Tags');
 const streamerAlertsSettingsRef = database.ref('/StreamerAlertsSettings');
-const streamerCustomMediaForCheers = database.ref('/StreamerCustomMediaForCheers');
 const qoinsToBitForStreamersRef = database.ref('/QoinsToBitForStreamers');
 const qlanesRef = database.ref('/Qlanes');
 const qreatorsCodesRef = database.ref('/QreatorsCodes');
 const qaplaChallengeRef = database.ref('/QaplaChallenge');
-const qStoreRef = database.ref('/QStore');
 const userStreamerPublicDataRef = database.ref('/UserStreamerPublicData');
 const streamersInteractionsRewardsRef = database.ref('/StreamersInteractionsRewards');
-const streamerReactionTestMediaRef = database.ref('StreamerReactionTestMedia');
 const giphyTextRequestsRef = database.ref('/GiphyTextRequests');
+const userStreamerDropsRef = database.ref('//UserStreamerDrops');
+const streamsCardsImagesRef = database.ref('/StreamsCardsImages')
+const streamersDeepLinksRef = database.ref('/StreamersDeepLinks');
+const dashboardStreamersVisitsCounterRef = database.ref('/DashboardStreamersVisitsCounter');
+const uberduckRequestsRef = database.ref('/UberduckRequests');
+const streamerCashOutRef = database.ref('/StreamersCashOut');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -210,42 +215,130 @@ export function removeQoinsEnabledListener(streamId) {
  * @param {string} hour Hour in format hh:mm
  * @param {string} streamType One of 'exp' or 'tournament'
  * @param {timestamp} timestamp Timestamp based on the given date and hour
- * @param {object} optionalData Customizable data for events
+ * @param {object} titles Object with titles in differente languages. { en: 'Title', es: 'Titulo' }
+ * @param {string} titles.es Spanish version of the title
+ * * @param {string} titles.en English version of the title
  * @param {number} createdAt timestamp of when the request was created
  * @param {string} stringDate Temporary field just to detect a bug
+ * @param {number} drops Max number of drops to use in the stream
  */
-export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, optionalData, createdAt, stringDate) {
-    const event = await streamersEventsDataRef.child(uid).push({
-        date,
-        hour,
-        game,
-        status: 1,
-        streamType,
-        timestamp,
-        optionalData,
-        createdAt,
-        stringDate
+export async function createNewStreamRequest(uid, streamerData, game, date, hour, streamType, timestamp, titles, createdAt, stringDate, drops, onSuccess) {
+    const dropsUsedBeforeTransaction = await userStreamerDropsRef.child(uid).child('qoinsDrops').child('used').once('value');
+
+    /**
+     * We assume the drops amount chosen is used, if the streamer cancels the event we return the drops, if in the
+     * stream not all the drops are redeemed then we make an adjustment when stream is closing
+     */
+    const transactionResult = await userStreamerDropsRef.child(uid).child('qoinsDrops').transaction((qoinsDrops) => {
+        if (qoinsDrops) {
+            if (qoinsDrops.used >= 0) {
+                if ((qoinsDrops.used + drops) <= qoinsDrops.original) {
+                    qoinsDrops.used += drops;
+                }
+
+                return qoinsDrops;
+            }
+
+            return { ...qoinsDrops, used: drops };
+        }
+
+        return qoinsDrops;
     });
 
-    await premiumEventsSubscriptionRef.child(uid).child(event.key).set({
-        approved: false,
-        timestamp
-    });
+    const imageIndex = await streamsCardsImagesRef.child(game).child('front').once('value');
 
-    return await streamsApprovalRef.child(event.key).set({
-        date,
-        hour,
-        game,
-        idStreamer: uid,
-        streamerName: streamerData.displayName,
-        streamType,
-        timestamp,
-        streamerChannelLink: 'https://twitch.tv/' + streamerData.login,
-        streamerPhoto: streamerData.photoUrl,
-        optionalData,
-        createdAt,
-        stringDate
-    });
+    const backgroundImage = await streamsCardsImagesRef.child(game).child('images').child(imageIndex.val() || 0).once('value');
+
+    const imageLength = await streamsCardsImagesRef.child(game).child('length').once('value');
+    if (imageIndex.val() === imageLength.val() - 1) {
+        await streamsCardsImagesRef.child(game).child('front').set(0);
+    } else {
+        await streamsCardsImagesRef.child(game).child('front').set(imageIndex.val() + 1);
+    }
+
+    const userLanguage = getCurrentLanguage();
+    if (transactionResult.committed && (!dropsUsedBeforeTransaction.exists() || transactionResult.snapshot.val().used !== dropsUsedBeforeTransaction.val())) {
+        const streamRef = streamsRef.push();
+        let data = { shortLink: '' };
+        try {
+            // TODO: Replace with dinamycLinks methods
+            const streamLinkRequest = await fetch(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyAwrwwTRiyYV7-SzOvE6kEteE0lmYhBe8c`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    dynamicLinkInfo: {
+                        domainUriPrefix: 'https://qapla.page.link',
+                        link: `https://qapla.app/?type=stream&streamId=${streamRef.key}`,
+                        androidInfo: {
+                            androidPackageName: 'com.qapla.gaming.app'
+                        },
+                        iosInfo: {
+                            iosBundleId: 'org.Qapla.QaplaApp',
+                            iosAppStoreId: '1485332229'
+                        },
+                        socialMetaTagInfo: {
+                            socialTitle: titles[userLanguage],
+                            socialDescription: userLanguage === 'es' ? 'Evento Qapla' : 'Qapla Event',
+                            socialImageLink: backgroundImage.val()
+                        }
+                    },
+                    suffix: {
+                        option: 'UNGUESSABLE'
+                    }
+                })
+            });
+
+            data = await streamLinkRequest.json();
+        } catch (error) {
+            console.log(error);
+        }
+
+        streamsRef.child(streamRef.key).set({
+            idStreamer: uid,
+            title: titles,
+            titulo: titles[userLanguage],
+            platform: 'allGames',
+            game,
+            streamingPlatformImage: 'https://cdn.discordapp.com/attachments/696141270757933086/717152413819077050/Logo_Twitch.png',
+            sponsorImage: '',
+            streamerName: streamerData.displayName,
+            streamerChannelLink: `https://twitch.tv/${streamerData.login}`,
+            streamerPhoto: streamerData.photoUrl,
+            backgroundImage: backgroundImage.val(),
+            eventEntry: 0,
+            acceptAllUsers: true,
+            featured: false,
+            timestamp,
+            createdAt: (new Date()).getTime(),
+            customRewardsMultipliers: {
+                qoins: 1
+            },
+            streamLink: data.shortLink,
+            drops
+        });
+
+        await streamersEventsDataRef.child(uid).child(streamRef.key).set({
+            date,
+            hour,
+            game,
+            status: SCHEDULED_EVENT_TYPE,
+            streamType,
+            timestamp,
+            createdAt,
+            stringDate,
+            drops,
+            image: backgroundImage.val()
+        });
+
+        await premiumEventsSubscriptionRef.child(uid).child(streamRef.key).set({
+            approved: true,
+            timestamp
+        });
+
+        return onSuccess();
+    }
 }
 
 export async function getUserDisplayName(uid) {
@@ -281,13 +374,13 @@ export async function loadStreamsByStatus(uid, status) {
  * @param {string} streamId Identifier of the stream to remove
  */
 export async function cancelStreamRequest(uid, streamId) {
+    // Remove drops from used when stream is canceled
+    const drops = await streamersEventsDataRef.child(uid).child(streamId).child('drops').once('value');
+    await userStreamerDropsRef.child(uid).child('qoinsDrops').child('used').set(databaseServerValue.increment(-1 * drops.val()));
+
+    // Delete stream
     await streamersEventsDataRef.child(uid).child(streamId).remove();
     await streamsApprovalRef.child(streamId).remove();
-    userStreamersRef.child(uid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
-        if (numberOfRequests) {
-            return numberOfRequests - 1;
-        }
-    });
 }
 
 /**
@@ -335,11 +428,27 @@ export async function getStreamTitle(streamId) {
 }
 
 /**
+ * Returns the value of the stream link node of the given stream
+ * @param {string} streamId Stream unique identifier
+ */
+export async function getStreamLink(streamId) {
+    return await streamsRef.child(streamId).child('streamLink').once('value');
+}
+
+/**
  * Returns the value of the timestamp node of the given stream
  * @param {string} streamId Stream unique identifier
  */
 export async function getStreamTimestamp(streamId) {
     return await streamsRef.child(streamId).child('timestamp').once('value');
+}
+
+export async function getStreamDrops(streamId) {
+    return await streamsRef.child(streamId).child('drops').once('value');
+}
+
+export async function getStreamQoinsRedemptionsCounter(streamId) {
+    return await streamsRef.child(streamId).child('qoinsRedemptionsCounter').once('value');
 }
 
 /**
@@ -546,12 +655,7 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  * @param {string} errorMessage Message to show if the write operation fails
  */
 export async function writeTestCheer(streamerUid, completeMessage, errorMessage) {
-    const testMediaArrayLength = await streamerReactionTestMediaRef.child('length').once('value');
-    const index = Math.floor(Math.random() * testMediaArrayLength.val());
-    const media = (await streamerReactionTestMediaRef.child('media').child(index).once('value')).val();
-
     streamersDonationsTestRef.child(streamerUid).push({
-        media,
         amountQoins: 0,
         message: 'Test',
         timestamp: (new Date()).getTime(),
@@ -746,21 +850,6 @@ export async function addBoughtStreamsToStreamer(streamerUid, boughtStreams, exp
 }
 
 /**
- * Add one to the streamsRequested node of the given streamer in their subscriptionDetails
- * (streamsRequested in this node is the counter of events for their included on their subscription streams)
- * @param {string} streamerUid Streamer user identifier
- */
-export async function addToStreamsRequestedOnSubscriptionDetails(streamerUid) {
-    userStreamersRef.child(streamerUid).child('subscriptionDetails').child('streamsRequested').transaction((numberOfRequests) => {
-        if (!numberOfRequests) {
-            return 1;
-        }
-
-        return numberOfRequests + 1;
-    });
-}
-
-/**
  * Add one to the streamsRequested node of the given streamer in their boughtStreams/{package}
  * (streamsRequested in this node is the counter of events for their package that the user bought)
  * @param {string} streamerUid Streamer user identifier
@@ -937,17 +1026,6 @@ export async function getStreamerChallengeCategory(streamerUid) {
 }
 
 ////////////////////////
-// Q Store
-////////////////////////
-
-/**
- * Gets all the items in the Q-Store
- */
-export async function getQStoreItems() {
-    return await qStoreRef.once('value');
-}
-
-////////////////////////
 // Referral codes
 ////////////////////////
 
@@ -1006,4 +1084,140 @@ export async function getInteractionsRewardData(uid) {
  */
  export async function saveGiphyText(uid, data) {
     return giphyTextRequestsRef.child(uid).set(data);
+}
+
+////////////////////////
+// User Streamer Drops
+////////////////////////
+
+/**
+ * Listen to changes for streamer Qoins drops
+ * @param {string} uid User identifier
+ * @param {function} callback Function to handle the response of the listener
+ */
+export async function getStreamerDropsLeft(uid) {
+    return await userStreamerDropsRef.child(uid).child('qoinsDrops').child('left').once('value');
+}
+
+/**
+ * Reduce the number of used drops
+ * @param {string} uid User identifier
+ * @param {number} amountToReduce Amount to reduce of used drops
+ */
+export async function decreaseUsedDrops(uid, amountToReduce) {
+    return await userStreamerDropsRef.child(uid).child('qoinsDrops').child('used').set(databaseServerValue.increment(-1 * amountToReduce))
+}
+
+/**
+ * Reduce the number of left drops
+ * @param {string} uid User identifier
+ * @param {number} amountToReduce Amount to reduce of used drops
+ */
+export async function decreaseDropsLeft(uid, amountToReduce) {
+    return await userStreamerDropsRef.child(uid).child('qoinsDrops').child('left').set(databaseServerValue.increment(-1 * amountToReduce))
+}
+
+/**
+ * Listen to changes for streamer Qoins drops
+ * @param {string} uid User identifier
+ * @param {function} callback Function to handle the response of the listener
+ */
+export function listenToStreamerDrops(uid, callback) {
+    return userStreamerDropsRef.child(uid).child('qoinsDrops').on('value', callback);
+}
+
+/**
+ * Remove the listener for streamer Qoins drops
+ * @param {string} uid User identifier
+ */
+export function removeListenerFromStreamerDrops(uid) {
+    return userStreamerDropsRef.child(uid).child('qoinsDrops').off('value');
+}
+
+////////////////////////
+// Streamer Deep Links
+////////////////////////
+
+/**
+ * Save the deep link of the streamer on database
+ * @param {string} uid User identifier
+ * @param {string} url Deep link to save
+ */
+export async function saveStreamerDeepLink(uid, url) {
+    return await streamersDeepLinksRef.child(uid).set(url);
+}
+
+/**
+ * Gets the streamer deep link
+ * @param {string} uid User identifier
+ */
+export async function getStreamerDeepLink(uid) {
+    return await streamersDeepLinksRef.child(uid).once('value');
+}
+
+////////////////////////
+// Visits counter
+////////////////////////
+
+/**
+ * Set the number of visits the user has done to the dashboard (used to show optional profile-link onboarding every 3 times the
+ * user enters the dashboard)
+ * @param {string} uid User identifier
+ * @param {number} count Number of visits to set
+ */
+export async function setVisitsCounter(uid, count) {
+    return await dashboardStreamersVisitsCounterRef.child(uid).set(count);
+}
+
+/**
+ * Gets the number of visits of the user
+ * @param {string} uid User identifier
+ */
+export async function getNumberOfVisits(uid) {
+    return await dashboardStreamersVisitsCounterRef.child(uid).once('value');
+}
+// Uberduck requests
+////////////////////////
+
+/**
+ * Listen for the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ * @param {function} callback Handler for listener results
+ */
+export async function listenForUberduckAudio(donationId, callback) {
+    uberduckRequestsRef.child(donationId).on('value', callback);
+}
+
+/**
+ * Remove the listene from the given donation Uberduck request
+ * @param {string} donationId Donation identifier
+ */
+export async function removeListenerForUberduckAudio(donationId) {
+    uberduckRequestsRef.child(donationId).off('value');
+}
+////////////////////////
+// Streamer Cash Out
+////////////////////////
+
+/**
+ * Saves the request of cash out for the given streamer
+ * @param {string} uid User identifier
+ * @param {number} amountQoins Amount of Qoins to remove from the streamer balance
+ * @param {number} amountBits Amount of bits to deliver to the streamer
+ */
+export async function saveStreamerCashOutRequest(uid, amountQoins, amountBits) {
+    const date = new Date();
+
+    const qoinsRemoved = await userStreamersRef.child(uid).child('qoinsBalance').transaction((qoinsBalance) => {
+        return qoinsBalance - amountQoins;
+    });
+
+    if (qoinsRemoved.committed) {
+        return await streamerCashOutRef.child(uid).push({
+            amountQoins,
+            amountBits,
+            delivered: false,
+            timestamp: date.getTime()
+        });
+    }
 }

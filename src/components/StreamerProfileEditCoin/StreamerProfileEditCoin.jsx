@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, CircularProgress, makeStyles } from "@material-ui/core";
+import { Button, CircularProgress, FormControlLabel, makeStyles, Switch, withStyles } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { Modal } from "@material-ui/core";
@@ -21,6 +21,20 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const GreenSwitch = withStyles({
+    switchBase: {
+      color: 'rgb(156, 156, 156)',
+      '&$checked': {
+        color: '#2ce9d2',
+      },
+      '&$checked + $track': {
+        backgroundColor: '#2ce9d2',
+      },
+    },
+    checked: {},
+    track: {},
+  })(Switch);
+
 const StreamerProfileEditCoin = ({ user }) => {
     const [ActiveEditTitle, setActiveEditTitle] = useState(false);
     const [ActiveEditCoins, setActiveEditCoins] = useState(false);
@@ -32,6 +46,7 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [modal, setModal] = useState(false);
     const [titleCheckbox, setTitleCheckbox] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
+    const [qoinsReaction, setQoinsReaction] = useState(false);
     const classes = useStyles();
     const { t } = useTranslation();
     const history = useHistory();
@@ -143,6 +158,15 @@ const StreamerProfileEditCoin = ({ user }) => {
             toggleReward();
         }
     }
+    const handleQoinsReactions = (e) => {
+        if (!e.target.checked) {
+            setQoinsReaction(false)
+        }
+        else {
+            setQoinsReaction(true)
+        }
+       
+    }
 
     const toggleReward = async () => {
         setSavingChanges(true);
@@ -195,75 +219,81 @@ const StreamerProfileEditCoin = ({ user }) => {
 
     return (
         <div className={style.containerItereractions}>
-            <h1 className={style.Titulo}>
+            <h1 className={style.title}>
                 {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
             </h1>
             {rewardId == '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
-                <div className={style.content_input}>
+                <div className={style.contentInput}>
                     <div className={style.input}>
                         {ActiveEditTitle ?
                             <>
-                            <input
-                                className={style.Visibility_input}
-                                type="text"
-                                maxLength={18}
-                                autoFocus
-                                value={rewardName}
-                                onChange={(event) => setRewardName(event.target.value)}
-                                onKeyPress={saveData} />
-                            <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <ConfirmChange />
-                            </Button>
-                            </>
-                            :
-                            <>
-                            <p className={style.p}>
-                                {rewardName}
-                            </p>
-                            <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <img src={iconEdit} alt="icons-edit" />
-                            </Button>
-                            </>
-                        }
-                    </div>
-                    <div className={style.input}>
-                        {ActiveEditCoins ?
-                            <>
-                            <input
-                                className={style.Visibility_input}
-                                type="number"
-                                autoFocus
-                                value={rewardCost}
-                                onChange={(event) => setRewardCost(event.target.value || 0)}
-                                onKeyPress={saveData} />
+                                <input
+                                    className={style.VisibilityInput}
+                                    type="text"
+                                    maxLength={18}
+                                    autoFocus
+                                    value={rewardName}
+                                    onChange={(event) => setRewardName(event.target.value)}
+                                    onKeyPress={saveData} />
                                 <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
                                     <ConfirmChange />
                                 </Button>
                             </>
                             :
                             <>
-                            <p className={style.p}>
-                                {rewardCost.toLocaleString()}
-                            </p>
-                            <Button onClick={() => setActiveEditCoins(!ActiveEditCoins)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
-                                <img src={iconEdit} alt="icons-edit" />
-                            </Button>
+                                <p className={style.p}>
+                                    {rewardName}
+                                </p>
+                                <Button onClick={() => setActiveEditTitle(!ActiveEditTitle)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                    <img src={iconEdit} alt="icons-edit" />
+                                </Button>
+                            </>
+                        }
+                    </div>
+                    <div className={style.input}>
+                        {ActiveEditCoins ?
+                            <>
+                                <input
+                                    className={style.VisibilityInput}
+                                    type="number"
+                                    autoFocus
+                                    value={rewardCost}
+                                    onChange={(event) => setRewardCost(event.target.value || 0)}
+                                    onKeyPress={saveData} />
+                                    <Button onClick={saveData} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                        <ConfirmChange />
+                                    </Button>
+                            </>
+                            :
+                            <>
+                                <p className={style.p}>
+                                    {rewardCost.toLocaleString()}
+                                </p>
+                                <Button onClick={() => setActiveEditCoins(!ActiveEditCoins)} style={{ justifyContent: 'flex-end', padding: '6px 0px' }}>
+                                    <img src={iconEdit} alt="icons-edit" />
+                                </Button>
                             </>
                         }
                     </div>
                     <div className={style.disableInteractions}>
-                        <p className={style.p}>{t('StreamerProfile.StreamerProfileEditCoin.reactions')} {titleCheckbox}</p>
+                        <p className={style.p}>
+                            {t('StreamerProfile.StreamerProfileEditCoin.reactions')} {titleCheckbox}
+                        </p>
+                        <GreenSwitch checked={reactionsEnabled}
+                            onChange={(e) => handleCheckbox(e)} />
+                    </div>
+                    {/* <div className={style.onlyQoinsReaction}> 
+                        <p className={style.p}>Only Qoins Reactions</p>
                         <input
                             className={style.input_checkbox}
-                            type="checkbox"
-                            id="boton"
-                            checked={reactionsEnabled}
-                            onChange={(e) => handleCheckbox(e)}
-                        />
-                        <label for="boton"></label>
-                    </div>
+                            type="checkbox" 
+                            id="switch"
+                            checked={qoinsReaction}
+                            onChange={(e)=>handleQoinsReactions(e)}/>
+                            <label for="switch"></label>
+                    </div> */}
                 </div>
                 </>
             :

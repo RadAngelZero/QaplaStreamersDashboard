@@ -518,12 +518,14 @@ const OnBoarding = ({ user }) => {
                     <div style={{ opacity: acceptPolicies ? 1 : 0.7, color: '#FFF', paddingLeft: '6px' }}>
                         {t('Onboarding.policiesP1')}
                         <a href={t('Onboarding.termsOfUseUrl')} target="_blank"
+                            rel="noreferrer"
                             style={{ color: '#00FFDD', marginLeft: 4, marginRight: 4, textDecoration: 'none' }}>
                             {t('Onboarding.policiesP2')}
                         </a>
                         {t('Onboarding.policiesP3')}
                         <a href={t('Onboarding.privacyPolicy')}
                             target="_blank"
+                            rel="noreferrer"
                             style={{ color: '#00FFDD', marginLeft: 4, textDecoration: 'none' }}>
                             {t('Onboarding.policiesP4')}
                         </a>

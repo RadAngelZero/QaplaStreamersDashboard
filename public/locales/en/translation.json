@@ -95,6 +95,15 @@
             "disable": "Disable reactions",
             "dontDisable": "Don't disable",
             "dontShowAgain": "Don't show this message again"
+        },
+        "BarProgressBit": {
+            "nextMilestone": "Next Milestone",
+            "available": "Available",
+            "cashOut": "Cash Out",
+            "confirmCashOut": "Confirm you are cashing out your Qoins for Bits on Twitch",
+            "cancel": "Cancel",
+            "weGotYouRequestP1": "We got your request! We'll send you ",
+            "weGotYouRequestP2": " bits on your next stream"
         }
     },
     "StreamCard": {
@@ -165,13 +174,13 @@
     "NewStream": {
         "alerts": {
             "noChannelPoints": "Apparently you don't have channel points on Twitch 😦 Get your affiliate so you can give rewards and post your streams on Qapla :D\n\nhttps://help.twitch.tv/s/article/joining-the-affiliate-program",
-            "before24h": "All requests must be sent at least 24 hours before the stream",
+            "beforeXminutes": "All requests must be sent at least 5 minutes before the stream",
             "missingData": "Verify that all fields have been filled correctly",
             "streamsLimit": "You have reached the limit of streams for your subscription",
             "beforePlanExpiration": "The selected date is not valid as your plan will expire before it"
         },
         "whatAreYouPlaying": "What are you going to stream?",
-        "pickACategory": "Pick a category",
+        "pickACategory": "Choose a category",
         "categoryPickerPlaceholder": "E.g., Just Chatting",
         "when": "When?",
         "date": "Date",
@@ -185,20 +194,21 @@
         },
         "advanced": "Advenced (Optional)",
         "feelingCreative": "Feeling creative? Give your stream a cool name",
-        "streamTitle": "Stream title (optional)",
-        "streamTitlePlaceholder": "Trolling on Apex Arena",
-        "streamDescription": "Stream description",
-        "subtitle": "Subtitle",
-        "descriptionPlaceholder": "Share what your stream is going to be about",
+        "streamTitle": "Stream title ",
+        "optional": "(optional)",
+        "streamTitleDescription": "Give your stream a personal touch to increase engagement",
+        "streamTitlePlaceholder": "i.e., Reacting to cat videos",
+        "dropsTitle": "Drops limit",
+        "dropsDescription": "Set the max amount of Qoins Drops that could be redeemed during your live stream",
+        "maxLimit": "Max limit",
+        "dropsAboveLimitErrorP1": "You have ",
+        "dropsAboveLimitErrorP2": "{{drops}} drops available. ",
+        "dropsAboveLimitErrorP3": "Please lower the drops limit.",
+        "setValidAmountOfDropsP1": "Drops limit can’t be set to 0. You still have ",
+        "setValidAmountOfDropsP2": "{{drops}} drops available",
         "submit": "Submit",
-        "confirmDialog": {
-            "almostDone": "We are almost done",
-            "confirmDetails": "Just confirm the details to continue",
-            "dateAndHour": "Date and hour",
-            "localTime": "Local time"
-        },
         "successDialog": {
-            "description": "Request sent for approval successfully. We’ll post it as soon as possible"
+            "description": "Your stream has been scheduled successfully and is posted in the app"
         }
     },
     "CheersSettings": {
@@ -261,17 +271,14 @@
         },
         "month": "month",
         "payment": "Payment",
-        "totalPeriodPayment": "${{totalPayment}} Payment",
+        "totalPeriodPayment": "${{totalPayment}}",
         "saving": "You save {{saving}}%",
         "monthlyPublications": "{{numberOfPublications}} monthly publications",
         "with": "with",
-        "doubleXQ": "Double XQ",
-        "redemptions": "{{numberOfRedemptions}} redemptions of Qoins and XQ per stream",
-        "cheers": "Receives cheers of Qoins.",
-        "extraPublications": "Extra publications include",
-        "noQoinsMinimum": "No minimum Qoins withdrawal",
-        "qoinsStore": "Qoins store",
-        "discounts": "Qoins store discounts",
+        "qaplaReactions": "Qapla Reactions",
+        "cashOut": "Qoins cash out",
+        "drops": "{{numberOfDrops}} Qoins Drops per month",
+        "postAlways": "Post streams on Qapla as long as you have drops",
         "getVisibility": "Get visibility for your content",
         "rewardYourCommunity": "Reward your community"
     },
@@ -284,18 +291,27 @@
         "showUpcomingStreams": "Show upcoming streams",
         "social": "Social",
         "OnBoarding": {
-            "header1": "Increase your visibility",
-            "header2": "Improve live interaction",
-            "header3": "Amplify your reach",
-            "body1": "Welcome to your Qapla profile 😍. Connect with more members of the community by enabling your profile",
-            "body2": "Share what you like, what your content is about, or whatever you want!, to increase the chances of matching with the people who come by your stream 💜",
-            "body3": "Drive valuable traffic to all your online content. One place for your schedule streams and your communication channels 🎙",
-            "presentYourself": "Introduce yourself to the community",
-            "addTags": "Add tags that represent you as the creator, your persona, your content, etc.",
-            "yourIntro": "Your intro is a glimpse of yourself and your content. Make it nice 😉",
+            "header1": "Increase your interactions",
+            "header2": "Introduce yourself",
+            "header3": "Tags",
+            "header4": "Copy and share!",
+            "body1": "Create and share your profile link to make it easier for your viewers to react on your stream ⚡️",
+            "body2": "It’s a bio, you know how it goes 🫶",
+            "body3": "Add tags about your content, you as a creator, you as a person, or whatever you want! 💜",
+            "body4": "Your viewers can send reactions quick on stream right from your profile, or even download the app!",
+            "waysOfSharing": "Ways of sharing:",
+            "addToYourBio": "🔗 Add it to your Link-in-Bio",
+            "useItAsLinkInBio": "🪪 Use it as a Link-in-Bio",
+            "addToNightbot": "🤖 Add it to your Nightbot on Twitch",
+            "typeToCreateLink": "type to create your link",
+            "createProfileLink": "Create Profile Link",
+            "confirmBio": "Confirm Bio",
+            "finish": "Finish set up",
+            "goToProfile": "Go to my profile",
             "minChars": "Min. Characters",
             "tagErrorNotSelected": "To add a tag write and/or click on it",
-            "minTags": "Add at least {{minTags}} tags to continue"
+            "minTags": "Add at least {{minTags}} tags to continue",
+            "duplicatedLink": "Link already in use, try with other"
         },
         "confirmations": {
             "saveImage": "Image saved successfully"
@@ -329,30 +345,17 @@
         "backToDashboard": "Back to dashboard"
     },
     "RequestActivation": {
-        "title": "Your publication is\nready to be sent!",
-        "descriptionP1": "Start your ",
-        "descriptionHiglight": "Free Trial",
-        "descriptionP2": " with your referral code\nto be able to publish your streams",
-        "buyAMembership": "Reward your community and give your content visibility with a Qapla membership",
-        "referralCode": "Referral code",
-        "startFreeTrial": "Start Free Trial",
-        "dontHaveACode": "Don't have a code?",
-        "subscribe": "Subscribe to publish",
-        "referralProgramP1": "or invite other streamers with you ",
-        "qreatorCode": "Qreator code",
-        "referralProgramP2": " and receive 2 posts for each streamer you invite"
-    },
-    "QStore": {
-        "QStore": "Q Store",
-        "description": "Earn rewards for your community with your $QOINS, or set a Qoins goal to reach a reward.",
-        "legend": "🇲🇽 Mexico  🇺🇸 USA  🌐 International",
-        "requestBits": "Request Bits",
-        "setGoal": "Create a goal of Qoins",
-        "acquire": "Acquire"
+        "title": "Schedule your streams on\nthe Qapla app 🚀",
+        "startTrial": "Start Free Trial. ",
+        "noCardRequired": "No credit card required.",
+        "drops": "🪂 Reward your audience with Qoins Drops",
+        "customAlerts": "🫡 Add value to your Twitch subscribers with custom alerts",
+        "visibility": "👁 Visibility for your content outside of Twitch",
+        "startFreeTrial": "Start Free Trial"
     },
     "StreamsLeft": {
-        "streams": "Remaining posts: ",
-        "leftStreams": "{{available}} of {{total}}",
+        "drops": "Remaining drops: ",
+        "dropsLeft": "{{available}} of {{total}}",
         "renewsOn": "Renews on {{month}} {{date}}",
         "membershipExpired": "Membership expired on {{month}} {{date}}"
     },

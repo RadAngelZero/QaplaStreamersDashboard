@@ -101,7 +101,7 @@ const StreamersSignin = ({ user, title }) => {
                     }
                 }
             } else {
-                history.push('/onboarding');
+                history.push('/profile');
             }
         }
 
@@ -117,8 +117,6 @@ const StreamersSignin = ({ user, title }) => {
         signInWithTwitch();
         setIsLoadingAuth(false);
     }
-
-    const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
 
     if (user === undefined) {
         return (
@@ -143,7 +141,7 @@ const StreamersSignin = ({ user, title }) => {
                         </Button>
                         <p style={{ marginTop: '38px', color: '#FFF', fontSize: '.8rem' }}>
                             {t('StreamersSignin.termsAndConditionsP1')}
-                            <a style={{ cursor: 'pointer', color: '#3B4BF9' }} href={t('Onboarding.termsOfUseUrl')} target='_blank'>
+                            <a style={{ cursor: 'pointer', color: '#3B4BF9' }} href={t('Onboarding.termsOfUseUrl')} target='_blank' rel="noreferrer">
                                 {t('StreamersSignin.termsAndConditionsP2')}
                             </a>
                         </p>

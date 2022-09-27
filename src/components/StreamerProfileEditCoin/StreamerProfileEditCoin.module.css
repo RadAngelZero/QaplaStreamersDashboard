@@ -17,10 +17,12 @@
 
 .contentInput {
   width: 212px;
-  height: 145px;
+  min-height: 145px;
+  max-width: 200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-top: 25px;
 }
 
 .input {
@@ -59,6 +61,7 @@
 .disableInteractions {
   display: flex;
   justify-content: space-between;
+  padding-top: 10px;
   align-items: center;
 }
 
@@ -70,7 +73,7 @@ label[for="boton"] {
   border-radius: 13px;
   display: block;
   background-color: #202750;
-  margin-left: 25px;
+
 }
 
 .inputCheckbox{
@@ -93,11 +96,42 @@ label[for="boton"]::before {
   background-color: #2ce9d2;
 }
 
-
-
 .modalContainer{
   width:100%;
   display:flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+label[for="switch"] {
+  display: block;
+  width: 60px;
+  height: 25px;
+  cursor: pointer;
+  border-radius: 13px;
+  display: block;
+  background-color: #202750;
+  margin-left: 6px;
+}
+label[for="switch"]::before {
+  content: "";
+  width: 25px;
+  height: 25px;
+  background-color: rgb(156, 156, 156);
+  border-radius: 50%;
+  display: block;
+  transform: translate(0px, 0px);
+  transition: all 300ms;
+}
+
+.input_checkbox:checked ~ label::before {
+  transform: translate(calc(60px - 25px), 0px);
+  background-color: #2ce9d2;
+}
+
+.onlyQoinsReaction{
+  display: flex;
+  max-width: 240px;
+  min-width: 240px;
+  padding-top: 10px;
 }

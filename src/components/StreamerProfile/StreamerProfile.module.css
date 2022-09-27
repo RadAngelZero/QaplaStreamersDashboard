@@ -43,7 +43,7 @@ body {
 }
 
 .qreatorCodeContainer {
-    margin-right: 46px;
+    margin-right: 50px;
     margin-left: auto;
     display: flex;
     flex-direction: row;
@@ -310,10 +310,6 @@ body {
     height: 400px;
 }
 
-.cardContainer {
-    margin-top: 8px;
-}
-
 .title {
     color: #FFFFFF;
     font-size: 36px;
@@ -352,7 +348,7 @@ h1 {
 
 .newStream {
     margin-left: 24px;
-    margin-top: 24px; 
+    margin-top: 24px;
     color: #FFF;
     font-size: 18px;
     font-style: normal;

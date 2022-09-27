@@ -46,6 +46,7 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [modal, setModal] = useState(false);
     const [titleCheckbox, setTitleCheckbox] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
+    const [qoinsReaction, setQoinsReaction] = useState(false);
     const classes = useStyles();
     const { t } = useTranslation();
     const history = useHistory();
@@ -72,7 +73,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                         }
                     }
                 } else {
-                    history.push('/onboarding');
+                    // history.push('/onboarding');
                 }
             } catch (error) {
                 console.log(error);
@@ -157,6 +158,15 @@ const StreamerProfileEditCoin = ({ user }) => {
             toggleReward();
         }
     }
+    const handleQoinsReactions = (e) => {
+        if (!e.target.checked) {
+            setQoinsReaction(false)
+        }
+        else {
+            setQoinsReaction(true)
+        }
+       
+    }
 
     const toggleReward = async () => {
         setSavingChanges(true);
@@ -212,7 +222,7 @@ const StreamerProfileEditCoin = ({ user }) => {
             <h1 className={style.title}>
                 {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
             </h1>
-            {rewardId !== '' && !savingChanges ?
+            {rewardId == '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
                 <div className={style.contentInput}>
@@ -274,6 +284,16 @@ const StreamerProfileEditCoin = ({ user }) => {
                         <GreenSwitch checked={reactionsEnabled}
                             onChange={(e) => handleCheckbox(e)} />
                     </div>
+                    {/* <div className={style.onlyQoinsReaction}> 
+                        <p className={style.p}>Only Qoins Reactions</p>
+                        <input
+                            className={style.input_checkbox}
+                            type="checkbox" 
+                            id="switch"
+                            checked={qoinsReaction}
+                            onChange={(e)=>handleQoinsReactions(e)}/>
+                            <label for="switch"></label>
+                    </div> */}
                 </div>
                 </>
             :

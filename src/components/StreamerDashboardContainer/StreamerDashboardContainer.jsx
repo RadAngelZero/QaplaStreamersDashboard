@@ -22,8 +22,9 @@ const useStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        paddingLeft: theme.spacing(4) + 1,
-        paddingTop: theme.spacing(4) + 1,
+        paddingLeft: theme.spacing(6),
+        paddingRight: theme.spacing(6),
+        paddingTop: theme.spacing(6),
     }
 }));
 
@@ -33,7 +34,7 @@ const StreamerDashboardContainer = ({ children, user, containerStyle = {} }) => 
 
     return (
         <Grid container className={[classes.gridContainer, styles.container]} alignItems={user ? 'flex-start' : 'center'} justify={user ? 'flex-start' : 'center'}>
-            {!user && user === undefined ?
+            {user && user === undefined ?
                 <>
                     {children}
                 </>

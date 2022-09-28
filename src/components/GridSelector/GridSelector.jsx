@@ -46,6 +46,7 @@ const GridSelector = ({
                 webkitBoxSizing: 'border-box',
                 mozBoxSizing: 'border-box',
                 boxSizing: 'border-box',
+                cursor: 'pointer',
                 // zIndex: 1000,
             }} onClick={() => { onAreaClick(index); console.log(`${index} selected`); }}>
                 {selected === index && Variants === null &&

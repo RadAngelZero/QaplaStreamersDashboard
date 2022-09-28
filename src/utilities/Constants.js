@@ -93,6 +93,7 @@ export const YEARLY = 'yearly';
  */
 export const MEME = 'meme';
 export const MEMES = 'memes';
+
 // Giphy media types
 export const GIPHY_GIFS = 'gifs';
 export const GIPHY_STICKERS = 'stickers';
@@ -100,6 +101,9 @@ export const GIPHY_GIF = 'gif';
 export const GIPHY_STICKER = 'sticker';
 export const GIPHY_CLIP = 'video';
 export const GIPHY_CLIPS = 'videos';
+
+export const EMOJI = 'emoji';
+export const EMOTE = 'emote';
 
 /**
  * Streams Status

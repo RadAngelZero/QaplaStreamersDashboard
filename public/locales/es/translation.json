@@ -175,7 +175,7 @@
     "NewStream": {
         "alerts": {
             "noChannelPoints": "Al parecer no tienes puntos del canal en Twitch 😦 Consigue tu afiliado para que puedas dar recompensas y puedas publicar tus directos en Qapla :D\n\nhttps://help.twitch.tv/s/article/joining-the-affiliate-program",
-            "before24h": "Las solicitudes deben ser enviadas al menos 24 horas antes del stream",
+            "beforeXminutes": "Las solicitudes deben ser enviadas al menos 5 minutos antes del stream",
             "missingData": "Verifica que toda la información haya sido llenada correctamente",
             "streamsLimit": "Ha alcanzado el límite de streams para su suscripción",
             "beforePlanExpiration": "La fecha seleccionada no es válida ya que su plan vencerá antes"
@@ -202,6 +202,11 @@
         "dropsTitle": "Límite de Drops",
         "dropsDescription": "Cantidad máxima de Drops de Qoins que se podrán canjear durante tu transmisión",
         "maxLimit": "Límite máximo",
+        "dropsAboveLimitErrorP1": "Tienes ",
+        "dropsAboveLimitErrorP2": "{{drops}} drops disponibles. ",
+        "dropsAboveLimitErrorP3": "Por favor reduce el límite de drops.",
+        "setValidAmountOfDropsP1": "El límite de drops no puede ser 0. Tienes ",
+        "setValidAmountOfDropsP2": "{{drops}} drops disponibles",
         "submit": "Enviar",
         "successDialog": {
             "description": "¡Stream agendado! Tu stream ha sido publicado en la app"
@@ -344,14 +349,6 @@
         "visibility": "👁 Visibilidad para tu contenido fuera de Twitch",
         "startFreeTrial": "Activar Free Trial"
     },
-    "QStore": {
-        "QStore": "Q Store",
-        "description": "Adquiere recompensas para tu comunidad con tus $QOINS, o pon un meta de Qoins para alcanzar una recompensa.",
-        "legend": "🇲🇽 México  🇺🇸 USA  🌐 Internacional",
-        "requestBits": "Solicitar Bits",
-        "setGoal": "Crea una meta de Qoins",
-        "acquire": "Adquirir"
-    },
     "StreamsLeft": {
         "drops": "Drops disponibles: ",
         "dropsLeft": "{{available}} de {{total}}",
@@ -372,7 +369,7 @@
         },
         "alerts": {
             "updated": "Horario actualizado",
-            "errorDate": "Por favor verifica que has selecionado una fecha y/o hora valida",
+            "errorDate": "Por favor verifica que has selecionado una fecha y/o hora válida",
             "sent": "Notificación enviada",
             "errorSend": "Error al enviar la notificación. Intenta de nuevo mas tarde",
             "updatesPolicy": "Se permite cambiar de horario hasta 5 minutos antes de la fecha programada"

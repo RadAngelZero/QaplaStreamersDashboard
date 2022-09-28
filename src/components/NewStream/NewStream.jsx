@@ -128,8 +128,9 @@ const NewStream = ({ user, games, qoinsDrops }) => {
     const [clockOpen, setClockOpen] = useState(false);
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [gamesData, setGamesData] = useState([]);
-    const [dropsForStream, setDropsForStream] = useState(qoinsDrops.left && qoinsDrops.left < 50 ? qoinsDrops.left : 50);
+    const [dropsForStream, setDropsForStream] = useState(null);
     const [lockSendButton, setLockSendButton] = useState(false);
+    const [dropsError, setDropsError] = useState(null);
 
     useEffect(() => {
         let gameList = [];
@@ -147,7 +148,11 @@ const NewStream = ({ user, games, qoinsDrops }) => {
 
             setGamesData(tempGamesData);
         }
-    }, [games.allGames, user]);
+
+        if (dropsForStream === null && qoinsDrops.original > 0) {
+            setDropsForStream(qoinsDrops.original - qoinsDrops.used < 50 ? qoinsDrops.original - qoinsDrops.used : 50);
+        }
+    }, [games.allGames, user, qoinsDrops, dropsForStream]);
 
     const optionalDataReducer = (state, action) => {
         // We don´t need this to be a reducer anymore, we should change it later
@@ -164,8 +169,8 @@ const NewStream = ({ user, games, qoinsDrops }) => {
 
     const [optionalData, optionalDataDispatcher] = useReducer(optionalDataReducer, {});
 
-    // Minimum valid date is 24 hours since the current date
-    const minDate = new Date((new Date()).getTime() + 86400000);
+    // Minimum valid date is 5 minutes from the current date
+    const minDate = new Date((new Date()).getTime() + 300000);
 
     // The default date is the minDate + 15 minutes, to avoid show the error feedback when the streamer open the screen
     const [selectedDate, setSelectedDate] = useState(new Date(minDate.getTime() + 900000));
@@ -181,7 +186,30 @@ const NewStream = ({ user, games, qoinsDrops }) => {
     };
 
     const setDrops = (drops) => {
-        if (drops >= 0 && drops <= qoinsDrops.left) {
+        if (drops >= 0) {
+            if (drops > qoinsDrops.original - qoinsDrops.used) {
+                setDropsError(
+                    <p style={{ fontSize: 12, fontWeight: '400', color: '#FF0000', marginTop: 8 }}>
+                        {t('NewStream.dropsAboveLimitErrorP1')}
+                        <span style={{ color: '#00FFDD', fontSize: 12 }}>
+                            {t('NewStream.dropsAboveLimitErrorP2', { drops: qoinsDrops.original - qoinsDrops.used })}
+                        </span>
+                        {t('NewStream.dropsAboveLimitErrorP3')}
+                    </p>
+                );
+            } else if (drops === 0) {
+                setDropsError(
+                    <p style={{ fontSize: 12, fontWeight: '400', color: '#FF0000', marginTop: 8 }}>
+                        {t('NewStream.setValidAmountOfDropsP1')}
+                        <span style={{ color: '#00FFDD', fontSize: 12 }}>
+                            {t('NewStream.setValidAmountOfDropsP2', { drops: qoinsDrops.original - qoinsDrops.used })}
+                        </span>
+                    </p>
+                );
+            } else {
+                setDropsError(null);
+            }
+
             setDropsForStream(drops);
         }
     }
@@ -200,7 +228,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
 
         if (selectedDate < minDate) {
             setLockSendButton(false);
-            alert(t('NewStream.alerts.before24h'));
+            alert(t('NewStream.alerts.beforeXminutes'));
             return;
         }
         if (!selectedGame) {
@@ -254,14 +282,39 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                         });
                     }
 
-                    await createNewStreamRequest(user.uid, streamerData, selectedGame, UTCDate, UTCTime, selectedEvent, selectedDate.getTime(), optionalData, (new Date()).getTime(), stringDate, dropsForStream);
+                    let titles = {
+                        es: '🪂 Únete y obtén Drops de Qoins',
+                        en: '🪂 Join to get Qoins Drops'
+                    };
 
-                    window.analytics.track('Stream requested', {
+                    if (optionalData.title) {
+                        titles = {
+                            es: optionalData.title,
+                            en: optionalData.title
+                        };
+                    }
+
+                    await createNewStreamRequest(
+                        user.uid,
+                        streamerData,
                         selectedGame,
-                        selectedDate: selectedDate.getTime(),
-                        uid: user.uid
-                    });
-                    setOpenSuccessDialog(true);
+                        UTCDate,
+                        UTCTime,
+                        selectedEvent,
+                        selectedDate.getTime(),
+                        titles,
+                        (new Date()).getTime(),
+                        stringDate,
+                        dropsForStream,
+                        () => {
+                            window.analytics.track('Stream requested', {
+                                selectedGame,
+                                selectedDate: selectedDate.getTime(),
+                                uid: user.uid
+                            });
+                            setOpenSuccessDialog(true);
+                        }
+                    );
                 }
             } else {
                 alert(t('NewStream.alerts.beforePlanExpiration'));
@@ -334,7 +387,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                     onChange={handleDateChange}
                                     defaultValue={new Date()}
                                     minDate={minDate}
-                                    minDateMessage={t('NewStream.alerts.before24h')}
+                                    minDateMessage={t('NewStream.alerts.beforeXminutes')}
                                     format='DD-MM-YY ddd'
                                     style={{width:'274px', height:'56px'}}
                                     keyboardIcon={
@@ -365,7 +418,7 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                     onClose={() => setClockOpen(false)}
                                     autoOk
                                     error={selectedDate <= minDate}
-                                    helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.before24h')}
+                                    helperText={selectedDate >= minDate ? '' : t('NewStream.alerts.beforeXminutes')}
                                     value={displayDate}
                                     placeholder='08:00 AM'
                                     onChange={handleDateChange}
@@ -432,15 +485,16 @@ const NewStream = ({ user, games, qoinsDrops }) => {
                                             fullWidth={true}
                                             value={dropsForStream}
                                             onChange={(e) => setDrops(Number(e.target.value))}
-                                            type={'Number'}
+                                            type='Number'
                                         />
+                                        {dropsError}
                                     </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
                     <Button
-                        disabled={lockSendButton}
+                        disabled={lockSendButton || dropsError || !dropsForStream}
                         className={styles.button}
                         onClick={submitEvent}>
                         {lockSendButton ?

@@ -351,6 +351,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                             </div>
                         </Dialog>}
                     </div>
+
                 </div>
                 </>
             :

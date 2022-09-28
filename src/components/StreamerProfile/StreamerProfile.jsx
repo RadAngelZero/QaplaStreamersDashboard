@@ -34,7 +34,7 @@ const BalanceButtonContainer = withStyles(() => ({
         width: '100%',
         padding: '22px 24px',
         height: '100px',
-        minWidth: '180px !important',
+        minWidth: '250px !important',
         maxWidth: '330px !important',
         borderRadius: '20px',
         alignItems: 'center',
@@ -54,15 +54,15 @@ const BitsButtonContainer = withStyles(() => ({
     root: {
         display: 'flex',
         backgroundColor: '#141735',
-        width: '100%',
         padding: '22px 24px',
         height: '100px',
         minWidth: '190px !important',
-        maxWidth: 552,
+        maxWidth: 522,
         borderRadius: '20px',
         alignItems: 'center',
         justifyContent: 'space-between',
         textTransform: 'none',
+        marginLeft:'8px',
         '&:hover': {
             backgroundColor: '#141735'
         },
@@ -212,7 +212,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <Grid style={{ maxWidth:'1180px'}} container xs={12} spacing={3}>
+                    <Grid style={{ maxWidth:'1180px', gap:'70px'}} container xs={12} >
                         <Grid style={{maxWidth:'800px'}}  item xs={9} >
                             <Grid container xs={12}>
                                 <Grid xs={12}>
@@ -250,12 +250,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 {t('StreamerProfile.balance')}
                                             </h1>
                                         </Grid>
-                                        <Grid container xs={12} style={{ justifyContent: 'space-between' }}>
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between' }} >
                                             <Grid item xs={12} sm={4} style={{ paddingRight: 24 }}>
                                                 <BalanceButtonContainer onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Qoins') }}>
                                                     <DonatedQoin style={{ width: '35px', height: '35px' }} />
                                                     <div className={styles.balanceInnerContainer}>
-                                                        <p className={styles.balanceDataTextTitle}>Cheers</p>
+                                                        <p className={styles.balanceDataTextTitle}>Qoins</p>
                                                         <p className={styles.balanceDataText}>
                                                             {cheersQoins.toLocaleString()}
                                                         </p>
@@ -314,6 +314,43 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 </CardContent>
                                             </Card>
                                         </Grid>
+                                        <StreamCard
+                                            streamType={2}
+                                            streamId={'testEvent'}
+                                            image={''}
+                                            user={user}
+                                            game={'multiRocket'}
+                                            games={games}
+                                            date={formatDate(1664386044904)}
+                                            hour={formatHour(1664386044904)}
+                                            timestamp={1664386044904}
+                                            drops={2}
+                                            onRemoveStream={onRemoveStream} />
+                                            <StreamCard
+                                            streamType={2}
+                                            streamId={'testEvent'}
+                                            image={''}
+                                            user={user}
+                                            game={'multiRocket'}
+                                            games={games}
+                                            date={formatDate(1664386044904)}
+                                            hour={formatHour(1664386044904)}
+                                            timestamp={1664386044904}
+                                            drops={2}
+                                            onRemoveStream={onRemoveStream} />
+                                            <StreamCard
+                                            streamType={2}
+                                            streamId={'testEvent'}
+                                            image={''}
+                                            user={user}
+                                            game={'multiRocket'}
+                                            games={games}
+                                            date={formatDate(1664386044904)}
+                                            hour={formatHour(1664386044904)}
+                                            timestamp={1664386044904}
+                                            drops={2}
+                                            onRemoveStream={onRemoveStream} />
+                                            
                                         {streams && Object.keys(streams).map((streamId) => (
                                             <Grid item xl={2} lg={3} md={3} sm={4} xs={10} key={streamId} className={styles.cardContainer}>
                                                 <StreamCard
@@ -337,7 +374,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         <Grid style={{maxWidth:'260px'}} xs={3}>
                             <Button variant='contained'
                                 className={styles.messagesButton}
-                                style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735',marginBottom:'50px' }}
+                                style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735',marginBottom:'50px', minWidth:'205px' }}
                                 onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
                                 endIcon={
                                     <div style={{ display: 'flex', alignItems: 'center' }}>

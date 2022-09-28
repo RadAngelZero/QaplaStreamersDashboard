@@ -41,6 +41,7 @@ const useStyles = makeStyles(() => ({
         height: '100%',
         minWidth: '250px',
         minHeight: '360px',
+        marginLeft: '20px'
     },
     relativeContainer: {
         position: 'relative'

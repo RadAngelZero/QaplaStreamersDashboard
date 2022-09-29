@@ -284,7 +284,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             <Grid item xs={12} sm={3} md={5} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
                                                 <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
                                             </Grid>
-                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px', marginLeft: 'auto', marginRight: '-2px', minWidth: 'fit-content' }}>
+                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px', marginLeft: 'auto', marginRight: '16px', minWidth: 'fit-content' }}>
                                                 {(user.premium || user.freeTrial) && user.currentPeriod &&
                                                     <StreamsLeft uid={user.uid}
                                                         qoinsDrops={qoinsDrops}
@@ -321,9 +321,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             user={user}
                                             game={'multiRocket'}
                                             games={games}
-                                            date={formatDate(1664386044904)}
-                                            hour={formatHour(1664386044904)}
-                                            timestamp={1664386044904}
+                                            date={formatDate(1664469477935)}
+                                            hour={formatHour(1664469477935)}
+                                            timestamp={1664469477935}
                                             drops={2}
                                             onRemoveStream={onRemoveStream} />
                                             <StreamCard
@@ -333,9 +333,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             user={user}
                                             game={'multiRocket'}
                                             games={games}
-                                            date={formatDate(1664386044904)}
-                                            hour={formatHour(1664386044904)}
-                                            timestamp={1664386044904}
+                                            date={formatDate(1664469477935)}
+                                            hour={formatHour(1664469477935)}
+                                            timestamp={1664469477935}
                                             drops={2}
                                             onRemoveStream={onRemoveStream} />
                                             <StreamCard
@@ -345,9 +345,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             user={user}
                                             game={'multiRocket'}
                                             games={games}
-                                            date={formatDate(1664386044904)}
-                                            hour={formatHour(1664386044904)}
-                                            timestamp={1664386044904}
+                                            date={formatDate(1664469477935)}
+                                            hour={formatHour(1664469477935)}
+                                            timestamp={1664469477935}
                                             drops={2}
                                             onRemoveStream={onRemoveStream} />
                                             
@@ -370,7 +370,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid style={{maxWidth:'260px'}} xs={3}>
+                        <Grid style={{maxWidth:'260px',maxHeight:'500px'}} xs={3}>
                             <Button variant='contained'
                                 className={styles.messagesButton}
                                 style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735',marginBottom:'50px', minWidth:'205px' }}

@@ -8,6 +8,7 @@ const QaplaTab = withStyles((theme) => ({
         fontWeight: theme.typography.fontWeightRegular,
         marginRight: theme.spacing(4),
         fontSize: 18,
+        color: '#fff6',
         '&:hover': {
             color: '#FFF',
             opacity: 1,

@@ -1,4 +1,4 @@
-import { SCHEDULED_EVENT_TYPE } from '../utilities/Constants';
+import { EMOTE, GIPHY_GIF, SCHEDULED_EVENT_TYPE } from '../utilities/Constants';
 import { getCurrentLanguage } from '../utilities/i18n';
 import { database, databaseServerValue } from './firebase';
 
@@ -729,6 +729,31 @@ export async function markDonationAsRead(streamerUid, donationId) {
  */
 export async function markDonationAsUnreadToRepeat(streamerUid, donationId) {
     return await streamersDonationsRef.child(streamerUid).child(donationId).update({ read: false, repeating: true });
+}
+
+/**
+ * Write a Qoins Drops alert (use this when the user enables the Qoins Drops)
+ * @param {string} uid Uid of the streamer
+ */
+export async function sendQoinsDropsAlert(uid) {
+    streamersDonationsRef.child(uid).push({
+        amountQoins: 0,
+        emojiRain: {
+            type: EMOTE,
+            emojis: ['https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/DropsEnabledEmotes%2Fparachute_Qapla.png?alt=media&token=c3bf444a-6b80-4c01-9b20-4b7ab361b1cb']
+        },
+        media: {
+            url: 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/DropsEnabledEmotes%2Fgiphy.gif?alt=media&token=a4e8e9f7-c816-4c49-b3f2-72e12da72dbb',
+            width: 620,
+            height: 349,
+            type: GIPHY_GIF
+        },
+        pointsChannelInteractions: true,
+        read: false,
+        timestamp: (new Date()).getTime(),
+        twitchUserName: 'Qapla GG',
+        userName: 'Qapla GG'
+    });
 }
 
 /**

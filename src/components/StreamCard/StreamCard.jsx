@@ -20,7 +20,8 @@ import {
     checkActiveCustomReward,
     listenToQoinsEnabled,
     removeQoinsEnabledListener,
-    getStreamLink
+    getStreamLink,
+    sendQoinsDropsAlert
 } from '../../services/database';
 import { closeQaplaStream, enableStreamQoinsReward, startQaplaStream } from '../../services/streamQapla';
 import EventManagementDialog from '../QaplaStreamDialogs/EventManagementDialog';
@@ -305,6 +306,8 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                         removeQoinsEnabledListener(streamId);
                     }
                 });
+            } else {
+                sendQoinsDropsAlert(user.uid);
             }
 
             setStream(streamData);

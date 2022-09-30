@@ -165,7 +165,6 @@ const StreamerProfileEditCoin = ({ user }) => {
         else {
             setQoinsReaction(true)
         }
-       
     }
 
     const toggleReward = async () => {
@@ -222,7 +221,7 @@ const StreamerProfileEditCoin = ({ user }) => {
             <h1 className={style.title}>
                 {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
             </h1>
-            {rewardId == '' && !savingChanges ?
+            {rewardId !== '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
                 <div className={style.contentInput}>

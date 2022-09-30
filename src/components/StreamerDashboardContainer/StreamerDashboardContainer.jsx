@@ -34,7 +34,7 @@ const StreamerDashboardContainer = ({ children, user, containerStyle = {} }) => 
 
     return (
         <Grid container className={[classes.gridContainer, styles.container]} alignItems={user ? 'flex-start' : 'center'} justify={user ? 'flex-start' : 'center'}>
-            {user && user === undefined ?
+            {!user && user === undefined ?
                 <>
                     {children}
                 </>

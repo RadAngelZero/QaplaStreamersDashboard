@@ -282,121 +282,127 @@ const CheersSettings = ({ uid, twitchId }) => {
                 {/* <Button className={classes.Button}>Save and Test</Button> */}
             </Grid>
             <Grid container className={classes.instructionsMargin} xs={12}>
-                <div style={{
-                    display: 'flex',
-                    flex: 1,
-                    // flexDirection: 'row',
-                    flexWrap: 'wrap',
-                }}>
+                <div>
+                    <h1 className={classes.title} style={{
+                        marginTop: '18px',
+                        marginBottom: '32px',
+                    }}>Position</h1>
                     <div style={{
                         display: 'flex',
-                        flexDirection: 'column',
+                        flex: 1,
+                        // flexDirection: 'row',
+                        flexWrap: 'wrap',
                     }}>
                         <div style={{
-                            marginBottom: '16px',
-                        }}>
-                            <h2 className={classes.titlesSectionPosition}>Reaction Alert</h2>
-                            <p className={classes.subTitle}>Set the position of your alerts on your overlay</p>
-                        </div>
-                        <div style={{
-                            height: '360px',
-                            width: '480px',
                             display: 'flex',
-                            marginRight: '5vw',
-                            marginBottom: '4vh',
+                            flexDirection: 'column',
                         }}>
-                            <GridSelector
-                                selected={overlayAreaSelected}
-                                onAreaClick={setOverlayAreaSelected}
-                                rows={2}
-                                columns={2}
-                                backgroundImage="https://static.bandainamcoent.eu/high/elden-ring/elden-ring/03-news/Starter_Guide/Elden_Ring_game_screen.jpg"
-                                Chilren={() => (<img src={interactionImage} alt='Interaction'
-                                    style={{
-                                        flex: 1,
-                                        objectFit: 'contain',
-                                        width: '100%',
-                                        height: '100%',
-                                        padding: '12px',
-                                        webkitBoxSizing: 'border-box',
-                                        mozBoxSizing: 'border-box',
-                                        boxSizing: 'border-box',
-                                    }}
-                                />)}
-                            />
+                            <div style={{
+                                marginBottom: '16px',
+                            }}>
+                                <h2 className={classes.titlesSectionPosition}>Reaction Alert</h2>
+                                <p className={classes.subTitle}>Set the position of your alerts on your overlay</p>
+                            </div>
+                            <div style={{
+                                height: '360px',
+                                width: '480px',
+                                display: 'flex',
+                                marginRight: '5vw',
+                                marginBottom: '4vh',
+                            }}>
+                                <GridSelector
+                                    selected={overlayAreaSelected}
+                                    onAreaClick={setOverlayAreaSelected}
+                                    rows={2}
+                                    columns={2}
+                                    backgroundImage="https://static.bandainamcoent.eu/high/elden-ring/elden-ring/03-news/Starter_Guide/Elden_Ring_game_screen.jpg"
+                                    Chilren={() => (<img src={interactionImage} alt='Interaction'
+                                        style={{
+                                            flex: 1,
+                                            objectFit: 'contain',
+                                            width: '100%',
+                                            height: '100%',
+                                            padding: '12px',
+                                            webkitBoxSizing: 'border-box',
+                                            mozBoxSizing: 'border-box',
+                                            boxSizing: 'border-box',
+                                        }}
+                                    />)}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}>
                         <div style={{
-                            marginBottom: '16px',
-                        }}>
-                            <h2 className={classes.titlesSectionPosition}>Qapla On Badge</h2>
-                            <p className={classes.subTitle}>Your audience can be sure their reactions will</p>
-                        </div>
-                        <div style={{
-                            height: '360px',
-                            width: '480px',
                             display: 'flex',
+                            flexDirection: 'column',
                         }}>
-                            <GridSelector
-                                selected={overlayAreaSelectedQaplaLogo}
-                                onAreaClick={setOverlayAreaSelectedQaplaLogo}
-                                columns={2}
-                                backgroundImage="https://static.bandainamcoent.eu/high/elden-ring/elden-ring/03-news/Starter_Guide/Elden_Ring_game_screen.jpg"
-                                // Chilren={() => (<img src={interactionImage} alt='Interaction'
-                                //     style={{
-                                //         flex: 1,
-                                //         objectFit: 'contain',
-                                //         width: '100%',
-                                //         height: '100%',
-                                //         padding: '42px',
-                                //         webkitBoxSizing: 'border-box',
-                                //         mozBoxSizing: 'border-box',
-                                //         boxSizing: 'border-box',
-                                //     }}
-                                // />)}
-                                Variants={[
-                                    () => (
-                                        <div style={{
-                                            display: 'flex',
-                                            flex: 1,
-                                            height: '100%',
-                                            alignItems: 'flex-end',
-                                        }}>
-                                            <img src={qaplaLogoLeft} alt="qapla logo left"
-                                                style={{
-                                                    width: '20%',
-                                                    objectFit: 'scale-down',
-                                                }} />
-                                        </div>
-                                    )
-                                    ,
-                                    () => (
-                                        <div style={{
-                                            display: 'flex',
-                                            flex: 1,
-                                            height: '100%',
-                                            alignItems: 'flex-end',
-                                            justifyContent: 'flex-end',
-                                        }}>
-                                            <img src={qaplaLogoRight} alt="qapla logo right"
-                                                style={{
-                                                    width: '20%',
-                                                    objectFit: 'scale-down',
-                                                }} />
-                                        </div>
-                                    )
-                                ]}
-                            />
+                            <div style={{
+                                marginBottom: '16px',
+                            }}>
+                                <h2 className={classes.titlesSectionPosition}>Qapla On Badge</h2>
+                                <p className={classes.subTitle}>Your audience can be sure their reactions will</p>
+                            </div>
+                            <div style={{
+                                height: '360px',
+                                width: '480px',
+                                display: 'flex',
+                            }}>
+                                <GridSelector
+                                    selected={overlayAreaSelectedQaplaLogo}
+                                    onAreaClick={setOverlayAreaSelectedQaplaLogo}
+                                    columns={2}
+                                    backgroundImage="https://static.bandainamcoent.eu/high/elden-ring/elden-ring/03-news/Starter_Guide/Elden_Ring_game_screen.jpg"
+                                    // Chilren={() => (<img src={interactionImage} alt='Interaction'
+                                    //     style={{
+                                    //         flex: 1,
+                                    //         objectFit: 'contain',
+                                    //         width: '100%',
+                                    //         height: '100%',
+                                    //         padding: '42px',
+                                    //         webkitBoxSizing: 'border-box',
+                                    //         mozBoxSizing: 'border-box',
+                                    //         boxSizing: 'border-box',
+                                    //     }}
+                                    // />)}
+                                    Variants={[
+                                        () => (
+                                            <div style={{
+                                                display: 'flex',
+                                                flex: 1,
+                                                height: '100%',
+                                                alignItems: 'flex-end',
+                                            }}>
+                                                <img src={qaplaLogoLeft} alt="qapla logo left"
+                                                    style={{
+                                                        width: '20%',
+                                                        objectFit: 'scale-down',
+                                                    }} />
+                                            </div>
+                                        )
+                                        ,
+                                        () => (
+                                            <div style={{
+                                                display: 'flex',
+                                                flex: 1,
+                                                height: '100%',
+                                                alignItems: 'flex-end',
+                                                justifyContent: 'flex-end',
+                                            }}>
+                                                <img src={qaplaLogoRight} alt="qapla logo right"
+                                                    style={{
+                                                        width: '20%',
+                                                        objectFit: 'scale-down',
+                                                    }} />
+                                            </div>
+                                        )
+                                    ]}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
             </Grid>
             <Button className={classes.Button}>Save and Test</Button>
-            <div className={classes.instructionsMargin} style={{height: '20px'}} />
+            <div className={classes.instructionsMargin} style={{ height: '20px' }} />
         </Grid>
     );
 }

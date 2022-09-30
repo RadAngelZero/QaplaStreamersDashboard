@@ -308,8 +308,8 @@ const CheersSettings = ({ uid, twitchId }) => {
                             <GridSelector
                                 selected={overlayAreaSelected}
                                 onAreaClick={setOverlayAreaSelected}
-                                rows={3}
-                                columns={3}
+                                rows={2}
+                                columns={2}
                                 backgroundImage="https://static.bandainamcoent.eu/high/elden-ring/elden-ring/03-news/Starter_Guide/Elden_Ring_game_screen.jpg"
                                 Chilren={() => (<img src={interactionImage} alt='Interaction'
                                     style={{

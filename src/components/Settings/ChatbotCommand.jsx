@@ -100,11 +100,11 @@ const ChatbotCommand = () => {
                 </div>
                 <p className={classes.text} style={{ maxWidth: '270px' }} >Create your own alerts to react on stream using your channel points! <br /><br /> You can use memes, GIFs, stickers, emotes, TTS and more! <br /><br /> Download the app: <span style={{ color: '#428EFF' }}>myqap.la/download</span></p>
             </div>
-            <div style={{
+            {/* <div style={{
                 marginTop: '34px',
             }}>
                 <p className={classes.title} >Create your profile link</p>
-            </div>
+            </div> */}
         </div>
     )
 }

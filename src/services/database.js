@@ -1,5 +1,6 @@
 import { EMOTE, GIPHY_GIF, SCHEDULED_EVENT_TYPE } from '../utilities/Constants';
 import { getCurrentLanguage } from '../utilities/i18n';
+import { generateStreamDynamicLink } from './dynamicLinks';
 import { database, databaseServerValue } from './firebase';
 
 const gamesRef = database.ref('/GamesResources');
@@ -259,38 +260,13 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
     const userLanguage = getCurrentLanguage();
     if (transactionResult.committed && (!dropsUsedBeforeTransaction.exists() || transactionResult.snapshot.val().used !== dropsUsedBeforeTransaction.val())) {
         const streamRef = streamsRef.push();
-        let data = { shortLink: '' };
+        let streamLink = '';
         try {
-            // TODO: Replace with dinamycLinks methods
-            const streamLinkRequest = await fetch(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyAwrwwTRiyYV7-SzOvE6kEteE0lmYhBe8c`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    dynamicLinkInfo: {
-                        domainUriPrefix: 'https://qapla.page.link',
-                        link: `https://qapla.app/?type=stream&streamId=${streamRef.key}`,
-                        androidInfo: {
-                            androidPackageName: 'com.qapla.gaming.app'
-                        },
-                        iosInfo: {
-                            iosBundleId: 'org.Qapla.QaplaApp',
-                            iosAppStoreId: '1485332229'
-                        },
-                        socialMetaTagInfo: {
-                            socialTitle: titles[userLanguage],
-                            socialDescription: userLanguage === 'es' ? 'Evento Qapla' : 'Qapla Event',
-                            socialImageLink: backgroundImage.val()
-                        }
-                    },
-                    suffix: {
-                        option: 'UNGUESSABLE'
-                    }
-                })
+            streamLink = await generateStreamDynamicLink(streamRef.key, {
+                title: titles[userLanguage],
+                description: userLanguage === 'es' ? 'Evento Qapla' : 'Qapla Event',
+                image: backgroundImage.val()
             });
-
-            data = await streamLinkRequest.json();
         } catch (error) {
             console.log(error);
         }
@@ -315,7 +291,7 @@ export async function createNewStreamRequest(uid, streamerData, game, date, hour
             customRewardsMultipliers: {
                 qoins: 1
             },
-            streamLink: data.shortLink,
+            streamLink,
             drops
         });
 

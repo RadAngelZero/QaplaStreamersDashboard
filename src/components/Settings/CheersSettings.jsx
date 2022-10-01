@@ -343,7 +343,9 @@ const CheersSettings = ({ uid, twitchId }) => {
                     </div>
                 </div>
             </Grid>
-            <Button className={classes.Button}>Save and Test</Button>
+            <Button className={classes.Button} onClick={sendTestCheer}>
+                Save and Test
+            </Button>
             <div className={classes.instructionsMargin} style={{ height: '20px' }} />
         </Grid>
     );

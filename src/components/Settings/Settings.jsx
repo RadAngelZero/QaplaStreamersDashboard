@@ -11,8 +11,8 @@ const Settings = ({ user }) => {
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
-        console.log(newValue);
     };
+
     return (
         <StreamerDashboardContainer user={user}>
             <QaplaTabs value={value} onChange={handleChange}>
@@ -23,7 +23,7 @@ const Settings = ({ user }) => {
                 <CheersSettings uid={user.uid} twitchId={user.id} />
             }
             {user && user.uid && user.id && value === 1 &&
-                <ChatbotCommand />
+                <ChatbotCommand uid={user.uid} />
             }
         </StreamerDashboardContainer>
     );

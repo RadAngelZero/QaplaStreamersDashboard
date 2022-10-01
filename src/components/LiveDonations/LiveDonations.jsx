@@ -8,6 +8,7 @@ import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
+import QoinsDropsAudio from '../../assets/siu.mp3';
 import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
 import { EMOTE, GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
@@ -216,9 +217,7 @@ const LiveDonations = () => {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
                 if (isStreaming.exists() && isStreaming.val()) {
-                    setTimeout(() => {
-                        loadDonations();
-                    }, 150);
+                    loadDonations();
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -233,7 +232,16 @@ const LiveDonations = () => {
             async function showCheer(audioUrl) {
                 const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
                 const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
-                audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
+
+                // Donations without uid are for Qoins Drops alerts and they have an special sound
+                if (donation.uid) {
+                    audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
+                    audioAlert.volume = 1
+                } else {
+                    audioAlert = new Audio(QoinsDropsAudio);
+                    audioAlert.volume = 0.7
+                }
+
                 if (audioUrl || !donation.repeating) {
                     const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
 
@@ -514,10 +522,10 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
             flex: 1,
             flexDirection: 'column',
             backgroundColor: '#f0f0',
-            padding: '0px 40px',
-            marginBottom: '30px',
-            marginLeft: donation.isRightSide ? '0px' : '20px',
-            marginRight: donation.isRightSide ? '20px' : '0px'
+            paddingTop: '64px',
+            paddingBottom: '64px',
+            paddingLeft: donation.isRightSide ? '0px' : '64px',
+            paddingRight: donation.isRightSide ? '64px' : '0px'
         }}>
             {donation.media &&
                 <>
@@ -556,55 +564,55 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                 }}
                 onLoad={() => setGiphyTextReady(true)} />
             }
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-around',
-                    marginTop: '20px',
-                    width: 'fit-content',
-                    backgroundColor: '#4D00FB',
-                    marginLeft: donation.isRightSide ? '0px' : '-30px',
-                    marginRight: donation.isRightSide ? '-30px' : '0px',
-                    borderRadius: '30px',
-                    padding: '24px 24px',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
-                    zIndex: 10
-                }}
-            >
-                <div style={{ display: 'flex', alignSelf: 'center' }}>
-                    <p style={{
+            {donation.uid &&
+                <div
+                    style={{
                         display: 'flex',
-                        color: 'white',
-                        fontSize: '26px',
-                        textAlign: 'center'
-                    }}>
-                        <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
-                        {donation.amountQoins ?
-                            <>
-                            <div style={{ margin: '0 6px' }}>has sent you</div>
-                            <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
-                                {`${donation.amountQoins.toLocaleString()} Qoins`}
-                            </b>
-                            </>
-                            :
-                            <b style={{ color: '#FFF', fontWeight: '700', margin: '0 6px' }}>
-                                reacted
-                            </b>
-                        }
-                    </p>
-                </div>
-                {donation.amountQoins ?
-                    <>
-                    <div style={{ width: '10px' }}></div>
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                        marginTop: '20px',
+                        width: 'fit-content',
+                        backgroundColor: '#4D00FB',
+                        borderRadius: '30px',
+                        padding: '24px 24px',
+                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                        zIndex: 10
+                    }}
+                >
                     <div style={{ display: 'flex', alignSelf: 'center' }}>
-                        <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
+                        <p style={{
+                            display: 'flex',
+                            color: 'white',
+                            fontSize: '26px',
+                            textAlign: 'center'
+                        }}>
+                            <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
+                            {donation.amountQoins ?
+                                <>
+                                <div style={{ margin: '0 6px' }}>has sent you</div>
+                                <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
+                                    {`${donation.amountQoins.toLocaleString()} Qoins`}
+                                </b>
+                                </>
+                                :
+                                <b style={{ color: '#FFF', fontWeight: '700', margin: '0 6px' }}>
+                                    reacted
+                                </b>
+                            }
+                        </p>
                     </div>
-                    </>
-                    :
-                    null
-                }
-            </div>
+                    {donation.amountQoins ?
+                        <>
+                        <div style={{ width: '10px' }}></div>
+                        <div style={{ display: 'flex', alignSelf: 'center' }}>
+                            <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
+                        </div>
+                        </>
+                        :
+                        null
+                    }
+                </div>
+            }
             {(donation.message && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
                 <div style={{
                     display: 'flex',
@@ -615,6 +623,8 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                     borderTopLeftRadius: donation.isRightSide ? '30px' : '0px',
                     borderTopRightRadius: donation.isRightSide ? '0px' : '30px',
                     padding: '30px',
+                    marginLeft: donation.isRightSide ? '0px' : '20px',
+                    marginRight: donation.isRightSide ? '20px' : '0px',
                     alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
                 }}>
                     <p style={{

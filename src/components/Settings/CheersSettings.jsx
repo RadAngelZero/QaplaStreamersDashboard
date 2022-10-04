@@ -94,10 +94,10 @@ const useStyles = makeStyles(() => ({
             backgroundColor: '#3B4BF9'
         },
         color: '#FFFFFF',
-        textTransform: 'capitalize',
+        textTransform: 'none',
     },
     snackbarRoot: {
-        background: 'rgb(95, 193, 111)'
+        background: '#6C5DD3'
     }
 }));
 
@@ -317,7 +317,7 @@ const CheersSettings = ({ uid, twitchId }) => {
             <div className={classes.instructionsMargin} style={{ height: '20px' }} />
             <Snackbar open={showChangesSavedSnackbar}
                 onClose={() => setShowChangesSavedSnackbar(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 autoHideDuration={5000}
                 ContentProps={{
                     classes: {

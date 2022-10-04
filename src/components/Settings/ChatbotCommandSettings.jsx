@@ -24,6 +24,7 @@ const useStyles = makeStyles(() => ({
         color: 'rgba(255, 255, 255, 0.6)',
         fontSize: '16px',
         fontWeight: '400',
+        whiteSpace: 'pre-line'
     },
     createLinkCard: {
         backgroundColor: '#141735',
@@ -50,7 +51,7 @@ const useStyles = makeStyles(() => ({
             backgroundColor: '#3B4BF9'
         },
         color: '#FFFFFF',
-        textTransform: 'capitalize',
+        textTransform: 'none',
     }
 }))
 
@@ -82,7 +83,9 @@ const ChatbotCommandSettings = ({ uid }) => {
         }, 1250);
     }
     const copyMessage = () => {
-        navigator.clipboard.writeText('Create your own alerts to react on stream using your channel points! You can use memes, GIFs, stickers, emotes, TTS and more! Download the app: myqap.la/download');
+        let message = t('ChatbotCommandSettings.chatbotMessage').replaceAll('\n\n', ' ');
+        message += ` ${(streamerLink ? streamerLink : 'https://myqap.la/download')}`
+        navigator.clipboard.writeText(message);
         setOpenTooltip2(true);
         setTimeout(() => {
             setOpenTooltip2(false);
@@ -152,11 +155,7 @@ const ChatbotCommandSettings = ({ uid }) => {
 
                     </div>
                     <p className={classes.text} style={{ maxWidth: '270px' }}>
-                        Create your own alerts to react on stream using your channel points!
-                        <br /><br />
-                        You can use memes, GIFs, stickers, emotes, TTS and more!
-                        <br /><br />
-                        React now:
+                        {t('ChatbotCommandSettings.chatbotMessage')}
                         {streamerLink !== undefined &&
                             (streamerLink ?
                                 <span style={{ color: '#428EFF' }}> {streamerLink} </span>
@@ -171,16 +170,15 @@ const ChatbotCommandSettings = ({ uid }) => {
                 <Grid item sm={12} md={4}>
                     <div>
                         <h1 className={classes.title}>
-                            Create your profile link
+                            {t('ChatbotCommandSettings.createProfileLink')}
                         </h1>
                         <Card className={classes.createLinkCard}>
-                            <CardContent style={{ padding: 0 }}>
-                                The quickest way for your audience to react on stream is with your custom link.
-                                <br /><br />
-                                It replaces the default link in your settings <span style={{ color: '#428EFF' }}> https://myqap.la/app </span>
+                            <CardContent style={{ padding: 0, whiteSpace: 'pre-line' }}>
+                                {t('ChatbotCommandSettings.createProfileLinkDescription')}
+                                <span style={{ color: '#428EFF' }}> https://myqap.la/app </span>
                             </CardContent>
                             <Button className={classes.createLinkButton} onClick={() => history.push('/editProfile')}>
-                                Create Profile Link
+                                {t('ChatbotCommandSettings.createProfileLinkButton')}
                             </Button>
                         </Card>
                     </div>

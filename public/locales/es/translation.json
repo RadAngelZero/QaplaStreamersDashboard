@@ -231,6 +231,10 @@
         "addCommandBold": "Copia y pega en tu chatbot.",
         "command": "Comando",
         "message": "Mensaje",
+        "chatbotMessage": "¡Crea tus propias alertas para enviar en stream usando tus puntos del canal!\n\nPuedes usar memes, GIFs, emotes, TTS y más!\n\nReacciona aquí:",
+        "createProfileLink": "Crea tu Link de Perfil",
+        "createProfileLinkDescription": "La forma mas rapida para tu audiencia de reaccionar en stream es tu link personalizado.\n\nReemplaza el link de deafult en tus ajustes",
+        "createProfileLinkButton": "Crear Link de perfil",
         "copied": "Copiado"
     },
     "CheersBitsRecordDialog": {

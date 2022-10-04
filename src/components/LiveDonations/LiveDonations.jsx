@@ -57,10 +57,11 @@ const LiveDonations = () => {
                 listenToStreamerAlertsSettings(uid, (streamerSettings) => {
                     if (streamerSettings.exists()) {
                         setReactionsEnabled(streamerSettings.val().reactionsEnabled !== false);
-                        // The only time alerts are displayed to the right is in x === 3
-                        setAlertSideRight(streamerSettings.val().reactionCoordinates.x === 3);
+
                         let alertsOffsets = {};
                         if (streamerSettings.val().reactionCoordinates) {
+                            // The only time alerts are displayed to the right is in x === 3
+                            setAlertSideRight(streamerSettings.val().reactionCoordinates.x === 3);
                             switch (streamerSettings.val().reactionCoordinates.y) {
                                 case 1:
                                     alertsOffsets.top = '0%';
@@ -88,6 +89,11 @@ const LiveDonations = () => {
                                 default:
                                     break;
                             }
+                        } else {
+                            alertsOffsets = {
+                                left: streamerSettings.val().alertSideRight ? '65%' : '5%',
+                                top: '0%'
+                            };
                         }
 
                         setAlertOffsets(alertsOffsets);
@@ -118,6 +124,12 @@ const LiveDonations = () => {
                                 default:
                                     break;
                             }
+                        } else {
+                            qaplaOnOffsets = {
+                                bottom: 0,
+                                right: streamerSettings.val().alertSideRight ? '-12px' : 'auto',
+                                left: streamerSettings.val().alertSideRight ? 'auto' : '-12px',
+                            };
                         }
 
                         setQaplaOnOffsets(qaplaOnOffsets);

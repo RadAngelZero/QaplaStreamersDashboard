@@ -64,7 +64,7 @@ const ChatbotCommandSettings = ({ uid }) => {
 
     useEffect(() => {
         async function getLink() {
-            const link = await getStreamerDeepLink('uid');
+            const link = await getStreamerDeepLink(uid);
             setStreamerLink(link.val());
         }
 

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Checkbox, makeStyles, Grid, Card, CardMedia, Tooltip, FormControlLabel, Button } from '@material-ui/core';
+import { makeStyles, Tooltip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CopyIcon } from './../../assets/Copy.svg';
+import { getStreamerDeepLink } from '../../services/database';
 
 const useStyles = makeStyles(() => ({
     title: {
@@ -25,10 +26,23 @@ const useStyles = makeStyles(() => ({
     },
 }))
 
-const ChatbotCommand = () => {
+const ChatbotCommandSettings = ({ uid }) => {
     const classes = useStyles();
     const [openTooltip1, setOpenTooltip1] = useState(false);
     const [openTooltip2, setOpenTooltip2] = useState(false);
+    const [streamerLink, setStreamerLink] = useState(undefined);
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        async function getLink() {
+            const link = await getStreamerDeepLink(uid);
+            setStreamerLink(link.val());
+        }
+
+        if (uid) {
+            getLink();
+        }
+    }, [uid]);
 
 
     const copyCommand = () => {
@@ -50,11 +64,17 @@ const ChatbotCommand = () => {
         <div style={{
             marginTop: '60px',
             maxWidth: '633px',
-
         }}>
             <div>
-                <h1 className={classes.title}>Chatbot</h1>
-                <p className={classes.text}>Add the Qapla Command to your chatbot and make it easier to share Qapla with your community. <b>Copy and paste in your chatbot</b>.</p>
+                <h1 className={classes.title}>
+                    Chatbot
+                </h1>
+                <p className={classes.text}>
+                    {t('ChatbotCommandSettings.addCommandNormal')}
+                    <b>
+                        {t('ChatbotCommandSettings.addCommandBold')}
+                    </b>
+                </p>
             </div>
             <div style={{
                 marginTop: '28px',
@@ -63,7 +83,9 @@ const ChatbotCommand = () => {
                     display: 'flex',
                     alignItems: 'center',
                 }}>
-                    <h1 className={classes.subTitle}>Command</h1>
+                    <h1 className={classes.subTitle}>
+                        {t('ChatbotCommandSettings.command')}
+                    </h1>
                     <Tooltip placement='top' open={openTooltip1} title='Copiado'>
                         <CopyIcon style={{
                             width: '20px',
@@ -76,7 +98,9 @@ const ChatbotCommand = () => {
                     </Tooltip>
 
                 </div>
-                <p className={classes.text}>!qapla</p>
+                <p className={classes.text}>
+                    !qapla
+                </p>
             </div>
             <div style={{
                 marginTop: '28px',
@@ -85,7 +109,9 @@ const ChatbotCommand = () => {
                     display: 'flex',
                     alignItems: 'center',
                 }}>
-                    <h1 className={classes.subTitle}>Message</h1>
+                    <h1 className={classes.subTitle}>
+                        {t('ChatbotCommandSettings.message')}
+                    </h1>
                     <Tooltip placement='top' open={openTooltip2} title='Copiado'>
                         <CopyIcon style={{
                             width: '20px',
@@ -98,7 +124,23 @@ const ChatbotCommand = () => {
                     </Tooltip>
 
                 </div>
-                <p className={classes.text} style={{ maxWidth: '270px' }} >Create your own alerts to react on stream using your channel points! <br /><br /> You can use memes, GIFs, stickers, emotes, TTS and more! <br /><br /> Download the app: <span style={{ color: '#428EFF' }}>myqap.la/download</span></p>
+                <p className={classes.text} style={{ maxWidth: '270px' }}>
+                    Create your own alerts to react on stream using your channel points!
+                    <br /><br />
+                    You can use memes, GIFs, stickers, emotes, TTS and more!
+                    <br /><br />
+                    {streamerLink !== undefined &&
+                        (streamerLink ?
+                            <>
+                            Link: <span style={{ color: '#428EFF' }}> {streamerLink} </span>
+                            </>
+                            :
+                            <>
+                            Download the app: <span style={{ color: '#428EFF' }}> myqap.la/download </span>
+                            </>
+                        )
+                    }
+                </p>
             </div>
             {/* <div style={{
                 marginTop: '34px',
@@ -109,4 +151,4 @@ const ChatbotCommand = () => {
     )
 }
 
-export default ChatbotCommand;
+export default ChatbotCommandSettings;

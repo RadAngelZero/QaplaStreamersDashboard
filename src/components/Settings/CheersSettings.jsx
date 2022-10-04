@@ -38,7 +38,7 @@ const useStyles = makeStyles(() => ({
     link: {
         color: '#6C5DD3',
         fontWeight: '500',
-        fontSize: 18
+        fontSize: '14px'
     },
     container: {
         marginTop: 40,
@@ -95,6 +95,9 @@ const useStyles = makeStyles(() => ({
         maxWidth: '202px',
         maxHeight: '56px',
         minHeight: '56px',
+        fontSize: '14px',
+        fontWeight: '600',
+        letterSpacing: '0.49',
         borderRadius: '16px',
         boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)',
         '&:hover': {
@@ -188,22 +191,22 @@ const CheersSettings = ({ uid, twitchId }) => {
             <Grid style={{ height: '223px', maxWidth: '633px' }}>
                 <Grid>
                     <h1 className={classes.title}>
-                        Set up Overlay for your Qapla Reactions
+                        {t('CheersSettings.setup')}
                     </h1>
                     <p className={classes.text}>
-                        Add the Qapla Reactions URL as a brower source on your OBS/SLOBS. make sure to set right width and height
+                        {t('CheersSettings.instructions')}
                     </p>
                 </Grid>
                 <Grid style={{ marginTop: '30px' }}>
                     <Grid style={{ display: 'flex', alignItems: 'center' }}>
                         <h3 style={{ color: '#ffffff', fontSize: '14px' }}>
-                            Width
+                            {t('CheersSettings.width')}
                         </h3>
                         <p className={classes.textScreenDimension}>
                             1920
                         </p>
                         <h3 style={{ color: '#ffffff', fontSize: '14px' }}>
-                            Heigth
+                            {t('CheersSettings.height')}
                         </h3>
                         <p className={classes.textScreenDimension}>
                             1080
@@ -211,7 +214,7 @@ const CheersSettings = ({ uid, twitchId }) => {
                     </Grid>
                     <Grid item xs={8} style={{ display: 'flex', alignItems: 'start', marginTop: '40px' }}>
                         <StreamerTextInput
-                            textInputStyle={{ margin: '0px' }}
+                            textInputStyle={{ height: 45, margin: '0px', paddingTop: 0, paddingBottom: 0 }}
                             containerStyle={{ minWidth: '400px' }}
                             Icon={
                                 <Tooltip placement='top' open={openTooltip} title='Copiado'>
@@ -230,7 +233,7 @@ const CheersSettings = ({ uid, twitchId }) => {
                         marginTop: '18px',
                         marginBottom: '32px',
                     }}>
-                        Position
+                        {t('CheersSettings.position')}
                     </h1>
                     <div style={{
                         display: 'flex',
@@ -246,10 +249,10 @@ const CheersSettings = ({ uid, twitchId }) => {
                                 marginBottom: '16px',
                             }}>
                                 <h2 className={classes.titlesSectionPosition}>
-                                    Reaction Alert
+                                    {t('CheersSettings.reactionAlert')}
                                 </h2>
                                 <p className={classes.subTitle}>
-                                    Set the position of your alerts on your overlay
+                                    {t('CheersSettings.setReactionPosition')}
                                 </p>
                             </div>
                             <div style={{
@@ -290,8 +293,12 @@ const CheersSettings = ({ uid, twitchId }) => {
                             <div style={{
                                 marginBottom: '16px',
                             }}>
-                                <h2 className={classes.titlesSectionPosition}>Qapla On Badge</h2>
-                                <p className={classes.subTitle}>Your audience can be sure their reactions will</p>
+                                <h2 className={classes.titlesSectionPosition}>
+                                    Qapla On Badge
+                                </h2>
+                                <p className={classes.subTitle}>
+                                    {t('CheersSettings.qaplaOnFunctionality')}
+                                </p>
                             </div>
                             <div style={{
                                 height: '360px',
@@ -344,7 +351,7 @@ const CheersSettings = ({ uid, twitchId }) => {
                 </div>
             </Grid>
             <Button className={classes.Button} onClick={sendTestCheer}>
-                Save and Test
+                {t('CheersSettings.testButton')}
             </Button>
             <div className={classes.instructionsMargin} style={{ height: '20px' }} />
         </Grid>

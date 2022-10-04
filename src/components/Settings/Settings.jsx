@@ -4,7 +4,7 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import QaplaTabs from '../QaplaTabs/QaplaTabs';
 import QaplaTab from '../QaplaTabs/QaplaTab';
 import CheersSettings from './CheersSettings';
-import ChatbotCommand from './ChatbotCommand';
+import ChatbotCommandSettings from './ChatbotCommandSettings';
 
 const Settings = ({ user }) => {
     const [value, setValue] = useState(0);
@@ -23,7 +23,7 @@ const Settings = ({ user }) => {
                 <CheersSettings uid={user.uid} twitchId={user.id} />
             }
             {user && user.uid && user.id && value === 1 &&
-                <ChatbotCommand uid={user.uid} />
+                <ChatbotCommandSettings uid={user.uid} />
             }
         </StreamerDashboardContainer>
     );

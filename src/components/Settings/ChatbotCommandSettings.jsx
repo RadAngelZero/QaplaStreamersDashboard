@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, Tooltip } from '@material-ui/core';
+import { Button, Card, CardContent, Grid, makeStyles, Tooltip } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 
 import { ReactComponent as CopyIcon } from './../../assets/Copy.svg';
 import { getStreamerDeepLink } from '../../services/database';
@@ -24,6 +25,33 @@ const useStyles = makeStyles(() => ({
         fontSize: '16px',
         fontWeight: '400',
     },
+    createLinkCard: {
+        backgroundColor: '#141735',
+        borderRadius: '20px',
+        padding: '24px',
+        color: '#FFF',
+        fontSize: '16px',
+        fontWeight: '400',
+        marginTop: '16px'
+    },
+    createLinkButton: {
+        marginTop: '24px',
+        backgroundColor: '#3B4BF9',
+        minWidth: '202px',
+        maxWidth: '202px',
+        maxHeight: '56px',
+        minHeight: '56px',
+        fontSize: '14px',
+        fontWeight: '600',
+        letterSpacing: '0.49',
+        borderRadius: '16px',
+        boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)',
+        '&:hover': {
+            backgroundColor: '#3B4BF9'
+        },
+        color: '#FFFFFF',
+        textTransform: 'capitalize',
+    }
 }))
 
 const ChatbotCommandSettings = ({ uid }) => {
@@ -31,11 +59,12 @@ const ChatbotCommandSettings = ({ uid }) => {
     const [openTooltip1, setOpenTooltip1] = useState(false);
     const [openTooltip2, setOpenTooltip2] = useState(false);
     const [streamerLink, setStreamerLink] = useState(undefined);
+    const history = useHistory();
     const { t } = useTranslation();
 
     useEffect(() => {
         async function getLink() {
-            const link = await getStreamerDeepLink(uid);
+            const link = await getStreamerDeepLink('uid');
             setStreamerLink(link.val());
         }
 
@@ -61,93 +90,103 @@ const ChatbotCommandSettings = ({ uid }) => {
     }
 
     return (
-        <div style={{
-            marginTop: '60px',
-            maxWidth: '633px',
-        }}>
-            <div>
-                <h1 className={classes.title}>
-                    Chatbot
-                </h1>
-                <p className={classes.text}>
-                    {t('ChatbotCommandSettings.addCommandNormal')}
-                    <b>
-                        {t('ChatbotCommandSettings.addCommandBold')}
-                    </b>
-                </p>
-            </div>
-            <div style={{
-                marginTop: '28px',
-            }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                }}>
-                    <h1 className={classes.subTitle}>
-                        {t('ChatbotCommandSettings.command')}
+        <Grid container style={{ marginTop: '40px' }} spacing={2}>
+            <Grid item sm={12} md={8}>
+                <div>
+                    <h1 className={classes.title}>
+                        Chatbot
                     </h1>
-                    <Tooltip placement='top' open={openTooltip1} title='Copiado'>
-                        <CopyIcon style={{
-                            width: '20px',
-                            height: '22px',
-                            cursor: 'pointer',
-                            marginLeft: '10px',
-                        }}
-                            onClick={() => copyCommand()}
-                        />
-                    </Tooltip>
-
+                    <p className={classes.text}>
+                        {t('ChatbotCommandSettings.addCommandNormal')}
+                        <b>
+                            {t('ChatbotCommandSettings.addCommandBold')}
+                        </b>
+                    </p>
                 </div>
-                <p className={classes.text}>
-                    !qapla
-                </p>
-            </div>
-            <div style={{
-                marginTop: '28px',
-            }}>
                 <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
+                    marginTop: '28px',
                 }}>
-                    <h1 className={classes.subTitle}>
-                        {t('ChatbotCommandSettings.message')}
-                    </h1>
-                    <Tooltip placement='top' open={openTooltip2} title='Copiado'>
-                        <CopyIcon style={{
-                            width: '20px',
-                            height: '22px',
-                            cursor: 'pointer',
-                            marginLeft: '10px',
-                        }}
-                            onClick={() => copyMessage()}
-                        />
-                    </Tooltip>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}>
+                        <h1 className={classes.subTitle}>
+                            {t('ChatbotCommandSettings.command')}
+                        </h1>
+                        <Tooltip placement='top' open={openTooltip1} title={t('ChatbotCommandSettings.copied')}>
+                            <CopyIcon style={{
+                                width: '20px',
+                                height: '22px',
+                                cursor: 'pointer',
+                                marginLeft: '10px',
+                            }}
+                                onClick={() => copyCommand()}
+                            />
+                        </Tooltip>
 
+                    </div>
+                    <p className={classes.text}>
+                        !qapla
+                    </p>
                 </div>
-                <p className={classes.text} style={{ maxWidth: '270px' }}>
-                    Create your own alerts to react on stream using your channel points!
-                    <br /><br />
-                    You can use memes, GIFs, stickers, emotes, TTS and more!
-                    <br /><br />
-                    {streamerLink !== undefined &&
-                        (streamerLink ?
-                            <>
-                            Link: <span style={{ color: '#428EFF' }}> {streamerLink} </span>
-                            </>
-                            :
-                            <>
-                            Download the app: <span style={{ color: '#428EFF' }}> myqap.la/download </span>
-                            </>
-                        )
-                    }
-                </p>
-            </div>
-            {/* <div style={{
-                marginTop: '34px',
-            }}>
-                <p className={classes.title} >Create your profile link</p>
-            </div> */}
-        </div>
+                <div style={{
+                    marginTop: '28px',
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}>
+                        <h1 className={classes.subTitle}>
+                            {t('ChatbotCommandSettings.message')}
+                        </h1>
+                        <Tooltip placement='top' open={openTooltip2} title={t('ChatbotCommandSettings.copied')}>
+                            <CopyIcon style={{
+                                width: '20px',
+                                height: '22px',
+                                cursor: 'pointer',
+                                marginLeft: '10px',
+                            }}
+                                onClick={() => copyMessage()}
+                            />
+                        </Tooltip>
+
+                    </div>
+                    <p className={classes.text} style={{ maxWidth: '270px' }}>
+                        Create your own alerts to react on stream using your channel points!
+                        <br /><br />
+                        You can use memes, GIFs, stickers, emotes, TTS and more!
+                        <br /><br />
+                        React now:
+                        {streamerLink !== undefined &&
+                            (streamerLink ?
+                                <span style={{ color: '#428EFF' }}> {streamerLink} </span>
+                                :
+                                <span style={{ color: '#428EFF' }}> https://myqap.la/download </span>
+                            )
+                        }
+                    </p>
+                </div>
+            </Grid>
+            {!streamerLink &&
+                <Grid item sm={12} md={4}>
+                    <div>
+                        <h1 className={classes.title}>
+                            Create your profile link
+                        </h1>
+                        <Card className={classes.createLinkCard}>
+                            <CardContent style={{ padding: 0 }}>
+                                The quickest way for your audience to react on stream is with your custom link.
+                                <br /><br />
+                                It replaces the default link in your settings <span style={{ color: '#428EFF' }}> https://myqap.la/app </span>
+                            </CardContent>
+                            <Button className={classes.createLinkButton} onClick={() => history.push('/editProfile')}>
+                                Create Profile Link
+                            </Button>
+                        </Card>
+                    </div>
+                </Grid>
+            }
+        </Grid>
     )
 }
 

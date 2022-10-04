@@ -222,13 +222,15 @@
         "qaplaOnFunctionality": "Your audience can be sure their reactions will",
         "testCheerError": "There was an error sending the test message, try again, if the error persists contact technical support",
         "testCheerSuccess": "Test Cheer sent succesfuly! It will be shown in your OBS in a few seconds",
-        "testButton": "Test Reaction"
+        "testButton": "Test Reaction",
+        "copied": "Copied"
     },
     "ChatbotCommandSettings": {
         "addCommandNormal": "Add the Qapla Command to your chatbot and make it easier to share Qapla with your community. ",
         "addCommandBold": "Copy and paste in your chatbot.",
         "command": "Command",
-        "message": "Message"
+        "message": "Message",
+        "copied": "Copied"
     },
     "CheersBitsRecordDialog": {
         "messages": "Messages",

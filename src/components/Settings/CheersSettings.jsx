@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, Grid, Card, CardMedia, Tooltip, Button } from '@material-ui/core';
+import { makeStyles, Grid, Tooltip, Button, Snackbar } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import GridSelector from '../GridSelector/GridSelector';
-
-import {
-    CHEERS_URI,
-    LEFT,
-    RIGHT
-} from '../../utilities/Constants';
-
+import { CHEERS_URI } from '../../utilities/Constants';
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
-
 import interactionImage from '../../assets/Interaction.png';
 import qaplaLogoLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import qaplaLogoRight from '../../assets/Qapla-On-Overlay-Right.png';
@@ -20,7 +13,7 @@ import { getStreamerAlertsSettings, setAlertSetting, writeTestCheer } from './..
 
 const useStyles = makeStyles(() => ({
     instructionsMargin: {
-        marginTop: 50
+        marginTop: '32px'
     },
     instructionTitle: {
         fontWeight: '600',
@@ -42,9 +35,7 @@ const useStyles = makeStyles(() => ({
     },
     container: {
         marginTop: 40,
-        marginRight: 24,
-        maxHeight: '100vh',
-        minHeight: '100vh'
+        marginRight: 24
     },
     cursorPointer: {
         cursor: 'pointer'
@@ -57,7 +48,7 @@ const useStyles = makeStyles(() => ({
         fontSize: '18px',
         fontWeight: '600',
         lineHeight: '32px',
-        marginBottom: '15px'
+        marginBottom: '16px'
     },
     text: {
         color: 'rgba(255, 255, 255, 0.6)',
@@ -80,7 +71,7 @@ const useStyles = makeStyles(() => ({
     },
     titlesSectionPosition: {
         color: '#FFFFFF',
-        margin: '0px 0px 5px 0px',
+        margin: '0px 0px 8px 0px',
         fontSize: '16px'
     },
     subTitle: {
@@ -88,8 +79,7 @@ const useStyles = makeStyles(() => ({
         fontSize: '14px',
         fontWeight: '400'
     },
-    Button: {
-        marginTop: '80px',
+    testButton: {
         backgroundColor: '#3B4BF9',
         minWidth: '202px',
         maxWidth: '202px',
@@ -105,40 +95,11 @@ const useStyles = makeStyles(() => ({
         },
         color: '#FFFFFF',
         textTransform: 'capitalize',
+    },
+    snackbarRoot: {
+        background: 'rgb(95, 193, 111)'
     }
 }));
-
-const InstructionSection = ({ title, description, mediaContainerComponent = 'img', src }) => {
-    const classes = useStyles();
-
-    return (
-        <div className={classes.instructionsMargin}>
-            <p className={classes.instructionTitle}>
-                {title}
-            </p>
-            {description &&
-                <p className={classes.instructionDescription}>
-                    {description}
-                </p>
-            }
-            {src &&
-                <Grid container className={classes.instructionsMargin}>
-                    <Grid xs={12} sm={8} md={7}>
-                        <Card className={classes.instructionMediaCard}>
-                            <CardMedia component={mediaContainerComponent}
-                                width='480'
-                                height='475'
-                                src={src}
-                                frameborder='0'
-                                allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                                allowfullscreen />
-                        </Card>
-                    </Grid>
-                </Grid>
-            }
-        </div>
-    );
-};
 
 const CheersSettings = ({ uid, twitchId }) => {
     const classes = useStyles();
@@ -146,6 +107,7 @@ const CheersSettings = ({ uid, twitchId }) => {
     const [openTooltip, setOpenTooltip] = useState(false);
     const [overlayAreaSelected, setOverlayAreaSelected] = useState(null);
     const [overlayAreaSelectedQaplaLogo, setOverlayAreaSelectedQaplaLogo] = useState(null);
+    const [showChangesSavedSnackbar, setShowChangesSavedSnackbar] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -178,17 +140,19 @@ const CheersSettings = ({ uid, twitchId }) => {
         setOverlayAreaSelected(index);
         await setAlertSetting(uid, 'reactionGridIndex', index);
         await setAlertSetting(uid, 'reactionCoordinates', coordinates);
+        setShowChangesSavedSnackbar(true);
     }
 
     const setQaplaOnPosition = async (coordinates, index) => {
         setOverlayAreaSelectedQaplaLogo(index);
         await setAlertSetting(uid, 'qaplaOnGridIndex', index);
         await setAlertSetting(uid, 'qaplaOnCoordinates', coordinates);
+        setShowChangesSavedSnackbar(true);
     }
 
     return (
-        <Grid className={classes.container}>
-            <Grid style={{ height: '223px', maxWidth: '633px' }}>
+        <Grid className={classes.container} spacing={2}>
+            <Grid item sm={12} md={8}>
                 <Grid>
                     <h1 className={classes.title}>
                         {t('CheersSettings.setup')}
@@ -217,7 +181,7 @@ const CheersSettings = ({ uid, twitchId }) => {
                             textInputStyle={{ height: 45, margin: '0px', paddingTop: 0, paddingBottom: 0 }}
                             containerStyle={{ minWidth: '400px' }}
                             Icon={
-                                <Tooltip placement='top' open={openTooltip} title='Copiado'>
+                                <Tooltip placement='top' open={openTooltip} title={t('CheersSettings.copied')}>
                                     <CopyIcon className={classes.cursorPointer} onClick={copyCheersURL} />
                                 </Tooltip>
                             }
@@ -229,10 +193,7 @@ const CheersSettings = ({ uid, twitchId }) => {
             </Grid>
             <Grid container className={classes.instructionsMargin} xs={12}>
                 <div>
-                    <h1 className={classes.title} style={{
-                        marginTop: '18px',
-                        marginBottom: '32px',
-                    }}>
+                    <h1 className={classes.title}>
                         {t('CheersSettings.position')}
                     </h1>
                     <div style={{
@@ -350,10 +311,21 @@ const CheersSettings = ({ uid, twitchId }) => {
                     </div>
                 </div>
             </Grid>
-            <Button className={classes.Button} onClick={sendTestCheer}>
+            <Button className={classes.testButton} onClick={sendTestCheer}>
                 {t('CheersSettings.testButton')}
             </Button>
             <div className={classes.instructionsMargin} style={{ height: '20px' }} />
+            <Snackbar open={showChangesSavedSnackbar}
+                onClose={() => setShowChangesSavedSnackbar(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                autoHideDuration={5000}
+                ContentProps={{
+                    classes: {
+                      root: classes.snackbarRoot
+                    }
+                }}
+                message='Changes Saved'>
+            </Snackbar>
         </Grid>
     );
 }

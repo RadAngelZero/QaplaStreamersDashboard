@@ -76,12 +76,6 @@ export const TWITCH_REDIRECT_URI = !process.env.NODE_ENV || process.env.NODE_ENV
 export const CHEERS_URI = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? 'http://localhost:3000/liveDonations' : 'https://dashboard.qapla.gg/liveDonations';
 
 /**
- * Alert Side Selection
- */
-export const LEFT = 'LEFT';
-export const RIGHT = 'RIGHT';
-
-/**
  * Subscription Types
  */
 export const MONTHLY = 'monthly';

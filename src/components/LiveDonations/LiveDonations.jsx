@@ -31,6 +31,8 @@ const LiveDonations = () => {
     const [playQaplaOnAnimation, setPlayQaplaOnAnimation] = useState("false");
     const [showEmojiRain, setShowEmojiRain] = useState(false);
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
+    const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
+    const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
     const { streamerId } = useParams();
 
     useEffect(() => {
@@ -55,7 +57,82 @@ const LiveDonations = () => {
                 listenToStreamerAlertsSettings(uid, (streamerSettings) => {
                     if (streamerSettings.exists()) {
                         setReactionsEnabled(streamerSettings.val().reactionsEnabled !== false);
-                        setAlertSideRight(streamerSettings.val().alertSideRight);
+
+                        let alertsOffsets = {};
+                        if (streamerSettings.val().reactionCoordinates) {
+                            // The only time alerts are displayed to the right is in x === 3
+                            setAlertSideRight(streamerSettings.val().reactionCoordinates.x === 3);
+                            switch (streamerSettings.val().reactionCoordinates.y) {
+                                case 1:
+                                    alertsOffsets.top = '0%';
+                                    break;
+                                case 2:
+                                    alertsOffsets.top = '22%';
+                                    break;
+                                case 3:
+                                    alertsOffsets.bottom = '0%';
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            switch (streamerSettings.val().reactionCoordinates.x) {
+                                case 1:
+                                    alertsOffsets.left = '5%';
+                                    break;
+                                case 2:
+                                    alertsOffsets.left = '40%';
+                                    break;
+                                case 3:
+                                    alertsOffsets.left = '65%';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else {
+                            alertsOffsets = {
+                                left: streamerSettings.val().alertSideRight ? '65%' : '5%',
+                                top: '0%'
+                            };
+                        }
+
+                        setAlertOffsets(alertsOffsets);
+
+                        let qaplaOnOffsets = {};
+                        /**
+                         * Currently Qapla on only can be at the bottom of the screen totally aligned to the
+                         * left or to the right
+                         */
+                        if (streamerSettings.val().qaplaOnCoordinates) {
+                            switch (streamerSettings.val().qaplaOnCoordinates.y) {
+                                case 1:
+                                    qaplaOnOffsets.bottom = '-15px';
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            switch (streamerSettings.val().qaplaOnCoordinates.x) {
+                                case 1:
+                                    qaplaOnOffsets.left = '-12px';
+                                    qaplaOnOffsets.right = 'auto';
+                                    break;
+                                case 2:
+                                    qaplaOnOffsets.right = '-12px';
+                                    qaplaOnOffsets.left = 'auto';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else {
+                            qaplaOnOffsets = {
+                                bottom: 0,
+                                right: streamerSettings.val().alertSideRight ? '-12px' : 'auto',
+                                left: streamerSettings.val().alertSideRight ? 'auto' : '-12px',
+                            };
+                        }
+
+                        setQaplaOnOffsets(qaplaOnOffsets);
                     }
                 });
 
@@ -281,8 +358,6 @@ const LiveDonations = () => {
                     }
                 }
 
-                donation.isRightSide = alertSideRight;
-
                 setDonationToShow(donation);
 
                 if (donation.emojiRain && donation.emojiRain.emojis) {
@@ -407,9 +482,7 @@ const LiveDonations = () => {
                     }}
                     style={{
                         position: 'fixed',
-                        bottom: '-15px',
-                        left: alertSideRight ? 'auto' : '-12px',
-                        right: alertSideRight ? '-12px' : 'auto',
+                        ...qaplaOnOffsets,
                         width: '150px',
                     }}
                     className="qapla-logo-container"
@@ -434,7 +507,7 @@ const LiveDonations = () => {
                         animation-timing-function: ease-in-out;
                     }
                     `}</style>
-                    <img src={alertSideRight ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
+                    <img src={qaplaOnOffsets.left === 'auto' ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
                 </div>
             }
             {showEmojiRain &&
@@ -448,15 +521,17 @@ const LiveDonations = () => {
                 }}></div>
             }
             {donationToShow &&
-                <>
-                    <DonationHandler donationToShow={donationToShow} finishReaction={finishReaction} startDonation={startDonation} />
-                </>
+                <DonationHandler donationToShow={donationToShow}
+                    finishReaction={finishReaction}
+                    startDonation={startDonation}
+                    alertSideRight={alertSideRight}
+                    alertOffsets={alertOffsets} />
             }
         </div>
     );
 }
 
-const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
+const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertSideRight, alertOffsets }) => {
     const [clip, setClip] = useState(null);
     const [mediaReady, setMediaReady] = useState(false);
     const [giphyTextReady, setGiphyTextReady] = useState(false);
@@ -517,6 +592,8 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
 
     return (
         <div style={{
+            position: 'absolute',
+            ...alertOffsets,
             opacity: showDonation ? 1 : 0,
             display: 'flex',
             flex: 1,
@@ -524,8 +601,8 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
             backgroundColor: '#f0f0',
             paddingTop: '64px',
             paddingBottom: '64px',
-            paddingLeft: donation.isRightSide ? '0px' : '64px',
-            paddingRight: donation.isRightSide ? '64px' : '0px'
+            paddingLeft: alertSideRight ? '0px' : '64px',
+            paddingRight: alertSideRight ? '64px' : '0px'
         }}>
             {donation.media &&
                 <>
@@ -533,7 +610,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                     <img src={donation.media.url} alt='' style={{
                         aspectRatio: donation.media.width / donation.media.height,
                         display: 'flex',
-                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                         maxHeight: '250px',
                         objectFit: 'scale-down'
                     }}
@@ -543,7 +620,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                         <div style={{
                             display: 'flex',
                             aspectRatio: donation.media.width / donation.media.height,
-                            alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                            alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                             maxHeight: '250px',
                             objectFit: 'scale-down'
                         }}>
@@ -558,7 +635,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                 <img src={donation.messageExtraData.giphyText.url} alt='' style={{
                     aspectRatio: donation.messageExtraData.giphyText.width / donation.messageExtraData.giphyText.height,
                     display: 'flex',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                     maxHeight: '250px',
                     objectFit: 'scale-down'
                 }}
@@ -575,7 +652,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                         backgroundColor: '#4D00FB',
                         borderRadius: '30px',
                         padding: '24px 24px',
-                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                         zIndex: 10
                     }}
                 >
@@ -618,14 +695,15 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                     display: 'flex',
                     width: 'fit-content',
                     backgroundColor: '#FFFFFF',
+                    maxWidth: '500px',
                     marginTop: '-20px',
                     borderRadius: '30px',
-                    borderTopLeftRadius: donation.isRightSide ? '30px' : '0px',
-                    borderTopRightRadius: donation.isRightSide ? '0px' : '30px',
+                    borderTopLeftRadius: alertSideRight ? '30px' : '0px',
+                    borderTopRightRadius: alertSideRight ? '0px' : '30px',
                     padding: '30px',
-                    marginLeft: donation.isRightSide ? '0px' : '20px',
-                    marginRight: donation.isRightSide ? '20px' : '0px',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    marginLeft: alertSideRight ? '0px' : '20px',
+                    marginRight: alertSideRight ? '20px' : '0px',
+                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                 }}>
                     <p style={{
                         display: 'flex',

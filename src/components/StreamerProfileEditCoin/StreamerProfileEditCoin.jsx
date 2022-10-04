@@ -165,7 +165,6 @@ const StreamerProfileEditCoin = ({ user }) => {
         else {
             setQoinsReaction(true)
         }
-       
     }
 
     const toggleReward = async () => {

@@ -300,11 +300,11 @@ body {
 }
 
 .streamsCardContainer {
-    height: 400px;
+    min-height: 400px;
 }
 
 .innerStreamsCardContainer {
-    height: 400px;
+    min-height: 400px;
 }
 
 .title {

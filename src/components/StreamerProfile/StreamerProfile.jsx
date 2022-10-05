@@ -62,7 +62,7 @@ const BitsButtonContainer = withStyles(() => ({
         alignItems: 'center',
         justifyContent: 'space-between',
         textTransform: 'none',
-        marginLeft:'8px',
+        marginLeft:'5px',
         '&:hover': {
             backgroundColor: '#141735'
         },
@@ -326,6 +326,42 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             timestamp={1664469477935}
                                             drops={2}
                                             onRemoveStream={onRemoveStream} />
+                                             <StreamCard
+                                            streamType={2}
+                                            streamId={'testEvent'}
+                                            image={''}
+                                            user={user}
+                                            game={'multiRocket'}
+                                            games={games}
+                                            date={formatDate(1664559234874)}
+                                            hour={formatHour(1664559234874)}
+                                            timestamp={1664559234874}
+                                            drops={2}
+                                            onRemoveStream={onRemoveStream} />
+                                             <StreamCard
+                                            streamType={2}
+                                            streamId={'testEvent'}
+                                            image={''}
+                                            user={user}
+                                            game={'multiRocket'}
+                                            games={games}
+                                            date={formatDate(1664559234874)}
+                                            hour={formatHour(1664559234874)}
+                                            timestamp={1664559234874}
+                                            drops={2}
+                                            onRemoveStream={onRemoveStream} />
+                                             <StreamCard
+                                            streamType={2}
+                                            streamId={'testEvent'}
+                                            image={''}
+                                            user={user}
+                                            game={'multiRocket'}
+                                            games={games}
+                                            date={formatDate(1664559234874)}
+                                            hour={formatHour(1664559234874)}
+                                            timestamp={1664559234874}
+                                            drops={2}
+                                            onRemoveStream={onRemoveStream} />
                                             <StreamCard
                                             streamType={2}
                                             streamId={'testEvent'}
@@ -370,7 +406,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid style={{maxWidth:'260px',maxHeight:'500px'}} xs={3}>
+                        <Grid style={{maxWidth:'260px'}}  xs={3}>
                             <Button variant='contained'
                                 className={styles.messagesButton}
                                 style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735',marginBottom:'50px', minWidth:'205px' }}

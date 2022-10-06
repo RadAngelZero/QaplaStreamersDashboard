@@ -118,7 +118,7 @@
         "creatingRewards": "Creando recompensas",
         "manageRewards": "Gestionar recompensas",
         "manageStream": "Gestionar stream",
-        "cancelStreamRequest": "Cancelar",
+        "cancelStreamRequest": "Cancelar stream",
         "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo para continuar"
     },
     "QaplaStreamDialogs": {

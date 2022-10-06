@@ -6,7 +6,6 @@ import { database, databaseServerValue } from './firebase';
 const gamesRef = database.ref('/GamesResources');
 const InvitationCodeRef = database.ref('/InvitationCode');
 const userStreamersRef = database.ref('/UserStreamer');
-const streamsApprovalRef = database.ref('/StreamsApproval');
 const streamersEventsDataRef = database.ref('/StreamersEventsData');
 const streamsRef = database.ref('/eventosEspeciales').child('eventsData');
 const streamersHistoryEventsDataRef = database.ref('/StreamersHistoryEventsData');
@@ -356,7 +355,7 @@ export async function cancelStreamRequest(uid, streamId) {
 
     // Delete stream
     await streamersEventsDataRef.child(uid).child(streamId).remove();
-    await streamsApprovalRef.child(streamId).remove();
+    await streamsRef.child(streamId).remove();
 }
 
 /**

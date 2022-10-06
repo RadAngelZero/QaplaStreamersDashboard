@@ -116,8 +116,8 @@
         "end": "End drops",
         "creatingRewards": "Creating rewards",
         "manageRewards": "Manage rewards",
-        "manageStream": "Manage stream",
-        "cancelStreamRequest": "Cancel",
+        "manageStream": "Update stream",
+        "cancelStreamRequest": "Cancel stream",
         "sessionExpired": "Your session has expired. Login again to continue"
     },
     "QaplaStreamDialogs": {

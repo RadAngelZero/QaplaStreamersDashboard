@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as ShareArrow } from './../../assets/ShareArrow.svg';
 import { ReactComponent as TimerIcon } from './../../assets/Timer.svg';
+import { ReactComponent as EditIcon } from './../../assets/EditPencil.svg';
+import { ReactComponent as DeleteIcon } from './../../assets/Delete.svg';
 import {
     streamsPlaceholderImages,
     SCHEDULED_EVENT_TYPE,
@@ -161,12 +163,25 @@ const useStyles = makeStyles(() => ({
         color: '#FFFFFF99',
         width: '100%',
         borderRadius: '8px',
-        textTransform: 'none'
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#272D5780',
+            opacity: 0.8
+        }
     },
     cardContainer: {
         padding: '0px 16px !important',
         maxWidth: '270px !important',
         marginBottom: '20px !important'
+    },
+    cancelButton: {
+        marginBottom: '16px',
+        backgroundColor: 'transparent',
+        color: '#FFF',
+        opacity: 0.6,
+        width: '100%',
+        borderRadius: '8px',
+        textTransform: 'none'
     }
 }));
 
@@ -795,20 +810,6 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                         <p className={classes.eventCardTitle}>
                             {title && title[currentLanguage] ? title[currentLanguage] : ''}
                         </p>
-                        {streamType !== PAST_STREAMS_EVENT_TYPE && !showRewardsOptions &&
-                            <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
-                                <div style={{
-                                    backgroundColor: streamType === PENDING_APPROVAL_EVENT_TYPE ? '#C6B200' : '#00FFDD',
-                                    width: '8px',
-                                    height: '8px',
-                                    borderRadius: '50%'
-                                }} />
-                                <div style={{ width: '6px' }} />
-                                <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>
-                                    {streamType === PENDING_APPROVAL_EVENT_TYPE ? t('StreamCard.pendingReview') : t('StreamCard.posted')}
-                                </p>
-                            </div>
-                        }
                         <div className={classes.buttonsContainer}>
                             {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
                                 (!startingStream ?
@@ -839,14 +840,20 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                             }
                             <div style={{ height: '11px' }} />
                             {streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions &&
-                                <Button size='medium' className={classes.manageButton} onClick={manageStream}>
-                                    {t('StreamCard.manageStream')}
-                                </Button>
-                            }
-                            {streamType === PENDING_APPROVAL_EVENT_TYPE &&
-                                <Button size='medium' className={classes.manageButton} onClick={cancelStream}>
+                                <>
+                                <Button size='medium'
+                                    className={classes.cancelButton}
+                                    onClick={cancelStream}
+                                    startIcon={<DeleteIcon color='rgba(255, 255, 255, 0.6)' />}>
                                     {t('StreamCard.cancelStreamRequest')}
                                 </Button>
+                                <Button size='medium'
+                                    className={classes.manageButton}
+                                    onClick={manageStream}
+                                    startIcon={<EditIcon />}>
+                                    {t('StreamCard.manageStream')}
+                                </Button>
+                                </>
                             }
                         </div>
                     </div>

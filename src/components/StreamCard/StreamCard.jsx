@@ -35,6 +35,8 @@ import { auth } from '../../services/firebase';
 import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
 import { sendCustomMessage } from '../../services/functions';
 import { getCurrentLanguage } from '../../utilities/i18n';
+import EventConfirmCancellationDialog from '../QaplaStreamDialogs/EventConfirmCancellationDialog';
+import SuccessDialog from '../SuccessDialog/SuccessDialog';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -209,6 +211,8 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
     const [playBothExitAnimation, setPlayBothExitAnimation] = useState("false");
     const [isTouch, setIsTouch] = useState(false);
     const [streamLink, setStreamLink] = useState('');
+    const [openCancelStreamDialog, setOpenCancelStreamDialog] = useState(false);
+    const [openCanceledStreamSuccessfulDialog, setOpenCanceledStreamSuccessfulDialog] = useState(false);
     const actualShareHover = useRef(null);
     const history = useHistory();
     const classes = useStyles();
@@ -297,12 +301,11 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
         // stream is not in this array intentionally, cause it causes a loop because of the checkActiveCustomReward function
     }, [game, games, streamId, streamType, user, loadingDots, startingStream, showRewardsOptions, timestamp]);
 
-    const cancelStream = (e) => {
-        e.stopPropagation();
-        if (window.confirm(t('StreamCard.deleteConfirmation'))) {
-            cancelStreamRequest(user.uid, streamId);
-            onRemoveStream(streamId);
-        }
+    const cancelStream = async () => {
+        await cancelStreamRequest(user.uid, streamId);
+        onRemoveStream(streamId);
+        setOpenCancelStreamDialog(false);
+        setOpenCanceledStreamSuccessfulDialog(true);
     }
 
     const startStream = async (enableIn) => {
@@ -431,7 +434,7 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
 
     const sendMessage = async (message) => {
         if (message) {
-            await sendCustomMessage(user.uid, title && title['en'] ? title['en'] : '', message);
+            await sendCustomMessage(user.uid, title && title['en'] ? title['en'] : 'Event canceled', message);
 
             window.analytics.track('Custom Message sent', {
                 streamId,
@@ -439,7 +442,6 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                 timestamp: (new Date()).getTime(),
                 message
             });
-            setOpenCustomMessageSentDialog(true);
         }
     }
 
@@ -843,7 +845,7 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                                 <>
                                 <Button size='medium'
                                     className={classes.cancelButton}
-                                    onClick={cancelStream}
+                                    onClick={() => setOpenCancelStreamDialog(true)}
                                     startIcon={<DeleteIcon color='rgba(255, 255, 255, 0.6)' />}>
                                     {t('StreamCard.cancelStreamRequest')}
                                 </Button>
@@ -859,7 +861,7 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                     </div>
                     <EventManagementDialog open={openStreamDialog}
                         user={user}
-                        sendMessage={sendMessage}
+                        sendMessage={() => { sendMessage(); setOpenCustomMessageSentDialog(true); }}
                         streamId={streamId}
                         stream={stream}
                         streamStarted={startingStream}
@@ -885,6 +887,14 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                         onClose={closeAndRemoveStream} />
                     <EventCustomMessageSentConfirmation open={openCustomMessageSentDialog}
                         onClose={() => setOpenCustomMessageSentDialog(false)} />
+                    <EventConfirmCancellationDialog open={openCancelStreamDialog}
+                        onClose={() => setOpenCancelStreamDialog(false)}
+                        cancelStream={cancelStream}
+                        sendCustomMessage={sendMessage} />
+                    <SuccessDialog open={openCanceledStreamSuccessfulDialog}
+                        title={t('StreamCard.successfullyCanceledStreamDialogTitle')}
+                        buttonText={t('StreamCard.successfullyCanceledStreamDialogButtonText')}
+                        onClose={() => setOpenCanceledStreamSuccessfulDialog(false)} />
                 </Card>
             </Grid>
         );

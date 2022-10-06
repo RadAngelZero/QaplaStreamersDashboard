@@ -119,7 +119,9 @@
         "manageRewards": "Gestionar recompensas",
         "manageStream": "Gestionar stream",
         "cancelStreamRequest": "Cancelar stream",
-        "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo para continuar"
+        "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo para continuar",
+        "successfullyCanceledStreamDialogTitle": "Stream cancelado correctamente",
+        "successfullyCanceledStreamDialogButtonText": "Ir al Dashboard"
     },
     "QaplaStreamDialogs": {
         "EventConfirmStartDialog": {
@@ -150,6 +152,12 @@
             "finish": "Terminar stream",
             "back": "Volver atras",
             "dontShowThisMessageAgain": "No volver a mostrar este mensaje"
+        },
+        "EventConfirmCancellationDialog": {
+            "title": "Confirmar cancelación",
+            "description": "Puedes enviar un mensaje personalizado a tu comunidad de que no vas a poder hacerlo :)",
+            "customMessagePlaceholder": "Campo opcional. Limte de 140 caracteres.",
+            "cancelStream": "Cancelar Stream"
         },
         "EventRewardsRemovedConfirmation": {
             "title": "Las recompensas se eliminaron correctamente 👌",

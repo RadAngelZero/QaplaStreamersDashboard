@@ -10,9 +10,9 @@ import {
     TableBody,
     withStyles,
     Avatar,
-    Hidden,
     InputLabel,
-    InputAdornment
+    InputAdornment,
+    Button
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useParams, useLocation } from 'react-router-dom';
@@ -31,9 +31,12 @@ import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg'
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
 import { SCHEDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
-import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate } from '../../services/database';
-import { sednPushNotificationToTopic } from '../../services/functions';
+import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate, cancelStreamRequest } from '../../services/database';
+import { sednPushNotificationToTopic, sendCustomMessage } from '../../services/functions';
 import { notifyUpdateToQaplaAdmins } from '../../services/discord';
+import EventConfirmCancellationDialog from '../QaplaStreamDialogs/EventConfirmCancellationDialog';
+import SuccessDialog from '../SuccessDialog/SuccessDialog';
+import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -45,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
         color: 'rgba(255,255,255,0.60)',
         lineHeight: '18px',
         paddingRight: '16px',
-        marginTop: '16px'
+        marginTop: '8px'
     },
     datePickerLabel: {
         fontSize: '12px',
@@ -53,13 +56,59 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: '16px'
     },
     button: {
-        marginTop: '32px'
+        marginTop: '32px',
+        backgroundColor: '#3B4BF9',
+        boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)',
+        borderRadius: '16px',
+        color: '#FFF',
+        padding: '18px 0px',
+        fontSize: '14px',
+        fontWeight: '600',
+        width: '166px',
+        textTransform: 'none',
+        '&:disabled': {
+            opacity: .4,
+            color: '#FFF',
+            padding: '18px 0px',
+            fontSize: '14px',
+            fontWeight: '600',
+            width: '166px',
+            boxShadow: 'none',
+        },
+        '&:hover': {
+            backgroundColor: '#3B4BF9',
+            opacity: .9
+        }
+    },
+    cancelButton: {
+        backgroundColor: '#FF006B',
+        borderRadius: '16px',
+        color: '#FFF',
+        padding: '18px 0px',
+        fontSize: '14px',
+        fontWeight: '600',
+        width: '166px',
+        textTransform: 'none',
+        '&:disabled': {
+            opacity: .4,
+            color: '#FFF',
+            padding: '18px 0px',
+            fontSize: '14px',
+            fontWeight: '600',
+            width: '166px',
+        },
+        '&:hover': {
+            backgroundColor: '#FF006B',
+            opacity: .9
+        }
     },
     containerTextArea: {
-        marginRight: '2.5rem'
+        width: '100%'
     },
     textArea: {
-        paddingTop: '1rem'
+        minHeight: '100px',
+        fontSize: '13px',
+        fontWeight: '700'
     },
     tableHead: {
         fontSize: '16px !important',
@@ -192,6 +241,9 @@ const EditStreamerEvent = ({ user }) => {
     const [clockOpen, setClockOpen] = useState(false);
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [minDateToAllowUpdates, setMinDateToAllowUpdates] = useState(new Date((new Date()).getTime() + 300000));
+    const [openCancelStreamDialog, setOpenCancelStreamDialog] = useState(false);
+    const [openCanceledStreamSuccessfulDialog, setOpenCanceledStreamSuccessfulDialog] = useState(false);
+    const [openCustomMessageSentDialog, setOpenCustomMessageSentDialog] = useState(false);
     const { t } = useTranslation();
     const classes = useStyles();
     const history = useHistory();
@@ -219,7 +271,7 @@ const EditStreamerEvent = ({ user }) => {
         async function setStreamTitle() {
             if (streamType === SCHEDULED_EVENT_TYPE) {
                 const title = await getStreamTitle(streamId);
-                setTitle(title.val());
+                setTitle({ en: 'test', es: 'test' });
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
                 if (user.uid) {
                     const title = await getPastStreamTitle(user.uid, streamId);
@@ -233,24 +285,9 @@ const EditStreamerEvent = ({ user }) => {
         setStreamTitle();
     }, [streamId, streamType, user]);
 
-    const sendNotification = async () => {
-        const bodys = {
-            es: notificationBody,
-            en: notificationBody
-        };
-
-        const titles = {
-            es: title['en'],
-            en: title['en']
-        };
-
-        try {
-            sednPushNotificationToTopic(streamId, titles, bodys);
-            alert(t('EditStream.alerts.sent'));
-            setNotificationBody('');
-        } catch (error) {
-            alert(t('EditStream.alerts.errorSent'));
-        }
+    const sendNotification = async (message) => {
+        await sendCustomMessage(streamId, title['en'], message ? message : notificationBody);
+        setNotificationBody('');
     }
 
     const onChangeNotificationBody = (e) => {
@@ -300,6 +337,12 @@ const EditStreamerEvent = ({ user }) => {
 
         setDisplayDate(date)
     };
+
+    const cancelStream = async () => {
+        await cancelStreamRequest(user.uid, streamId);
+        setOpenCancelStreamDialog(false);
+        setOpenCanceledStreamSuccessfulDialog(true);
+    }
 
     return (
         <StreamerDashboardContainer user={user}>
@@ -396,17 +439,18 @@ const EditStreamerEvent = ({ user }) => {
                                             </Grid>
                                         </MuiPickersUtilsProvider>
                                     }
-                                    <ContainedButton className={classes.button}
+                                    <Button className={classes.button}
                                         onClick={saveDate}
+                                        buttonColor={2}
                                         disabled={(new Date()).getTime() >= minDateToAllowUpdates || selectedDate.getTime() === firstTimestamp.getTime()}>
                                         {t('EditStream.save')}
-                                    </ContainedButton>
+                                    </Button>
                                 </Grid>
                             </Grid>
                             <SectionHeader title={t('EditStream.sendMessage')}
                                 description={t('EditStream.sendMessageDesc')} />
                             <Grid item md={12} style={{
-                                marginTop: '24px'
+                                marginTop: '32px'
                             }}>
                                 <StreamerTextInput placeholder={t('EditStream.limit')}
                                     multiline
@@ -416,24 +460,23 @@ const EditStreamerEvent = ({ user }) => {
                                     containerClassName={classes.containerTextArea}
                                     value={notificationBody}
                                     onChange={onChangeNotificationBody} />
-                                <ContainedButton className={classes.button}
-                                    onClick={sendNotification}>
+                                <Button className={classes.button}
+                                    disabled={!notificationBody}
+                                    onClick={() => { sendNotification(); alert(t('EditStream.alerts.sent')); }}>
                                     {t('QaplaStreamDialogs.EventManagementDialog.send')}
-                                </ContainedButton>
+                                </Button>
+                            </Grid>
+                            <SectionHeader title={t('EditStream.cancelStream')}
+                                description={t('EditStream.cancelStreamDescription')} />
+                            <Grid item md={12} style={{
+                                marginTop: '32px'
+                            }}>
+                                <Button className={classes.cancelButton}
+                                    onClick={() => setOpenCancelStreamDialog(true)}>
+                                    {t('EditStream.cancelStream')}
+                                </Button>
                             </Grid>
                         </Grid>
-                        {/** To define how this section is going to work
-                            <Grid xs={6}>
-                                <SectionHeader title='Private Rooms'
-                                    description='If you are hosting a private room and want to give access to the participants of the event, you can share the ID with them directly in the Qapla app. Participants will get a notification to see the ID.' />
-                                <StreamerTextInput label='ID'
-                                    placeholder='ID' />
-                                <br/>
-                                <ContainedButton className={classes.button}>
-                                    Send
-                                </ContainedButton>
-                            </Grid>
-                        */}
                     </>
                 }
                 <Grid xs={12}>
@@ -482,6 +525,14 @@ const EditStreamerEvent = ({ user }) => {
                     </TableContainer>
                 </Grid>
             </Grid>
+            <EventConfirmCancellationDialog open={openCancelStreamDialog}
+                onClose={() => setOpenCancelStreamDialog(false)}
+                cancelStream={cancelStream}
+                sendCustomMessage={sendNotification} />
+            <SuccessDialog open={openCanceledStreamSuccessfulDialog}
+                title={t('StreamCard.successfullyCanceledStreamDialogTitle')}
+                buttonText={t('StreamCard.successfullyCanceledStreamDialogButtonText')}
+                onClose={() => { history.push('/profile'); setOpenCanceledStreamSuccessfulDialog(false); }} />
         </StreamerDashboardContainer>
     );
 }

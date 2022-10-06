@@ -355,8 +355,8 @@
     "EditStream": {
         "change" : "Cambiar fecha u hora",
         "changeDesc": "Los participantes y tus seguidores recibirán una notificación de cualquier cambio. Recomendamos no cambiar la fecha y hora muy seguido, la consistencia en tus publicaciones genera mayor a tus streams.",
-        "sendMessage": "Enviar mensaje",
-        "sendMessageDesc": "Avisa a tu gente sobre algo relevante de tu stream, crea hype o ¡lo que tu quieras! Los participante y tus seguidores recibirán una notificación móvil con tu mensaje.",
+        "sendMessage": "Mensajes directos",
+        "sendMessageDesc": "Avisa a tu gente sobre algo relevante de tu stream, crea hype o ¡lo que tu quieras!",
         "participants": "Participantes",
         "table": {
             "twitch": "Nombre de Twitch",
@@ -371,8 +371,10 @@
             "errorSend": "Error al enviar la notificación. Intenta de nuevo mas tarde",
             "updatesPolicy": "Se permite cambiar de horario hasta 5 minutos antes de la fecha programada"
         },
-        "save": "Guardar cambios",
-        "limit" : "Limite de 140 caracteres"
+        "save": "Aplicar cambios",
+        "limit" : "Limite de 140 caracteres",
+        "cancelStream": "Cancelar Stream",
+        "cancelStreamDescription": "Usar solo en caso de emergencias 😬"
     },
     "continue": "Continuar",
     "cancel": "Cancelar",

@@ -51,10 +51,8 @@ const GreenSwitch = withStyles({
       color: 'rgb(156, 156, 156)',
       height:30,
       width:20,
-
       '&$checked': {
         color: '#2ce9d2',
-        
       },
       '&$checked + $track': {
         backgroundColor: '#2ce9d2',
@@ -89,7 +87,7 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [titleCheckbox, setTitleCheckbox] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const [qoinsReaction, setQoinsReaction] = useState(false);
-    const [openDialog, setOpenDialog] = useState(true);
+    const [openDialog, setOpenDialog] = useState(false);
     const [confiDialog, setConfirDialog] = useState(false);
     const classes = useStyles();
     const { t } = useTranslation();
@@ -269,7 +267,7 @@ const StreamerProfileEditCoin = ({ user }) => {
             <h1 className={style.title}>
                 {t('StreamerProfile.StreamerProfileEditCoin.reactions')}
             </h1>
-            {rewardId == '' && !savingChanges ?
+            {rewardId !== '' && !savingChanges ?
                 <>
                 <StreamerProfileImgCoin rewardCost={rewardCost} backgroundColor={rewardBackgroundColor} />
                 <div className={style.contentInput}>
@@ -331,26 +329,26 @@ const StreamerProfileEditCoin = ({ user }) => {
                         <GreenSwitch checked={reactionsEnabled}
                             onChange={(e) => handleCheckbox(e)} />
                     </div>
-                    <div className={style.onlyQoinsReaction}> 
+                    {/* <div className={style.onlyQoinsReaction}>
                         <p style={{fontSize:'14px', fontWeight:'500', color:'#FFFFFF'}}>Only Qoins</p>
                         <GreenSwitch />
-                        {!confiDialog? <> 
-                        <DialogOnlyQoins  open={openDialog} onClose={() => setOpenDialog(false)} setConfirDialog={setConfirDialog}  />
-                        </> :
-                        <Dialog open={openDialog} onClose={() => setOpenDialog(true)}  classes={{
-                            container: classes.dialogContainer,
-                            root: classes.dialogRoot,
-                            paper: classes.paper}}>
-                            <div style={{ width: '347px', height: '384px', display: 'flex', justifyContent: 'space-evenly', marginTop:'10px', alignItems: 'center', flexDirection: 'column', padding: '20px'}}>
-                               < IconCheck style={{width:'120px', height:'120px', }} src={IconCheck}  alt='icons'/>
-                               <p style={{fontSize:'18px', fontWeight:'600', textAlign: 'center', color:'#FFFFFF', maxWidth:'250px', marginBottom:'30px'}}>You will get only paid reactions on your stream</p>
-                               <Button classes={{
-                                root: classes.ButtonRoot,
-                                }} onClick={handleCloseDialog}>Go to Dashoboard</Button>
-                            </div>
-                        </Dialog>}
-                    </div>
-
+                        {!confiDialog ?
+                            <DialogOnlyQoins  open={openDialog} onClose={() => setOpenDialog(false)} setConfirDialog={setConfirDialog}  />
+                            :
+                            <Dialog open={openDialog} onClose={() => setOpenDialog(true)}  classes={{
+                                container: classes.dialogContainer,
+                                root: classes.dialogRoot,
+                                paper: classes.paper}}>
+                                <div style={{ width: '347px', height: '384px', display: 'flex', justifyContent: 'space-evenly', marginTop:'10px', alignItems: 'center', flexDirection: 'column', padding: '20px'}}>
+                                < IconCheck style={{width:'120px', height:'120px', }} src={IconCheck}  alt='icons'/>
+                                <p style={{fontSize:'18px', fontWeight:'600', textAlign: 'center', color:'#FFFFFF', maxWidth:'250px', marginBottom:'30px'}}>You will get only paid reactions on your stream</p>
+                                <Button classes={{
+                                    root: classes.ButtonRoot,
+                                    }} onClick={handleCloseDialog}>Go to Dashoboard</Button>
+                                </div>
+                            </Dialog>
+                        }
+                    </div> */}
                 </div>
                 </>
             :

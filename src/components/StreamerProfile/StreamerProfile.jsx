@@ -215,8 +215,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <Grid style={{ maxWidth:'1180px', gap:'70px'}} container xs={12} >
-                        <Grid style={{maxWidth:'800px'}}  item xs={9} >
+                    <Grid style={{ maxWidth:'1180px' }} container xs={12} >
+                        <Grid style={{maxWidth:'800px'}} item xs={9}>
                             <Grid container xs={12}>
                                 <Grid xs={12}>
                                     <div className={styles.header}>
@@ -336,18 +336,16 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid style={{maxWidth:'260px'}}  xs={3}>
+                        <Grid style={{ maxWidth: '212px', marginLeft: '32px' }} item xs={3}>
                             <Button variant='contained'
                                 className={styles.messagesButton}
-                                style={{ backgroundColor: pendingMessages ? '#3B4BF9' : '#141735',marginBottom:'50px', minWidth:'205px' }}
+                                style={{ backgroundColor: '#141735',marginBottom:'50px', minWidth: '205px' }}
                                 onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
                                 endIcon={
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <MessageIcon style={{ width: '32px', height: '32px' }} />
-                                        {pendingMessages > 0 &&
+                                        {pendingMessages > 0 ?
                                             <div style={{
                                                 display: 'flex',
-                                                marginLeft: '12px',
                                                 backgroundColor: '#FF007A',
                                                 width: '27px',
                                                 height: '27px',
@@ -364,17 +362,14 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                         {pendingMessages}
                                                 </p>
                                             </div>
-
+                                            :
+                                            <MessageIcon style={{ width: '32px', height: '32px' }} />
                                         }
                                     </div>
                                 }>
-                                {pendingMessages > 0 &&
-                                    <>
-                                        <p>{`New `}</p>
-                                        <div style={{ width: '6px' }}></div>
-                                    </>
-                                }
-                                <p>{'Messages'}</p>
+                                <p>
+                                    Text-to-Speech
+                                </p>
                             </Button>
                             <StreamerProfileEditCoin user={user} />
                         </Grid>

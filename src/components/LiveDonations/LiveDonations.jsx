@@ -8,6 +8,7 @@ import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
+import QoinsDropsAudio from '../../assets/siu.mp3';
 import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
 import { EMOTE, GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
@@ -30,6 +31,8 @@ const LiveDonations = () => {
     const [playQaplaOnAnimation, setPlayQaplaOnAnimation] = useState("false");
     const [showEmojiRain, setShowEmojiRain] = useState(false);
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
+    const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
+    const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
     const { streamerId } = useParams();
 
     useEffect(() => {
@@ -54,7 +57,82 @@ const LiveDonations = () => {
                 listenToStreamerAlertsSettings(uid, (streamerSettings) => {
                     if (streamerSettings.exists()) {
                         setReactionsEnabled(streamerSettings.val().reactionsEnabled !== false);
-                        setAlertSideRight(streamerSettings.val().alertSideRight);
+
+                        let alertsOffsets = {};
+                        if (streamerSettings.val().reactionCoordinates) {
+                            // The only time alerts are displayed to the right is in x === 3
+                            setAlertSideRight(streamerSettings.val().reactionCoordinates.x === 3);
+                            switch (streamerSettings.val().reactionCoordinates.y) {
+                                case 1:
+                                    alertsOffsets.top = '0%';
+                                    break;
+                                case 2:
+                                    alertsOffsets.top = '22%';
+                                    break;
+                                case 3:
+                                    alertsOffsets.bottom = '0%';
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            switch (streamerSettings.val().reactionCoordinates.x) {
+                                case 1:
+                                    alertsOffsets.left = '5%';
+                                    break;
+                                case 2:
+                                    alertsOffsets.left = '40%';
+                                    break;
+                                case 3:
+                                    alertsOffsets.left = '65%';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else {
+                            alertsOffsets = {
+                                left: streamerSettings.val().alertSideRight ? '65%' : '5%',
+                                top: '0%'
+                            };
+                        }
+
+                        setAlertOffsets(alertsOffsets);
+
+                        let qaplaOnOffsets = {};
+                        /**
+                         * Currently Qapla on only can be at the bottom of the screen totally aligned to the
+                         * left or to the right
+                         */
+                        if (streamerSettings.val().qaplaOnCoordinates) {
+                            switch (streamerSettings.val().qaplaOnCoordinates.y) {
+                                case 1:
+                                    qaplaOnOffsets.bottom = '-15px';
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            switch (streamerSettings.val().qaplaOnCoordinates.x) {
+                                case 1:
+                                    qaplaOnOffsets.left = '-12px';
+                                    qaplaOnOffsets.right = 'auto';
+                                    break;
+                                case 2:
+                                    qaplaOnOffsets.right = '-12px';
+                                    qaplaOnOffsets.left = 'auto';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else {
+                            qaplaOnOffsets = {
+                                bottom: 0,
+                                right: streamerSettings.val().alertSideRight ? '-12px' : 'auto',
+                                left: streamerSettings.val().alertSideRight ? 'auto' : '-12px',
+                            };
+                        }
+
+                        setQaplaOnOffsets(qaplaOnOffsets);
                     }
                 });
 
@@ -216,9 +294,7 @@ const LiveDonations = () => {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
                 if (isStreaming.exists() && isStreaming.val()) {
-                    setTimeout(() => {
-                        loadDonations();
-                    }, 150);
+                    loadDonations();
                 } else {
                     removeListenerForUnreadStreamerCheers(streamerUid);
                     setDonationQueue([]);
@@ -233,7 +309,16 @@ const LiveDonations = () => {
             async function showCheer(audioUrl) {
                 const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
                 const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
-                audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
+
+                // Donations without uid are for Qoins Drops alerts and they have an special sound
+                if (donation.uid) {
+                    audioAlert = new Audio(qoinsDonation ? qoinsReactionAudio : channelPointReactionAudio);
+                    audioAlert.volume = 1
+                } else {
+                    audioAlert = new Audio(QoinsDropsAudio);
+                    audioAlert.volume = 0.7
+                }
+
                 if (audioUrl || !donation.repeating) {
                     const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
 
@@ -272,8 +357,6 @@ const LiveDonations = () => {
                         console.log('Message not found, what must be do here?');
                     }
                 }
-
-                donation.isRightSide = alertSideRight;
 
                 setDonationToShow(donation);
 
@@ -399,9 +482,7 @@ const LiveDonations = () => {
                     }}
                     style={{
                         position: 'fixed',
-                        bottom: '-15px',
-                        left: alertSideRight ? 'auto' : '-12px',
-                        right: alertSideRight ? '-12px' : 'auto',
+                        ...qaplaOnOffsets,
                         width: '150px',
                     }}
                     className="qapla-logo-container"
@@ -426,7 +507,7 @@ const LiveDonations = () => {
                         animation-timing-function: ease-in-out;
                     }
                     `}</style>
-                    <img src={alertSideRight ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
+                    <img src={qaplaOnOffsets.left === 'auto' ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
                 </div>
             }
             {showEmojiRain &&
@@ -440,15 +521,17 @@ const LiveDonations = () => {
                 }}></div>
             }
             {donationToShow &&
-                <>
-                    <DonationHandler donationToShow={donationToShow} finishReaction={finishReaction} startDonation={startDonation} />
-                </>
+                <DonationHandler donationToShow={donationToShow}
+                    finishReaction={finishReaction}
+                    startDonation={startDonation}
+                    alertSideRight={alertSideRight}
+                    alertOffsets={alertOffsets} />
             }
         </div>
     );
 }
 
-const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
+const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertSideRight, alertOffsets }) => {
     const [clip, setClip] = useState(null);
     const [mediaReady, setMediaReady] = useState(false);
     const [giphyTextReady, setGiphyTextReady] = useState(false);
@@ -509,15 +592,17 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
 
     return (
         <div style={{
+            position: 'absolute',
+            ...alertOffsets,
             opacity: showDonation ? 1 : 0,
             display: 'flex',
             flex: 1,
             flexDirection: 'column',
             backgroundColor: '#f0f0',
-            padding: '0px 40px',
-            marginBottom: '30px',
-            marginLeft: donation.isRightSide ? '0px' : '20px',
-            marginRight: donation.isRightSide ? '20px' : '0px'
+            paddingTop: '64px',
+            paddingBottom: '64px',
+            paddingLeft: alertSideRight ? '0px' : '64px',
+            paddingRight: alertSideRight ? '64px' : '0px'
         }}>
             {donation.media &&
                 <>
@@ -525,7 +610,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                     <img src={donation.media.url} alt='' style={{
                         aspectRatio: donation.media.width / donation.media.height,
                         display: 'flex',
-                        alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                         maxHeight: '250px',
                         objectFit: 'scale-down'
                     }}
@@ -535,7 +620,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                         <div style={{
                             display: 'flex',
                             aspectRatio: donation.media.width / donation.media.height,
-                            alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                            alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                             maxHeight: '250px',
                             objectFit: 'scale-down'
                         }}>
@@ -550,72 +635,75 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation }) => {
                 <img src={donation.messageExtraData.giphyText.url} alt='' style={{
                     aspectRatio: donation.messageExtraData.giphyText.width / donation.messageExtraData.giphyText.height,
                     display: 'flex',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                     maxHeight: '250px',
                     objectFit: 'scale-down'
                 }}
                 onLoad={() => setGiphyTextReady(true)} />
             }
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-around',
-                    marginTop: '20px',
-                    width: 'fit-content',
-                    backgroundColor: '#4D00FB',
-                    marginLeft: donation.isRightSide ? '0px' : '-30px',
-                    marginRight: donation.isRightSide ? '-30px' : '0px',
-                    borderRadius: '30px',
-                    padding: '24px 24px',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
-                    zIndex: 10
-                }}
-            >
-                <div style={{ display: 'flex', alignSelf: 'center' }}>
-                    <p style={{
+            {donation.uid &&
+                <div
+                    style={{
                         display: 'flex',
-                        color: 'white',
-                        fontSize: '26px',
-                        textAlign: 'center'
-                    }}>
-                        <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
-                        {donation.amountQoins ?
-                            <>
-                            <div style={{ margin: '0 6px' }}>has sent you</div>
-                            <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
-                                {`${donation.amountQoins.toLocaleString()} Qoins`}
-                            </b>
-                            </>
-                            :
-                            <b style={{ color: '#FFF', fontWeight: '700', margin: '0 6px' }}>
-                                reacted
-                            </b>
-                        }
-                    </p>
-                </div>
-                {donation.amountQoins ?
-                    <>
-                    <div style={{ width: '10px' }}></div>
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                        marginTop: '20px',
+                        width: 'fit-content',
+                        backgroundColor: '#4D00FB',
+                        borderRadius: '30px',
+                        padding: '24px 24px',
+                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                        zIndex: 10
+                    }}
+                >
                     <div style={{ display: 'flex', alignSelf: 'center' }}>
-                        <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
+                        <p style={{
+                            display: 'flex',
+                            color: 'white',
+                            fontSize: '26px',
+                            textAlign: 'center'
+                        }}>
+                            <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
+                            {donation.amountQoins ?
+                                <>
+                                <div style={{ margin: '0 6px' }}>has sent you</div>
+                                <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
+                                    {`${donation.amountQoins.toLocaleString()} Qoins`}
+                                </b>
+                                </>
+                                :
+                                <b style={{ color: '#FFF', fontWeight: '700', margin: '0 6px' }}>
+                                    reacted
+                                </b>
+                            }
+                        </p>
                     </div>
-                    </>
-                    :
-                    null
-                }
-            </div>
+                    {donation.amountQoins ?
+                        <>
+                        <div style={{ width: '10px' }}></div>
+                        <div style={{ display: 'flex', alignSelf: 'center' }}>
+                            <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
+                        </div>
+                        </>
+                        :
+                        null
+                    }
+                </div>
+            }
             {(donation.message && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
                 <div style={{
                     display: 'flex',
                     width: 'fit-content',
                     backgroundColor: '#FFFFFF',
+                    maxWidth: '500px',
                     marginTop: '-20px',
                     borderRadius: '30px',
-                    borderTopLeftRadius: donation.isRightSide ? '30px' : '0px',
-                    borderTopRightRadius: donation.isRightSide ? '0px' : '30px',
+                    borderTopLeftRadius: alertSideRight ? '30px' : '0px',
+                    borderTopRightRadius: alertSideRight ? '0px' : '30px',
                     padding: '30px',
-                    alignSelf: donation.isRightSide ? 'flex-end' : 'flex-start',
+                    marginLeft: alertSideRight ? '0px' : '20px',
+                    marginRight: alertSideRight ? '20px' : '0px',
+                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                 }}>
                     <p style={{
                         display: 'flex',

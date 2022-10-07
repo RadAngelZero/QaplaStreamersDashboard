@@ -118,6 +118,7 @@ const StreamersSignin = ({ user, title }) => {
         setIsLoadingAuth(false);
     }
 
+    const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
     if (user === undefined) {
         return (
             <StreamerDashboardContainer>

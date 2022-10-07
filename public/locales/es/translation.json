@@ -212,41 +212,34 @@
             "description": "¡Stream agendado! Tu stream ha sido publicado en la app"
         }
     },
+    "Settings": {
+        "chatbotCommand": "Comando de chat"
+    },
     "CheersSettings": {
-        "QaplaChallenge": "Reto Qapla",
-        "showQaplaChallengeProgress": "Elige si mostrar o no el progreso de tu Qlan en el Reto Qapla",
-        "QaplaChallengeProgressCheckboxLabel": "Mostrar progreso en el overlay",
-        "title": "Recibe mensajes de parte de tu comunidad",
-        "description": "Muestra los mensajes de los cheers que tu comunidad te envia en tus streams agregando este link en tu OBS.",
-        "instruction0": {
-            "title": "¿Como agrego las alertas de cheers de Qapla a mi OBS?",
-            "description": "¡Es muy sencillo! Funciona como las alertas que ya conoces y que tanto te gusta mostrar en tus streams :).",
-            "descriptionBold": "Sigue las sencillas instrucciones a continuación para agregarlas."
-        },
-        "instruction1": {
-            "title": "1. Abre tu setup en OBS",
-            "description": "Ve a tu OBS (StreamLabs, OBS, Stream Elements, etc.) y abre el setup que usas regularmente para tus streams."
-        },
-        "instruction2": {
-            "title": "2. Agrega un elemento fuente a tu pantalla en tu OBS"
-        },
-        "instruction3": {
-            "title": "3. Selecciona Navegador en el menu de fuentes"
-        },
-        "instruction4": {
-            "title": "4. Nombra tu fuente (por ejemplo: Qapla Cheers)"
-        },
-        "instruction5": {
-            "title": "5. Pega tu URL personalizado de Qapla",
-            "description": "En las opciones de la fuente define la anchura en 1920 y la altura en 1080 y desmarca todas las opciones"
-        },
-        "instruction6": {
-            "title": "6. Prueba tus alertas Qapla",
-            "description": "Presiona el botón para enviar un mensaje falso y comprobar que todo funciona correctamente"
-        },
+        "setup": "Configura el overlay para tus reacciones Qapla",
+        "instructions": "Agrega el URL de Reacciones Qapla como una fuente de navegador en tu OBS/SLOBS. ",
+        "makeSure": "Asegurate de definir el ancho y el alto correctos.",
+        "width": "Ancho",
+        "height": "Alto",
+        "position": "Posición",
+        "reactionAlert": "Alerta de reacción",
+        "setReactionPosition": "Ajusta la posición de tus alertas en tu overlay",
+        "qaplaOnFunctionality": "Tu audiencia puede estar segura que sus reacciones se mostrarán",
         "testCheerError": "Hubo un error al enviar el mensaje de prueba, intenta de nuevo, si el error persiste contacta con soporte tecnico",
         "testCheerSuccess": "¡El Cheer de prueba fue enviado correctamente! Sera mostrado en tu OBS en unos segundos",
-        "testButton": "Enviar mensaje de prueba"
+        "testButton": "Probar Reacción",
+        "copied": "Copiado"
+    },
+    "ChatbotCommandSettings": {
+        "addCommandNormal": "Agrega el comando Qapla a tu chatbot y facilita compartir Qapla con tu comunidad. ",
+        "addCommandBold": "Copia y pega en tu chatbot.",
+        "command": "Comando",
+        "message": "Mensaje",
+        "chatbotMessage": "¡Crea tus propias alertas para enviar en stream usando tus puntos del canal!\n\nPuedes usar memes, GIFs, emotes, TTS y más!\n\nReacciona aquí:",
+        "createProfileLink": "Crea tu Link de Perfil",
+        "createProfileLinkDescription": "La forma mas rapida para tu audiencia de reaccionar en stream es tu link personalizado.\n\nReemplaza el link de deafult en tus ajustes",
+        "createProfileLinkButton": "Crear Link de perfil",
+        "copied": "Copiado"
     },
     "CheersBitsRecordDialog": {
         "messages": "Mensajes",

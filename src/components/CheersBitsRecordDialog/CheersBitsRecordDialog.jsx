@@ -304,7 +304,9 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages }
                     <RecordsHeader value={balance} Icon={QoinsIcon} />
                     <div className={classes.subDataContainer}>
                         <div style={{ display: 'flex' }}>
-                            <p style={{ display: 'flex', width: '62px' }}> Cheers </p>
+                            <p style={{ display: 'flex', width: '62px' }}>
+                                Qoins
+                            </p>
                             <p style={{ display: 'flex', }}> {qoinsBalance.toLocaleString()} </p>
                         </div>
                         <p style={{ display: 'flex', color: '#8692FFA6', marginTop: '36px', letterSpacing: '0px' }}>
@@ -316,7 +318,8 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages }
             <List className={classes.list} style={{ maxHeight: messages ? '82vh' : '60vh', marginTop: '20px', paddingTop: '0px' }}>
                 {Object.keys(cheers).reverse().map((cheerId) => (
                     <>
-                        {((messages && cheers[cheerId].message) || (!messages)) &&
+                        {/* uid validation to not show Qoins Drops activation alerts here */}
+                        {(((messages && cheers[cheerId].message) || (!messages && cheers[cheerId].amountQoins > 0))) && (cheers[cheerId].uid) &&
                             <ListItem disableGutters style={{ display: 'flex', flexDirection: 'column', padding: '0px', marginBottom: '40px' }}>
                                 <div style={{ display: 'flex', width: '100%' }}>
                                     <ListItemAvatar style={{ alignSelf: 'center' }} >
@@ -359,7 +362,8 @@ const QoinsCheers = ({ uid, qoinsBalance, cheers, messages, setPendingMessages }
                                         </p>
                                     </div>
                                 }
-                            </ListItem>}
+                            </ListItem>
+                        }
                     </>
                 ))}
             </List>

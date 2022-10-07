@@ -340,7 +340,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         <Grid style={{ maxWidth: '212px', marginLeft: '32px' }} item xs={3}>
                             <Button variant='contained'
                                 className={styles.messagesButton}
-                                style={{ backgroundColor: '#141735',marginBottom:'50px', minWidth: '205px' }}
+                                style={{ backgroundColor: '#141735',marginBottom:'50px', minWidth: '212px' }}
                                 onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
                                 endIcon={
                                     <div style={{ display: 'flex', alignItems: 'center' }}>

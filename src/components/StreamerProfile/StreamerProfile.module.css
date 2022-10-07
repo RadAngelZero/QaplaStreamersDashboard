@@ -43,7 +43,7 @@ body {
 }
 
 .qreatorCodeContainer {
-    margin-right: 50px;
+    padding-right: 25px;
     margin-left: auto;
     display: flex;
     flex-direction: row;
@@ -52,7 +52,7 @@ body {
 }
 
 .qreatorCode {
-    margin-left: 8px;
+    margin-left: 9px;
     font-size: 24px;
     line-height: 28px;
     font-weight: 700;
@@ -65,7 +65,7 @@ body {
     font-weight: 500 !important;
     color: #FFF !important;
     font-size: 15px !important;
-    padding: 24px 30px !important;
+    padding: 24px 16px !important;
     text-transform: none !important;
     max-height: 48px !important;
 }
@@ -120,19 +120,16 @@ body {
     align-items: center;
 }
 
-@media (max-width: 600px) {
-    .bitBalanceContainer{
-        display: flex;
-        flex-direction: column;
-        height:309px;
-        align-items: start;
-    }
+@media (max-width: 1155px) {
+    
     .containerBit{
         display: flex;
         flex-direction: column;
         align-items: start;
         justify-content:start;
         height:100%;
+        margin-top: 20px;
+       
     }
    }
 
@@ -303,11 +300,11 @@ body {
 }
 
 .streamsCardContainer {
-    height: 400px;
+    min-height: 400px;
 }
 
 .innerStreamsCardContainer {
-    height: 400px;
+    min-height: 400px;
 }
 
 .title {

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Button, CircularProgress, FormControlLabel, makeStyles, Switch, withStyles } from "@material-ui/core";
+import { Button, CircularProgress, FormControlLabel, makeStyles, Switch, withStyles,Dialog } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { Modal } from "@material-ui/core";
 
 import iconEdit from "../../assets/Edit.svg";
+import { ReactComponent as  IconCheck} from "../../assets/TickSquareDark.svg"
 import { getCustomReward, updateCustomReward } from "../../services/twitch";
 import { getInteractionsRewardData, setAlertSetting, updateStreamerProfile } from "../../services/database";
 import { refreshUserAccessToken } from "../../services/functions";
@@ -13,26 +14,65 @@ import { ReactComponent as ConfirmChange } from './../../assets/ConfirmChange.sv
 import StreamerProfileModalDisableInteractions from "../StreamerProfileModalDisableInteractions/StreamerProfileModalDisableInteractions";
 import StreamerProfileImgCoin from '../StreamerProfileImgCoin/StreamerProfileImgCoin';
 import style from "./StreamerProfileEditCoin.module.css";
+import DialogOnlyQoins from '../DialogOnlyQoins/DiealogOnlyQoins'
 
 const useStyles = makeStyles((theme) => ({
     circularProgress: {
         color: '#0AFFD2',
         alignSelf: 'center'
+    },
+    dialogContainer: {
+        backdropFilter: "blur(20px)",
+        },
+        dialogRoot: {},
+        paper: {
+        backgroundColor: "#141833",
+        color: "#FFF",
+        overflow: "visible",
+        borderRadius: "35px",
+        },
+    ButtonRoot: {
+        background:"linear-gradient(0deg, #3B4BF9, #3B4BF9), #FF006B;",
+        color:'#FFFFFF',
+        width:"202px",
+        height:"56px",
+        textTransform: 'none',
+        fontSize:"14px",
+        fontWeight:"600",
+        borderRadius: "16px",
+        boxShadow:"0px 20px 40px -10px rgba(59, 75, 249, 0.4)"
     }
 }));
 
+
 const GreenSwitch = withStyles({
+
     switchBase: {
       color: 'rgb(156, 156, 156)',
+      height:30,
+      width:20,
       '&$checked': {
         color: '#2ce9d2',
       },
       '&$checked + $track': {
         backgroundColor: '#2ce9d2',
+        height: '25px',
+        borderRadius: '10px'
+
       },
     },
+    thumb: {
+        width: 30,
+        height: 24,
+        boxShadow: 'none',
+  },
     checked: {},
-    track: {},
+    track: {
+        backgroundColor:'rgb(156, 156, 156)',
+        height:'25px',
+        width:70,
+        borderRadius:'15px'
+        },
   })(Switch);
 
 const StreamerProfileEditCoin = ({ user }) => {
@@ -47,6 +87,8 @@ const StreamerProfileEditCoin = ({ user }) => {
     const [titleCheckbox, setTitleCheckbox] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const [qoinsReaction, setQoinsReaction] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [confiDialog, setConfirDialog] = useState(false);
     const classes = useStyles();
     const { t } = useTranslation();
     const history = useHistory();
@@ -143,6 +185,10 @@ const StreamerProfileEditCoin = ({ user }) => {
         alert(t('StreamCard.sessionExpired'));
         await auth.signOut();
         history.push('/');
+    }
+    const handleCloseDialog = () => {
+        setOpenDialog(false)
+        setConfirDialog(false)
     }
 
     const handleCheckbox = (e) => {
@@ -283,15 +329,25 @@ const StreamerProfileEditCoin = ({ user }) => {
                         <GreenSwitch checked={reactionsEnabled}
                             onChange={(e) => handleCheckbox(e)} />
                     </div>
-                    {/* <div className={style.onlyQoinsReaction}> 
-                        <p className={style.p}>Only Qoins Reactions</p>
-                        <input
-                            className={style.input_checkbox}
-                            type="checkbox" 
-                            id="switch"
-                            checked={qoinsReaction}
-                            onChange={(e)=>handleQoinsReactions(e)}/>
-                            <label for="switch"></label>
+                    {/* <div className={style.onlyQoinsReaction}>
+                        <p style={{fontSize:'14px', fontWeight:'500', color:'#FFFFFF'}}>Only Qoins</p>
+                        <GreenSwitch />
+                        {!confiDialog ?
+                            <DialogOnlyQoins  open={openDialog} onClose={() => setOpenDialog(false)} setConfirDialog={setConfirDialog}  />
+                            :
+                            <Dialog open={openDialog} onClose={() => setOpenDialog(true)}  classes={{
+                                container: classes.dialogContainer,
+                                root: classes.dialogRoot,
+                                paper: classes.paper}}>
+                                <div style={{ width: '347px', height: '384px', display: 'flex', justifyContent: 'space-evenly', marginTop:'10px', alignItems: 'center', flexDirection: 'column', padding: '20px'}}>
+                                < IconCheck style={{width:'120px', height:'120px', }} src={IconCheck}  alt='icons'/>
+                                <p style={{fontSize:'18px', fontWeight:'600', textAlign: 'center', color:'#FFFFFF', maxWidth:'250px', marginBottom:'30px'}}>You will get only paid reactions on your stream</p>
+                                <Button classes={{
+                                    root: classes.ButtonRoot,
+                                    }} onClick={handleCloseDialog}>Go to Dashoboard</Button>
+                                </div>
+                            </Dialog>
+                        }
                     </div> */}
                 </div>
                 </>

@@ -221,9 +221,13 @@
             "description": "¡Stream agendado! Tu stream ha sido publicado en la app"
         }
     },
+    "Settings": {
+        "chatbotCommand": "Comando de chat"
+    },
     "CheersSettings": {
         "setup": "Configura el overlay para tus reacciones Qapla",
-        "instructions": "Agrega el URL de Reacciones Qapla como una fuente de navegador en tu OBS/SLOBS. Asegurate de definir el ancho y el alto",
+        "instructions": "Agrega el URL de Reacciones Qapla como una fuente de navegador en tu OBS/SLOBS. ",
+        "makeSure": "Asegurate de definir el ancho y el alto correctos.",
         "width": "Ancho",
         "height": "Alto",
         "position": "Posición",

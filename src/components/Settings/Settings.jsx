@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import QaplaTabs from '../QaplaTabs/QaplaTabs';
@@ -9,6 +10,7 @@ import { Box } from '@material-ui/core';
 
 const Settings = ({ user }) => {
     const [value, setValue] = useState(0);
+    const { t } = useTranslation();
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -17,8 +19,8 @@ const Settings = ({ user }) => {
     return (
         <StreamerDashboardContainer user={user}>
             <QaplaTabs value={value} onChange={handleChange}>
-                <QaplaTab label='Cheers' />
-                <QaplaTab label='ChatBot Command' />
+                <QaplaTab label='Overlay' />
+                <QaplaTab label={t('Settings.chatbotCommand')} />
             </QaplaTabs>
             {/* Both components exists and are loaded but we only show the selected component */}
             {user && user.uid && user.id &&

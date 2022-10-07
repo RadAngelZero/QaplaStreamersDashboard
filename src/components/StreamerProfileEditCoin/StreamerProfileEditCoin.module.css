@@ -131,7 +131,13 @@ label[for="switch"]::before {
 
 .onlyQoinsReaction{
   display: flex;
-  max-width: 240px;
-  min-width: 240px;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
   padding-top: 10px;
+  align-items: center;
+}
+.onlyQoinsReaction p{
+  margin-top: 10px;
+  color: #FFFFFF;
 }

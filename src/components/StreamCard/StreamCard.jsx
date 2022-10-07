@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as ShareArrow } from './../../assets/ShareArrow.svg';
 import { ReactComponent as TimerIcon } from './../../assets/Timer.svg';
+import { ReactComponent as EditIcon } from './../../assets/EditPencil.svg';
+import { ReactComponent as DeleteIcon } from './../../assets/Delete.svg';
 import {
     streamsPlaceholderImages,
     SCHEDULED_EVENT_TYPE,
@@ -33,6 +35,8 @@ import { auth } from '../../services/firebase';
 import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
 import { sendCustomMessage } from '../../services/functions';
 import { getCurrentLanguage } from '../../utilities/i18n';
+import EventConfirmCancellationDialog from '../QaplaStreamDialogs/EventConfirmCancellationDialog';
+import SuccessDialog from '../SuccessDialog/SuccessDialog';
 
 const useStyles = makeStyles(() => ({
     eventCard: {
@@ -161,16 +165,29 @@ const useStyles = makeStyles(() => ({
         color: '#FFFFFF99',
         width: '100%',
         borderRadius: '8px',
-        textTransform: 'none'
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: '#272D5780',
+            opacity: 0.8
+        }
     },
     cardContainer: {
         padding: '0px 16px !important',
         maxWidth: '270px !important',
         marginBottom: '20px !important'
+    },
+    cancelButton: {
+        marginBottom: '16px',
+        backgroundColor: 'transparent',
+        color: '#FFF',
+        opacity: 0.6,
+        width: '100%',
+        borderRadius: '8px',
+        textTransform: 'none'
     }
 }));
 
-const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image, drops }) => {
+const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image, drops, usedDrops = 0 }) => {
     const [title, setTitle] = useState({ en: '', es: '' });
     const [stream, setStream] = useState(null);
     const [showRewardsOptions, setShowRewardsOptions] = useState(false);
@@ -194,6 +211,8 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
     const [playBothExitAnimation, setPlayBothExitAnimation] = useState("false");
     const [isTouch, setIsTouch] = useState(false);
     const [streamLink, setStreamLink] = useState('');
+    const [openCancelStreamDialog, setOpenCancelStreamDialog] = useState(false);
+    const [openCanceledStreamSuccessfulDialog, setOpenCanceledStreamSuccessfulDialog] = useState(false);
     const actualShareHover = useRef(null);
     const history = useHistory();
     const classes = useStyles();
@@ -282,12 +301,11 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
         // stream is not in this array intentionally, cause it causes a loop because of the checkActiveCustomReward function
     }, [game, games, streamId, streamType, user, loadingDots, startingStream, showRewardsOptions, timestamp]);
 
-    const cancelStream = (e) => {
-        e.stopPropagation();
-        if (window.confirm(t('StreamCard.deleteConfirmation'))) {
-            cancelStreamRequest(user.uid, streamId);
-            onRemoveStream(streamId);
-        }
+    const cancelStream = async () => {
+        await cancelStreamRequest(user.uid, streamId);
+        onRemoveStream(streamId);
+        setOpenCancelStreamDialog(false);
+        setOpenCanceledStreamSuccessfulDialog(true);
     }
 
     const startStream = async (enableIn) => {
@@ -416,7 +434,7 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
 
     const sendMessage = async (message) => {
         if (message) {
-            await sendCustomMessage(user.uid, title && title['en'] ? title['en'] : '', message);
+            await sendCustomMessage(user.uid, title && title['en'] ? title['en'] : 'Event canceled', message);
 
             window.analytics.track('Custom Message sent', {
                 streamId,
@@ -424,7 +442,6 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                 timestamp: (new Date()).getTime(),
                 message
             });
-            setOpenCustomMessageSentDialog(true);
         }
     }
 
@@ -795,19 +812,12 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                         <p className={classes.eventCardTitle}>
                             {title && title[currentLanguage] ? title[currentLanguage] : ''}
                         </p>
-                        {streamType !== PAST_STREAMS_EVENT_TYPE && !showRewardsOptions &&
-                            <div style={{ display: 'flex', marginTop: '14px', alignItems: 'center' }}>
-                                <div style={{
-                                    backgroundColor: streamType === PENDING_APPROVAL_EVENT_TYPE ? '#C6B200' : '#00FFDD',
-                                    width: '8px',
-                                    height: '8px',
-                                    borderRadius: '50%'
-                                }} />
-                                <div style={{ width: '6px' }} />
-                                <p style={{ color: '#FFF', fontSize: '12px', fontWeight: '500', lineHeight: '16px' }}>
-                                    {streamType === PENDING_APPROVAL_EVENT_TYPE ? t('StreamCard.pendingReview') : t('StreamCard.posted')}
-                                </p>
-                            </div>
+                        {(usedDrops && streamType === PAST_STREAMS_EVENT_TYPE) ?
+                            <p style={{ fontSize: '16px', fontWeight: '500', color: '#FFF', marginTop: '13px' }}>
+                                🪂 <span style={{ color: '#00FFDD' }}>{usedDrops} drops</span> {t('StreamCard.used')}
+                            </p>
+                            :
+                            null
                         }
                         <div className={classes.buttonsContainer}>
                             {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
@@ -839,20 +849,26 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                             }
                             <div style={{ height: '11px' }} />
                             {streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions &&
-                                <Button size='medium' className={classes.manageButton} onClick={manageStream}>
-                                    {t('StreamCard.manageStream')}
-                                </Button>
-                            }
-                            {streamType === PENDING_APPROVAL_EVENT_TYPE &&
-                                <Button size='medium' className={classes.manageButton} onClick={cancelStream}>
+                                <>
+                                <Button size='medium'
+                                    className={classes.cancelButton}
+                                    onClick={() => setOpenCancelStreamDialog(true)}
+                                    startIcon={<DeleteIcon color='rgba(255, 255, 255, 0.6)' />}>
                                     {t('StreamCard.cancelStreamRequest')}
                                 </Button>
+                                <Button size='medium'
+                                    className={classes.manageButton}
+                                    onClick={manageStream}
+                                    startIcon={<EditIcon />}>
+                                    {t('StreamCard.manageStream')}
+                                </Button>
+                                </>
                             }
                         </div>
                     </div>
                     <EventManagementDialog open={openStreamDialog}
                         user={user}
-                        sendMessage={sendMessage}
+                        sendMessage={() => { sendMessage(); setOpenCustomMessageSentDialog(true); }}
                         streamId={streamId}
                         stream={stream}
                         streamStarted={startingStream}
@@ -878,6 +894,14 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                         onClose={closeAndRemoveStream} />
                     <EventCustomMessageSentConfirmation open={openCustomMessageSentDialog}
                         onClose={() => setOpenCustomMessageSentDialog(false)} />
+                    <EventConfirmCancellationDialog open={openCancelStreamDialog}
+                        onClose={() => setOpenCancelStreamDialog(false)}
+                        cancelStream={cancelStream}
+                        sendCustomMessage={sendMessage} />
+                    <SuccessDialog open={openCanceledStreamSuccessfulDialog}
+                        title={t('StreamCard.successfullyCanceledStreamDialogTitle')}
+                        buttonText={t('StreamCard.successfullyCanceledStreamDialogButtonText')}
+                        onClose={() => setOpenCanceledStreamSuccessfulDialog(false)} />
                 </Card>
             </Grid>
         );

@@ -112,14 +112,17 @@
         "pendingReview": "Pendiente de revisión",
         "posted": "Publicado",
         "enableDrops": "Habilitar drops de Qoins",
+        "used": " usados",
         "dropsScheduled": "🪂 Drops programados",
         "end": "Finalizar stream",
         "finish": "Terminar stream",
         "creatingRewards": "Creando recompensas",
         "manageRewards": "Gestionar recompensas",
         "manageStream": "Gestionar stream",
-        "cancelStreamRequest": "Cancelar",
-        "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo para continuar"
+        "cancelStreamRequest": "Cancelar stream",
+        "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo para continuar",
+        "successfullyCanceledStreamDialogTitle": "Stream cancelado correctamente",
+        "successfullyCanceledStreamDialogButtonText": "Ir al Dashboard"
     },
     "QaplaStreamDialogs": {
         "EventConfirmStartDialog": {
@@ -150,6 +153,12 @@
             "finish": "Terminar stream",
             "back": "Volver atras",
             "dontShowThisMessageAgain": "No volver a mostrar este mensaje"
+        },
+        "EventConfirmCancellationDialog": {
+            "title": "Confirmar cancelación",
+            "description": "Puedes enviar un mensaje personalizado a tu comunidad de que no vas a poder hacerlo :)",
+            "customMessagePlaceholder": "Campo opcional. Limte de 140 caracteres.",
+            "cancelStream": "Cancelar Stream"
         },
         "EventRewardsRemovedConfirmation": {
             "title": "Las recompensas se eliminaron correctamente 👌",
@@ -351,8 +360,8 @@
     "EditStream": {
         "change" : "Cambiar fecha u hora",
         "changeDesc": "Los participantes y tus seguidores recibirán una notificación de cualquier cambio. Recomendamos no cambiar la fecha y hora muy seguido, la consistencia en tus publicaciones genera mayor a tus streams.",
-        "sendMessage": "Enviar mensaje",
-        "sendMessageDesc": "Avisa a tu gente sobre algo relevante de tu stream, crea hype o ¡lo que tu quieras! Los participante y tus seguidores recibirán una notificación móvil con tu mensaje.",
+        "sendMessage": "Mensajes directos",
+        "sendMessageDesc": "Avisa a tu gente sobre algo relevante de tu stream, crea hype o ¡lo que tu quieras!",
         "participants": "Participantes",
         "table": {
             "twitch": "Nombre de Twitch",
@@ -367,8 +376,10 @@
             "errorSend": "Error al enviar la notificación. Intenta de nuevo mas tarde",
             "updatesPolicy": "Se permite cambiar de horario hasta 5 minutos antes de la fecha programada"
         },
-        "save": "Guardar cambios",
-        "limit" : "Limite de 140 caracteres"
+        "save": "Aplicar cambios",
+        "limit" : "Limite de 140 caracteres",
+        "cancelStream": "Cancelar Stream",
+        "cancelStreamDescription": "Usar solo en caso de emergencias 😬"
     },
     "continue": "Continuar",
     "cancel": "Cancelar",

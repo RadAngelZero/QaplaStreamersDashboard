@@ -317,7 +317,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 </CardContent>
                                             </Card>
                                         </Grid>
-                                        {streams && Object.keys(streams).map((streamId) => (
+                                        {streams && Object.keys(streams).reverse().map((streamId) => (
                                             <StreamCard
                                                 key={streamId}
                                                 streamType={streams[streamId].status}
@@ -330,6 +330,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 hour={formatHour(streams[streamId].timestamp)}
                                                 timestamp={streams[streamId].timestamp}
                                                 drops={streams[streamId].drops}
+                                                usedDrops={streams[streamId].usedDrops}
                                                 onRemoveStream={onRemoveStream} />
                                         ))}
                                     </Grid>

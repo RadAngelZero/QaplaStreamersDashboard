@@ -112,13 +112,16 @@
         "pendingReview": "Pending for review",
         "posted": "Posted",
         "enableDrops": "Enable Qoins Drops",
+        "used": " used",
         "dropsScheduled": "🪂 Drops scheduled",
         "end": "End drops",
         "creatingRewards": "Creating rewards",
         "manageRewards": "Manage rewards",
-        "manageStream": "Manage stream",
-        "cancelStreamRequest": "Cancel",
-        "sessionExpired": "Your session has expired. Login again to continue"
+        "manageStream": "Update stream",
+        "cancelStreamRequest": "Cancel stream",
+        "sessionExpired": "Your session has expired. Login again to continue",
+        "successfullyCanceledStreamDialogTitle": "Stream canceled successfully",
+        "successfullyCanceledStreamDialogButtonText": "Go to Dashboard"
     },
     "QaplaStreamDialogs": {
         "EventConfirmStartDialog": {
@@ -149,6 +152,12 @@
             "end": "End stream",
             "back": "Go back",
             "dontShowThisMessageAgain": "Do not show this message again"
+        },
+        "EventConfirmCancellationDialog": {
+            "title": "Confimr cancellation",
+            "description": "You can send a custom message to your community that you’re not going to make it :)",
+            "customMessagePlaceholder": "Optional field. 140 character limit.",
+            "cancelStream": "Cancel Stream"
         },
         "EventRewardsRemovedConfirmation": {
             "title": "The rewards were successfully removed 👌",
@@ -355,8 +364,8 @@
     "EditStream": {
         "change" : "Change date or time",
         "changeDesc": "Participants and your followers will be notified of any changes. We recommend not changing the date and time very often, the consistency in your publications generates more to your streams.",
-        "sendMessage": "Send message",
-        "sendMessageDesc": "Notify your people about something relevant in your stream, create hype or whatever you want! Participants and your followers will receive a mobile notification with your message.",
+        "sendMessage": "Direct Messages",
+        "sendMessageDesc": "Send updates to your followers, or just hype up your stream.",
         "participants": "Participants",
         "table": {
             "twitch": "Twitch Username",
@@ -371,8 +380,10 @@
             "errorSend": "Error sending notification. Try again later",
             "updatesPolicy": "It is allowed to change the schedule up to 5 minutes before the scheduled date"
         },
-        "save": "Save Changes",
-        "limit" : "140 character limit"
+        "save": "Apply Changes",
+        "limit" : "140 character limit",
+        "cancelStream": "Cancel Stream",
+        "cancelStreamDescription": "Use only in case of emergencies 😬"
     },
     "continue": "Continue",
     "cancel": "Cancel",

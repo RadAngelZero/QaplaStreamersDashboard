@@ -6,7 +6,6 @@ import { database, databaseServerValue } from './firebase';
 const gamesRef = database.ref('/GamesResources');
 const InvitationCodeRef = database.ref('/InvitationCode');
 const userStreamersRef = database.ref('/UserStreamer');
-const streamsApprovalRef = database.ref('/StreamsApproval');
 const streamersEventsDataRef = database.ref('/StreamersEventsData');
 const streamsRef = database.ref('/eventosEspeciales').child('eventsData');
 const streamersHistoryEventsDataRef = database.ref('/StreamersHistoryEventsData');
@@ -356,7 +355,7 @@ export async function cancelStreamRequest(uid, streamId) {
 
     // Delete stream
     await streamersEventsDataRef.child(uid).child(streamId).remove();
-    await streamsApprovalRef.child(streamId).remove();
+    await streamsRef.child(streamId).remove();
 }
 
 /**
@@ -367,6 +366,16 @@ export async function cancelStreamRequest(uid, streamId) {
  */
 export async function updateStreamStatus(uid, streamId, status) {
     return await streamersEventsDataRef.child(uid).child(streamId).update({ status });
+}
+
+/**
+ * Saves the stream used drops to be shown in the history
+ * @param {string} uid User identifier
+ * @param {string} streamId Streamer identifier
+ * @param {number} usedDrops Number of drops used on the stream
+ */
+export async function updatePastStreamUsedDrops(uid, streamId, usedDrops) {
+    return await streamersEventsDataRef.child(uid).child(streamId).update({ usedDrops });
 }
 
 /**

@@ -27,13 +27,17 @@ const useStyles = makeStyles(() => ({
         whiteSpace: 'pre-line'
     },
     createLinkCard: {
+        maxWidth: '300px',
         backgroundColor: '#141735',
         borderRadius: '20px',
         padding: '24px',
         color: '#FFF',
         fontSize: '16px',
         fontWeight: '400',
-        marginTop: '16px'
+        marginTop: '16px',
+        webkitBoxSizing: 'border-box',
+        mozBoxSizing: 'border-box',
+        boxSizing: 'border-box'
     },
     createLinkButton: {
         marginTop: '24px',
@@ -93,8 +97,8 @@ const ChatbotCommandSettings = ({ uid }) => {
     }
 
     return (
-        <Grid container style={{ marginTop: '40px' }} spacing={2}>
-            <Grid item sm={12} md={8}>
+        <Grid container style={{ marginTop: '12px' }} spacing={7}>
+            <Grid item sm={12} md={8} style={{ maxWidth: '633px' }}>
                 <div>
                     <h1 className={classes.title}>
                         Chatbot

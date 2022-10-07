@@ -152,13 +152,16 @@ const CheersSettings = ({ uid, twitchId }) => {
 
     return (
         <Grid className={classes.container} spacing={2}>
-            <Grid item sm={12} md={8}>
+            <Grid item sm={12} md={8} style={{ maxWidth: '633px' }}>
                 <Grid>
                     <h1 className={classes.title}>
                         {t('CheersSettings.setup')}
                     </h1>
                     <p className={classes.text}>
                         {t('CheersSettings.instructions')}
+                        <b>
+                            {t('CheersSettings.makeSure')}
+                        </b>
                     </p>
                 </Grid>
                 <Grid style={{ marginTop: '30px' }}>

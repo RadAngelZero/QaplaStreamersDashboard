@@ -211,9 +211,13 @@
             "description": "Your stream has been scheduled successfully and is posted in the app"
         }
     },
+    "Settings": {
+        "chatbotCommand": "Chatbot Command"
+    },
     "CheersSettings": {
         "setup": "Set up Overlay for your Qapla Reactions",
-        "instructions": "Add the Qapla Reactions URL as a brower source on your OBS/SLOBS. Make sure to set right width and height",
+        "instructions": "Add the Qapla Reactions URL as a brower source on your OBS/SLOBS. ",
+        "makeSure": "Make sure to set right width and height.",
         "width": "Width",
         "height": "Height",
         "position": "Position",

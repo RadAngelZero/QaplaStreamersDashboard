@@ -187,7 +187,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image, drops }) => {
+const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, onRemoveStream, style = {}, timestamp, image, drops, usedDrops = 0 }) => {
     const [title, setTitle] = useState({ en: '', es: '' });
     const [stream, setStream] = useState(null);
     const [showRewardsOptions, setShowRewardsOptions] = useState(false);
@@ -812,6 +812,13 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                         <p className={classes.eventCardTitle}>
                             {title && title[currentLanguage] ? title[currentLanguage] : ''}
                         </p>
+                        {(usedDrops && streamType === PAST_STREAMS_EVENT_TYPE) ?
+                            <p style={{ fontSize: '16px', fontWeight: '500', color: '#FFF', marginTop: '13px' }}>
+                                🪂 <span style={{ color: '#00FFDD' }}>{usedDrops} drops</span> {t('StreamCard.used')}
+                            </p>
+                            :
+                            null
+                        }
                         <div className={classes.buttonsContainer}>
                             {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
                                 (!startingStream ?

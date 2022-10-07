@@ -11,7 +11,8 @@ import {
     updateStreamerProfile,
     updateStreamStatus,
     decreaseUsedDrops,
-    decreaseDropsLeft
+    decreaseDropsLeft,
+    updatePastStreamUsedDrops
 } from './database';
 import { notifyBugToDevelopTeam } from './discord';
 import { refreshUserAccessToken, subscribeStreamerToTwitchWebhook, unsubscribeStreamerToTwitchWebhook } from './functions';
@@ -97,6 +98,7 @@ export async function closeQaplaStream(uid, twitchId, refreshToken, streamId, qo
 
         // Update status and remove event from main events node
         await updateStreamStatus(uid, streamId, PAST_STREAMS_EVENT_TYPE);
+        await updatePastStreamUsedDrops(uid, streamId, dropsRedeemed);
         await removeStreamFromEventsData(uid, streamId);
     } else if (userTokensUpdated.data.status === 401) {
         await Promise.reject({ status: userTokensUpdated.data.status });

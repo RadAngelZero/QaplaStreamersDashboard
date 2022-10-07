@@ -369,6 +369,16 @@ export async function updateStreamStatus(uid, streamId, status) {
 }
 
 /**
+ * Saves the stream used drops to be shown in the history
+ * @param {string} uid User identifier
+ * @param {string} streamId Streamer identifier
+ * @param {number} usedDrops Number of drops used on the stream
+ */
+export async function updatePastStreamUsedDrops(uid, streamId, usedDrops) {
+    return await streamersEventsDataRef.child(uid).child(streamId).update({ usedDrops });
+}
+
+/**
  * Save a copy of the event in the StreamersHistoryEventsData and remove the event from eventosEspeciales/eventsData
  * @param {string} uid User identifier
  * @param {string} streamId Stream identifier

@@ -359,7 +359,7 @@
     },
     "EditStream": {
         "change" : "Cambiar fecha u hora",
-        "changeDesc": "Los participantes y tus seguidores recibirán una notificación de cualquier cambio. Recomendamos no cambiar la fecha y hora muy seguido, la consistencia en tus publicaciones genera mayor a tus streams.",
+        "changeDesc": "Notificaremos a tus seguidores sobre cualquier cambio.",
         "sendMessage": "Mensajes directos",
         "sendMessageDesc": "Avisa a tu gente sobre algo relevante de tu stream, crea hype o ¡lo que tu quieras!",
         "participants": "Participantes",
@@ -370,7 +370,7 @@
             "download": "Descargar lista"
         },
         "alerts": {
-            "updated": "Horario actualizado",
+            "updated": "Stream actualizado",
             "errorDate": "Por favor verifica que has selecionado una fecha y/o hora válida",
             "sent": "Notificación enviada",
             "errorSend": "Error al enviar la notificación. Intenta de nuevo mas tarde",

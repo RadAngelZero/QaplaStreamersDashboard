@@ -476,6 +476,21 @@ export async function updateStreamDate(uid, streamId, dateUTC, hourUTC, date, ho
 }
 
 /**
+ * Changes the title of the given stream
+ * @param {string} uid User identifier
+ * @param {string} streamId Stream identifier
+ * @param {object} newTitles New title for the stream
+ * @param {string} newTitles.en New title english version
+ * @param {string} newTitles.es New title spanish version
+ */
+export async function updateStreamTitle(streamId, newTitles) {
+    return await streamsRef.child(streamId).update({
+        titulo: newTitles.en,
+        title: newTitles
+    });
+}
+
+/**
  * Returns the customRewardsMultipliers object of the given stream
  * @param {string} streamId Stream identifier
  */

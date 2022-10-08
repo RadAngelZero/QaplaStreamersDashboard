@@ -205,7 +205,7 @@
         "feelingCreative": "Feeling creative? Give your stream a cool name",
         "streamTitle": "Stream title ",
         "optional": "(optional)",
-        "streamTitleDescription": "Give your stream a personal touch to increase engagement",
+        "streamTitleDescription": "Give your stream a personal touch to make it more appealing",
         "streamTitlePlaceholder": "i.e., Reacting to cat videos",
         "dropsTitle": "Drops limit",
         "dropsDescription": "Set the max amount of Qoins Drops that could be redeemed during your live stream",
@@ -363,7 +363,7 @@
     },
     "EditStream": {
         "change" : "Change date or time",
-        "changeDesc": "Participants and your followers will be notified of any changes. We recommend not changing the date and time very often, the consistency in your publications generates more to your streams.",
+        "changeDesc": "We’ll notify your followers about any change.",
         "sendMessage": "Direct Messages",
         "sendMessageDesc": "Send updates to your followers, or just hype up your stream.",
         "participants": "Participants",
@@ -374,7 +374,7 @@
             "download": "Download List"
         },
         "alerts": {
-            "updated": "Updated schedule",
+            "updated": "Stream updated",
             "errorDate": "Please verify that you have selected a valid date and/or hour",
             "sent": "Notification sent",
             "errorSend": "Error sending notification. Try again later",

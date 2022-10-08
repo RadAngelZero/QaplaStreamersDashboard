@@ -31,7 +31,7 @@ import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg'
 import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
 import { SCHEDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
-import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate, cancelStreamRequest } from '../../services/database';
+import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate, cancelStreamRequest, updateStreamTitle } from '../../services/database';
 import { sednPushNotificationToTopic, sendCustomMessage } from '../../services/functions';
 import { notifyUpdateToQaplaAdmins } from '../../services/discord';
 import EventConfirmCancellationDialog from '../QaplaStreamDialogs/EventConfirmCancellationDialog';
@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
         color: '#FFF'
     },
     description: {
+        height: '30px',
         fontSize: '12px',
         color: 'rgba(255,255,255,0.60)',
         lineHeight: '18px',
@@ -81,6 +82,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     cancelButton: {
+        marginBottom: '32px',
         backgroundColor: '#FF006B',
         borderRadius: '16px',
         color: '#FFF',
@@ -142,6 +144,8 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: 16
     },
     dateInput: {
+        width: '274px',
+        height: '56px',
         color: '#FFF',
         marginTop: theme.spacing(1),
         paddingLeft: theme.spacing(2),
@@ -201,7 +205,7 @@ const useStyles = makeStyles((theme) => ({
         '& .MuiPickersClockNumber-clockNumberSelected': {
             color: '#000'
         }
-    },
+    }
 }));
 
 const TableCellStyled = withStyles(() => ({
@@ -243,7 +247,7 @@ const EditStreamerEvent = ({ user }) => {
     const [minDateToAllowUpdates, setMinDateToAllowUpdates] = useState(new Date((new Date()).getTime() + 300000));
     const [openCancelStreamDialog, setOpenCancelStreamDialog] = useState(false);
     const [openCanceledStreamSuccessfulDialog, setOpenCanceledStreamSuccessfulDialog] = useState(false);
-    const [openCustomMessageSentDialog, setOpenCustomMessageSentDialog] = useState(false);
+    const [disableChangesButton, setDisableChangesButton] = useState(true);
     const { t } = useTranslation();
     const classes = useStyles();
     const history = useHistory();
@@ -271,7 +275,7 @@ const EditStreamerEvent = ({ user }) => {
         async function setStreamTitle() {
             if (streamType === SCHEDULED_EVENT_TYPE) {
                 const title = await getStreamTitle(streamId);
-                setTitle({ en: 'test', es: 'test' });
+                setTitle(title);
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
                 if (user.uid) {
                     const title = await getPastStreamTitle(user.uid, streamId);
@@ -320,12 +324,30 @@ const EditStreamerEvent = ({ user }) => {
 
                 await updateStreamDate(user.uid, streamId, UTCDate, UTCHour, localDate, localHour, dateRef.getTime());
                 notifyUpdateToQaplaAdmins(streamId, user.displayName, dateRef);
-                alert(t('EditStream.alerts.updated'));
+
+                return true;
             } else {
                 alert(t('EditStream.alerts.errorDate'))
             }
         } else {
             alert(t('EditStream.alerts.errorDate'));
+        }
+    }
+
+    const saveChanges = async () => {
+        const dateChanged = !((new Date()).getTime() >= minDateToAllowUpdates || selectedDate.getTime() === firstTimestamp.getTime());
+        let dateUpdated = false;
+        if (dateChanged) {
+            dateUpdated = await saveDate();
+        }
+
+        // disableChangesButton is only false when title has changed
+        if (!disableChangesButton && title.en && title.es) {
+            await updateStreamTitle(streamId, title);
+        }
+
+        if (!disableChangesButton || (dateChanged && dateUpdated)) {
+            alert(t('EditStream.alerts.updated'));
         }
     }
 
@@ -351,178 +373,149 @@ const EditStreamerEvent = ({ user }) => {
                     <BackButton label={title && title['en'] ? title['en'] : ''}
                         onClick={history.goBack} />
                 </Grid>
-                {streamType === SCHEDULED_EVENT_TYPE &&
-                    <>
-                        <Grid xs={6}>
-                            <SectionHeader
-                                title={t('EditStream.change')}
-                                description={t('EditStream.changeDesc')} />
-                            <Grid item sm={12}>
-                                <Grid container>
-                                    {selectedDate === null ? // to secure that dateState.getTime() isn't from a null
-                                        <></>
-                                        :
-                                        <MuiPickersUtilsProvider utils={DayJsUtils}>
-                                            <Grid container style={{
-                                                marginTop: '24px'
-                                            }}>
-                                                <Grid item sm={7} md={4} spacing={4}>
-                                                    <InputLabel className={classes.datePickerLabel}>
-                                                        {t('NewStream.date')}
-                                                    </InputLabel>
-                                                    <KeyboardDatePicker
-                                                        disabled={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
-                                                        open={calendarOpen}
-                                                        onClick={() => (new Date()).getTime() >= minDateToAllowUpdates.getTime() ? {} : setCalendarOpen(true)}
-                                                        onClose={() => setCalendarOpen(false)}
-                                                        clearable
-                                                        disablePast
-                                                        disableToolbar
-                                                        autoOk
-                                                        value={displayDate}
-                                                        placeholder='10-10-2021'
-                                                        onChange={handleDateChange}
-                                                        minDate={new Date()}
-                                                        format='DD-MM-YY ddd'
-                                                        keyboardIcon={
-                                                            <InputAdornment position='end' >
-                                                                <CalendarIcon />
-                                                            </InputAdornment>
-                                                        }
-                                                        InputProps={{
-                                                            disableUnderline: true,
-                                                            className: classes.dateInput
-                                                        }}
-                                                        variant={'inline'}
-                                                        PopoverProps={{
-                                                            PaperProps: {
-                                                                className: classes.popover,
+                <Grid container style={{ maxWidth: '588px' }}>
+                    {streamType === SCHEDULED_EVENT_TYPE &&
+                        <>
+                            <Grid xs={12}>
+                                <SectionHeader
+                                    title={t('EditStream.change')}
+                                    description={t('EditStream.changeDesc')} />
+                                <Grid item sm={12}>
+                                    <Grid container>
+                                        {selectedDate === null ? // to secure that dateState.getTime() isn't from a null
+                                            <></>
+                                            :
+                                            <MuiPickersUtilsProvider utils={DayJsUtils}>
+                                                <Grid container style={{
+                                                    marginTop: '24px'
+                                                }}>
+                                                    <Grid item sm={12} md={6}>
+                                                        <InputLabel className={classes.datePickerLabel}>
+                                                            {t('NewStream.date')}
+                                                        </InputLabel>
+                                                        <KeyboardDatePicker
+                                                            disabled={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
+                                                            open={calendarOpen}
+                                                            onClick={() => (new Date()).getTime() >= minDateToAllowUpdates.getTime() ? {} : setCalendarOpen(true)}
+                                                            onClose={() => setCalendarOpen(false)}
+                                                            clearable
+                                                            disablePast
+                                                            disableToolbar
+                                                            autoOk
+                                                            value={displayDate}
+                                                            placeholder='10-10-2021'
+                                                            onChange={handleDateChange}
+                                                            minDate={new Date()}
+                                                            format='DD-MM-YY ddd'
+                                                            keyboardIcon={
+                                                                <InputAdornment position='end' >
+                                                                    <CalendarIcon />
+                                                                </InputAdornment>
                                                             }
-                                                        }}
-                                                    />
-                                                </Grid>
-                                                <div style={{ minWidth: '16px' }} />
-                                                <Grid item sm={7} md={4}>
-                                                    <InputLabel className={classes.datePickerLabel}>
-                                                        {t('NewStream.time')}
-                                                    </InputLabel>
-                                                    <KeyboardTimePicker
-                                                        open={clockOpen}
-                                                        onClick={() => (new Date()).getTime() >= minDateToAllowUpdates.getTime() ? {} : setClockOpen(true)}
-                                                        onOpen={() => { }}
-                                                        onClose={() => setClockOpen(false)}
-                                                        disabled={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
-                                                        autoOk
-                                                        error={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
-                                                        helperText={(new Date()).getTime() >= minDateToAllowUpdates.getTime() ? t('EditStream.alerts.updatesPolicy') : ''}
-                                                        value={displayDate}
-                                                        placeholder='08:00 AM'
-                                                        onChange={handleDateChange}
-                                                        // mask='__:__ _M'
-                                                        keyboardIcon={
-                                                            <InputAdornment position='end' >
-                                                                <TimeIcon />
-                                                            </InputAdornment>
-                                                        }
-                                                        InputProps={{
-                                                            disableUnderline: true,
-                                                            className: classes.dateInput
-                                                        }}
-                                                        variant={'inline'}
-                                                        PopoverProps={{
-                                                            PaperProps: {
-                                                                className: classes.popover,
+                                                            InputProps={{
+                                                                disableUnderline: true,
+                                                                className: classes.dateInput
+                                                            }}
+                                                            variant={'inline'}
+                                                            PopoverProps={{
+                                                                PaperProps: {
+                                                                    className: classes.popover,
+                                                                }
+                                                            }}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item sm={12} md={6}>
+                                                        <InputLabel className={classes.datePickerLabel}>
+                                                            {t('NewStream.time')}
+                                                        </InputLabel>
+                                                        <KeyboardTimePicker
+                                                            open={clockOpen}
+                                                            onClick={() => (new Date()).getTime() >= minDateToAllowUpdates.getTime() ? {} : setClockOpen(true)}
+                                                            onOpen={() => { }}
+                                                            onClose={() => setClockOpen(false)}
+                                                            disabled={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
+                                                            autoOk
+                                                            error={(new Date()).getTime() >= minDateToAllowUpdates.getTime()}
+                                                            helperText={(new Date()).getTime() >= minDateToAllowUpdates.getTime() ? t('EditStream.alerts.updatesPolicy') : ''}
+                                                            value={displayDate}
+                                                            placeholder='08:00 AM'
+                                                            onChange={handleDateChange}
+                                                            keyboardIcon={
+                                                                <InputAdornment position='end' >
+                                                                    <TimeIcon />
+                                                                </InputAdornment>
                                                             }
-                                                        }}
-                                                    />
+                                                            InputProps={{
+                                                                disableUnderline: true,
+                                                                className: classes.dateInput
+                                                            }}
+                                                            variant={'inline'}
+                                                            PopoverProps={{
+                                                                PaperProps: {
+                                                                    className: classes.popover,
+                                                                }
+                                                            }}
+                                                        />
+                                                    </Grid>
                                                 </Grid>
-                                            </Grid>
-                                        </MuiPickersUtilsProvider>
-                                    }
+                                            </MuiPickersUtilsProvider>
+                                        }
+                                        <Button className={classes.button}
+                                            onClick={saveChanges}
+                                            buttonColor={2}
+                                            disabled={disableChangesButton && ((new Date()).getTime() >= minDateToAllowUpdates || selectedDate.getTime() === firstTimestamp.getTime())}>
+                                            {t('EditStream.save')}
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                                <SectionHeader title={t('EditStream.sendMessage')}
+                                    description={t('EditStream.sendMessageDesc')} />
+                                <Grid item md={12} style={{
+                                    marginTop: '32px'
+                                }}>
+                                    <StreamerTextInput placeholder={t('EditStream.limit')}
+                                        multiline
+                                        rows={3}
+                                        fullWidth
+                                        textInputClassName={classes.textArea}
+                                        containerClassName={classes.containerTextArea}
+                                        value={notificationBody}
+                                        onChange={onChangeNotificationBody} />
                                     <Button className={classes.button}
-                                        onClick={saveDate}
-                                        buttonColor={2}
-                                        disabled={(new Date()).getTime() >= minDateToAllowUpdates || selectedDate.getTime() === firstTimestamp.getTime()}>
-                                        {t('EditStream.save')}
+                                        disabled={!notificationBody}
+                                        onClick={() => { sendNotification(); alert(t('EditStream.alerts.sent')); }}>
+                                        {t('QaplaStreamDialogs.EventManagementDialog.send')}
+                                    </Button>
+                                </Grid>
+                                <SectionHeader title={t('EditStream.cancelStream')}
+                                    description={t('EditStream.cancelStreamDescription')} />
+                                <Grid item md={12} style={{
+                                    marginTop: '32px'
+                                }}>
+                                    <Button className={classes.cancelButton}
+                                        onClick={() => setOpenCancelStreamDialog(true)}>
+                                        {t('EditStream.cancelStream')}
                                     </Button>
                                 </Grid>
                             </Grid>
-                            <SectionHeader title={t('EditStream.sendMessage')}
-                                description={t('EditStream.sendMessageDesc')} />
-                            <Grid item md={12} style={{
-                                marginTop: '32px'
-                            }}>
-                                <StreamerTextInput placeholder={t('EditStream.limit')}
-                                    multiline
-                                    rows={3}
-                                    fullWidth
-                                    textInputClassName={classes.textArea}
-                                    containerClassName={classes.containerTextArea}
-                                    value={notificationBody}
-                                    onChange={onChangeNotificationBody} />
-                                <Button className={classes.button}
-                                    disabled={!notificationBody}
-                                    onClick={() => { sendNotification(); alert(t('EditStream.alerts.sent')); }}>
-                                    {t('QaplaStreamDialogs.EventManagementDialog.send')}
-                                </Button>
-                            </Grid>
-                            <SectionHeader title={t('EditStream.cancelStream')}
-                                description={t('EditStream.cancelStreamDescription')} />
-                            <Grid item md={12} style={{
-                                marginTop: '32px'
-                            }}>
-                                <Button className={classes.cancelButton}
-                                    onClick={() => setOpenCancelStreamDialog(true)}>
-                                    {t('EditStream.cancelStream')}
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </>
-                }
-                <Grid xs={12}>
-                    <SectionHeader title={t('EditStream.participants')} />
-                    <TableContainer className={classes.tableContainer}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCellStyled align='center' padding='checkbox'>
-                                        <ProfileIcon />
-                                    </TableCellStyled>
-                                    <TableCellStyled className={classes.tableHead}>{t('EditStream.table.twitch')}</TableCellStyled>
-                                    <TableCellStyled className={classes.tableHead}>{t('EditStream.table.game')}</TableCellStyled>
-                                    <TableCellStyled className={classes.tableHead}>{t('EditStream.table.qapla')}</TableCellStyled>
-                                    <TableCellStyled className={classes.participantsColumn}>
-                                        <EyeIcon /> <p>{Object.keys(participantsList).length}</p>
-                                    </TableCellStyled>
-                                    <TableCellStyled className={classes.tableHead}>
-                                        <ContainedButton
-                                            startIcon={<DownloadIcon />}>
-                                            {t('EditStream.table.download')}
-                                        </ContainedButton>
-                                    </TableCellStyled>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {Object.keys(participantsList).map((participantUid, index) => (
-                                    <TableRow className={index % 2 === 0 ? classes.tableRow : classes.tableRowOdd}
-                                        key={`Participant-${participantUid}`}>
-                                        <TableCellStyled align='center' className={classes.firstCell}>
-                                            <Avatar className={classes.avatar} />
-                                        </TableCellStyled>
-                                        <TableCellStyled>
-                                            {participantsList[participantUid].userName}
-                                        </TableCellStyled>
-                                        <TableCellStyled>
-                                            {participantsList[participantUid].userName}
-                                        </TableCellStyled>
-                                        <TableCellStyled className={classes.lastCell}>
-                                            {participantsList[participantUid].userName}
-                                        </TableCellStyled>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                        </>
+                    }
+                </Grid>
+                <div style={{ width: '32px' }}></div>
+                <Grid container style={{ maxWidth: '274px', flexDirection: 'column' }} alignItems='flex-start'>
+                    <SectionHeader title={t('NewStream.streamTitle')}
+                        description={t('NewStream.streamTitleDescription')} />
+                    <div style={{ marginTop: '24px' }}>
+                        <StreamerTextInput
+                            textInputStyle={{ marginTop: '8px' }}
+                            label={t('NewStream.streamTitle')}
+                            placeholder={t('NewStream.streamTitlePlaceholder')}
+                            id='eventTitle'
+                            fullWidth={true}
+                            value={title.en}
+                            onChange={(e) =>{ setDisableChangesButton(false); setTitle({ en: e.target.value, es: e.target.value }); }}
+                        />
+                    </div>
                 </Grid>
             </Grid>
             <EventConfirmCancellationDialog open={openCancelStreamDialog}

@@ -189,3 +189,24 @@ export async function activateUserFreeTrial(uid, email) {
         console.log(error);
     }
 }
+
+/**
+ * Notify followers of the streamer and participants of an event about event related things
+ * @param {string} streamId Stream identifier
+ * @param {string} streamerId Streamer uid
+ * @param {object} titles Titles for the push notification
+ * @param {string} titles.en English title
+ * @param {string} titles.es Spanish title
+ * @param {object} bodies Bodies for the push notification
+ * @param {string} bodies.en English description
+ * @param {string} bodies.es Spanish description
+ * @param {string} topic Streamer topic to use (ej: 'cancelation' or 'reminders')
+ */
+export async function notifyAboutStreamToFollowersAndParticipants(streamId, streamerId, titles, bodies, topic) {
+    const notifyEventParticipantsAndStreamerFollowers = functions.httpsCallable('notificateToEventParticipantsAndStreamerFollowers');
+    try {
+        return await notifyEventParticipantsAndStreamerFollowers({ streamId, streamerId, titles, bodies, topic });
+    } catch (error) {
+        console.log(error);
+    }
+}

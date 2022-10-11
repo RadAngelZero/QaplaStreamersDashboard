@@ -3,6 +3,7 @@ import { Button, Dialog, DialogContent, makeStyles, TextField } from '@material-
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as CloseIcon } from './../../assets/CloseIcon.svg';
+import { notifyAboutStreamToFollowersAndParticipants } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     dialogContainer: {
@@ -74,15 +75,24 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const EventConfirmCancellationDialog = ({ open, onClose, cancelStream, sendCustomMessage }) => {
+const EventConfirmCancellationDialog = ({ streamerUid, streamId, streamTitle = '', streamerName, open, onClose, cancelStream }) => {
     const [message, setMessage] = useState('');
     const classes = useStyles();
     const { t } = useTranslation();
 
     const cancel = () => {
-        if (message) {
-            sendCustomMessage(message);
-        }
+        notifyAboutStreamToFollowersAndParticipants(streamId,
+            streamerUid,
+            {
+                es: `🚨 ${streamerName} ha cancelado su stream`,
+                en: `🚨 ${streamerName}'s stream has been canceled`
+            },
+            {
+                es: message ? message : `El stream ${streamTitle} no podrá llevarse a cabo 😢`,
+                en: message ? message :`${streamerName} won't be able to stream ${streamTitle} 😢`
+            },
+            'cancelations'
+        );
 
         cancelStream();
     }

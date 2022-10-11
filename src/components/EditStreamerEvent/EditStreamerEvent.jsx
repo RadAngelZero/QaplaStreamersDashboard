@@ -2,14 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
     makeStyles,
     Grid,
-    TableContainer,
-    Table,
-    TableHead,
-    TableRow,
     TableCell,
-    TableBody,
     withStyles,
-    Avatar,
     InputLabel,
     InputAdornment,
     Button
@@ -24,19 +18,13 @@ import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDa
 import StreamerTextInput from '../StreamerTextInput/StreamerTextInput';
 import { ReactComponent as CalendarIcon } from './../../assets/CalendarIcon.svg';
 import { ReactComponent as TimeIcon } from './../../assets/TimeIcon.svg';
-import { ReactComponent as ProfileIcon } from './../../assets/ProfileIcon.svg';
-import { ReactComponent as EyeIcon } from './../../assets/EyeIcon.svg';
-import { ReactComponent as DownloadIcon } from './../../assets/DownloadIcon.svg';
-
-import ContainedButton from '../ContainedButton/ContainedButton';
 import BackButton from '../BackButton/BackButton';
 import { SCHEDULED_EVENT_TYPE, PAST_STREAMS_EVENT_TYPE } from '../../utilities/Constants';
 import { loadApprovedStreamTimeStamp, getStreamParticipantsList, getStreamTitle, getPastStreamTitle, updateStreamDate, cancelStreamRequest, updateStreamTitle } from '../../services/database';
-import { sednPushNotificationToTopic, sendCustomMessage } from '../../services/functions';
+import { notifyAboutStreamToFollowersAndParticipants } from '../../services/functions';
 import { notifyUpdateToQaplaAdmins } from '../../services/discord';
 import EventConfirmCancellationDialog from '../QaplaStreamDialogs/EventConfirmCancellationDialog';
 import SuccessDialog from '../SuccessDialog/SuccessDialog';
-import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -275,7 +263,7 @@ const EditStreamerEvent = ({ user }) => {
         async function setStreamTitle() {
             if (streamType === SCHEDULED_EVENT_TYPE) {
                 const title = await getStreamTitle(streamId);
-                setTitle(title);
+                setTitle(title.val());
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
                 if (user.uid) {
                     const title = await getPastStreamTitle(user.uid, streamId);
@@ -289,9 +277,22 @@ const EditStreamerEvent = ({ user }) => {
         setStreamTitle();
     }, [streamId, streamType, user]);
 
-    const sendNotification = async (message) => {
-        await sendCustomMessage(streamId, title['en'], message ? message : notificationBody);
+    const sendNotification = async () => {
+        await notifyAboutStreamToFollowersAndParticipants(streamId,
+            user.uid,
+            {
+                es: title.es,
+                en: title.en
+            },
+            {
+                es: notificationBody,
+                en: notificationBody
+            },
+            'reminders'
+        );
+
         setNotificationBody('');
+        alert(t('EditStream.alerts.sent'));
     }
 
     const onChangeNotificationBody = (e) => {
@@ -483,7 +484,7 @@ const EditStreamerEvent = ({ user }) => {
                                         onChange={onChangeNotificationBody} />
                                     <Button className={classes.button}
                                         disabled={!notificationBody}
-                                        onClick={() => { sendNotification(); alert(t('EditStream.alerts.sent')); }}>
+                                        onClick={sendNotification}>
                                         {t('QaplaStreamDialogs.EventManagementDialog.send')}
                                     </Button>
                                 </Grid>
@@ -519,9 +520,12 @@ const EditStreamerEvent = ({ user }) => {
                 </Grid>
             </Grid>
             <EventConfirmCancellationDialog open={openCancelStreamDialog}
+                streamTitle={title.en}
+                streamerName={user.displayName}
+                streamerUid={user.uid}
+                streamId={streamId}
                 onClose={() => setOpenCancelStreamDialog(false)}
-                cancelStream={cancelStream}
-                sendCustomMessage={sendNotification} />
+                cancelStream={cancelStream} />
             <SuccessDialog open={openCanceledStreamSuccessfulDialog}
                 title={t('StreamCard.successfullyCanceledStreamDialogTitle')}
                 buttonText={t('StreamCard.successfullyCanceledStreamDialogButtonText')}

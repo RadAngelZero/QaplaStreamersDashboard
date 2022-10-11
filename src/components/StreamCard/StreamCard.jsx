@@ -33,7 +33,7 @@ import EventEndStreamConfirmDialog from '../QaplaStreamDialogs/EventEndStreamCon
 import EventRewardsRemovedConfirmation from '../QaplaStreamDialogs/EventRewardsRemovedConfirmation';
 import { auth } from '../../services/firebase';
 import EventCustomMessageSentConfirmation from '../QaplaStreamDialogs/EventCustomMessageSentConfirmation';
-import { sendCustomMessage } from '../../services/functions';
+import { notifyAboutStreamToFollowersAndParticipants, sendCustomMessage } from '../../services/functions';
 import { getCurrentLanguage } from '../../utilities/i18n';
 import EventConfirmCancellationDialog from '../QaplaStreamDialogs/EventConfirmCancellationDialog';
 import SuccessDialog from '../SuccessDialog/SuccessDialog';
@@ -226,7 +226,7 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                 if (title.exists()) {
                     setTitle(title.val());
                 } else if (games['allGames'] && games['allGames'][game] && games['allGames'][game].gameName) {
-                    setTitle({ en: games['allGames'][game].gameName });
+                    setTitle({ en: games['allGames'][game].gameName, es: games['allGames'][game].gameName });
                 }
             } else if (streamType === PAST_STREAMS_EVENT_TYPE) {
                 const title = await getPastStreamTitle(user.uid, streamId);
@@ -334,6 +334,23 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
             }
             setStartingStream(false);
 
+            try {
+                await notifyAboutStreamToFollowersAndParticipants(streamId,
+                    user.uid,
+                    {
+                        es: title.en,
+                        en: title.es
+                    },
+                    {
+                        en: `${user.displayName}’s is live! Come for your drops 🪂`,
+                        es: `${user.displayName} ya prendió su stream con drops 🪂`
+                    },
+                    'reminders'
+                );
+            } catch (error) {
+                console.log(error);
+            }
+
             window.analytics.track('Stream started', {
                 streamId,
                 uid: user.uid,
@@ -434,7 +451,19 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
 
     const sendMessage = async (message) => {
         if (message) {
-            await sendCustomMessage(user.uid, title && title['en'] ? title['en'] : 'Event canceled', message);
+            notifyAboutStreamToFollowersAndParticipants(streamId,
+                user.uid,
+                {
+                    es: title.en,
+                    en: title.es
+                },
+                {
+                    es: message,
+                    en: message
+                },
+                'reminders'
+            );
+            setOpenCustomMessageSentDialog(true);
 
             window.analytics.track('Custom Message sent', {
                 streamId,
@@ -868,7 +897,7 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                     </div>
                     <EventManagementDialog open={openStreamDialog}
                         user={user}
-                        sendMessage={() => { sendMessage(); setOpenCustomMessageSentDialog(true); }}
+                        sendMessage={(message) => sendMessage(message)}
                         streamId={streamId}
                         stream={stream}
                         streamStarted={startingStream}
@@ -895,9 +924,12 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                     <EventCustomMessageSentConfirmation open={openCustomMessageSentDialog}
                         onClose={() => setOpenCustomMessageSentDialog(false)} />
                     <EventConfirmCancellationDialog open={openCancelStreamDialog}
+                        streamTitle={title && title['en'] ? title['en'] : ''}
+                        streamerName={user.displayName}
+                        streamerUid={user.uid}
+                        streamId={streamId}
                         onClose={() => setOpenCancelStreamDialog(false)}
-                        cancelStream={cancelStream}
-                        sendCustomMessage={sendMessage} />
+                        cancelStream={cancelStream} />
                     <SuccessDialog open={openCanceledStreamSuccessfulDialog}
                         title={t('StreamCard.successfullyCanceledStreamDialogTitle')}
                         buttonText={t('StreamCard.successfullyCanceledStreamDialogButtonText')}

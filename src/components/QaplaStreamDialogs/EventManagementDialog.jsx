@@ -146,6 +146,7 @@ const useStyles = makeStyles((theme) => ({
         opacity: '0.2'
     },
     textInputContainer: {
+        height: '100px',
         backgroundColor: '#202750',
         borderRadius: '16px',
         paddingRight: '4px',
@@ -280,8 +281,8 @@ const EventManagementDialog = ({ open, stream = null, streamStarted, streamTitle
                         <div style={{ height: '20px' }} />
                         <StreamerTextInput
                             value={message}
+                            textInputStyle={{ paddingTop: '24px' }}
                             onChange={(e) => setMessage(e.target.value)}
-                            textInputStyle={{ marginTop: '0px' }}
                             textInputClassName={classes.textInputContainer}
                             fullWidth
                             multiline

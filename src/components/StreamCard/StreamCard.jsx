@@ -133,6 +133,10 @@ const useStyles = makeStyles(() => ({
         marginTop: 'auto'
     },
     startButton: {
+        fontSize: '12px',
+        paddingTop: '12px',
+        paddingBottom: '12px',
+        fontWeight: '600',
         backgroundColor: '#00FFDD',
         color: '#0D1021',
         width: '100%',
@@ -147,6 +151,10 @@ const useStyles = makeStyles(() => ({
         }
     },
     endButton: {
+        fontSize: '12px',
+        paddingTop: '12px',
+        paddingBottom: '12px',
+        fontWeight: '600',
         backgroundColor: '#3B4BF9',
         color: '#FFF',
         width: '100%',
@@ -161,6 +169,11 @@ const useStyles = makeStyles(() => ({
         }
     },
     manageButton: {
+        marginTop: '16px',
+        fontSize: '12px',
+        paddingTop: '12px',
+        paddingBottom: '12px',
+        fontWeight: '600',
         backgroundColor: '#272D5780',
         color: '#FFFFFF99',
         width: '100%',
@@ -177,7 +190,10 @@ const useStyles = makeStyles(() => ({
         marginBottom: '20px !important'
     },
     cancelButton: {
-        marginBottom: '16px',
+        fontSize: '12px',
+        paddingTop: '12px',
+        paddingBottom: '12px',
+        fontWeight: '600',
         backgroundColor: 'transparent',
         color: '#FFF',
         opacity: 0.6,
@@ -849,6 +865,25 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                             null
                         }
                         <div className={classes.buttonsContainer}>
+                            {streamType === SCHEDULED_EVENT_TYPE && !startingStream && !stream &&
+                                <>
+                                <Button size='medium'
+                                    className={classes.cancelButton}
+                                    onClick={() => setOpenCancelStreamDialog(true)}
+                                    startIcon={<DeleteIcon color='rgba(255, 255, 255, 0.6)' />}>
+                                    {t('StreamCard.cancelStreamRequest')}
+                                </Button>
+                                {!showRewardsOptions &&
+                                    <Button size='medium'
+                                        className={classes.manageButton}
+                                        onClick={manageStream}
+                                        startIcon={<EditIcon />}>
+                                        {t('StreamCard.manageStream')}
+                                    </Button>
+                                }
+                                </>
+                            }
+                            <div style={{ height: '11px' }} />
                             {(showRewardsOptions && streamType === SCHEDULED_EVENT_TYPE) &&
                                 (!startingStream ?
                                     (stream ?
@@ -875,23 +910,6 @@ const StreamCard = ({ key, user, streamId, streamType, game, games, date, hour, 
                                         {`${t('StreamCard.creatingRewards')}${loadingDots}`}
                                     </p>
                                 )
-                            }
-                            <div style={{ height: '11px' }} />
-                            {streamType === SCHEDULED_EVENT_TYPE && !showRewardsOptions &&
-                                <>
-                                <Button size='medium'
-                                    className={classes.cancelButton}
-                                    onClick={() => setOpenCancelStreamDialog(true)}
-                                    startIcon={<DeleteIcon color='rgba(255, 255, 255, 0.6)' />}>
-                                    {t('StreamCard.cancelStreamRequest')}
-                                </Button>
-                                <Button size='medium'
-                                    className={classes.manageButton}
-                                    onClick={manageStream}
-                                    startIcon={<EditIcon />}>
-                                    {t('StreamCard.manageStream')}
-                                </Button>
-                                </>
                             }
                         </div>
                     </div>

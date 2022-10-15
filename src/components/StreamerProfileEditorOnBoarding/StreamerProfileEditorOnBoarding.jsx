@@ -8,7 +8,7 @@ import { saveStreamerDeepLink, saveTags, updateStreamerPublicProfile } from '../
 import BioEditorTextArea from '../BioEditorTextArea/BioEditorTextArea';
 import { MIN_BIO_LENGTH, MIN_TAGS } from '../../utilities/Constants';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
-import { createLink } from '../../services/branch';
+import { createBranchDeepLink } from '../../services/functions';
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -180,17 +180,16 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
     const handleMainButton = async () => {
         switch (currentStep) {
             case 0:
-                const linkResponse = await createLink(user.uid, qaplaLinkAlias);
+                const linkResponse = await createBranchDeepLink(user.uid, qaplaLinkAlias);
 
-                if (linkResponse.status === 200) {
-                    const linkData = await linkResponse.json();
-                    await saveStreamerDeepLink(user.uid, linkData.url);
-                    setQaplaLink(linkData.url);
+                if (linkResponse.data.status === 200) {
+                    await saveStreamerDeepLink(user.uid, linkResponse.data.url);
+                    setQaplaLink(linkResponse.data.url);
 
                     if (showOnlySpecificStep) {
                         closeOnBoarding();
                     }
-                } else if (linkResponse.status === 409) {
+                } else if (linkResponse.data.status === 409) {
                     return setLinkError(t('StreamerProfileEditor.OnBoarding.duplicatedLink'));
                 }
                 break;

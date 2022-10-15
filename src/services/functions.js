@@ -210,3 +210,17 @@ export async function notifyAboutStreamToFollowersAndParticipants(streamId, stre
         console.log(error);
     }
 }
+
+/**
+ * Creates and return a deep link for the given streamer with the given alias
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} alias Alias of the link to create
+ */
+export async function createBranchDeepLink(streamerUid, alias) {
+    const createBranchDeepLink = functions.httpsCallable('createBranchDeepLink');
+    try {
+        return await createBranchDeepLink({ streamerUid, alias });
+    } catch (error) {
+        console.log(error);
+    }
+}

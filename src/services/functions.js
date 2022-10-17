@@ -219,7 +219,7 @@ export async function notifyAboutStreamToFollowersAndParticipants(streamId, stre
 export async function createBranchDeepLink(streamerUid, alias) {
     const createBranchDeepLink = functions.httpsCallable('createBranchDeepLink');
     try {
-        return await createBranchDeepLink({ streamerUid, alias });
+        return await createBranchDeepLink({ streamerUid, alias: alias.replaceAll(' ', '') });
     } catch (error) {
         console.log(error);
     }

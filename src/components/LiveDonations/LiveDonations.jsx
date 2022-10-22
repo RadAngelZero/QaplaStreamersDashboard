@@ -386,8 +386,13 @@ const LiveDonations = () => {
             async function initCheer() {
                 if (donation.messageExtraData && donation.messageExtraData.voiceAPIName && donation.messageExtraData && donation.messageExtraData.voiceAPIName.includes('Uberduck:')) {
                     // 9 Because the string "Uberduck:" length is 9
+                    const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
+                    const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
+
+                    const messageToRead = bigQoinsDonation ? `${donation.twitchUserName} has sent you ${donation.amountQoins} coins and says: ${donation.message}` : `${donation.twitchUserName} say: ${donation.message}`;
+
                     const voiceUuid = donation.messageExtraData.voiceAPIName.substring(9);
-                    await speakCheerMessageUberDuck(donation.id, donation.message, voiceUuid);
+                    await speakCheerMessageUberDuck(donation.id, messageToRead, voiceUuid);
                     listenForUberduckAudio(donation.id, (url) => {
                         if (url.exists()) {
                             if (url.val() !== 'error') {
@@ -717,6 +722,12 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
             }
         </div >
     )
+}
+
+const Greeting = ({ uid, twitchUsername, animationId, avatarId, message }) => {
+    return (
+        <></>
+    );
 }
 
 export default LiveDonations;

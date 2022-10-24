@@ -38,6 +38,8 @@ const streamersDeepLinksRef = database.ref('/StreamersDeepLinks');
 const dashboardStreamersVisitsCounterRef = database.ref('/DashboardStreamersVisitsCounter');
 const uberduckRequestsRef = database.ref('/UberduckRequests');
 const streamerCashOutRef = database.ref('/StreamersCashOut');
+const streamsGreetingsRef = database.ref('/StreamsGreetings');
+const avatarsAnimationsRef = database.ref('/AvatarsAnimations');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -629,7 +631,7 @@ export function listenForLastStreamerCheers(streamerUid, limit = 10, callback) {
  * @param {function} callback Handler of the results
  */
 export function listenForUnreadStreamerCheers(streamerUid, callback) {
-    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback);
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('value', callback);
 }
 
 /**
@@ -645,7 +647,7 @@ export function listenForUnreadStreamerCheers(streamerUid, callback) {
  * @param {string} streamerUid Uid of the streamer
  */
 export function removeListenerForUnreadStreamerCheers(streamerUid) {
-    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('child_added');
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('value');
 }
 
 /**
@@ -1245,4 +1247,28 @@ export async function saveStreamerCashOutRequest(uid, amountQoins, amountBits) {
             timestamp: date.getTime()
         });
     }
+}
+
+////////////////////////
+// Stream Greetings
+////////////////////////
+
+export async function listenForUnreadUsersGreetings(streamerUid, callback) {
+    streamsGreetingsRef.child(streamerUid).orderByChild('read').equalTo(false).on('value', callback);
+}
+
+export async function removeListenerForUnreadUsersGreetings(streamerUid) {
+    streamsGreetingsRef.child(streamerUid).orderByChild('read').equalTo(false).off('value');
+}
+
+export async function markGreetingAsRead(streamerUid, greetingId) {
+    return await streamsGreetingsRef.child(streamerUid).child(greetingId).update({ read: true });
+}
+
+////////////////////////
+// Avatars Animations
+////////////////////////
+
+export async function getAvatarAnimationData(animationId) {
+    return await avatarsAnimationsRef.child(animationId).once('value');
 }

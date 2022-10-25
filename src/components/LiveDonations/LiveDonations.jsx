@@ -495,12 +495,16 @@ const LiveDonations = () => {
     }
 
     function finishGreeting(greetingId) {
-        alert('Finish ' + greetingId);
-        /* setGreetingToShow(null);
+        // Mark as read inmediately
         markGreetingAsRead(streamerUid, greetingId);
+
+        // Wait 5 seconds to remove from UI
         setTimeout(() => {
-            setIsPlayingAudio(false);
-        }, 750); */
+            setGreetingToShow(null);
+            setTimeout(() => {
+                setIsPlayingAudio(false);
+            }, 750);
+        }, 5000);
     }
 
     const queueAnimation = () => {
@@ -734,13 +738,17 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                 display: 'flex'
             }}>
             {donation.avatar &&
-                <img src={`https://api.readyplayer.me/v1/avatars/${donation.avatar.id}.png?scene=fullbody-portrait-v1-transparent`}
+                <img src={`https://api.readyplayer.me/v1/avatars/${donation.avatar.avatarId}.png?scene=fullbody-portrait-v1-transparent`}
                     height={120}
                     width={120}
                     style={{
+                        marginTop: 24,
                         borderRadius: 100,
                         alignSelf: 'center',
-                        background: `linear-gradient(${donation.avatar.background.angle}deg, ${getGradientString(donation.avatar.background.colors)})`,
+                        background: donation.avatar.avatarBackground ?
+                            `linear-gradient(${donation.avatar.avatarBackground.angle}deg, ${getGradientString(donation.avatar.avatarBackground.colors)})`
+                            :
+                            'linear-gradient(95.16deg, #FF669D, #9746FF)',
                         marginRight: '6px'
                     }} />
             }
@@ -861,19 +869,18 @@ const Greeting = ({ id, startGreeting, uid, twitchUsername, animationId, avatarI
                 <>
                 <div style={{
                     display: 'flex',
-                    aspectRatio: .5,
                     alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                    borderWidth: 1,
-                    borderColor: '#FF0000',
-                    height: '250px',
+                    width: '400px',
+                    height: '300px'
                 }}>
                     <Canvas camera={{ position: [
-                                10, 10, 10
+                                animationData.camera.position.x,
+                                animationData.camera.position.y,
+                                animationData.camera.position.z
                             ], aspect: animationData.camera.aspect }}
                         style={{
-                            backgroundColor: '#FFF000',
-                            aspectRatio: .5,
-                            height: '250px'
+                            width: '100%',
+                            height: '100%'
                         }}>
                         <ambientLight intensity={1} />
                         <directionalLight intensity={0.4} />
@@ -881,7 +888,7 @@ const Greeting = ({ id, startGreeting, uid, twitchUsername, animationId, avatarI
                             <AvatarAnimation animationData={animationData}
                                 avatarId={avatarId}
                                 showGreeting={showGreeting}
-                                setShowGreeting={() => { setShowGreeting(true); startGreeting(); }}
+                                startGreeting={() => { setShowGreeting(true); startGreeting(); }}
                                 finishGreeting={finishGreeting}
                                 greetingId={id} />
                         </Suspense>
@@ -954,20 +961,34 @@ const AvatarAnimation = (props) => {
 
     useEffect(() => {
         if (scene && !props.showGreeting) {
-            props.setShowGreeting(true);
+            props.startGreeting();
         }
 
         if (props.showGreeting && animations && cameraReady) {
             const animation = avatarMixer.clipAction(animations[0], group.current);
-            avatarMixer.addEventListener('finished', (e) => {
-                avatarMixer.removeEventListener('finished');
-                props.finishGreeting(props.greetingId);
-            });
+
+            /**
+             * If the animation is not infinite and it last more than the voice bot then wait for the animation
+             * to end to finish the greeting
+             */
+            if (!props.animationData.loop && animations[0].duration >= voiceBotMessage.duration) {
+                avatarMixer.addEventListener('finished', (e) => {
+                    avatarMixer.removeEventListener('finished');
+                    props.finishGreeting(props.greetingId);
+                });
+            /**
+             * If the animation is in loop or the voice bot duration is greater than the animation duration
+             * then wait for the voice bot to end to finish the greeting
+             */
+            } else {
+                voiceBotMessage.onended = () => {
+                    props.finishGreeting(props.greetingId);
+                }
+            }
 
             animation.clampWhenFinished = !props.animationData.loop;
 
-            // animation.fadeIn(.5).play().setLoop(props.animationData.loop ? THREE.LoopRepeat : THREE.LoopOnce);
-            animation.fadeIn(.5).play().setLoop();
+            animation.fadeIn(.5).play().setLoop(props.animationData.loop ? THREE.LoopRepeat : THREE.LoopOnce);
         }
     }, [animations, avatarMixer, avatarMixer, cameraReady, scene, props.showGreeting]);
 

@@ -39,7 +39,7 @@ const dashboardStreamersVisitsCounterRef = database.ref('/DashboardStreamersVisi
 const uberduckRequestsRef = database.ref('/UberduckRequests');
 const streamerCashOutRef = database.ref('/StreamersCashOut');
 const streamsGreetingsRef = database.ref('/StreamsGreetings');
-const avatarsAnimationsRef = database.ref('/AvatarsAnimations');
+const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1253,22 +1253,41 @@ export async function saveStreamerCashOutRequest(uid, amountQoins, amountBits) {
 // Stream Greetings
 ////////////////////////
 
+/**
+ * Listen for unread greetings
+ * @param {string} streamerUid Streamer identifier
+ * @param {function} callback Callback to handle database resposne
+ */
 export async function listenForUnreadUsersGreetings(streamerUid, callback) {
     streamsGreetingsRef.child(streamerUid).orderByChild('read').equalTo(false).on('value', callback);
 }
 
+/**
+ * Remove listener for unread greetings
+ * @param {string} streamerUid Streamer identifier
+ * @param {function} callback Callback to handle database resposne
+ */
 export async function removeListenerForUnreadUsersGreetings(streamerUid) {
     streamsGreetingsRef.child(streamerUid).orderByChild('read').equalTo(false).off('value');
 }
 
+/**
+ * Mark the greeting as read
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} greetingId Greeting identifier
+ */
 export async function markGreetingAsRead(streamerUid, greetingId) {
     return await streamsGreetingsRef.child(streamerUid).child(greetingId).update({ read: true });
 }
 
 ////////////////////////
-// Avatars Animations
+// Avatars Animations Overlay
 ////////////////////////
 
+/**
+ * Gets all the given animation data
+ * @param {string} animationId Animation identifier
+ */
 export async function getAvatarAnimationData(animationId) {
-    return await avatarsAnimationsRef.child(animationId).once('value');
+    return await avatarsAnimationsOverlayRef.child(animationId).once('value');
 }

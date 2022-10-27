@@ -980,7 +980,7 @@ const AvatarAnimation = (props) => {
             if (!props.animationData.loop && animations[0].duration >= voiceBotMessage.duration) {
                 avatarMixer.addEventListener('finished', (e) => {
                     avatarMixer.removeEventListener('finished');
-                    // props.finishGreeting(props.greetingId);
+                    props.finishGreeting(props.greetingId);
                 });
             /**
              * If the animation is in loop or the voice bot duration is greater than the animation duration
@@ -988,7 +988,7 @@ const AvatarAnimation = (props) => {
              */
             } else {
                 voiceBotMessage.onended = () => {
-                    // props.finishGreeting(props.greetingId);
+                    props.finishGreeting(props.greetingId);
                 }
             }
 

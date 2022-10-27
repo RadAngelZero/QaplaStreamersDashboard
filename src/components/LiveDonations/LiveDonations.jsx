@@ -870,8 +870,8 @@ const Greeting = ({ id, startGreeting, uid, twitchUsername, animationId, avatarI
                 <div style={{
                     display: 'flex',
                     alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                    width: '400px',
-                    height: '300px'
+                    width: '800px',
+                    height: '600px'
                 }}>
                     <Canvas camera={{ position: [
                                 animationData.camera.position.x,
@@ -894,57 +894,63 @@ const Greeting = ({ id, startGreeting, uid, twitchUsername, animationId, avatarI
                         </Suspense>
                     </Canvas>
                 </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
-                        marginTop: '20px',
-                        width: 'fit-content',
-                        backgroundColor: '#4D00FB',
-                        borderRadius: '30px',
-                        padding: '24px 24px',
-                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                        zIndex: 10
-                    }}
-                >
-                    <div style={{ display: 'flex', alignSelf: 'center' }}>
-                        <p style={{
-                            display: 'flex',
-                            color: 'white',
-                            fontSize: '26px',
-                            textAlign: 'center'
-                        }}>
-                            <b style={{ color: '#0AFFD2' }}>
-                                {twitchUsername}
-                            </b>
-                        </p>
-                    </div>
-                </div>
                 <div style={{
                     display: 'flex',
-                    width: 'fit-content',
-                    backgroundColor: '#FFFFFF',
-                    maxWidth: '500px',
-                    marginTop: '-20px',
-                    borderRadius: '30px',
-                    borderTopLeftRadius: alertSideRight ? '30px' : '0px',
-                    borderTopRightRadius: alertSideRight ? '0px' : '30px',
-                    padding: '30px',
-                    marginLeft: alertSideRight ? '0px' : '20px',
-                    marginRight: alertSideRight ? '20px' : '0px',
-                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                    flex: 1,
+                    flexDirection: 'column',
+                    width: '500px'
                 }}>
-                    <p style={{
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-around',
+                            marginTop: '20px',
+                            width: 'fit-content',
+                            backgroundColor: '#4D00FB',
+                            borderRadius: '30px',
+                            padding: '24px 24px',
+                            alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                            zIndex: 10
+                        }}>
+                        <div style={{ display: 'flex', alignSelf: 'center' }}>
+                            <p style={{
+                                display: 'flex',
+                                color: 'white',
+                                fontSize: '26px',
+                                textAlign: 'center'
+                            }}>
+                                <b style={{ color: '#0AFFD2' }}>
+                                    {twitchUsername}
+                                </b>
+                            </p>
+                        </div>
+                    </div>
+                    <div style={{
                         display: 'flex',
-                        color: '#0D1021',
-                        fontSize: '24px',
-                        fontWeight: '600',
-                        lineHeight: '36px',
-                        letterSpacing: '0.6px'
+                        width: 'fit-content',
+                        backgroundColor: '#FFFFFF',
+                        maxWidth: '500px',
+                        marginTop: '-20px',
+                        borderRadius: '30px',
+                        borderTopLeftRadius: alertSideRight ? '30px' : '0px',
+                        borderTopRightRadius: alertSideRight ? '0px' : '30px',
+                        padding: '30px',
+                        marginLeft: alertSideRight ? '0px' : '20px',
+                        marginRight: alertSideRight ? '20px' : '0px',
+                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                     }}>
-                        {message}
-                    </p>
+                        <p style={{
+                            display: 'flex',
+                            color: '#0D1021',
+                            fontSize: '24px',
+                            fontWeight: '600',
+                            lineHeight: '36px',
+                            letterSpacing: '0.6px'
+                        }}>
+                            {message}
+                        </p>
+                    </div>
                 </div>
                 </>
             }
@@ -974,7 +980,7 @@ const AvatarAnimation = (props) => {
             if (!props.animationData.loop && animations[0].duration >= voiceBotMessage.duration) {
                 avatarMixer.addEventListener('finished', (e) => {
                     avatarMixer.removeEventListener('finished');
-                    props.finishGreeting(props.greetingId);
+                    // props.finishGreeting(props.greetingId);
                 });
             /**
              * If the animation is in loop or the voice bot duration is greater than the animation duration
@@ -982,7 +988,7 @@ const AvatarAnimation = (props) => {
              */
             } else {
                 voiceBotMessage.onended = () => {
-                    props.finishGreeting(props.greetingId);
+                    // props.finishGreeting(props.greetingId);
                 }
             }
 

@@ -10,7 +10,8 @@ import './App.css';
 import {
     loadStreamerProfile,
     loadQaplaGames,
-    listenToStreamerDrops
+    listenToStreamerDrops,
+    setStreamerDashboardUserLanguage
 } from './services/database';
 import { handleUserAuthentication } from './services/auth';
 import StreamersSignin from './components/StreamersSignin/StreamersSignin';
@@ -30,6 +31,7 @@ import { useTranslation } from 'react-i18next'
 import OnBoarding from './components/OnBoarding/OnBoarding';
 import GiphyTextGenerator from './components/GiphyTextGenerator/GiphyTextGenerator';
 import RequestActivation from './components/RequestActivation/RequestActivation';
+import { getCurrentLanguage } from './utilities/i18n';
 
 window.onbeforeunload = function () {
     return true;
@@ -133,6 +135,8 @@ const Router = () => {
             handleUserAuthentication((user) => {
                 loadStreamerProfile(user.uid, (userData) => {
                     setUser({ ...userData, admin: false, streamer: true, uid: user.uid });
+                    // We send the language to use it on the reactions overlay
+                    setStreamerDashboardUserLanguage(user.uid, getCurrentLanguage());
                     getDropQoins(user.uid);
                 });
             }, () => {

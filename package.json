@@ -29,6 +29,7 @@
     "react-scripts": "4.0.1",
     "react-search-autocomplete": "^7.2.1",
     "three": "^0.145.0",
+    "troika-three-text": "^0.46.4",
     "web-vitals": "^0.2.4"
   },
   "scripts": {

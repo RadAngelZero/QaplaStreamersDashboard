@@ -466,7 +466,7 @@ const StreamerProfileEditorOnBoarding = ({ step, showOnlySpecificStep = false, u
                     marginTop: 24,
                 }}>
                 <Button
-                    disabled={qaplaLinkAlias === ''}
+                    disabled={qaplaLinkAlias === '' && !showOnlySpecificStep}
                     onClick={handleMainButton}
                     className={classes.button}
                 >

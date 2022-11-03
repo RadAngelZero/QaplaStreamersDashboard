@@ -6,6 +6,7 @@ import { changeLanguage, getAvailableLanguages, getCurrentLanguage } from '../..
 import { ReactComponent as TranslateIcon } from './../../assets/Translate.svg';
 import { ReactComponent as ArrowIcon } from './../../assets/Arrow.svg';
 import StreamerSelect from '../StreamerSelect/StreamerSelect';
+import { setStreamerDashboardUserLanguage } from '../../services/database';
 
 const useStyles = makeStyles(() => ({
     languageLabel: {
@@ -15,7 +16,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const LanguageSelect = () => {
+const LanguageSelect = ({ uid }) => {
     const [currentLanguageCode, setCurrentLanguageCode] = useState(getCurrentLanguage());
     const [langData, setLangData] = useState([])
     const classes = useStyles();
@@ -33,6 +34,9 @@ const LanguageSelect = () => {
     }, [t])
 
     const onLanguageChanged = (languageCode) => {
+        if (uid) {
+            setStreamerDashboardUserLanguage(uid, languageCode);
+        }
         changeLanguage(languageCode);
         setCurrentLanguageCode(languageCode);
     }

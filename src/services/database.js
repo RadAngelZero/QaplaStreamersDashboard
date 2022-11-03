@@ -40,6 +40,7 @@ const uberduckRequestsRef = database.ref('/UberduckRequests');
 const streamerCashOutRef = database.ref('/StreamersCashOut');
 const streamsGreetingsRef = database.ref('/StreamsGreetings');
 const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
+const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1290,4 +1291,47 @@ export async function markGreetingAsRead(streamerUid, greetingId) {
  */
 export async function getAvatarAnimationData(animationId) {
     return await avatarsAnimationsOverlayRef.child(animationId).once('value');
+}
+
+////////////////////////
+// Streamers Dashboards User Language
+////////////////////////
+
+/**
+ * Saves the language the streamer is using on their dashboard
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} language Code of the language the streamer is using ('es' || 'en')
+ */
+export async function setStreamerDashboardUserLanguage(streamerUid, language) {
+    return await streamersDashboardsUserLanguageRef.child(streamerUid).set(language);
+}
+
+/**
+ * Listen for changes on the user dashboard language
+ * @param {string} streamerUid Streamer identifier
+ * @param {function} callback Handler for database data returned
+ */
+export function listenStreamerDashboardUserLanguage(streamerUid, callback) {
+    return streamersDashboardsUserLanguageRef.child(streamerUid).on('value', callback);
+}
+
+////////////////////////
+// Overlay Errors
+////////////////////////
+
+/**
+ * Logs an error from the overlay on the database
+ * @param {string} uid User identifier
+ * @param {object} error Useful data to identify and solve the error
+ */
+export async function logOverlayError(uid, error) {
+    return await database.ref('/OverlayErrors').child(uid).push(error);
+}
+
+export async function listenToReactionsCountDiaDeMuertos(streamerUid, callback) {
+    database.ref('/ReactionsCountDiaDeMuertos').child(streamerUid).on('value', callback);
+}
+
+export async function listeToDiaDeMuertosFlag(callback) {
+    database.ref('/DiaDeMuertosEvent').on('value', callback);
 }

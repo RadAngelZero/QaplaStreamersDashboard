@@ -3,11 +3,14 @@ import { useParams } from 'react-router-dom';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { Video } from '@giphy/react-components';
 import * as THREE from 'three';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, extend } from '@react-three/fiber';
+import { Text } from 'troika-three-text';
+import { useGLTF, GradientTexture } from '@react-three/drei';
+import { useTranslation } from 'react-i18next';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio, listenForUnreadUsersGreetings, removeListenerForUnreadUsersGreetings, markGreetingAsRead, getAvatarAnimationData } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio, listenForUnreadUsersGreetings, removeListenerForUnreadUsersGreetings, markGreetingAsRead, getAvatarAnimationData, logOverlayError, listenToReactionsCountDiaDeMuertos, listeToDiaDeMuertosFlag, getStreamerDashboardUserLanguage, listenStreamerDashboardUserLanguage } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import QoinsDropsAudio from '../../assets/siu.mp3';
@@ -16,9 +19,13 @@ import { EMOTE, GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, G
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
-import { useGLTF } from '@react-three/drei';
+import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
+import QlanProgressBar from '../QlanProgressBar';
+import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
+
+extend({ Text });
 
 let audioAlert = new Audio(channelPointReactionAudio);
 let voiceBotMessage = new Audio(channelPointReactionAudio);
@@ -38,7 +45,10 @@ const LiveDonations = () => {
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
     const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
+    const [reactionsCounter, setReactionsCounter] = useState(undefined);
+    const [diaDeMuertos, setDiaDeMuertos] = useState(false);
     const { streamerId } = useParams();
+    const { t } = useTranslation();
 
     useEffect(() => {
         queueAnimation();
@@ -174,6 +184,12 @@ const LiveDonations = () => {
                 });
 
                 setGreetingsQueue(greetings);
+            });
+        }
+
+        function loadLanguage() {
+            listenStreamerDashboardUserLanguage(streamerUid, (language) => {
+                changeLanguage(language.val() ?? 'es');
             });
         }
 
@@ -325,6 +341,8 @@ const LiveDonations = () => {
                 if (isStreaming.exists() && isStreaming.val()) {
                     loadGreetings();
                     loadDonations();
+                    loadLanguage();
+                    loadReactionsCount();
                 } else {
                     removeListenerForUnreadUsersGreetings(streamerUid);
                     setGreetingsQueue([]);
@@ -341,8 +359,8 @@ const LiveDonations = () => {
                 const greeting = popGreeting();
 
                 async function showGreeting() {
-                    const voiceToUse = greeting.messageLanguage === 'en' ? 'en-US-Standard-C' : 'es-US-Standard-A';
-                    const messageToRead = `${greeting.twitchUsername} say: ${greeting.message}`;
+                    const voiceToUse = getCurrentLanguage() === 'en' ? 'en-US-Standard-C' : 'es-US-Standard-A';
+                    const messageToRead = t('LiveDonations.greetingMessage', { viewerName: greeting.twitchUsername, message: greeting.message });
 
                     const cheerMessageUrl = await speakCheerMessage(streamerUid, greeting.id, messageToRead, voiceToUse, 'en-US');
                     voiceBotMessage = new Audio(cheerMessageUrl.data);
@@ -376,7 +394,10 @@ const LiveDonations = () => {
                             if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
                                 voiceBotMessage = new Audio(TEST_MESSAGE_SPEECH_URL);
                             } else {
-                                const messageToRead = bigQoinsDonation ? `${donation.twitchUserName} sent ${donation.amountQoins} coins and says: ${donation.message}` : `${donation.twitchUserName} say: ${donation.message}`;
+                                const messageToRead = bigQoinsDonation ?
+                                    t('LiveDonations.bigQoinsDonationMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins, message: donation.message })
+                                    :
+                                    t('LiveDonations.donationMessage', { viewerName: donation.twitchUserName, message: donation.message });
 
                                 window.analytics.track('Cheer received', {
                                     user: donation.twitchUserName,
@@ -439,7 +460,10 @@ const LiveDonations = () => {
                         const qoinsDonation = donation.amountQoins && donation.amountQoins >= 100;
                         const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
 
-                        const messageToRead = bigQoinsDonation ? `${donation.twitchUserName} sent ${donation.amountQoins} coins and says: ${donation.message}` : `${donation.twitchUserName} say: ${donation.message}`;
+                        const messageToRead = bigQoinsDonation ?
+                                    t('LiveDonations.bigQoinsDonationMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins, message: donation.message })
+                                    :
+                                    t('LiveDonations.donationMessage', { viewerName: donation.twitchUserName, message: donation.message });
 
                         const voiceUuid = donation.messageExtraData.voiceAPIName.substring(9);
                         await speakCheerMessageUberDuck(donation.id, messageToRead, voiceUuid);
@@ -479,6 +503,16 @@ const LiveDonations = () => {
 
             listenToOverlayStatus();
         }
+
+        // TODO: Remove this code after Dia de Muertos event
+        async function loadReactionsCount() {
+            listenToReactionsCountDiaDeMuertos(streamerUid, (count) => {
+                setReactionsCounter(count.val() ?? 0);
+            });
+            listeToDiaDeMuertosFlag((diaDeMuertos) => {
+                setDiaDeMuertos(diaDeMuertos.val());
+            });
+        }
     }, [streamerId, streamerUid, donationQueue, greetingsQueue, listenersAreSetted, isPlayingAudio, reactionsEnabled]);
 
     function finishReaction(donation) {
@@ -494,6 +528,17 @@ const LiveDonations = () => {
         }, 750);
     }
 
+    function onReactionFailed(error, errorInfo, reaction) {
+        /**
+         * We could not play it, we save the error on database, we marked it as read and move on
+         * to the next greeting/reaction
+         */
+        markDonationAsRead(streamerUid, reaction.id);
+        setDonationToShow(null);
+        setIsPlayingAudio(false);
+        logOverlayError(streamerUid, { title: error.toString(), ...errorInfo, reaction });
+    }
+
     function finishGreeting(greetingId) {
         // Mark as read inmediately
         markGreetingAsRead(streamerUid, greetingId);
@@ -505,6 +550,17 @@ const LiveDonations = () => {
                 setIsPlayingAudio(false);
             }, 750);
         }, 5000);
+    }
+
+    function onGreetingFailed(error, errorInfo, greeting) {
+        /**
+         * We could not play it, we save the error on database, we marked it as read and move on
+         * to the next greeting/reaction
+         */
+        markGreetingAsRead(streamerUid, greeting.id);
+        setGreetingToShow(null);
+        setIsPlayingAudio(false);
+        logOverlayError(streamerUid, { title: error.toString(), ...errorInfo, greeting });
     }
 
     const queueAnimation = () => {
@@ -543,7 +599,7 @@ const LiveDonations = () => {
     document.body.style.backgroundColor = 'transparent';
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end' }}>
-            {reactionsEnabled &&
+            {reactionsEnabled && !diaDeMuertos &&
                 <div
                     onAnimationEnd={() => {
                         setPlayQaplaOnAnimation("false");
@@ -594,18 +650,30 @@ const LiveDonations = () => {
                 }}></div>
             }
             {donationToShow &&
-                <DonationHandler donationToShow={donationToShow}
-                    finishReaction={finishReaction}
-                    startDonation={startDonation}
-                    alertSideRight={alertSideRight}
-                    alertOffsets={alertOffsets} />
+                <ErrorBoundary onFail={(error, errorInfo) => onReactionFailed(error, errorInfo, donationToShow)}>
+                    <DonationHandler donationToShow={donationToShow}
+                        finishReaction={finishReaction}
+                        startDonation={startDonation}
+                        alertSideRight={alertSideRight}
+                        alertOffsets={alertOffsets} />
+                </ErrorBoundary>
             }
             {greetingToShow &&
-                <Greeting {...greetingToShow}
-                    alertSideRight={alertSideRight}
-                    alertOffsets={alertOffsets}
-                    finishGreeting={finishGreeting}
-                    startGreeting={startGreeting} />
+                <ErrorBoundary onFail={(error, errorInfo) => onGreetingFailed(error, errorInfo, greetingToShow)}>
+                    <Greeting {...greetingToShow}
+                        // For render timeout
+                        onFail={(error, errorInfo) => onGreetingFailed(error, errorInfo, greetingToShow)}
+                        alertSideRight={alertSideRight}
+                        alertOffsets={alertOffsets}
+                        finishGreeting={finishGreeting}
+                        startGreeting={startGreeting} />
+                </ErrorBoundary>
+            }
+            {diaDeMuertos && reactionsCounter !== undefined &&
+                <QlanProgressBar
+                    percentage={reactionsCounter <= 30 ? reactionsCounter / 30 : reactionsCounter / 60} // Progress percentage from 0 to 1
+                    xq={reactionsCounter < 60 ? reactionsCounter : 60}
+                />
             }
         </div>
     );
@@ -617,6 +685,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
     const [giphyTextReady, setGiphyTextReady] = useState(false);
     const [showDonation, setShowDonation] = useState(false);
     const [muteClip, setMuteClip] = useState(false);
+    const { t } = useTranslation();
     const donation = donationToShow;
 
     useEffect(() => {
@@ -735,7 +804,8 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                 onLoad={() => setGiphyTextReady(true)} />
             }
             <div style={{
-                display: 'flex'
+                display: 'flex',
+                alignItems: 'center'
             }}>
             {donation.avatar &&
                 <img src={`https://api.readyplayer.me/v1/avatars/${donation.avatar.avatarId}.png?scene=fullbody-portrait-v1-transparent`}
@@ -781,14 +851,16 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                                 <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
                                 {donation.amountQoins ?
                                     <>
-                                    <div style={{ margin: '0 6px' }}>sent</div>
+                                    <div style={{ margin: '0 6px' }}>
+                                        {t('LiveDonations.sent')}
+                                    </div>
                                     <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
                                         {`${donation.amountQoins.toLocaleString()} Qoins`}
                                     </b>
                                     </>
                                     :
                                     <b style={{ color: '#FFF', fontWeight: '700', margin: '0 6px' }}>
-                                        reacted
+                                        {t('LiveDonations.reacted')}
                                     </b>
                                 }
                             </p>
@@ -836,20 +908,81 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
     )
 }
 
-const Greeting = ({ id, startGreeting, uid, twitchUsername, animationId, avatarId, message, alertSideRight, alertOffsets, finishGreeting }) => {
+const fonts = {
+    PolychromeNano: 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/Experiments%2FMDPolychrome-Nano.otf?alt=media&token=6747a8d1-9b89-4409-9ca6-e6dc3646c7b0',
+    YerkRegulat: 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/Experiments%2FYerk-Regular.ttf?alt=media&token=0992539c-4d70-4e2c-bea4-b780df9a6514',
+    NichromeUltra: 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/Experiments%2FMDNichrome-Ultra.otf?alt=media&token=b0f618c1-fff9-4cc5-89bf-ada84365faa4'
+};
+
+const Greeting = ({ id, startGreeting, twitchUsername, animationId, avatarId, alertSideRight, alertOffsets, finishGreeting, onFail }) => {
     const [showGreeting, setShowGreeting] = useState(false);
     const [animationData, setAnimationData] = useState(null);
+    const [avatarReady, setAvatarReady] = useState(false);
+    const [textReady, setTextReady] = useState(false);
+    const [renderTimeout, setRenderTimeout] = useState(null);
+    const [textOpts, setTextOpts] = useState(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         async function getAnimation() {
             const animationData = await getAvatarAnimationData(animationId);
-            setAnimationData(animationData.val());
+            if (animationData.exists()) {
+                setAnimationData({ ...animationData.val() });
+
+                // Get random font
+                const fontsKeys = Object.keys(fonts);
+                const fontIndex = Math.floor(Math.random() * fontsKeys.length);
+                const font = fontsKeys[fontIndex];
+
+                setTextOpts({
+                    ...animationData.val().text[font],
+                    name: t('LiveDonations.viewerName', { viewerName: twitchUsername }),
+                    font
+                });
+            } else {
+                setAnimationData(undefined);
+            }
         }
 
         if (animationId) {
             getAnimation();
         }
     }, []);
+
+    useEffect(() => {
+        if (!showGreeting && avatarReady && textReady) {
+            setShowGreeting(true);
+            startGreeting();
+        }
+    }, [avatarReady, textReady, showGreeting]);
+
+    useEffect(() => {
+        if (showGreeting) {
+            /**
+             * Render Timeout error is the only timeout, but it could be duplicated so we remove all
+             * the timeouts
+             */
+            let id = setTimeout(function() {}, 0);
+
+            while (id--) {
+                clearTimeout(id);
+            }
+        } else if (!renderTimeout) {
+            setRenderTimeout(
+                setTimeout(
+                    () => {
+                        onFail('Render Timeout', {});
+                        clearTimeout(renderTimeout);
+                    },
+                    30000
+                )
+            );
+        }
+    }, [showGreeting, renderTimeout]);
+
+    if (animationData === undefined) {
+        throw new Error(`Animation ${animationId} not found`);
+    }
 
     return (
         <div style={{
@@ -860,24 +993,21 @@ const Greeting = ({ id, startGreeting, uid, twitchUsername, animationId, avatarI
             flex: 1,
             flexDirection: 'column',
             backgroundColor: '#f0f0',
-            paddingTop: '64px',
-            paddingBottom: '64px',
-            paddingLeft: alertSideRight ? '0px' : '64px',
-            paddingRight: alertSideRight ? '64px' : '0px'
+            paddingTop: '64px'
         }}>
-            {animationData &&
+            {animationData && textOpts &&
                 <>
                 <div style={{
                     display: 'flex',
                     alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                    width: '800px',
-                    height: '600px'
+                    width: '1000px',
+                    height: '1000px'
                 }}>
                     <Canvas camera={{ position: [
                                 animationData.camera.position.x,
                                 animationData.camera.position.y,
                                 animationData.camera.position.z
-                            ], aspect: animationData.camera.aspect }}
+                            ], aspect: animationData.camera.aspect ?? 1 }}
                         style={{
                             width: '100%',
                             height: '100%'
@@ -888,69 +1018,16 @@ const Greeting = ({ id, startGreeting, uid, twitchUsername, animationId, avatarI
                             <AvatarAnimation animationData={animationData}
                                 avatarId={avatarId}
                                 showGreeting={showGreeting}
-                                startGreeting={() => { setShowGreeting(true); startGreeting(); }}
+                                setAvatarReady={() => setAvatarReady(true)}
                                 finishGreeting={finishGreeting}
                                 greetingId={id} />
                         </Suspense>
+                        <Suspense fallback={null}>
+                            <Text3DTest textOpts={textOpts}
+                                showGreeting={showGreeting}
+                                setTextReady={() => setTextReady(true)} />
+                        </Suspense>
                     </Canvas>
-                </div>
-                <div style={{
-                    display: 'flex',
-                    flex: 1,
-                    flexDirection: 'column',
-                    width: '500px'
-                }}>
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-around',
-                            marginTop: '20px',
-                            width: 'fit-content',
-                            backgroundColor: '#4D00FB',
-                            borderRadius: '30px',
-                            padding: '24px 24px',
-                            alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                            zIndex: 10
-                        }}>
-                        <div style={{ display: 'flex', alignSelf: 'center' }}>
-                            <p style={{
-                                display: 'flex',
-                                color: 'white',
-                                fontSize: '26px',
-                                textAlign: 'center'
-                            }}>
-                                <b style={{ color: '#0AFFD2' }}>
-                                    {twitchUsername}
-                                </b>
-                            </p>
-                        </div>
-                    </div>
-                    <div style={{
-                        display: 'flex',
-                        width: 'fit-content',
-                        backgroundColor: '#FFFFFF',
-                        maxWidth: '500px',
-                        marginTop: '-20px',
-                        borderRadius: '30px',
-                        borderTopLeftRadius: alertSideRight ? '30px' : '0px',
-                        borderTopRightRadius: alertSideRight ? '0px' : '30px',
-                        padding: '30px',
-                        marginLeft: alertSideRight ? '0px' : '20px',
-                        marginRight: alertSideRight ? '20px' : '0px',
-                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                    }}>
-                        <p style={{
-                            display: 'flex',
-                            color: '#0D1021',
-                            fontSize: '24px',
-                            fontWeight: '600',
-                            lineHeight: '36px',
-                            letterSpacing: '0.6px'
-                        }}>
-                            {message}
-                        </p>
-                    </div>
                 </div>
                 </>
             }
@@ -967,7 +1044,7 @@ const AvatarAnimation = (props) => {
 
     useEffect(() => {
         if (scene && !props.showGreeting) {
-            props.startGreeting();
+            props.setAvatarReady();
         }
 
         if (props.showGreeting && animations && cameraReady) {
@@ -1000,7 +1077,7 @@ const AvatarAnimation = (props) => {
 
     useFrame((state, delta) => {
         if (props.showGreeting) {
-            state.camera.aspect = props.animationData.camera.aspect;
+            state.camera.aspect = 1;
             state.camera.rotation.set(
                 props.animationData.camera.rotation.x,
                 props.animationData.camera.rotation.y,
@@ -1028,6 +1105,71 @@ const AvatarAnimation = (props) => {
         <group ref={group} {...props} dispose={null}>
             <primitive object={scene} />
         </group>
+    );
+}
+
+const Text3DTest = ({ textOpts, setTextReady, showGreeting }) => {
+    const textP1 = useRef(null);
+    const textP2 = useRef(null);
+    const [text1Ready, setText1Ready] = useState(false);
+    const [text2Ready, setText2Ready] = useState(false);
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        if (!showGreeting && text1Ready /*  && text2Ready */) {
+            setTextReady();
+        }
+        setTimeout(() => {
+            setTextReady();
+        }, 10000);
+    }, [text1Ready, /* text2Ready, */ showGreeting]);
+
+    useFrame((state) => {
+        textP1.current.lookAt(state.camera.position);
+        textP2.current.lookAt(state.camera.position);
+    });
+
+    return (
+        <>
+        <mesh position={[textOpts.x, textOpts.y, textOpts.z]} onAfterRender={() => setText1Ready(true)}>
+            <text {...textOpts}
+                font={fonts[textOpts.font]}
+                ref={textP1}
+                text={textOpts.name}
+                anchorX='center'
+                anchorY='middle'
+                color='#FFF'
+                outlineBlur={0}
+                outlineOffsetX='-6%'
+                outlineOffsetY='6%'
+                outlineColor='#7000FF'
+                textAlign='center'>
+                <meshBasicMaterial attach='material'>
+                    <GradientTexture
+                        stops={[0, 1]}
+                        colors={['#FFB097', '#42FFC7']}
+                        center={[.5, .5]}
+                        rotation={1.5} />
+                </meshBasicMaterial>
+            </text>
+        </mesh>
+        <mesh position={[textOpts.x1, textOpts.y1, textOpts.z1]} onAfterRender={() => setText2Ready(true)}>
+            <text {...textOpts}
+                font={fonts[textOpts.font]}
+                ref={textP2}
+                text={t('LiveDonations.viewerArrived')}
+                anchorX='center'
+                anchorY='middle'
+                color='#FFF'
+                outlineBlur={0}
+                outlineOffsetX='-6%'
+                outlineOffsetY='6%'
+                outlineColor='#7000FF'
+                textAlign='center'>
+                <meshBasicMaterial attach='material' />
+            </text>
+        </mesh>
+        </>
     );
 }
 

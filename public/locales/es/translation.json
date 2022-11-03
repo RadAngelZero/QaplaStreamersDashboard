@@ -381,6 +381,15 @@
         "cancelStream": "Cancelar Stream",
         "cancelStreamDescription": "Usar solo en caso de emergencias 😬"
     },
+    "LiveDonations": {
+        "greetingMessage": "{{viewerName}} dice: {{message}}",
+        "bigQoinsDonationMessage": "{{viewerName}} envió {{qoins}} coins y dice: {{message}}",
+        "donationMessage": "{{viewerName}} dice: {{message}}",
+        "sent": "envió",
+        "reacted": "reaccionó",
+        "viewerName": "¡{{viewerName}}",
+        "viewerArrived": "ha llegado al stream!"
+    },
     "continue": "Continuar",
     "cancel": "Cancelar",
     "title": "Título",

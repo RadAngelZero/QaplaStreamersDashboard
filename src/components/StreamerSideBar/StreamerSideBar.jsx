@@ -178,7 +178,7 @@ const StreamerSideBar = ({ user }) => {
                 padding: '0px'
             }}>
                 <ListItem className={classes.listItem}>
-                    <LanguageSelect />
+                    <LanguageSelect uid={user?.uid ?? null} />
                 </ListItem>
                 <ListItem button className={classes.listItem} onClick={closeSession}>
                     <ListItemIcon style={{ minWidth: 40 }}>

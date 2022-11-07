@@ -127,11 +127,6 @@ const RequestActivation = ({ user }) => {
                             </li>
                             <li>
                                 <p style={{ marginTop: 16 }}>
-                                    {t('RequestActivation.customAlerts')}
-                                </p>
-                            </li>
-                            <li>
-                                <p style={{ marginTop: 16 }}>
                                     {t('RequestActivation.visibility')}
                                 </p>
                             </li>

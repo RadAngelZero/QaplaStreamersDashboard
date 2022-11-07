@@ -115,7 +115,7 @@ const StreamerProfileEditCoin = ({ user }) => {
                         }
                     }
                 } else {
-                    // history.push('/onboarding');
+                    history.push('/onboarding');
                 }
             } catch (error) {
                 console.log(error);

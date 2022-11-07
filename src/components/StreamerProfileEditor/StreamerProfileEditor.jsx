@@ -363,7 +363,7 @@ const StreamerProfileEditor = ({ user }) => {
     }
 
     const addTag = async () => {
-        setOnBoardingStep(4);
+        setOnBoardingStep(2);
         setAddingTag(true);
     }
 
@@ -421,7 +421,7 @@ const StreamerProfileEditor = ({ user }) => {
     }
 
     const editBio = () => {
-        setOnBoardingStep(3);
+        setOnBoardingStep(1);
         setEditingBio(true);
     }
 

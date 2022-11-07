@@ -38,6 +38,9 @@ const streamersDeepLinksRef = database.ref('/StreamersDeepLinks');
 const dashboardStreamersVisitsCounterRef = database.ref('/DashboardStreamersVisitsCounter');
 const uberduckRequestsRef = database.ref('/UberduckRequests');
 const streamerCashOutRef = database.ref('/StreamersCashOut');
+const streamsGreetingsRef = database.ref('/StreamsGreetings');
+const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
+const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -629,7 +632,7 @@ export function listenForLastStreamerCheers(streamerUid, limit = 10, callback) {
  * @param {function} callback Handler of the results
  */
 export function listenForUnreadStreamerCheers(streamerUid, callback) {
-    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('child_added', callback);
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).on('value', callback);
 }
 
 /**
@@ -645,7 +648,7 @@ export function listenForUnreadStreamerCheers(streamerUid, callback) {
  * @param {string} streamerUid Uid of the streamer
  */
 export function removeListenerForUnreadStreamerCheers(streamerUid) {
-    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('child_added');
+    streamersDonationsRef.child(streamerUid).orderByChild('read').equalTo(false).off('value');
 }
 
 /**
@@ -1245,4 +1248,90 @@ export async function saveStreamerCashOutRequest(uid, amountQoins, amountBits) {
             timestamp: date.getTime()
         });
     }
+}
+
+////////////////////////
+// Stream Greetings
+////////////////////////
+
+/**
+ * Listen for unread greetings
+ * @param {string} streamerUid Streamer identifier
+ * @param {function} callback Callback to handle database resposne
+ */
+export async function listenForUnreadUsersGreetings(streamerUid, callback) {
+    streamsGreetingsRef.child(streamerUid).orderByChild('read').equalTo(false).on('value', callback);
+}
+
+/**
+ * Remove listener for unread greetings
+ * @param {string} streamerUid Streamer identifier
+ * @param {function} callback Callback to handle database resposne
+ */
+export async function removeListenerForUnreadUsersGreetings(streamerUid) {
+    streamsGreetingsRef.child(streamerUid).orderByChild('read').equalTo(false).off('value');
+}
+
+/**
+ * Mark the greeting as read
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} greetingId Greeting identifier
+ */
+export async function markGreetingAsRead(streamerUid, greetingId) {
+    return await streamsGreetingsRef.child(streamerUid).child(greetingId).update({ read: true });
+}
+
+////////////////////////
+// Avatars Animations Overlay
+////////////////////////
+
+/**
+ * Gets all the given animation data
+ * @param {string} animationId Animation identifier
+ */
+export async function getAvatarAnimationData(animationId) {
+    return await avatarsAnimationsOverlayRef.child(animationId).once('value');
+}
+
+////////////////////////
+// Streamers Dashboards User Language
+////////////////////////
+
+/**
+ * Saves the language the streamer is using on their dashboard
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} language Code of the language the streamer is using ('es' || 'en')
+ */
+export async function setStreamerDashboardUserLanguage(streamerUid, language) {
+    return await streamersDashboardsUserLanguageRef.child(streamerUid).set(language);
+}
+
+/**
+ * Listen for changes on the user dashboard language
+ * @param {string} streamerUid Streamer identifier
+ * @param {function} callback Handler for database data returned
+ */
+export function listenStreamerDashboardUserLanguage(streamerUid, callback) {
+    return streamersDashboardsUserLanguageRef.child(streamerUid).on('value', callback);
+}
+
+////////////////////////
+// Overlay Errors
+////////////////////////
+
+/**
+ * Logs an error from the overlay on the database
+ * @param {string} uid User identifier
+ * @param {object} error Useful data to identify and solve the error
+ */
+export async function logOverlayError(uid, error) {
+    return await database.ref('/OverlayErrors').child(uid).push(error);
+}
+
+export async function listenToReactionsCountDiaDeMuertos(streamerUid, callback) {
+    database.ref('/ReactionsCountDiaDeMuertos').child(streamerUid).on('value', callback);
+}
+
+export async function listeToDiaDeMuertosFlag(callback) {
+    database.ref('/DiaDeMuertosEvent').on('value', callback);
 }

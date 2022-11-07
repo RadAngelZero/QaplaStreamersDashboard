@@ -347,7 +347,6 @@
         "startTrial": "Inicia tu Free Trial. ",
         "noCardRequired": "No requiere tarjeta.",
         "drops": "🪂 Recompensa a tu audiencia con Drops de Qoins",
-        "customAlerts": "🫡 Agrega valor a tus suscriptores en Twitch con alertas personalizadas",
         "visibility": "👁 Visibilidad para tu contenido fuera de Twitch",
         "startFreeTrial": "Activar Free Trial"
     },
@@ -380,6 +379,15 @@
         "limit" : "Limite de 140 caracteres",
         "cancelStream": "Cancelar Stream",
         "cancelStreamDescription": "Usar solo en caso de emergencias 😬"
+    },
+    "LiveDonations": {
+        "greetingMessage": "{{viewerName}} dice: {{message}}",
+        "bigQoinsDonationMessage": "{{viewerName}} envió {{qoins}} coins y dice: {{message}}",
+        "donationMessage": "{{viewerName}} dice: {{message}}",
+        "sent": "envió",
+        "reacted": "reaccionó",
+        "viewerName": "¡{{viewerName}}",
+        "viewerArrived": "ha llegado al stream!"
     },
     "continue": "Continuar",
     "cancel": "Cancelar",

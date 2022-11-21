@@ -22,6 +22,7 @@ import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import QlanProgressBar from '../QlanProgressBar';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
+import ChatBubbleiOS from '../ChatBubbleiOS/ChatBubbleiOS';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
 
@@ -350,7 +351,6 @@ const LiveDonations = () => {
                     loadGreetings();
                     loadDonations();
                     loadLanguage();
-                    loadReactionsCount();
                 } else {
                     removeListenerForUnreadUsersGreetings(streamerUid);
                     setGreetingsQueue([]);
@@ -538,7 +538,7 @@ const LiveDonations = () => {
     }
 
     function finishGreeting(greetingId) {
-        /* // Mark as read inmediately
+        // Mark as read inmediately
         markGreetingAsRead(streamerUid, greetingId);
 
         // Wait 5 seconds to remove from UI
@@ -547,7 +547,7 @@ const LiveDonations = () => {
             setTimeout(() => {
                 setIsPlayingAudio(false);
             }, 750);
-        }, 5000); */
+        }, 5000);
     }
 
     function onGreetingFailed(error, errorInfo, greeting) {

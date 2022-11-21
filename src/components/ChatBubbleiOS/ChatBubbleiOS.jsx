@@ -26,7 +26,7 @@ const ChatBubbleiOS = ({ children, bubbleColor = '#22f', textColor = '#fff', max
     }, [bubbleColor, textColor])
 
     return (
-        <p className={tailRight ? styles.tailRight : styles.tailLeft}>
+        <p className={`${tailRight ? styles.tailRight : styles.tailLeft} ${styles.paragrapChatBubble}`}>
             <style>{bubbleColors}</style>
             {children}
         </p>

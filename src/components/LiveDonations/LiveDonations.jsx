@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
-import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio, listenForUnreadUsersGreetings, removeListenerForUnreadUsersGreetings, markGreetingAsRead, getAvatarAnimationData, logOverlayError, listenToReactionsCountDiaDeMuertos, listeToDiaDeMuertosFlag, getStreamerDashboardUserLanguage, listenStreamerDashboardUserLanguage } from '../../services/database';
+import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio, listenForUnreadUsersGreetings, removeListenerForUnreadUsersGreetings, markGreetingAsRead, getAvatarAnimationData, logOverlayError, getStreamerDashboardUserLanguage, listenStreamerDashboardUserLanguage } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import QoinsDropsAudio from '../../assets/siu.mp3';
@@ -45,8 +45,6 @@ const LiveDonations = () => {
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
     const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
-    const [reactionsCounter, setReactionsCounter] = useState(undefined);
-    const [diaDeMuertos, setDiaDeMuertos] = useState(false);
     const { streamerId } = useParams();
     const { t } = useTranslation();
 
@@ -181,6 +179,16 @@ const LiveDonations = () => {
                 const greetings = [];
                 greetingsSnap.forEach((greeting) => {
                     greetings.unshift({ ...greeting.val(), id: greeting.key });
+                });
+
+                greetings.unshift({
+                    animationId: 'strutWalinkg',
+                    avatarId: '63587d14563a37f6d081b970',
+                    message: 'Ya llegue perros',
+                    read: false,
+                    timestamp: 1,
+                    twitchUsername: 'a',
+                    id: 'greeting'
                 });
 
                 setGreetingsQueue(greetings);
@@ -503,16 +511,6 @@ const LiveDonations = () => {
 
             listenToOverlayStatus();
         }
-
-        // TODO: Remove this code after Dia de Muertos event
-        async function loadReactionsCount() {
-            listenToReactionsCountDiaDeMuertos(streamerUid, (count) => {
-                setReactionsCounter(count.val() ?? 0);
-            });
-            listeToDiaDeMuertosFlag((diaDeMuertos) => {
-                setDiaDeMuertos(diaDeMuertos.val());
-            });
-        }
     }, [streamerId, streamerUid, donationQueue, greetingsQueue, listenersAreSetted, isPlayingAudio, reactionsEnabled]);
 
     function finishReaction(donation) {
@@ -540,7 +538,7 @@ const LiveDonations = () => {
     }
 
     function finishGreeting(greetingId) {
-        // Mark as read inmediately
+        /* // Mark as read inmediately
         markGreetingAsRead(streamerUid, greetingId);
 
         // Wait 5 seconds to remove from UI
@@ -549,7 +547,7 @@ const LiveDonations = () => {
             setTimeout(() => {
                 setIsPlayingAudio(false);
             }, 750);
-        }, 5000);
+        }, 5000); */
     }
 
     function onGreetingFailed(error, errorInfo, greeting) {
@@ -599,7 +597,7 @@ const LiveDonations = () => {
     document.body.style.backgroundColor = 'transparent';
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end' }}>
-            {reactionsEnabled && !diaDeMuertos &&
+            {reactionsEnabled &&
                 <div
                     onAnimationEnd={() => {
                         setPlayQaplaOnAnimation("false");
@@ -668,12 +666,6 @@ const LiveDonations = () => {
                         finishGreeting={finishGreeting}
                         startGreeting={startGreeting} />
                 </ErrorBoundary>
-            }
-            {diaDeMuertos && reactionsCounter !== undefined &&
-                <QlanProgressBar
-                    percentage={reactionsCounter <= 30 ? reactionsCounter / 30 : reactionsCounter / 60} // Progress percentage from 0 to 1
-                    xq={reactionsCounter < 60 ? reactionsCounter : 60}
-                />
             }
         </div>
     );

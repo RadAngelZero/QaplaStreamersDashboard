@@ -5,7 +5,7 @@ import { Video } from '@giphy/react-components';
 import * as THREE from 'three';
 import { Canvas, useFrame, extend } from '@react-three/fiber';
 import { Text } from 'troika-three-text';
-import { useGLTF, GradientTexture } from '@react-three/drei';
+import { useGLTF, GradientTexture, OrbitControls } from '@react-three/drei';
 import { useTranslation } from 'react-i18next';
 
 import styles from './LiveDonations.module.css';
@@ -20,9 +20,9 @@ import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
-import QlanProgressBar from '../QlanProgressBar';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 import ChatBubbleiOS from '../ChatBubbleiOS/ChatBubbleiOS';
+import { AlternateEmail } from '@material-ui/icons';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
 
@@ -46,6 +46,7 @@ const LiveDonations = () => {
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
     const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
+    const happyTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarHappy.glb?alt=media&token=2c2d24f1-a8bf-47be-850f-06eeda6fe885');
     const { streamerId } = useParams();
     const { t } = useTranslation();
 
@@ -180,16 +181,6 @@ const LiveDonations = () => {
                 const greetings = [];
                 greetingsSnap.forEach((greeting) => {
                     greetings.unshift({ ...greeting.val(), id: greeting.key });
-                });
-
-                greetings.unshift({
-                    animationId: 'strutWalinkg',
-                    avatarId: '63587d14563a37f6d081b970',
-                    message: 'Ya llegue perros',
-                    read: false,
-                    timestamp: 1,
-                    twitchUsername: 'a',
-                    id: 'greeting'
                 });
 
                 setGreetingsQueue(greetings);
@@ -514,7 +505,7 @@ const LiveDonations = () => {
     }, [streamerId, streamerUid, donationQueue, greetingsQueue, listenersAreSetted, isPlayingAudio, reactionsEnabled]);
 
     function finishReaction(donation) {
-        setDonationToShow(null);
+        /* setDonationToShow(null);
         setShowEmojiRain(false);
         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
             removeTestDonation(streamerUid, donation.id);
@@ -523,7 +514,7 @@ const LiveDonations = () => {
         }
         setTimeout(() => {
             setIsPlayingAudio(false);
-        }, 750);
+        }, 750); */
     }
 
     function onReactionFailed(error, errorInfo, reaction) {
@@ -653,7 +644,8 @@ const LiveDonations = () => {
                         finishReaction={finishReaction}
                         startDonation={startDonation}
                         alertSideRight={alertSideRight}
-                        alertOffsets={alertOffsets} />
+                        alertOffsets={alertOffsets}
+                        happyTalkingAnimation={happyTalkingAnimation.animations} />
                 </ErrorBoundary>
             }
             {greetingToShow &&
@@ -671,11 +663,13 @@ const LiveDonations = () => {
     );
 }
 
-const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertSideRight, alertOffsets }) => {
+const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertSideRight, alertOffsets, happyTalkingAnimation }) => {
     const [clip, setClip] = useState(null);
     const [mediaReady, setMediaReady] = useState(false);
     const [giphyTextReady, setGiphyTextReady] = useState(false);
     const [showDonation, setShowDonation] = useState(false);
+    // If the user has avatar and avatar id then mark as not ready otherwise mark as ready
+    const [avatarReady, setAvatarReady] = useState(donationToShow.avatar && donationToShow.avatar.avatarId !== '' ? false : true);
     const [muteClip, setMuteClip] = useState(false);
     const { t } = useTranslation();
     const donation = donationToShow;
@@ -690,23 +684,23 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
         if ((donation.media && (donation.media.type === GIPHY_CLIP || donation.media.type === GIPHY_CLIPS) && donation.media.id) && !clip) {
             getClip();
         } else {
-            if (donation.media && donation.messageExtraData && donation.messageExtraData.giphyText && mediaReady && giphyTextReady) {
+            if (avatarReady && donation.media && donation.messageExtraData && donation.messageExtraData.giphyText && mediaReady && giphyTextReady) {
                 displayDonation();
             }
 
-            if (!(donation.messageExtraData && donation.messageExtraData.giphyText) && donation.media && mediaReady) {
+            if (avatarReady && !(donation.messageExtraData && donation.messageExtraData.giphyText) && donation.media && mediaReady) {
                 displayDonation();
             }
 
-            if ((!donation.media) && donation.messageExtraData && donation.messageExtraData.giphyText && giphyTextReady) {
+            if (avatarReady && (!donation.media) && donation.messageExtraData && donation.messageExtraData.giphyText && giphyTextReady) {
                 displayDonation();
             }
 
-            if (donation.message && !donation.media && !(donation.messageExtraData && donation.messageExtraData.giphyText)) {
+            if (avatarReady && donation.message && !donation.media && !(donation.messageExtraData && donation.messageExtraData.giphyText)) {
                 displayDonation();
             }
         }
-    }, [clip, mediaReady, giphyTextReady]);
+    }, [avatarReady, clip, mediaReady, giphyTextReady]);
 
     const displayDonation = () => {
         setShowDonation(true);
@@ -731,18 +725,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
         }
     }
 
-    const getGradientString = (colors) => {
-        let colorString = '';
-        colors.forEach((color, index) => {
-            if (index !== colors.length - 1) {
-                colorString += `${color},`;
-            } else {
-                colorString += `${color}`;
-            }
-        });
-
-        return colorString;
-    }
+    const avatarShouldTalk = donation.avatar && donation.avatar.avatarId !== '';
 
     return (
         <div style={{
@@ -799,26 +782,63 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                 display: 'flex',
                 alignItems: 'center'
             }}>
-            {donation.avatar &&
-                <img src={`https://api.readyplayer.me/v1/avatars/${donation.avatar.avatarId}.png?scene=fullbody-portrait-v1-transparent`}
-                    height={120}
-                    width={120}
-                    style={{
-                        marginTop: 24,
-                        borderRadius: 100,
-                        alignSelf: 'center',
-                        background: donation.avatar.avatarBackground ?
-                            `linear-gradient(${donation.avatar.avatarBackground.angle}deg, ${getGradientString(donation.avatar.avatarBackground.colors)})`
-                            :
-                            'linear-gradient(95.16deg, #FF669D, #9746FF)',
-                        marginRight: '6px'
-                    }} />
-            }
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                {donation.uid &&
+                <div style={{
+                    position: 'relative',
+                    display: 'flex',
+                    justifyContent: alertSideRight ? 'flex-end' : 'flex-start'
+                }}>
+                    {avatarShouldTalk ?
+                        <Canvas camera={{
+                                position: [0, 1.6871838845728084, 0.403600876626397],
+                                aspect: 1
+                            }}
+                            style={{
+                                width: '180px',
+                                height: '180px',
+                                alignSelf: alertSideRight ? 'flex-end' : 'flex-start'
+                            }}>
+                            <ambientLight intensity={1} />
+                            <directionalLight intensity={0.4} />
+                            <OrbitControls />
+                            <Suspense fallback={null}>
+                                <TalkingAvatarAnimation avatarId={donation.avatar.avatarId}
+                                    animations={happyTalkingAnimation}
+                                    setAvatarReady={() => setAvatarReady(true)} />
+                            </Suspense>
+                        </Canvas>
+                        :
+                        <img src={donation.photoURL}
+                            height='120px'
+                            width='120px'
+                            style={{
+                                borderRadius: 100,
+                                marginRight: '6px'
+                            }} />
+                    }
+                    {(donation.message !== '' && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
+                        <div style={{
+                            position: 'absolute',
+                            top: '10px',
+                            left: alertSideRight ? undefined : (avatarShouldTalk ? '120px' : '136px'),
+                            right: alertSideRight ? (avatarShouldTalk ? '120px' : '136px') : undefined,
+                            display: 'flex',
+                            width: '400px'
+                        }}>
+                            <ChatBubbleiOS
+                                bubbleColor='#22F'
+                                textColor='#FFF'
+                                maxWidth='500px'
+                                tailRight={alertSideRight}>
+                                {donation.message}
+                            </ChatBubbleiOS>
+                        </div>
+                    }
+                </div>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
+                {donation.uid && donation.amountQoins > 0 &&
                     <div
                         style={{
                             display: 'flex',
@@ -841,20 +861,14 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                                 textAlign: 'center'
                             }}>
                                 <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
-                                {donation.amountQoins ?
-                                    <>
-                                    <div style={{ margin: '0 6px' }}>
-                                        {t('LiveDonations.sent')}
-                                    </div>
-                                    <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
-                                        {`${donation.amountQoins.toLocaleString()} Qoins`}
-                                    </b>
-                                    </>
-                                    :
-                                    <b style={{ color: '#FFF', fontWeight: '700', margin: '0 6px' }}>
-                                        {t('LiveDonations.reacted')}
-                                    </b>
-                                }
+                                <>
+                                <div style={{ margin: '0 6px' }}>
+                                    {t('LiveDonations.sent')}
+                                </div>
+                                <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
+                                    {`${donation.amountQoins.toLocaleString()} Qoins`}
+                                </b>
+                                </>
                             </p>
                         </div>
                         {donation.amountQoins ?
@@ -869,35 +883,48 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                         }
                     </div>
                 }
-                {(donation.message && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
-                    <div style={{
-                        display: 'flex',
-                        width: 'fit-content',
-                        backgroundColor: '#FFFFFF',
-                        maxWidth: '500px',
-                        marginTop: '-20px',
-                        borderRadius: '30px',
-                        borderTopLeftRadius: alertSideRight ? '30px' : '0px',
-                        borderTopRightRadius: alertSideRight ? '0px' : '30px',
-                        padding: '30px',
-                        marginLeft: alertSideRight ? '0px' : '20px',
-                        marginRight: alertSideRight ? '20px' : '0px',
-                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                    }}>
-                        <p style={{
-                            display: 'flex',
-                            color: '#0D1021',
-                            fontSize: '24px',
-                            fontWeight: '600',
-                            lineHeight: '36px',
-                            letterSpacing: '0.6px'
-                        }}>{donation.message}</p>
-                    </div>
-                }
                 </div>
             </div>
         </div>
     )
+}
+
+const TalkingAvatarAnimation = (props) => {
+    const group = useRef();
+    const { scene } = useGLTF(`https://api.readyplayer.me/v1/avatars/${props.avatarId}.glb?meshLod=1&textureAtlas=1024&pose=A&textureSizeLimit=1024`);
+    const [avatarMixer] = useState(() => new THREE.AnimationMixer());
+
+    useEffect(() => {
+        if (scene) {
+            props.setAvatarReady();
+        }
+
+        if (props.animations) {
+            avatarMixer.stopAllAction();
+            const headAnimation = avatarMixer.clipAction(props.animations[0], group.current);
+            const talkingAnimation = avatarMixer.clipAction(props.animations[3], group.current);
+
+            headAnimation.fadeIn(.5).play();
+            try {
+                talkingAnimation.fadeIn(.5).play();
+            } catch (error) {
+                alert(error);
+            }
+        }
+    }, [props.animations, avatarMixer, scene]);
+
+    useFrame((state, delta) => {
+        state.camera.lookAt(state.camera.position);
+        state.camera.updateProjectionMatrix();
+
+        avatarMixer.update(delta);
+    });
+
+    return (
+        <group ref={group} {...props} dispose={null}>
+            <primitive object={scene} />
+        </group>
+    );
 }
 
 const fonts = {

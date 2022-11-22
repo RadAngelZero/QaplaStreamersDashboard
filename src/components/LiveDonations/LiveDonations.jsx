@@ -22,7 +22,6 @@ import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 import ChatBubbleiOS from '../ChatBubbleiOS/ChatBubbleiOS';
-import { AlternateEmail } from '@material-ui/icons';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
 
@@ -585,7 +584,6 @@ const LiveDonations = () => {
         voiceBotMessage.play();
     }
 
-    document.body.style.backgroundColor = 'transparent';
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end' }}>
             {reactionsEnabled &&
@@ -670,6 +668,11 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
     const [showDonation, setShowDonation] = useState(false);
     // If the user has avatar and avatar id then mark as not ready otherwise mark as ready
     const [avatarReady, setAvatarReady] = useState(donationToShow.avatar && donationToShow.avatar.avatarId !== '' ? false : true);
+    /**
+     * Qoins Bubble should only appear if we have a channel points reaction without TTS or if the donation has
+     * more than 0 Qoins
+     */
+    const [showQoinsBubble, setShowQoinsBubble] = useState(donationToShow.uid && ((donationToShow.amountQoins <= 0 && !donationToShow.message) || donationToShow.amountQoins > 0));
     const [muteClip, setMuteClip] = useState(false);
     const { t } = useTranslation();
     const donation = donationToShow;
@@ -701,6 +704,29 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
             }
         }
     }, [avatarReady, clip, mediaReady, giphyTextReady]);
+
+    useEffect(() => {
+        if (showDonation && showQoinsBubble) {
+            // If the donation has Qoins
+            if (donation.amountQoins > 0) {
+                // If the donation has message
+                if (donation.message) {
+                    // Hide bubble after X time
+                    setTimeout(() => {
+                        setShowQoinsBubble(false);
+                    }, 1645.714);
+                }
+                // If the donation don´t have message we never hide the bubble
+            // If the donation does not have Qoins
+            } else {
+                // If the donation has message
+                if (donation.message) {
+                    // Hide bubble inmediately
+                    setShowQoinsBubble(false);
+                }
+            }
+        }
+    }, [showDonation, showQoinsBubble]);
 
     const displayDonation = () => {
         setShowDonation(true);
@@ -768,19 +794,72 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                 }
                 </>
             }
-            {donation.messageExtraData && donation.messageExtraData.giphyText &&
-                <img src={donation.messageExtraData.giphyText.url} alt='' style={{
-                    aspectRatio: donation.messageExtraData.giphyText.width / donation.messageExtraData.giphyText.height,
-                    display: 'flex',
-                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                    maxHeight: '250px',
-                    objectFit: 'scale-down'
-                }}
-                onLoad={() => setGiphyTextReady(true)} />
-            }
+            <div style={{
+                display: showQoinsBubble ? 'flex' : 'none',
+                marginTop: '40px'
+            }}>
+                {donation.message === '' &&
+                    <img src={donation.photoURL}
+                        height='120px'
+                        width='120px'
+                        style={{
+                            borderRadius: 100,
+                            marginRight: '6px'
+                        }} />
+                }
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                        marginTop: '20px',
+                        width: 'fit-content',
+                        backgroundColor: '#4D00FB',
+                        borderRadius: '30px',
+                        padding: '24px 24px',
+                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                        zIndex: 10
+                    }}>
+                    <div style={{ display: 'flex', alignSelf: 'center' }}>
+                        <p style={{
+                            display: 'flex',
+                            color: 'white',
+                            fontSize: '26px',
+                            textAlign: 'center'
+                        }}>
+                            <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
+                            {donation.amountQoins ?
+                                <>
+                                <div style={{ margin: '0 6px' }}>
+                                    {t('LiveDonations.sent')}
+                                </div>
+                                <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
+                                    {`${donation.amountQoins.toLocaleString()} Qoins`}
+                                </b>
+                                </>
+                                :
+                                <div style={{ margin: '0 6px' }}>
+                                    {t('LiveDonations.reacted')}
+                                </div>
+                            }
+                        </p>
+                    </div>
+                    {donation.amountQoins ?
+                        <>
+                        <div style={{ width: '10px' }}></div>
+                        <div style={{ display: 'flex', alignSelf: 'center' }}>
+                            <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
+                        </div>
+                        </>
+                        :
+                        null
+                    }
+                </div>
+            </div>
             <div style={{
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                opacity: showQoinsBubble ? 0 : 1
             }}>
                 <div style={{
                     position: 'relative',
@@ -815,12 +894,31 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                                 marginRight: '6px'
                             }} />
                     }
+                    {donation.messageExtraData && donation.messageExtraData.giphyText &&
+                        <div style={{
+                            position: 'absolute',
+                            top: '-25px',
+                            left: alertSideRight ? undefined : '120px',
+                            right: alertSideRight ? '120px' : undefined,
+                            display: 'flex',
+                            width: '400px'
+                        }}>
+                            <img src={donation.messageExtraData.giphyText.url} alt='' style={{
+                                aspectRatio: donation.messageExtraData.giphyText.width / donation.messageExtraData.giphyText.height,
+                                display: 'flex',
+                                alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                                maxHeight: '250px',
+                                objectFit: 'scale-down'
+                            }}
+                            onLoad={() => setGiphyTextReady(true)} />
+                        </div>
+                    }
                     {(donation.message !== '' && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
                         <div style={{
                             position: 'absolute',
                             top: '10px',
-                            left: alertSideRight ? undefined : (avatarShouldTalk ? '120px' : '136px'),
-                            right: alertSideRight ? (avatarShouldTalk ? '120px' : '136px') : undefined,
+                            left: alertSideRight ? undefined : '136px',
+                            right: alertSideRight ? '136px' : undefined,
                             display: 'flex',
                             width: '400px'
                         }}>
@@ -833,56 +931,6 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                             </ChatBubbleiOS>
                         </div>
                     }
-                </div>
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
-                {donation.uid && donation.amountQoins > 0 &&
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-around',
-                            marginTop: '20px',
-                            width: 'fit-content',
-                            backgroundColor: '#4D00FB',
-                            borderRadius: '30px',
-                            padding: '24px 24px',
-                            alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                            zIndex: 10
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignSelf: 'center' }}>
-                            <p style={{
-                                display: 'flex',
-                                color: 'white',
-                                fontSize: '26px',
-                                textAlign: 'center'
-                            }}>
-                                <b style={{ color: '#0AFFD2' }}>{`${donation.twitchUserName} `}</b>
-                                <>
-                                <div style={{ margin: '0 6px' }}>
-                                    {t('LiveDonations.sent')}
-                                </div>
-                                <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
-                                    {`${donation.amountQoins.toLocaleString()} Qoins`}
-                                </b>
-                                </>
-                            </p>
-                        </div>
-                        {donation.amountQoins ?
-                            <>
-                            <div style={{ width: '10px' }}></div>
-                            <div style={{ display: 'flex', alignSelf: 'center' }}>
-                                <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
-                            </div>
-                            </>
-                            :
-                            null
-                        }
-                    </div>
-                }
                 </div>
             </div>
         </div>
@@ -905,11 +953,7 @@ const TalkingAvatarAnimation = (props) => {
             const talkingAnimation = avatarMixer.clipAction(props.animations[3], group.current);
 
             headAnimation.fadeIn(.5).play();
-            try {
-                talkingAnimation.fadeIn(.5).play();
-            } catch (error) {
-                alert(error);
-            }
+            talkingAnimation.fadeIn(.5).play();
         }
     }, [props.animations, avatarMixer, scene]);
 

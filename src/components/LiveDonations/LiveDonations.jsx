@@ -406,7 +406,7 @@ const LiveDonations = () => {
                                 voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                             }
                         } else if (bigQoinsDonation) {
-                            const messageToRead = `${donation.twitchUserName} sent ${donation.amountQoins} Coins`;
+                            const messageToRead = t('LiveDonations.qoinsWithoutMessage', { viewerName: donation.twitchUserName, message: donation.amountQoins });;
 
                             window.analytics.track('Cheer received', {
                                 user: donation.twitchUserName,

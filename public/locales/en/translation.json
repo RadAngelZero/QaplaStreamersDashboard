@@ -387,6 +387,7 @@
     "LiveDonations": {
         "greetingMessage": "{{viewerName}} say: {{message}}",
         "bigQoinsDonationMessage": "{{viewerName}} sent {{qoins}} coins and says: {{message}}",
+        "qoinsWithoutMessage": "{{viewerName}} sent {{qoins}} Coins",
         "donationMessage": "{{viewerName}} say: {{message}}",
         "sent": "sent",
         "reacted": "reacted",

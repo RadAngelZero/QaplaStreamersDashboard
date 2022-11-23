@@ -106,7 +106,7 @@ const LiveDonations = () => {
                                     alertsOffsets.left = '40%';
                                     break;
                                 case 3:
-                                    alertsOffsets.left = '65%';
+                                    alertsOffsets.left = '71%';
                                     break;
                                 default:
                                     break;
@@ -504,7 +504,7 @@ const LiveDonations = () => {
     }, [streamerId, streamerUid, donationQueue, greetingsQueue, listenersAreSetted, isPlayingAudio, reactionsEnabled]);
 
     function finishReaction(donation) {
-        /* setDonationToShow(null);
+        setDonationToShow(null);
         setShowEmojiRain(false);
         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
             removeTestDonation(streamerUid, donation.id);
@@ -513,7 +513,7 @@ const LiveDonations = () => {
         }
         setTimeout(() => {
             setIsPlayingAudio(false);
-        }, 750); */
+        }, 750);
     }
 
     function onReactionFailed(error, errorInfo, reaction) {
@@ -674,6 +674,9 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
      */
     const [showQoinsBubble, setShowQoinsBubble] = useState(donationToShow.uid && ((donationToShow.amountQoins <= 0 && !donationToShow.message) || donationToShow.amountQoins > 0));
     const [muteClip, setMuteClip] = useState(false);
+    const [animationData, setAnimationData] = useState(null);
+    const [showMessage, setShowMessage] = useState(donationToShow.avatar && donationToShow.avatar.avatarId !== '' && donationToShow.avatar.avatarAnimationId ? false : true);
+    const [avatarFinishPosition, setAvatarFinishPosition] = useState(undefined);
     const { t } = useTranslation();
     const donation = donationToShow;
 
@@ -728,6 +731,21 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
         }
     }, [showDonation, showQoinsBubble]);
 
+    useEffect(() => {
+        async function getAnimation() {
+            const animationData = await getAvatarAnimationData(donation.avatar.avatarAnimationId);
+            if (animationData.exists()) {
+                setAnimationData({ ...animationData.val() });
+            } else {
+                setAnimationData(undefined);
+            }
+        }
+
+        if (donation.avatar && donation.avatar.avatarId !== '' && donation.avatar.avatarAnimationId) {
+            getAnimation();
+        }
+    }, []);
+
     const displayDonation = () => {
         setShowDonation(true);
         startDonation();
@@ -751,7 +769,14 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
         }
     }
 
-    const avatarShouldTalk = donation.avatar && donation.avatar.avatarId !== '';
+    const avatarAnimationFinished = (coords) => {
+        setAvatarFinishPosition(coords);
+        setShowMessage(true);
+    }
+
+    const avatarShouldTalk = donation.avatar && donation.avatar.avatarId !== '' && !donation.avatar.avatarAnimationId;
+
+    const avatarShouldDance = donation.avatar && donation.avatar.avatarId !== '' && donation.avatar.avatarAnimationId;
 
     return (
         <div style={{
@@ -795,8 +820,11 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                 </>
             }
             <div style={{
-                display: showQoinsBubble ? 'flex' : 'none',
-                marginTop: '40px'
+                display: 'flex',
+                opacity: showQoinsBubble ? 1 : 0,
+                alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                height: showQoinsBubble ? undefined : 0,
+                marginTop: showQoinsBubble ?  ' 40px' : 0
             }}>
                 {donation.message === '' &&
                     <img src={donation.photoURL}
@@ -859,49 +887,73 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                opacity: showQoinsBubble ? 0 : 1
+                opacity: showQoinsBubble ? 0 : 1,
             }}>
                 <div style={{
                     position: 'relative',
                     display: 'flex',
+                    width: '100%',
                     justifyContent: alertSideRight ? 'flex-end' : 'flex-start'
                 }}>
-                    {avatarShouldTalk ?
-                        <Canvas camera={{
-                                position: [0, 1.6871838845728084, 0.403600876626397],
-                                aspect: 1
-                            }}
+                    {avatarShouldDance ?
+                        <Canvas
                             style={{
-                                width: '180px',
-                                height: '180px',
-                                alignSelf: alertSideRight ? 'flex-end' : 'flex-start'
+                                width: '400px',
+                                height: '400px',
+                                alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                                transform: alertSideRight ? undefined : 'rotateY(180deg)'
                             }}>
                             <ambientLight intensity={1} />
                             <directionalLight intensity={0.4} />
                             <OrbitControls />
-                            <Suspense fallback={null}>
-                                <TalkingAvatarAnimation avatarId={donation.avatar.avatarId}
-                                    animations={happyTalkingAnimation}
-                                    setAvatarReady={() => setAvatarReady(true)} />
-                            </Suspense>
+                            {animationData &&
+                                <Suspense fallback={null}>
+                                    <AvatarAnimationReaction animationData={animationData}
+                                        avatarId={donation.avatar.avatarId}
+                                        playAnimation={!showQoinsBubble}
+                                        setAvatarReady={() => setAvatarReady(true)}
+                                        showMessage={avatarAnimationFinished} />
+                                </Suspense>
+                            }
                         </Canvas>
                         :
-                        <img src={donation.photoURL}
-                            height='120px'
-                            width='120px'
-                            style={{
-                                borderRadius: 100,
-                                marginRight: '6px'
-                            }} />
+                        avatarShouldTalk ?
+                            <Canvas camera={{
+                                    position: [0, 1.6871838845728084, 0.403600876626397],
+                                    aspect: 1
+                                }}
+                                style={{
+                                    width: '180px',
+                                    height: '180px',
+                                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start'
+                                }}>
+                                <ambientLight intensity={1} />
+                                <directionalLight intensity={0.4} />
+                                <OrbitControls />
+                                <Suspense fallback={null}>
+                                    <TalkingAvatarAnimation avatarId={donation.avatar.avatarId}
+                                        animations={happyTalkingAnimation}
+                                        setAvatarReady={() => setAvatarReady(true)} />
+                                </Suspense>
+                            </Canvas>
+                            :
+                            <img src={donation.photoURL}
+                                height='120px'
+                                width='120px'
+                                style={{
+                                    borderRadius: 100,
+                                    marginRight: '6px'
+                                }} />
                     }
                     {donation.messageExtraData && donation.messageExtraData.giphyText &&
                         <div style={{
                             position: 'absolute',
-                            top: '-25px',
-                            left: alertSideRight ? undefined : '120px',
-                            right: alertSideRight ? '120px' : undefined,
+                            top: avatarShouldDance ? '50px' : '-25px',
+                            left: alertSideRight ? undefined : (avatarShouldDance ? '300px' : '120px'),
+                            right: alertSideRight ? (avatarShouldDance ? '420px' : '256px') : undefined,
                             display: 'flex',
-                            width: '400px'
+                            width: '400px',
+                            opacity: showMessage ? 1 : 0
                         }}>
                             <img src={donation.messageExtraData.giphyText.url} alt='' style={{
                                 aspectRatio: donation.messageExtraData.giphyText.width / donation.messageExtraData.giphyText.height,
@@ -916,16 +968,18 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                     {(donation.message !== '' && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
                         <div style={{
                             position: 'absolute',
-                            top: '10px',
-                            left: alertSideRight ? undefined : '136px',
-                            right: alertSideRight ? '136px' : undefined,
+                            top: avatarShouldDance ? (avatarFinishPosition ? '100px' : '20px') : '10px',
+                            left: alertSideRight ? undefined : (avatarShouldDance ? (avatarFinishPosition ? '110px' : '250px') :'136px'),
+                            right: alertSideRight ? (avatarShouldDance ? (avatarFinishPosition ? '320px' : '220px') : '136px') : undefined,
                             display: 'flex',
-                            width: '400px'
+                            width: '400px',
+                            justifyContent: alertSideRight ? 'flex-end' : 'flex-start',
+                            opacity: showMessage ? 1 : 0
                         }}>
                             <ChatBubbleiOS
                                 bubbleColor='#22F'
                                 textColor='#FFF'
-                                maxWidth='500px'
+                                maxWidth='400px'
                                 tailRight={alertSideRight}>
                                 {donation.message}
                             </ChatBubbleiOS>
@@ -967,6 +1021,68 @@ const TalkingAvatarAnimation = (props) => {
     return (
         <group ref={group} {...props} dispose={null}>
             <primitive object={scene} />
+        </group>
+    );
+}
+
+const AvatarAnimationReaction = (props) => {
+    const group = useRef();
+    const avatarRef = useRef();
+    const { scene } = useGLTF(`https://api.readyplayer.me/v1/avatars/${props.avatarId}.glb`);
+    const { animations } = useGLTF(props.animationData.url);
+    const [avatarMixer] = useState(() => new THREE.AnimationMixer());
+    const [cameraReady, setCameraReady] = useState(false);
+
+    useEffect(() => {
+        if (scene) {
+            props.setAvatarReady();
+        }
+
+        if (props.playAnimation && animations && cameraReady) {
+            const animation = avatarMixer.clipAction(animations[0], group.current);
+
+            if (!props.animationData.loop) {
+                avatarMixer.addEventListener('finished', (e) => {
+                    avatarMixer.removeEventListener('finished');
+                    props.showMessage(group.current.position);
+                });
+            } else {
+                props.showMessage();
+            }
+
+            animation.clampWhenFinished = !props.animationData.loop;
+
+            animation.fadeIn(.5).play().setLoop(props.animationData.loop ? THREE.LoopRepeat : THREE.LoopOnce);
+        }
+    }, [animations, avatarMixer, avatarMixer, cameraReady, scene, props.playAnimation]);
+
+    useFrame((state, delta) => {
+        state.camera.aspect = 1;
+        state.camera.rotation.set(
+            props.animationData.camera.rotation.x,
+            props.animationData.camera.rotation.y,
+            props.animationData.camera.rotation.z
+        );
+        state.camera.position.lerp(
+            (new THREE.Vector3(
+                    props.animationData.camera.position.x,
+                    props.animationData.camera.position.y,
+                    props.animationData.camera.position.z
+                )
+            ),
+            1
+        );
+        state.camera.updateProjectionMatrix();
+        if (!cameraReady) {
+            setCameraReady(true);
+        }
+
+        avatarMixer.update(delta);
+    });
+
+    return (
+        <group ref={group} {...props} dispose={null}>
+            <primitive object={scene} ref={avatarRef} />
         </group>
     );
 }

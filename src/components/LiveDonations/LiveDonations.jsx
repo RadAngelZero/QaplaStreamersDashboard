@@ -406,7 +406,7 @@ const LiveDonations = () => {
                                 voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                             }
                         } else if (bigQoinsDonation) {
-                            const messageToRead = t('LiveDonations.qoinsWithoutMessage', { viewerName: donation.twitchUserName, message: donation.amountQoins });;
+                            const messageToRead = t('LiveDonations.qoinsWithoutMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins });;
 
                             window.analytics.track('Cheer received', {
                                 user: donation.twitchUserName,
@@ -769,6 +769,19 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
         }
     }
 
+    const getGradientString = (colors) => {
+        let colorString = '';
+        colors.forEach((color, index) => {
+            if (index !== colors.length - 1) {
+                colorString += `${color},`;
+            } else {
+                colorString += `${color}`;
+            }
+        });
+
+        return colorString;
+    }
+
     const avatarAnimationFinished = (coords) => {
         setAvatarFinishPosition(coords);
         setShowMessage(true);
@@ -826,14 +839,29 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                 height: showQoinsBubble ? undefined : 0,
                 marginTop: showQoinsBubble ?  ' 40px' : 0
             }}>
-                {donation.message === '' &&
-                    <img src={donation.photoURL}
-                        height='120px'
-                        width='120px'
-                        style={{
-                            borderRadius: 100,
-                            marginRight: '6px'
-                        }} />
+                {donation.message === '' && donation.uid !== 'Anonymus' &&
+                    (donation.avatar ?
+                        <img src={`https://api.readyplayer.me/v1/avatars/${donation.avatar.avatarId}.png?scene=fullbody-portrait-v1-transparent`}
+                            height='120px'
+                            width='120px'
+                            style={{
+                                borderRadius: 100,
+                                alignSelf: 'center',
+                                background: donation.avatar.avatarBackground ?
+                                    `linear-gradient(${donation.avatar.avatarBackground.angle}deg, ${getGradientString(donation.avatar.avatarBackground.colors)})`
+                                    :
+                                    `linear-gradient(95.16deg, #FF669D, #9746FF)`,
+                                marginRight: '6px'
+                            }} />
+                        :
+                        <img src={donation.photoURL}
+                            height='120px'
+                            width='120px'
+                            style={{
+                                borderRadius: 100,
+                                marginRight: '6px'
+                            }} />
+                    )
                 }
                 <div
                     style={{
@@ -937,13 +965,16 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                                 </Suspense>
                             </Canvas>
                             :
-                            <img src={donation.photoURL}
-                                height='120px'
-                                width='120px'
-                                style={{
-                                    borderRadius: 100,
-                                    marginRight: '6px'
-                                }} />
+                            donation.uid !== 'Anonymus' ?
+                                <img src={donation.photoURL}
+                                    height='120px'
+                                    width='120px'
+                                    style={{
+                                        borderRadius: 100,
+                                        marginRight: '6px'
+                                    }} />
+                                :
+                                null
                     }
                     {donation.messageExtraData && donation.messageExtraData.giphyText &&
                         <div style={{
@@ -969,8 +1000,8 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                         <div style={{
                             position: 'absolute',
                             top: avatarShouldDance ? (avatarFinishPosition ? '100px' : '20px') : '10px',
-                            left: alertSideRight ? undefined : (avatarShouldDance ? (avatarFinishPosition ? '110px' : '250px') :'136px'),
-                            right: alertSideRight ? (avatarShouldDance ? (avatarFinishPosition ? '320px' : '220px') : '136px') : undefined,
+                            left: alertSideRight ? undefined : (avatarShouldDance ? (avatarFinishPosition ? '320px' : '250px') :'136px'),
+                            right: alertSideRight ? (avatarShouldDance ? (avatarFinishPosition ? '320px' : '230px') : '136px') : undefined,
                             display: 'flex',
                             width: '400px',
                             justifyContent: alertSideRight ? 'flex-end' : 'flex-start',

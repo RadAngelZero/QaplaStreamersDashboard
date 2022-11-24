@@ -40,6 +40,17 @@ window.onbeforeunload = function () {
 // Remove navigation prompt
 window.onbeforeunload = null;
 
+/**
+ * Most of our pages need a background color of #0D1021 but not all, this container ensures
+ * to apply the right background color to any page, especially because in some cases (like on
+ * LiveDonations component) we need the background color to be applied inmediately
+ */
+const PageContainer = ({ backgroundColor = '#0D1021', children }) => (
+    <div style={{ backgroundColor, minHeight: '100vh', minWidth: '100vw' }}>
+        {children}
+    </div>
+);
+
 const Routes = ({ user, games, qoinsDrops }) => {
     const history = useHistory();
     const { t } = useTranslation();
@@ -55,52 +66,82 @@ const Routes = ({ user, games, qoinsDrops }) => {
     return (
         <Switch>
             <Route exact path='/'>
-                <StreamersSignin user={user} title={t('StreamersSignin.welcome')} />
+                <PageContainer>
+                    <StreamersSignin user={user} title={t('StreamersSignin.welcome')} />
+                </PageContainer>
             </Route>
             <Route exact path='/signin'>
-                <StreamersSignin user={user} title={t('StreamersSignin.welcome')} />
+                <PageContainer>
+                    <StreamersSignin user={user} title={t('StreamersSignin.welcome')} />
+                </PageContainer>
             </Route>
             <Route exact path='/welcome'>
                 <StreamerOnBoarding user={user} />
             </Route>
             <Route exact path='/create'>
-                <NewStream user={user} games={games} qoinsDrops={qoinsDrops} />
+                <PageContainer>
+                    <NewStream user={user} games={games} qoinsDrops={qoinsDrops} />
+                </PageContainer>
             </Route>
             <Route exact path='/edit/:streamId'>
-                <EditStreamerEvent user={user} games={games} />
+                <PageContainer>
+                    <EditStreamerEvent user={user} games={games} />
+                </PageContainer>
             </Route>
             <Route exact path='/profile'>
-                <StreamerProfile user={user} games={games} qoinsDrops={qoinsDrops} />
+                <PageContainer>
+                    <StreamerProfile user={user} games={games} qoinsDrops={qoinsDrops} />
+                </PageContainer>
             </Route>
             <Route exact path='/success'>
-                <EventSent user={user} />
+                <PageContainer>
+                    <EventSent user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/liveDonations/:streamerId'>
-                <LiveDonations user={user} />
+                <PageContainer backgroundColor='transparent'>
+                    <LiveDonations user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/settings'>
-                <Settings user={user} />
+                <PageContainer>
+                    <Settings user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/membership'>
-                <PlanPicker user={user} />
+                <PageContainer>
+                    <PlanPicker user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/buyStreams'>
-                <StreamsPackages user={user} games={games} />
+                <PageContainer>
+                    <StreamsPackages user={user} games={games} />
+                </PageContainer>
             </Route>
             <Route exact path='/editProfile'>
-                <StreamerProfileEditor user={user} />
+                <PageContainer>
+                    <StreamerProfileEditor user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/successCheckout'>
-                <ChargeConfirmationPage user={user} />
+                <PageContainer>
+                    <ChargeConfirmationPage user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/onboarding'>
-                <OnBoarding user={user} />
+                <PageContainer>
+                    <OnBoarding user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/freeTrial'>
-                <RequestActivation user={user} />
+                <PageContainer>
+                    <RequestActivation user={user} />
+                </PageContainer>
             </Route>
             <Route exact path='/giphyTextGenerator/:uid/:text'>
-                <GiphyTextGenerator user={user} />
+                <PageContainer>
+                    <GiphyTextGenerator user={user} />
+                </PageContainer>
             </Route>
             {/* <Route exact path='/lottery'>
                 <Lottery user={user} />

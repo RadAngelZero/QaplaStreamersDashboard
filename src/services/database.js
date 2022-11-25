@@ -41,7 +41,7 @@ const streamerCashOutRef = database.ref('/StreamersCashOut');
 const streamsGreetingsRef = database.ref('/StreamsGreetings');
 const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
 const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
-const reactionsPrices = database.ref('/ReactionsPrices');
+const reactionsPricesRef = database.ref('/ReactionsPrices');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1329,18 +1329,25 @@ export async function logOverlayError(uid, error) {
     return await database.ref('/OverlayErrors').child(uid).push(error);
 }
 
-export async function listenToReactionsCountDiaDeMuertos(streamerUid, callback) {
-    database.ref('/ReactionsCountDiaDeMuertos').child(streamerUid).on('value', callback);
+////////////////////////
+// Reactions Prices
+////////////////////////
+
+/**
+ * Returns the price of the given reaction level
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} level Reaction level to get
+ */
+export async function getReactionPriceByLevel(streamerUid, level) {
+    return await reactionsPricesRef.child(streamerUid).child(level).once('value');
 }
 
-export async function listeToDiaDeMuertosFlag(callback) {
-    database.ref('/DiaDeMuertosEvent').on('value', callback);
-}
-
-export async function getReactionsPrices(streamerUid) {
-    return await reactionsPrices.child(streamerUid).once('value');
-}
-
-export async function setReactionPrice(streamerUid, child, value) {
-    return await reactionsPrices.child(streamerUid).child(child).set(value);
+/**
+ * Sets the price of the given reaction level
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} level Reaction level to update
+ * @param {number} newPrice New price of the reaction
+ */
+export async function setReactionPrice(streamerUid, level, newPrice) {
+    return await reactionsPricesRef.child(streamerUid).child(level).set(newPrice);
 }

@@ -5,12 +5,13 @@ import style from './ReactionCard.module.css';
 import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
 import { ReactComponent as Qoin } from './../../assets/DonatedQoin.svg';
 import { REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from "../../utilities/Constants";
-import { getInteractionsRewardData, getReactionsPrices, setReactionPrice, updateStreamerProfile } from "../../services/database";
+import { getInteractionsRewardData, getReactionPriceByLevel, setReactionPrice, updateStreamerProfile } from "../../services/database";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { refreshUserAccessToken } from "../../services/functions";
-import { getCustomReward } from "../../services/twitch";
+import { getCustomReward, updateCustomReward } from "../../services/twitch";
 import { CircularProgress, makeStyles } from "@material-ui/core";
+import { auth } from "../../services/firebase";
 
 const useStyles = makeStyles((theme) => ({
     circularProgress: {
@@ -25,8 +26,8 @@ const ReactionCard = ({
     subtitle,
     textMaxWidth = '100%',
     type,
+    reactionLevel = 1,
     user,
-    FBNode,
     defaultCost,
     background,
     backgroundURL,
@@ -35,36 +36,30 @@ const ReactionCard = ({
     backgroundPosX = '50%',
     backgroundPosY = '50%',
 }) => {
-    const { t } = useTranslation();
-    const history = useHistory();
-    const classes = useStyles();
-
     const [cost, setCost] = useState(null);
     const [newCost, setNewCost] = useState(null);
     const [rewardId, setRewardId] = useState(null);
     const [editingCost, setEditingCost] = useState(false);
     const [updatingCost, setUpdatingCost] = useState(false);
-
     const inputRef = useRef(null);
+    const { t } = useTranslation();
+    const history = useHistory();
+    const classes = useStyles();
+
+    const level = `level${reactionLevel}`;
 
     useEffect(() => {
-        async function getPricesData() {
+        async function getPriceData() {
             try {
-                const pricesData = await getReactionsPrices(user.uid);
-                if (pricesData.exists()) {
-                    if (pricesData.child(FBNode).exists()) {
-                        setCost(pricesData.child(FBNode).val());
-                    } else {
-                        setReactionPrice(user.uid, FBNode, defaultCost);
-                        setCost(defaultCost);
-                    }
+                const price = await getReactionPriceByLevel(user.uid, level);
+                if (price.exists()) {
+                    setCost(price.val());
                 } else {
-                    setReactionPrice(user.uid, FBNode, defaultCost);
                     setCost(defaultCost);
                 }
             } catch (error) {
                 if (type === REACTION_CARD_QOINS) {
-                    console.log('error on qoins card: ' + FBNode);
+                    console.log('error on qoins card: ' + level);
                 } else {
                     console.log('error on channel points card');
                 }
@@ -82,17 +77,16 @@ const ReactionCard = ({
                         updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
                         const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
                         if (reward && reward.id) {
-                            // setRewardName(reward.title);
                             setCost(reward.cost);
-                            // setRewardBackgroundColor(reward.background_color);
-                            // setReactionsEnabled(!reward.is_paused);
-                            // setTitleCheckbox(t(!reward.is_paused ? 'StreamerProfile.StreamerProfileEditCoin.enabled' : 'StreamerProfile.StreamerProfileEditCoin.disabled'));
                             setRewardId(reward.id);
                         } else if (reward === 404) {
                             history.push('/onboarding');
                         }
                     } else {
-                        history.push('/onboarding');
+                        // Refresh token is useless, signout user
+                        alert(t('StreamCard.sessionExpired'));
+                        await auth.signOut();
+                        history.push('/');
                     }
                 } else {
                     history.push('/onboarding');
@@ -103,14 +97,14 @@ const ReactionCard = ({
         }
 
         if (user.uid && cost === null && type === REACTION_CARD_QOINS) {
-            getPricesData();
+            getPriceData();
         }
         if (user.uid && cost === null && type === REACTION_CARD_CHANNEL_POINTS) {
             getChannelPointRewardData();
         }
-    }, [FBNode, cost, defaultCost, history, type, user.id, user.refreshToken, user.uid]);
+    }, [cost, defaultCost, history, type, user.id, user.refreshToken, user.uid, reactionLevel]);
 
-    const HandleButton = () => {
+    const handleButton = async () => {
         if (updatingCost) {
             return;
         }
@@ -120,13 +114,15 @@ const ReactionCard = ({
             setTimeout(() => {
                 inputRef.current.focus();
             }, 100);
+
             return;
         }
 
         let newCostInt = parseInt(newCost);
-        
+
         if (cost === newCost) {
             setEditingCost(false);
+
             return;
         }
 
@@ -134,27 +130,38 @@ const ReactionCard = ({
         setEditingCost(false);
 
         if (type === REACTION_CARD_QOINS) {
-            setReactionPrice(user.uid, FBNode, newCostInt);
-            // on success
+            await setReactionPrice(user.uid, level, newCostInt);
             setCost(newCostInt);
             setUpdatingCost(false);
             return;
         }
 
         if (type === REACTION_CARD_CHANNEL_POINTS) {
+            const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
 
-            //on success
-            setCost(newCostInt);
-            setUpdatingCost(false);
-            return;
+            if (userTokensUpdated.data.status === 200) {
+                const userCredentialsUpdated = userTokensUpdated.data;
+                updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+                const rewardUpdated = await updateCustomReward(
+                    user.id,
+                    userCredentialsUpdated.access_token,
+                    rewardId,
+                    {
+                        cost: newCostInt
+                    }
+                );
+
+                if (rewardUpdated.status === 200) {
+                    setCost(newCostInt);
+                    setUpdatingCost(false);
+
+                    return;
+                }
+            }
         }
-        setTimeout(() => {
-            setUpdatingCost(false);
-        }, 1000)
     }
 
-    const HandleCost = (e) => {
-        console.log(e.target.value);
+    const handleCost = (e) => {
         setNewCost(e.target.value);
     }
 
@@ -240,10 +247,10 @@ const ReactionCard = ({
                         value={editingCost ? newCost : cost}
                         disabled={!editingCost}
                         onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                        onChange={HandleCost}
+                        onChange={handleCost}
                     />
                 </div>
-                <div className={style.button} onClick={HandleButton}>
+                <div className={style.button} onClick={handleButton}>
                     {updatingCost ?
                         <CircularProgress size={12} className={classes.circularProgress} />
                         :

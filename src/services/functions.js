@@ -224,3 +224,16 @@ export async function createBranchDeepLink(streamerUid, alias) {
         console.log(error);
     }
 }
+
+/**
+ * Get all the emotes of the given stream
+ * @param {string} streamerUid Streamer identifier
+ */
+ export async function getEmotes(streamerUid) {
+    const getStreamerEmotes = functions.httpsCallable('getStreamerEmotes');
+    try {
+        return await getStreamerEmotes({ streamerUid });
+    } catch (error) {
+        console.log(error);
+    }
+}

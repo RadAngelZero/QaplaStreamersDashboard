@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Tooltip } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +12,6 @@ import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg';
-import { ReactComponent as GiftIcon } from './../../assets/Gift.svg';
 
 import { ReactComponent as GIFIcon } from './../../assets/reactionCardsIcons/GIF.svg';
 import { ReactComponent as MemesIcon } from './../../assets/reactionCardsIcons/Memes.svg';
@@ -21,8 +20,6 @@ import { ReactComponent as AvatarIcon } from './../../assets/reactionCardsIcons/
 import { ReactComponent as TtGiphyIcon } from './../../assets/reactionCardsIcons/TtGiphy.svg';
 import { ReactComponent as TTSBotIcon } from './../../assets/reactionCardsIcons/TTSBot.svg';
 import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.svg';
-
-import StreamerProfileEditCoin from '../StreamerProfileEditCoin/StreamerProfileEditCoin'
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
@@ -38,6 +35,7 @@ import {
 } from '../../utilities/Constants';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 import ReactionCard from '../ReactionCard/ReactionCard';
+import { getEmotes } from '../../services/functions';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -111,6 +109,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [switchState, setSwitchState] = useState(false);
     const [qreatorCode, setQreatorCode] = useState('');
     const [openTooltip, setOpenTooltip] = useState(false);
+    const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -151,10 +150,29 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
+        async function getRandomEmote() {
+            if (user && user.uid) {
+                const emotesRequest = await getEmotes(user.uid);
+
+                const emotes = emotesRequest.data ? emotesRequest.data : null;
+                if (emotes) {
+                    // Find the first array who has more than 0 elements
+                    const array = emotes.find((typeOfEmote) => typeOfEmote.data[0].length > 0);
+                    const randomNumber = Math.floor(Math.random() * array.data[0].length);
+
+                    setRandomEmoteUrl(array.data[0][randomNumber].images.url_1x);
+                }
+            }
+        }
+
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();
-    }, [switchState, user, history]);
+
+        if (!randomEmoteUrl) {
+            getRandomEmote();
+        }
+    }, [switchState, user, history, randomEmoteUrl]);
 
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
@@ -341,6 +359,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 subtitle='Basic reaction'
                                                 textMaxWidth='110px'
                                                 type={REACTION_CARD_CHANNEL_POINTS}
+                                                reactionLevel={1}
                                                 user={user}
                                                 backgroundURL='https://media.tenor.com/XCReBZW8JFAAAAAd/cr1ti-ka-l-penguinz0.gif'
                                                 backgroundSize='350%'
@@ -360,6 +379,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 subtitle='Everything in basic +'
                                                 textMaxWidth='160px'
                                                 type={REACTION_CARD_QOINS}
+                                                reactionLevel={2}
                                                 user={user}
                                                 FBNode='level2'
                                                 defaultCost={500}
@@ -369,13 +389,15 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 icons={
                                                     [
                                                         <PlusIcon />,
-                                                        <MemesIcon />,
+                                                        <img src={randomEmoteUrl}
+                                                            style={{ height: 24, width: 24 }} />
                                                     ]
                                                 }
                                                 title='Full Screen Emotes Animatios'
                                                 subtitle='All content +'
                                                 textMaxWidth='130px'
                                                 type={REACTION_CARD_QOINS}
+                                                reactionLevel={3}
                                                 user={user}
                                                 FBNode='level3'
                                                 defaultCost={800}

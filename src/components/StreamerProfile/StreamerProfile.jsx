@@ -13,6 +13,15 @@ import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg';
 import { ReactComponent as GiftIcon } from './../../assets/Gift.svg';
+
+import { ReactComponent as GIFIcon } from './../../assets/reactionCardsIcons/GIF.svg';
+import { ReactComponent as MemesIcon } from './../../assets/reactionCardsIcons/Memes.svg';
+import { ReactComponent as MegaStickerIcon } from './../../assets/reactionCardsIcons/MegaSticker.svg';
+import { ReactComponent as AvatarIcon } from './../../assets/reactionCardsIcons/Avatar.svg';
+import { ReactComponent as TtGiphyIcon } from './../../assets/reactionCardsIcons/TtGiphy.svg';
+import { ReactComponent as TTSBotIcon } from './../../assets/reactionCardsIcons/TTSBot.svg';
+import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.svg';
+
 import StreamerProfileEditCoin from '../StreamerProfileEditCoin/StreamerProfileEditCoin'
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
@@ -23,9 +32,12 @@ import {
     SCHEDULED_EVENT_TYPE,
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE,
-    PREMIUM
+    PREMIUM,
+    REACTION_CARD_CHANNEL_POINTS,
+    REACTION_CARD_QOINS
 } from '../../utilities/Constants';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
+import ReactionCard from '../ReactionCard/ReactionCard';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -62,7 +74,7 @@ const BitsButtonContainer = withStyles(() => ({
         alignItems: 'center',
         justifyContent: 'space-between',
         textTransform: 'none',
-        marginLeft:'5px',
+        marginLeft: '5px',
         '&:hover': {
             backgroundColor: '#141735'
         },
@@ -79,7 +91,8 @@ const useStyles = makeStyles((theme) => ({
     createCardContentRoot: {
         display: 'flex',
         flexDirection: 'column',
-        height: '100%'
+        height: '100%',
+        alignItems: 'center',
     },
     createCardButtonIconLabel: {
         width: '18px',
@@ -193,7 +206,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
     if (user) {
         cheersQoins = user.qoinsBalance || 0;
-        const tensOfBits =  cheersQoins / 200;
+        const tensOfBits = cheersQoins / 200;
         estimatedBits = (tensOfBits) * valueOfQoinsForStreamer;
         availableBits = 250 * Math.floor((estimatedBits) / 250);
         nextMilestone = 250 * Math.ceil((estimatedBits + 1) / 250);
@@ -215,8 +228,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         <StreamerDashboardContainer user={user}>
             {user &&
                 <>
-                    <Grid style={{ maxWidth:'1180px' }} container xs={12} >
-                        <Grid style={{maxWidth:'800px'}} item xs={9}>
+                    <Grid style={{ maxWidth: '1180px' }} container xs={12} >
+                        <Grid style={{ maxWidth: '800px' }} item xs={12}>
                             <Grid container xs={12}>
                                 <Grid xs={12}>
                                     <div className={styles.header}>
@@ -236,22 +249,51 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             startIcon={<TwitchIcon style={{ width: '20px', height: '20px' }} />}>
                                             {user.displayName}
                                         </Button>
-                                        <Tooltip placement='bottom' open={openTooltip} title='Copiado'>
-                                            <div className={styles.qreatorCodeContainer} onClick={copyQreatorCode}>
-                                                <GiftIcon />
-                                                <p className={styles.qreatorCode}>
-                                                    {qreatorCode}
-                                                </p>
-                                            </div>
-                                        </Tooltip>
+                                        <Button variant='contained'
+                                            className={styles.messagesButton}
+                                            style={{ backgroundColor: '#141735', minWidth: '212px', marginLeft: 'auto' }}
+                                            onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
+                                            endIcon={
+                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    {pendingMessages > 0 ?
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            backgroundColor: '#FF007A',
+                                                            width: '27px',
+                                                            height: '27px',
+                                                            borderRadius: '30px',
+                                                            justifyContent: 'center'
+                                                        }}>
+                                                            <p style={{
+                                                                display: 'flex',
+                                                                fontSize: '11px',
+                                                                lineHeight: '24px',
+                                                                fontWeight: '600',
+                                                                marginTop: '2px'
+                                                            }}>
+                                                                {pendingMessages}
+                                                            </p>
+                                                        </div>
+                                                        :
+                                                        <MessageIcon style={{ width: '32px', height: '32px' }} />
+                                                    }
+                                                </div>
+                                            }>
+                                            <p>
+                                                Text-to-Speech
+                                            </p>
+                                        </Button>
                                     </div>
                                 </Grid>
                                 <Grid xs={12}>
                                     <Grid container xs={12}>
                                         <Grid item xs={12}>
-                                            <h1 className={styles.title} style={{ marginBottom: 40 }}>
+                                            <h1 className={styles.title}>
                                                 {t('StreamerProfile.balance')}
                                             </h1>
+                                            <p className={styles.subtitle}>
+                                                {`Track and cash out the Qoins you get from reactions.`}
+                                            </p>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between' }} >
                                             <Grid item xs={12} sm={4} style={{ paddingRight: 24 }}>
@@ -267,33 +309,99 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </Grid>
                                             <Grid item xs={12} sm={8}>
                                                 {/* e.currentTarget != e.target Help us to prevent trigger the event if the user clicks the inner button and not this button */}
-                                                <BitsButtonContainer disableRipple className={styles.containerBit} onClick={(e) => { if(e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
+                                                <BitsButtonContainer disableRipple className={styles.containerBit} onClick={(e) => { if (e.currentTarget !== e.target) return; setOpenRecordsDialog(true); setButtonPressed("Bits"); }}>
                                                     <BitsIcon style={{ width: '35px', height: '35px' }} />
                                                     <BarProgressBit user={user}
                                                         estimatedBits={Math.floor(estimatedBits)}
                                                         availableBits={Math.floor(availableBits)}
-                                                        nextMilestone={nextMilestone}/>
+                                                        nextMilestone={nextMilestone} />
                                                 </BitsButtonContainer>
                                             </Grid>
                                         </Grid>
                                     </Grid>
+                                    <Grid container xs={12} className={styles.reactionsContainer}>
+                                        <Grid item xs={12}>
+                                            <h1 className={styles.title}>
+                                                {`Reactions`}
+                                            </h1>
+                                            <p className={styles.subtitle}>
+                                                {`Set the price in Qoins for reactions on your stream reactions`}
+                                            </p>
+                                        </Grid>
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '10px' }} >
+                                            <ReactionCard
+                                                icons={
+                                                    [
+                                                        <GIFIcon />,
+                                                        <MemesIcon />,
+                                                        <MegaStickerIcon />,
+                                                    ]
+                                                }
+                                                title='GIF, Sticker or Meme + TTS'
+                                                subtitle='Basic reaction'
+                                                textMaxWidth='110px'
+                                                type={REACTION_CARD_CHANNEL_POINTS}
+                                                user={user}
+                                                backgroundURL='https://media.tenor.com/XCReBZW8JFAAAAAd/cr1ti-ka-l-penguinz0.gif'
+                                                backgroundSize='350%'
+                                                backgroundPosX='50%'
+                                                backgroundPosY='0'
+                                            />
+                                            <ReactionCard
+                                                icons={
+                                                    [
+                                                        <PlusIcon />,
+                                                        <AvatarIcon />,
+                                                        <TtGiphyIcon />,
+                                                        <TTSBotIcon />,
+                                                    ]
+                                                }
+                                                title='Animated Avatar, 3D Text and TTS Voice'
+                                                subtitle='Everything in basic +'
+                                                textMaxWidth='160px'
+                                                type={REACTION_CARD_QOINS}
+                                                user={user}
+                                                FBNode='level2'
+                                                defaultCost={500}
+                                                background='linear-gradient(0deg, #654DFF, #654DFF)'
+                                            />
+                                            <ReactionCard
+                                                icons={
+                                                    [
+                                                        <PlusIcon />,
+                                                        <MemesIcon />,
+                                                    ]
+                                                }
+                                                title='Full Screen Emotes Animatios'
+                                                subtitle='All content +'
+                                                textMaxWidth='130px'
+                                                type={REACTION_CARD_QOINS}
+                                                user={user}
+                                                FBNode='level3'
+                                                defaultCost={800}
+                                                background='linear-gradient(318.55deg, #8322FF 9.94%, #FF98BD 90.92%), #141735'
+                                            />
+                                        </Grid>
+                                    </Grid>
                                     <Grid item xs={12}>
                                         <Grid container className={styles.myStreamsContainer}>
-                                            <Grid item xs={12} sm={6} style={{ minWidth: '240px', maxWidth: '250px' }}>
+                                            <div style={{ display: 'flex', flex: 1, }}>
                                                 <h1 className={styles.title}>
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
-                                            </Grid>
-                                            <Grid item xs={12} sm={3} md={5} style={{ display: 'flex', alignItems: 'center', minHeight: '58px' }}>
-                                                <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
-                                            </Grid>
-                                            <Grid item xs={12} sm={3} style={{ display: 'flex', alignItems: 'center', minHeight: '58px', marginLeft: 'auto', marginRight: '16px', minWidth: 'fit-content' }}>
-                                                {(user.premium || user.freeTrial) && user.currentPeriod &&
-                                                    <StreamsLeft uid={user.uid}
-                                                        qoinsDrops={qoinsDrops}
-                                                        renovationDate={user.currentPeriod.endDate} />
-                                                }
-                                            </Grid>
+                                                <div style={{ marginLeft: '32px' }}>
+                                                    <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
+                                                </div>
+                                                <div style={{
+                                                    marginLeft: 'auto'
+                                                }}>
+                                                    {(user.premium || user.freeTrial) && user.currentPeriod &&
+                                                        <StreamsLeft uid={user.uid}
+                                                            qoinsDrops={qoinsDrops}
+                                                            renovationDate={user.currentPeriod.endDate} />
+                                                    }
+                                                </div>
+                                            </div>
                                         </Grid>
                                     </Grid>
                                 </Grid>
@@ -317,62 +425,31 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 </CardContent>
                                             </Card>
                                         </Grid>
-                                        {streams && Object.keys(streams).reverse().map((streamId) => (
-                                            <StreamCard
-                                                key={streamId}
-                                                streamType={streams[streamId].status}
-                                                streamId={streamId}
-                                                image={streams[streamId].image}
-                                                user={user}
-                                                game={streams[streamId].game}
-                                                games={games}
-                                                date={formatDate(streams[streamId].timestamp)}
-                                                hour={formatHour(streams[streamId].timestamp)}
-                                                timestamp={streams[streamId].timestamp}
-                                                drops={streams[streamId].drops}
-                                                usedDrops={streams[streamId].usedDrops}
-                                                onRemoveStream={onRemoveStream} />
-                                        ))}
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between'
+                                        }}>
+                                            {streams && Object.keys(streams).reverse().map((streamId) => (
+                                                <StreamCard
+                                                    key={streamId}
+                                                    streamType={streams[streamId].status}
+                                                    streamId={streamId}
+                                                    image={streams[streamId].image}
+                                                    user={user}
+                                                    game={streams[streamId].game}
+                                                    games={games}
+                                                    date={formatDate(streams[streamId].timestamp)}
+                                                    hour={formatHour(streams[streamId].timestamp)}
+                                                    timestamp={streams[streamId].timestamp}
+                                                    drops={streams[streamId].drops}
+                                                    usedDrops={streams[streamId].usedDrops}
+                                                    onRemoveStream={onRemoveStream} />
+                                            ))}
+                                        </div>
+
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
-                        <Grid style={{ maxWidth: '212px', marginLeft: '32px' }} item xs={3}>
-                            <Button variant='contained'
-                                className={styles.messagesButton}
-                                style={{ backgroundColor: '#141735',marginBottom:'50px', minWidth: '212px' }}
-                                onClick={() => { setOpenRecordsDialog(true); setButtonPressed('Messages') }}
-                                endIcon={
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        {pendingMessages > 0 ?
-                                            <div style={{
-                                                display: 'flex',
-                                                backgroundColor: '#FF007A',
-                                                width: '27px',
-                                                height: '27px',
-                                                borderRadius: '30px',
-                                                justifyContent: 'center'
-                                                }}>
-                                                <p style={{
-                                                    display: 'flex',
-                                                    fontSize: '11px',
-                                                    lineHeight: '24px',
-                                                    fontWeight: '600',
-                                                    marginTop: '2px'
-                                                    }}>
-                                                        {pendingMessages}
-                                                </p>
-                                            </div>
-                                            :
-                                            <MessageIcon style={{ width: '32px', height: '32px' }} />
-                                        }
-                                    </div>
-                                }>
-                                <p>
-                                    Text-to-Speech
-                                </p>
-                            </Button>
-                            <StreamerProfileEditCoin user={user} />
                         </Grid>
                     </Grid>
                     <CheersBitsRecordDialog open={openRecordsDialog}

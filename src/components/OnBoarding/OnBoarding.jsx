@@ -106,16 +106,21 @@ const OnBoarding = ({ user }) => {
         setStep(step + 1);
 
         const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, 'Qapla Reaction', channelPointsRewardCost);
-        if (result.reward.status === 200) {
-            if (result.webhookSubscription) {
-                onSuccessfullChannelPointsCreation();
+        if (result !== undefined) {
+            if (result.reward.status === 200) {
+                if (result.webhookSubscription) {
+                    onSuccessfullChannelPointsCreation();
+                } else {
+                    notifyBugToDevelopTeam(`${user.uid} Reward webhook creation error`);
+                    onErrorChannelPointsCreation(500);
+                }
             } else {
-                notifyBugToDevelopTeam(`${user.uid} Reward webhook creation error`);
-                onErrorChannelPointsCreation(500);
+                notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: ` + JSON.stringify(result.reward));
+                onErrorChannelPointsCreation(result.reward.status);
             }
         } else {
-            notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: ` + JSON.stringify(result.reward));
-            onErrorChannelPointsCreation(result.reward.status);
+            notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: error 0 (auth token expired)`);
+            onErrorChannelPointsCreation(0);
         }
     }
 
@@ -170,238 +175,238 @@ const OnBoarding = ({ user }) => {
                 zIndex: 500,
             }}>
                 {step === -1 &&
-                <>
-                    <img src={`https://media.giphy.com/media/51Uiuy5QBZNkoF3b2Z/giphy.gif`} alt={`Scared Dog`}
-                        style={{
-                            position: 'absolute',
-                            bottom: 190, // 256 - 23 (height of container - hidden part of the image)
-                            width: '238px',
-                            height: '239px',
-                            zIndex: '1000',
-                        }}
-                    />
-                </>
+                    <>
+                        <img src={`https://media.giphy.com/media/51Uiuy5QBZNkoF3b2Z/giphy.gif`} alt={`Scared Dog`}
+                            style={{
+                                position: 'absolute',
+                                bottom: 190, // 256 - 23 (height of container - hidden part of the image)
+                                width: '238px',
+                                height: '239px',
+                                zIndex: '1000',
+                            }}
+                        />
+                    </>
                 }
                 {step === 0 &&
-                <>
-                    <img src={`https://media.giphy.com/media/yQssIXdTQlbN3EEPYj/giphy.gif`} alt={`Barnaby on PC`}
-                        style={{
-                            zIndex: -1,
-                            position: 'absolute',
-                            bottom: 256, // 256 - 23 (height of container - hidden part of the image)
-                            width: '334px',
-                            height: '179px',
-                            resize: ''
-                        }}
-                    />
-                </>
+                    <>
+                        <img src={`https://media.giphy.com/media/yQssIXdTQlbN3EEPYj/giphy.gif`} alt={`Barnaby on PC`}
+                            style={{
+                                zIndex: -1,
+                                position: 'absolute',
+                                bottom: 256, // 256 - 23 (height of container - hidden part of the image)
+                                width: '334px',
+                                height: '179px',
+                                resize: ''
+                            }}
+                        />
+                    </>
                 }
                 {step === 1 &&
-                <>
-                    <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Fchannelpoints-pink.gif?alt=media&token=f5ca8128-99cc-4d03-9257-e5e6f960cac4'
-                        alt='channel points'
-                        style={{
-                            position: 'absolute',
-                            width: '269px',
-                            height: '134px',
-                            transform: 'rotate(-15deg)',
-                            bottom: 256, // 256 (height of container)
-                        }}
-                    />
-                    <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
-                        style={{
-                            position: 'absolute',
-                            width: '162px',
-                            height: '151px',
-                            zIndex: '1000',
-                            transform: 'rotate(-3.45deg)',
-                            bottom: 244, // 256 - 12 (height of container - hidden part of the image)
-                        }}
-                    />
-                </>
+                    <>
+                        <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Fchannelpoints-pink.gif?alt=media&token=f5ca8128-99cc-4d03-9257-e5e6f960cac4'
+                            alt='channel points'
+                            style={{
+                                position: 'absolute',
+                                width: '269px',
+                                height: '134px',
+                                transform: 'rotate(-15deg)',
+                                bottom: 256, // 256 (height of container)
+                            }}
+                        />
+                        <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
+                            style={{
+                                position: 'absolute',
+                                width: '162px',
+                                height: '151px',
+                                zIndex: '1000',
+                                transform: 'rotate(-3.45deg)',
+                                bottom: 244, // 256 - 12 (height of container - hidden part of the image)
+                            }}
+                        />
+                    </>
                 }
                 {step === 2 &&
-                <>
-                    <img src='https://media.giphy.com/media/3o752nnUPE7OzLeSVW/giphy.gif' alt={`Barnaby Working`}
-                        style={{
-                            position: 'absolute',
-                            bottom: 256, // 256 - 8 (height of container - hidden part of the image)
-                            width: '206px',
-                            height: '135px',
-                            zIndex: '1',
-                        }}
-                    />
-                </>
+                    <>
+                        <img src='https://media.giphy.com/media/3o752nnUPE7OzLeSVW/giphy.gif' alt={`Barnaby Working`}
+                            style={{
+                                position: 'absolute',
+                                bottom: 256, // 256 - 8 (height of container - hidden part of the image)
+                                width: '206px',
+                                height: '135px',
+                                zIndex: '1',
+                            }}
+                        />
+                    </>
                 }
                 {step === 3 &&
-                <>
-                    <img src='https://media.giphy.com/media/xULW8v7LtZrgcaGvC0/giphy.gif' alt={`Barnaby Says Thanks`}
-                        style={{
-                            position: 'absolute',
-                            bottom: 190, // 256 - 66 (height of container - visible part of the image over the card)
-                            width: '239px',
-                            height: '239px',
-                            zIndex: '1000',
-                        }}
-                    />
-                </>
-                }
-                {step === 4 &&
-                <>
-                    <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Foverlay.gif?alt=media&token=178044eb-f697-44ad-860c-81e93741d276'
-                        alt='overlay'
-                        style={{
-                            position: 'absolute',
-                            bottom: 402, // 402 - 66 (height of container)
-                            width: '300px',
-                            height: '150px',
-                        }}
-                    />
-                    <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
-                        style={{
-                            position: 'absolute',
-                            bottom: 390, // 256 - 12 (height of container - hidden part of the image)
-                            width: '162px',
-                            height: '151px',
-                            zIndex: '1000',
-                            transform: 'rotate(-3.45deg)',
-                        }}
-                    />
-                </>
-                }
-                {step === -1 &&
-                <>
-                    <p style={{ marginTop: '20px' }} className={styles.headerText}>
-                        {t('Onboarding.errorTitle', { errorCode })}
-                    </p>
-                    <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                        {t('Onboarding.errorDescription')}
-                    </p>
-                </>
-                }
-                {step === 0 &&
-                <>
-                    <p className={styles.headerText}>
-                        {t('Onboarding.letsSetUp')}
-                    </p>
-                    <ul>
-                        <li className={styles.subText}>
-                            {t('Onboarding.processDescriptionP1')}
-                        </li>
-                        <li className={`${styles.subText} ${styles.liMargin}`}>
-                            {t('Onboarding.processDescriptionP2')}
-                        </li>
-                    </ul>
-                </>
-                }
-                {step === 1 &&
-                <>
-                    <p className={styles.headerText}>
-                        {t('Onboarding.setRewardCost')}
-                    </p>
-                    <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                        {t('Onboarding.setRewardCostDescription')}
-                    </p>
-                    <div className={styles.qoinsMainContainer}>
-                        <div className={styles.qoinsSubContainer}>
-                            <input
-                                className={styles.qoins}
-                                value={channelPointsRewardCost}
-                                onChange={handleChannePointsRewardCostChange}
-
-                            />
-                        </div>
-                    </div>
-                </>
-                }
-                {step === 2 &&
-                <>
-                    <h1 className={styles.gradientText}>
-                        {t('Onboarding.workingOnRequest')}
-                    </h1>
-                </>
-                }
-                {step === 3 &&
-                <>
-                    <h1 className={styles.gradientText}>
-                        {t('Onboarding.rewardCreated')}
-                    </h1>
-                </>
+                    <>
+                        <img src='https://media.giphy.com/media/xULW8v7LtZrgcaGvC0/giphy.gif' alt={`Barnaby Says Thanks`}
+                            style={{
+                                position: 'absolute',
+                                bottom: 190, // 256 - 66 (height of container - visible part of the image over the card)
+                                width: '239px',
+                                height: '239px',
+                                zIndex: '1000',
+                            }}
+                        />
+                    </>
                 }
                 {step === 4 &&
                     <>
-                    <h1 className={styles.headerText}>
-                        {t('Onboarding.addReactionsToOverlay')}
-                    </h1>
-                    <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                        {t('Onboarding.copyLink')}
-                    </p>
-                    <div style={{
-                        marginTop: '32px',
-                        display: 'flex',
-                    }}>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                        }}>
-                            <p className={styles.overlayResText}>
-                                {t('Onboarding.width')}
-                            </p>
-                            <div className={styles.overlayResNumbContainer}>
-                                <p className={styles.overlayResNumb}>
-                                    1920
-                                </p>
-                            </div>
-                        </div>
-                        <div style={{
-                            marginLeft: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                        }}>
-                            <p className={styles.overlayResText}>
-                                {t('Onboarding.height')}
-                            </p>
-                            <div className={styles.overlayResNumbContainer}>
-                                <p className={styles.overlayResNumb}>
-                                    1080
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <Button
-                        disableRipple
-                        onClick={handleCopyOverlayLink}
-                        className={classes.copyOverlayLinkButton}>
-                        <p style={{
-                            color: '#6C5DD3',
-                            fontSize: '12px',
-                            fontWeight: '500',
-                            lineHeight: '24px',
-                            textAlign: 'center',
-                            flexGrow: 1,
-                        }}>
-                            {streamerOverlayLink}
+                        <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Foverlay.gif?alt=media&token=178044eb-f697-44ad-860c-81e93741d276'
+                            alt='overlay'
+                            style={{
+                                position: 'absolute',
+                                bottom: 402, // 402 - 66 (height of container)
+                                width: '300px',
+                                height: '150px',
+                            }}
+                        />
+                        <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
+                            style={{
+                                position: 'absolute',
+                                bottom: 390, // 256 - 12 (height of container - hidden part of the image)
+                                width: '162px',
+                                height: '151px',
+                                zIndex: '1000',
+                                transform: 'rotate(-3.45deg)',
+                            }}
+                        />
+                    </>
+                }
+                {step === -1 &&
+                    <>
+                        <p style={{ marginTop: '20px' }} className={styles.headerText}>
+                            {t('Onboarding.errorTitle', { errorCode })}
                         </p>
-                        <CopyIcon style={{
-                            justifySelf: 'flex-end',
-                        }} />
-                    </Button>
-                    <div style={{
-                        marginTop: '32px',
-                    }}>
-                        {overlayLinkCopied ?
-                            <Button
-                                onClick={handleTestOverlay}
-                                className={classes.testButton}>
-                                {t('Onboarding.testOverlay')}
-                            </Button>
-                            :
-                            <div style={{ height: '60px' }} />
-                        }
-                    </div>
-                </>
+                        <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                            {t('Onboarding.errorDescription')}
+                        </p>
+                    </>
+                }
+                {step === 0 &&
+                    <>
+                        <p className={styles.headerText}>
+                            {t('Onboarding.letsSetUp')}
+                        </p>
+                        <ul>
+                            <li className={styles.subText}>
+                                {t('Onboarding.processDescriptionP1')}
+                            </li>
+                            <li className={`${styles.subText} ${styles.liMargin}`}>
+                                {t('Onboarding.processDescriptionP2')}
+                            </li>
+                        </ul>
+                    </>
+                }
+                {step === 1 &&
+                    <>
+                        <p className={styles.headerText}>
+                            {t('Onboarding.setRewardCost')}
+                        </p>
+                        <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                            {t('Onboarding.setRewardCostDescription')}
+                        </p>
+                        <div className={styles.qoinsMainContainer}>
+                            <div className={styles.qoinsSubContainer}>
+                                <input
+                                    className={styles.qoins}
+                                    value={channelPointsRewardCost}
+                                    onChange={handleChannePointsRewardCostChange}
+
+                                />
+                            </div>
+                        </div>
+                    </>
+                }
+                {step === 2 &&
+                    <>
+                        <h1 className={styles.gradientText}>
+                            {t('Onboarding.workingOnRequest')}
+                        </h1>
+                    </>
+                }
+                {step === 3 &&
+                    <>
+                        <h1 className={styles.gradientText}>
+                            {t('Onboarding.rewardCreated')}
+                        </h1>
+                    </>
+                }
+                {step === 4 &&
+                    <>
+                        <h1 className={styles.headerText}>
+                            {t('Onboarding.addReactionsToOverlay')}
+                        </h1>
+                        <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                            {t('Onboarding.copyLink')}
+                        </p>
+                        <div style={{
+                            marginTop: '32px',
+                            display: 'flex',
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                            }}>
+                                <p className={styles.overlayResText}>
+                                    {t('Onboarding.width')}
+                                </p>
+                                <div className={styles.overlayResNumbContainer}>
+                                    <p className={styles.overlayResNumb}>
+                                        1920
+                                    </p>
+                                </div>
+                            </div>
+                            <div style={{
+                                marginLeft: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                            }}>
+                                <p className={styles.overlayResText}>
+                                    {t('Onboarding.height')}
+                                </p>
+                                <div className={styles.overlayResNumbContainer}>
+                                    <p className={styles.overlayResNumb}>
+                                        1080
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <Button
+                            disableRipple
+                            onClick={handleCopyOverlayLink}
+                            className={classes.copyOverlayLinkButton}>
+                            <p style={{
+                                color: '#6C5DD3',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                lineHeight: '24px',
+                                textAlign: 'center',
+                                flexGrow: 1,
+                            }}>
+                                {streamerOverlayLink}
+                            </p>
+                            <CopyIcon style={{
+                                justifySelf: 'flex-end',
+                            }} />
+                        </Button>
+                        <div style={{
+                            marginTop: '32px',
+                        }}>
+                            {overlayLinkCopied ?
+                                <Button
+                                    onClick={handleTestOverlay}
+                                    className={classes.testButton}>
+                                    {t('Onboarding.testOverlay')}
+                                </Button>
+                                :
+                                <div style={{ height: '60px' }} />
+                            }
+                        </div>
+                    </>
                 }
                 {step === 5 &&
                     <>
@@ -463,9 +468,9 @@ const OnBoarding = ({ user }) => {
                     {step === 4 &&
                         <>
                             {overlayLinkCopied ?
-                                    t('Onboarding.finishSetUp')
+                                t('Onboarding.finishSetUp')
                                 :
-                                    t('Onboarding.copyToTest')
+                                t('Onboarding.copyToTest')
                             }
                         </>
                     }

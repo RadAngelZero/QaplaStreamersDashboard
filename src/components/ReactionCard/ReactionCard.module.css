@@ -1,0 +1,49 @@
+.container {
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.costInput {
+    display: flex;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    margin-left: 8px;
+    background-color: #0000;
+    border: none;
+    outline: none;
+    height: 36px;
+    border-radius: 8px;
+    padding: 0px 8px;
+    width: 65%;
+}
+
+.costInput:focus {
+    background-color: #14173544;
+}
+
+.button {
+    display: flex;
+    background-color: #3B4BF9;
+    border-radius: 8px;
+    padding: 8px 12px;
+    min-width: 20px;
+    justify-content: center;
+    min-height: 16px;
+}
+
+.button:hover {
+    cursor: pointer;
+}
+
+.buttonText {
+    color: #fff;
+    font-family: Inter;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 15px;
+    letter-spacing: 0.492000013589859px;
+    text-align: center;
+
+}

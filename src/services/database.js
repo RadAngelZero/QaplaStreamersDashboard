@@ -41,6 +41,7 @@ const streamerCashOutRef = database.ref('/StreamersCashOut');
 const streamsGreetingsRef = database.ref('/StreamsGreetings');
 const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
 const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
+const reactionsPrices = database.ref('/ReactionsPrices');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -62,7 +63,7 @@ export function loadStreamerProfile(uid, dataHandler) {
   * Check if the invitation code exists
   * @param {string} invitationCode Random invitation code
   */
- export async function invitationCodeExists(invitationCode) {
+export async function invitationCodeExists(invitationCode) {
     if (invitationCode) {
         return (await InvitationCodeRef.child(invitationCode).once('value')).exists();
     }
@@ -342,7 +343,7 @@ export async function loadStreamsByStatus(uid, status) {
  * @param {number} statusStart Status where the query starts
  * @param {number} statusEnd Status where the query end
  */
- export async function loadStreamsByStatusRange(uid, statusStart, statusEnd) {
+export async function loadStreamsByStatusRange(uid, statusStart, statusEnd) {
     return await streamersEventsDataRef.child(uid).orderByChild('status').startAt(statusStart).endAt(statusEnd).once('value');
 }
 
@@ -536,7 +537,7 @@ export async function getPastStreamTitle(uid, streamId) {
  * @param {string} streamerId Id of the streamer
  * @param {string} streamId Stream identifier in our database
  */
-export async function getCustomRewardId(streamerId ,streamId) {
+export async function getCustomRewardId(streamerId, streamId) {
     return await (await userStreamersRef.child(streamerId).child('customRewards').child(streamId).child('rewardId').once('value')).val();
 }
 
@@ -545,7 +546,7 @@ export async function getCustomRewardId(streamerId ,streamId) {
  * @param {string} streamerId Id of the streamer
  * @param {string} streamId Stream identifier in our database
  */
-export async function getStreamCustomReward(streamerId ,streamId) {
+export async function getStreamCustomReward(streamerId, streamId) {
     return await userStreamersRef.child(streamerId).child('customRewards').child(streamId).once('value');
 }
 
@@ -639,7 +640,7 @@ export function listenForUnreadStreamerCheers(streamerUid, callback) {
  * Remove listener from the Streamers Donation node
  * @param {string} streamerUid Uid of the streamer
  */
- export function removeListenerForLastStreamerCheers(streamerUid) {
+export function removeListenerForLastStreamerCheers(streamerUid) {
     streamersDonationsRef.child(streamerUid).off('value');
 }
 
@@ -825,7 +826,7 @@ export async function getPeriodStreamerPayments(streamerUid, startTimestamp, end
  * @param {string} streamerUid Uid of the streamer
  * @param {Array} link Array of URLs and titles to save [ { title: 'Twitch', url: 'https://twitch.tv/mr_yuboto' } ]
  */
- export async function saveStreamerLinks(streamerUid, links) {
+export async function saveStreamerLinks(streamerUid, links) {
     await streamerLinksRef.child(streamerUid).update(links);
 }
 
@@ -970,7 +971,7 @@ export async function setAlertSetting(uid, settingKey, value) {
  * Get the alerts settings of the given streamer
  * @param {string} uid User identifier
  */
- export async function getStreamerAlertsSettings(uid) {
+export async function getStreamerAlertsSettings(uid) {
     return await streamerAlertsSettingsRef.child(uid).once('value');
 }
 
@@ -1110,7 +1111,7 @@ export async function getInteractionsRewardData(uid) {
  * @param {string} uid User identifier
  * @param {array} data Array of Giphy Text gifs
  */
- export async function saveGiphyText(uid, data) {
+export async function saveGiphyText(uid, data) {
     return giphyTextRequestsRef.child(uid).set(data);
 }
 
@@ -1334,4 +1335,12 @@ export async function listenToReactionsCountDiaDeMuertos(streamerUid, callback) 
 
 export async function listeToDiaDeMuertosFlag(callback) {
     database.ref('/DiaDeMuertosEvent').on('value', callback);
+}
+
+export async function getReactionsPrices(streamerUid) {
+    return await reactionsPrices.child(streamerUid).once('value');
+}
+
+export async function setReactionPrice(streamerUid, child, value) {
+    return await reactionsPrices.child(streamerUid).child(child).set(value);
 }

@@ -30,7 +30,6 @@ function useQuery() {
 
 const StreamersSignin = ({ user, title }) => {
     const [isLoadingAuth, setIsLoadingAuth] = useState(false);
-    const [openTermsAndConditionsDialog, setOpenTermsAndConditionsDialog] = useState(false);
     const history = useHistory();
     const query = useQuery();
     const { t } = useTranslation();
@@ -66,6 +65,8 @@ const StreamersSignin = ({ user, title }) => {
                             photoUrl: user.userData.photoUrl,
                             broadcasterType: user.userData.broadcasterType
                         });
+
+                        redirectUser(user.firebaseAuthUser.user.uid);
                     } catch (error) {
                         console.log(error);
                     }
@@ -107,7 +108,7 @@ const StreamersSignin = ({ user, title }) => {
 
         checkIfUsersIsSigningIn();
 
-        if (user) {
+        if (user && !isLoadingAuth) {
             redirectUser(user.uid);
         }
     }, [user, history, isLoadingAuth]);
@@ -118,7 +119,6 @@ const StreamersSignin = ({ user, title }) => {
         setIsLoadingAuth(false);
     }
 
-    const closeTermsAndConditionsModal = () => setOpenTermsAndConditionsDialog(false);
     if (user === undefined) {
         return (
             <StreamerDashboardContainer>

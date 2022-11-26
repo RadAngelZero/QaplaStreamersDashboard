@@ -288,7 +288,13 @@ body {
 }
 
 .myStreamsContainer {
-    margin-top: 72px;
+    margin-top: 56px;
+    margin-bottom: 40px;
+    max-width: 1000px;
+}
+
+.reactionsContainer {
+    margin-top: 56px;
     margin-bottom: 40px;
     max-width: 1000px;
 }
@@ -309,15 +315,22 @@ body {
 
 .title {
     color: #FFFFFF;
-    font-size: 36px;
+    font-size: 24px;
     font-weight: 500;
-    line-height: 48.5px;
     letter-spacing: -1px;
+}
+
+.subtitle {
+    color: #FFFFFF9A;
+    font-size: 16px;
+    font-weight: 400;
+    margin-top: 16px;
+    margin-bottom: 32px;
 }
 
 @media (max-width: 528.18px) {
     .myStreamsContainer {
-        margin-top: 72px;
+        margin-top: 56px;
         margin-bottom: 6px;
     }
 }

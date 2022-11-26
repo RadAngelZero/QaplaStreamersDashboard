@@ -27,8 +27,8 @@
     display: flex;
     background-color: #3B4BF9;
     border-radius: 8px;
-    padding: 8px 12px;
-    min-width: 20px;
+    padding: 8px 8px;
+    /* min-width: 20px; */
     justify-content: center;
     min-height: 16px;
 }

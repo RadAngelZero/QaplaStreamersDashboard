@@ -256,9 +256,9 @@ const ReactionCard = ({
                         :
                         <p className={style.buttonText}>
                             {editingCost ?
-                                `Save`
+                                t('StreamerProfile.ReactionCard.button.save')
                                 :
-                                `Edit`
+                                t('StreamerProfile.ReactionCard.button.edit')
                             }
                         </p>
                     }

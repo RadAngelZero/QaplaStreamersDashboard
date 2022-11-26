@@ -42,6 +42,7 @@ const streamsGreetingsRef = database.ref('/StreamsGreetings');
 const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
 const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
 const reactionsPricesRef = database.ref('/ReactionsPrices');
+const gifsLibrariesRef = database.ref('/GifsLibraries');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1350,4 +1351,19 @@ export async function getReactionPriceByLevel(streamerUid, level) {
  */
 export async function setReactionPrice(streamerUid, level, newPrice) {
     return await reactionsPricesRef.child(streamerUid).child(level).set(newPrice);
+}
+
+////////////////////////
+// Gifs Libraries
+////////////////////////
+
+/**
+ * Returns a random gif from the given librery
+ * @param {string} libraryName Library name to get random gif
+ */
+export async function getRandomGifByLibrary(libraryName) {
+    const length = await gifsLibrariesRef.child(libraryName).child('length').once('value');
+
+    const index = Math.floor(Math.random() * length.val());
+    return await gifsLibrariesRef.child(libraryName).child('gifs').child(index).once('value');
 }

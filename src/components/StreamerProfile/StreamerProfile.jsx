@@ -23,7 +23,7 @@ import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
-import { getQreatorCode, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
+import { getQreatorCode, getRandomGifByLibrary, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -110,6 +110,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [qreatorCode, setQreatorCode] = useState('');
     const [openTooltip, setOpenTooltip] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
+    const [level1ReactionGif, setLevel1ReactionGif] = useState('');
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -165,6 +166,14 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
+        async function getLevel1ReactionGif() {
+            const gif = await getRandomGifByLibrary('StreamerCardLevel1');
+
+            if (gif.exists()) {
+                setLevel1ReactionGif(gif.val());
+            }
+        }
+
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();
@@ -172,7 +181,11 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         if (!randomEmoteUrl) {
             getRandomEmote();
         }
-    }, [switchState, user, history, randomEmoteUrl]);
+
+        if (!level1ReactionGif) {
+            getLevel1ReactionGif();
+        }
+    }, [switchState, user, history, randomEmoteUrl, level1ReactionGif]);
 
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
@@ -347,25 +360,24 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </p>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '10px' }} >
-                                            <ReactionCard
-                                                icons={
-                                                    [
-                                                        <GIFIcon />,
-                                                        <MemesIcon />,
-                                                        <MegaStickerIcon />,
-                                                    ]
-                                                }
-                                                title={t('StreamerProfile.ReactionCard.tier1Title')}
-                                                subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
-                                                textMaxWidth='110px'
-                                                type={REACTION_CARD_CHANNEL_POINTS}
-                                                reactionLevel={1}
-                                                user={user}
-                                                backgroundURL='https://media.tenor.com/XCReBZW8JFAAAAAd/cr1ti-ka-l-penguinz0.gif'
-                                                backgroundSize='350%'
-                                                backgroundPosX='50%'
-                                                backgroundPosY='0'
-                                            />
+                                            {level1ReactionGif !== '' &&
+                                                <ReactionCard
+                                                    icons={
+                                                        [
+                                                            <GIFIcon />,
+                                                            <MemesIcon />,
+                                                            <MegaStickerIcon />,
+                                                        ]
+                                                    }
+                                                    title={t('StreamerProfile.ReactionCard.tier1Title')}
+                                                    subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
+                                                    textMaxWidth='110px'
+                                                    type={REACTION_CARD_CHANNEL_POINTS}
+                                                    reactionLevel={1}
+                                                    user={user}
+                                                    backgroundURL={level1ReactionGif}
+                                                />
+                                            }
                                             <ReactionCard
                                                 icons={
                                                     [

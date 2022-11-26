@@ -30,11 +30,7 @@ const ReactionCard = ({
     user,
     defaultCost,
     background,
-    backgroundURL,
-    backgroundPos = 'center',
-    backgroundSize = 'cover',
-    backgroundPosX = '50%',
-    backgroundPosY = '50%',
+    backgroundURL
 }) => {
     const [cost, setCost] = useState(null);
     const [newCost, setNewCost] = useState(null);
@@ -170,10 +166,8 @@ const ReactionCard = ({
             display: 'flex',
             flexDirection: 'column',
             background: background ? background : `url('${backgroundURL}')`,
-            backgroundSize: backgroundSize,
-            backgroundPosition: backgroundPos,
-            backgroundPositionX: backgroundPosX,
-            backgroundPositionY: backgroundPosY,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
             height: '288px',
             maxWidth: '250px',
             width: '250px',

@@ -70,6 +70,7 @@
     },
     "StreamerProfile": {
         "balance": "Balance",
+        "balanceSubtitle": "Mira y retira los Qoins que obtienes de las reacciones",
         "stimatedBits": "Bits estimados",
         "myStreams": "Mis Streams",
         "scheduled": "Programados",
@@ -78,6 +79,8 @@
         "cheersBalance": "Balance actual de Cheers",
         "premiumBenefits": "Obten Bits y Subs gratis",
         "receivedCheers": "Ver cheers recibidos",
+        "reactions": "Reactions",
+        "reactionsSubtitle": "Define el precio en Qoins para las reacciones en tu stream.",
         "cheersBalanceTooltip": {
             "title": "Realiza seguimiento de tu balance de Qoins<>Bits.",
             "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
@@ -104,6 +107,18 @@
             "cancel": "Cancelar",
             "weGotYouRequestP1": "¡Tenemos tu solicitud! Te enviaremos ",
             "weGotYouRequestP2": " bits en tu próximo stream"
+        },
+        "ReactionCard": {
+            "tier1Title": "GIF, Sticker o Meme + TTS",
+            "tier1Subtitle": "Reacción basica",
+            "tier2Title": "Avatar Animado, Texto 3D y Voz TTS",
+            "tier2Subtitle": "Todo lo de la basica +",
+            "tier3Title": "Animaciones de Emotes en Toda la Pantalla",
+            "tier3Subtitle": "Todo el contenido +",
+            "button": {
+                "edit": "Editar",
+                "save": "Guardar"
+            }
         }
     },
     "StreamCard": {

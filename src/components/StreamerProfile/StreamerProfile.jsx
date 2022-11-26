@@ -323,7 +323,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 {t('StreamerProfile.balance')}
                                             </h1>
                                             <p className={styles.subtitle}>
-                                                {`Track and cash out the Qoins you get from reactions.`}
+                                                {t('StreamerProfile.balanceSubtitle')}
                                             </p>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between' }} >
@@ -353,10 +353,10 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                     <Grid container xs={12} className={styles.reactionsContainer}>
                                         <Grid item xs={12}>
                                             <h1 className={styles.title}>
-                                                {`Reactions`}
+                                                {t('StreamerProfile.reactions')}
                                             </h1>
                                             <p className={styles.subtitle}>
-                                                {`Set the price in Qoins for reactions on your stream reactions`}
+                                                {t('StreamerProfile.reactionsSubtitle')}
                                             </p>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '10px' }} >
@@ -369,8 +369,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                             <MegaStickerIcon />,
                                                         ]
                                                     }
-                                                    title='GIF, Sticker or Meme + TTS'
-                                                    subtitle='Basic reaction'
+                                                    title={t('StreamerProfile.ReactionCard.tier1Title')}
+                                                    subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
                                                     textMaxWidth='110px'
                                                     type={REACTION_CARD_CHANNEL_POINTS}
                                                     reactionLevel={1}
@@ -387,8 +387,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                         <TTSBotIcon />,
                                                     ]
                                                 }
-                                                title='Animated Avatar, 3D Text and TTS Voice'
-                                                subtitle='Everything in basic +'
+                                                title={t('StreamerProfile.ReactionCard.tier2Title')}
+                                                subtitle={t('StreamerProfile.ReactionCard.tier2Subtitle')}
                                                 textMaxWidth='160px'
                                                 type={REACTION_CARD_QOINS}
                                                 reactionLevel={2}
@@ -405,8 +405,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                             style={{ height: 24, width: 24 }} />
                                                     ]
                                                 }
-                                                title='Full Screen Emotes Animatios'
-                                                subtitle='All content +'
+                                                title={t('StreamerProfile.ReactionCard.tier3Title')}
+                                                subtitle={t('StreamerProfile.ReactionCard.tier3Subtitle')}
                                                 textMaxWidth='130px'
                                                 type={REACTION_CARD_QOINS}
                                                 reactionLevel={3}

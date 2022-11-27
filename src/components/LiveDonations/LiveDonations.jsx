@@ -106,7 +106,7 @@ const LiveDonations = () => {
                                     alertsOffsets.left = '40%';
                                     break;
                                 case 3:
-                                    alertsOffsets.left = '71%';
+                                    alertsOffsets.left = '50%';
                                     break;
                                 default:
                                     break;
@@ -795,6 +795,8 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
         <div style={{
             position: 'absolute',
             ...alertOffsets,
+            // Left offset only works for greetings, here we need to apply other value
+            left: alertOffsets.left && alertOffsets.left === '50%' ? '70%' : alertOffsets.left,
             opacity: showDonation ? 1 : 0,
             display: 'flex',
             flex: 1,

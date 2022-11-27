@@ -796,7 +796,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
             position: 'absolute',
             ...alertOffsets,
             // Left offset only works for greetings, here we need to apply other value
-            left: alertOffsets.left && alertOffsets.left === '50%' ? '70%' : alertOffsets.left,
+            left: alertOffsets.left && alertOffsets.left === '50%' ? '72%' : alertOffsets.left,
             opacity: showDonation ? 1 : 0,
             display: 'flex',
             flex: 1,

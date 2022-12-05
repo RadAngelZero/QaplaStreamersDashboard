@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +36,7 @@ import {
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 import ReactionCard from '../ReactionCard/ReactionCard';
 import { getEmotes } from '../../services/functions';
+import { View } from '@react-three/drei';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -98,6 +99,47 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+
+const ReactionsSwitch = withStyles((theme) => ({
+    root: {
+        width: 58,
+        height: 30,
+        padding: 0,
+    },
+    switchBase: {
+        color: '#999',
+        padding: 0,
+        '&$checked': {
+            transform: 'translateX(28px)',
+            color: '#2CE9D2',
+            '& + $track': {
+                backgroundColor: '#3B4BF9',
+                opacity: 1,
+                border: 'none',
+            },
+        },
+    },
+    checked: {
+        // idk why this must exist for the above class to work
+    },
+    thumb: {
+        width: 30,
+        height: 30,
+    },
+    disabled: {
+        opacity: 0.6,
+        '& + $track': {
+            opacity: '0.6 !important',
+            backgroundColor: '#444 !important',
+        },
+    },
+    track: {
+        borderRadius: 30 / 2,
+        backgroundColor: '#444',
+        opacity: 1,
+    },
+}))(Switch);
+
 const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const classes = useStyles();
     const history = useHistory();
@@ -111,6 +153,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [openTooltip, setOpenTooltip] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
     const [level1ReactionGif, setLevel1ReactionGif] = useState('');
+    const [reactionsEnabled, setReactionsEnabled] = useState(false);
+    const [updatingReactionsStatus, setUpdatingReactionsStatus] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -255,6 +299,15 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         }, 1250);
     }
 
+    const handleReactionsSwitch = (e) => {
+        setUpdatingReactionsStatus(true);
+        console.log(e.target.checked)
+        setTimeout(() => {
+            setReactionsEnabled(!reactionsEnabled);
+            setUpdatingReactionsStatus(false);
+        }, 60000)
+    }
+
     return (
         <StreamerDashboardContainer user={user}>
             {user &&
@@ -352,12 +405,22 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                     </Grid>
                                     <Grid container xs={12} className={styles.reactionsContainer}>
                                         <Grid item xs={12}>
-                                            <h1 className={styles.title}>
-                                                {t('StreamerProfile.reactions')}
-                                            </h1>
-                                            <p className={styles.subtitle}>
-                                                {t('StreamerProfile.reactionsSubtitle')}
-                                            </p>
+                                            <div className={styles.reactionsHeaderContainer}>
+                                                <div>
+                                                    <h1 className={styles.title}>
+                                                        {t('StreamerProfile.reactions')}
+                                                    </h1>
+                                                    <p className={styles.subtitle}>
+                                                        {t('StreamerProfile.reactionsSubtitle')}
+                                                    </p>
+                                                </div>
+                                                <div className={styles.switchContainer}>
+                                                    <p className={styles.reactionsSwitchText}>
+                                                        {`Reactions enabled`}
+                                                    </p>
+                                                    <ReactionsSwitch checked={reactionsEnabled} onChange={handleReactionsSwitch} disabled={updatingReactionsStatus} />
+                                                </div>
+                                            </div>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '10px' }} >
                                             {level1ReactionGif !== '' &&

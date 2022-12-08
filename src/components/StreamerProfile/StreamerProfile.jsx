@@ -423,31 +423,28 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </div>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '10px' }} >
-                                            {level1ReactionGif !== '' &&
-                                                <ReactionCard
-                                                    icons={
-                                                        [
-                                                            <GIFIcon />,
-                                                            <MemesIcon />,
-                                                            <MegaStickerIcon />,
-                                                        ]
-                                                    }
-                                                    title={t('StreamerProfile.ReactionCard.tier1Title')}
-                                                    subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
-                                                    textMaxWidth='110px'
-                                                    type={REACTION_CARD_CHANNEL_POINTS}
-                                                    reactionLevel={1}
-                                                    user={user}
-                                                    backgroundURL={level1ReactionGif}
-                                                />
-                                            }
                                             <ReactionCard
                                                 icons={
                                                     [
-                                                        <PlusIcon />,
-                                                        <AvatarIcon />,
-                                                        <TtGiphyIcon />,
-                                                        <TTSBotIcon />,
+                                                        <GIFIcon />,
+                                                        <MemesIcon />,
+                                                        <MegaStickerIcon />,
+                                                    ]
+                                                }
+                                                title={t('StreamerProfile.ReactionCard.tier1Title')}
+                                                subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
+                                                textMaxWidth='110px'
+                                                type={REACTION_CARD_CHANNEL_POINTS}
+                                                reactionLevel={1}
+                                                user={user}
+                                            />
+                                            <ReactionCard
+                                                icons={
+                                                    [
+                                                        <PlusIcon fill={'url(#icons-gradient)'} />,
+                                                        <AvatarIcon fill={'url(#icons-gradient)'} />,
+                                                        <TtGiphyIcon fill={'url(#icons-gradient)'} />,
+                                                        <TTSBotIcon fill={'url(#icons-gradient)'} />,
                                                     ]
                                                 }
                                                 title={t('StreamerProfile.ReactionCard.tier2Title')}
@@ -457,13 +454,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 reactionLevel={2}
                                                 user={user}
                                                 FBNode='level2'
-                                                defaultCost={500}
-                                                background='linear-gradient(0deg, #654DFF, #654DFF)'
+                                                defaultCost={50}
                                             />
                                             <ReactionCard
                                                 icons={
                                                     [
-                                                        <PlusIcon />,
+                                                        <PlusIcon fill={'url(#icons-gradient)'} />,
                                                         <img src={randomEmoteUrl}
                                                             style={{ height: 24, width: 24 }} />
                                                     ]
@@ -475,9 +471,13 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 reactionLevel={3}
                                                 user={user}
                                                 FBNode='level3'
-                                                defaultCost={800}
-                                                background='linear-gradient(318.55deg, #8322FF 9.94%, #FF98BD 90.92%), #141735'
+                                                defaultCost={100}
                                             />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <p className={styles.miniInfoText}>
+                                                {`☝ People reacting from the mobile app will see prices in Qoins instead of Bits.`}
+                                            </p>
                                         </Grid>
                                     </Grid>
                                     <Grid item xs={12}>

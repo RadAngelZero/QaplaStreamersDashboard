@@ -55,7 +55,8 @@ const ReactionCard = ({
     user,
     defaultCost,
     background = '#141735',
-    backgroundURL
+    backgroundURL,
+    availablePrices
 }) => {
     const [cost, setCost] = useState(null);
     const [newCost, setNewCost] = useState(null);
@@ -355,87 +356,11 @@ const ReactionCard = ({
                                 disableUnderline
                                 value={cost}
                                 onChange={handleCost}>
-                                <MenuItem value={5}>
-                                    {(5).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem value={10}>
-                                    {(10).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(15).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(20).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(25).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(50).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(25).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(50).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(75).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(100).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(125).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(150).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(175).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(200).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(250).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(300).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(400).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(500).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(750).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(1000).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(1250).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(1500).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(2500).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(3000).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(5000).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(7500).toLocaleString()}
-                                </MenuItem>
-                                <MenuItem>
-                                    {(10000).toLocaleString()}
-                                </MenuItem>
+                                {availablePrices.map(({ cost }) => (
+                                    <MenuItem value={cost}>
+                                        {cost.toLocaleString()}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         }
                     </div>

@@ -23,7 +23,7 @@ import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
-import { getQreatorCode, getRandomGifByLibrary, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, setAlertSetting } from '../../services/database';
+import { getQreatorCode, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, loadTwitchExtensionReactionsPrices, setAlertSetting } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -36,7 +36,6 @@ import {
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 import ReactionCard from '../ReactionCard/ReactionCard';
 import { getEmotes } from '../../services/functions';
-import { View } from '@react-three/drei';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -152,9 +151,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [qreatorCode, setQreatorCode] = useState('');
     const [openTooltip, setOpenTooltip] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
-    const [level1ReactionGif, setLevel1ReactionGif] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(false);
     const [updatingReactionsStatus, setUpdatingReactionsStatus] = useState(false);
+    const [reactionsPrices, setReactionsPrices] = useState([]);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -210,14 +209,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
-        async function getLevel1ReactionGif() {
-            const gif = await getRandomGifByLibrary('StreamerCardLevel1');
-
-            if (gif.exists()) {
-                setLevel1ReactionGif(gif.val());
-            }
-        }
-
         async function loadReactionsEnabled() {
             if (user && user.uid) {
                 const reactionsEnabled = await getStreamerAlertSetting(user.uid, 'reactionsEnabled');
@@ -225,19 +216,23 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
+        async function loadTwitchExtensionPrices() {
+            const prices = await loadTwitchExtensionReactionsPrices();
+            if (prices.exists()) {
+                setReactionsPrices(prices.val());
+            }
+        }
+
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();
         loadReactionsEnabled();
+        loadTwitchExtensionPrices();
 
         if (!randomEmoteUrl) {
             getRandomEmote();
         }
-
-        if (!level1ReactionGif) {
-            getLevel1ReactionGif();
-        }
-    }, [switchState, user, history, randomEmoteUrl, level1ReactionGif]);
+    }, [switchState, user, history, randomEmoteUrl]);
 
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
@@ -307,9 +302,11 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         }, 1250);
     }
 
-    const handleReactionsSwitch = (e) => {
-        setAlertSetting(user.uid, 'reactionsEnabled', !reactionsEnabled);
+    const handleReactionsSwitch = async (e) => {
+        setUpdatingReactionsStatus(true);
+        await setAlertSetting(user.uid, 'reactionsEnabled', !reactionsEnabled);
         setReactionsEnabled(!reactionsEnabled);
+        setUpdatingReactionsStatus(false);
     }
 
     return (
@@ -462,6 +459,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 reactionLevel={2}
                                                 user={user}
                                                 defaultCost={50}
+                                                availablePrices={reactionsPrices}
                                             />
                                             <ReactionCard
                                                 icons={
@@ -478,6 +476,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 reactionLevel={3}
                                                 user={user}
                                                 defaultCost={100}
+                                                availablePrices={reactionsPrices}
                                             />
                                         </Grid>
                                         <Grid item xs={12}>

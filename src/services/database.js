@@ -43,6 +43,7 @@ const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
 const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
 const reactionsPricesRef = database.ref('/ReactionsPrices');
 const gifsLibrariesRef = database.ref('/GifsLibraries');
+const twitchExtensionProductsRef = database.ref('/TwitchExtensionProducts');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1370,4 +1371,8 @@ export async function getRandomGifByLibrary(libraryName) {
 
     const index = Math.floor(Math.random() * length.val());
     return await gifsLibrariesRef.child(libraryName).child('gifs').child(index).once('value');
+}
+
+export async function loadTwitchExtensionReactionsPrices() {
+    return await twitchExtensionProductsRef.child('ReactionsPrices').once('value');
 }

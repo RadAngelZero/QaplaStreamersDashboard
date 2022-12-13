@@ -461,7 +461,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 type={REACTION_CARD_QOINS}
                                                 reactionLevel={2}
                                                 user={user}
-                                                FBNode='level2'
                                                 defaultCost={50}
                                             />
                                             <ReactionCard
@@ -478,7 +477,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 type={REACTION_CARD_QOINS}
                                                 reactionLevel={3}
                                                 user={user}
-                                                FBNode='level3'
                                                 defaultCost={100}
                                             />
                                         </Grid>

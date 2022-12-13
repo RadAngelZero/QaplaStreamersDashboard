@@ -1,23 +1,22 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { CircularProgress, makeStyles, MenuItem, Select } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import style from './ReactionCard.module.css';
 
-import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
-import { ReactComponent as Qoin } from './../../assets/DonatedQoin.svg';
 import { REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from '../../utilities/Constants';
 import { getInteractionsRewardData, getReactionPriceByLevel, setReactionPrice, updateStreamerProfile } from '../../services/database';
-import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { refreshUserAccessToken } from '../../services/functions';
 import { getCustomReward, updateCustomReward } from '../../services/twitch';
-import { CircularProgress, FormControl, makeStyles, MenuItem, Select } from '@material-ui/core';
 import { auth } from '../../services/firebase';
 
+import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
 import { ReactComponent as Edit } from './../../assets/Edit.svg';
 import { ReactComponent as Bits } from './../../assets/Bits.svg';
 import { ReactComponent as Show } from './../../assets/Show.svg';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     circularProgress: {
         color: '#0AFFD2',
         alignSelf: 'center'
@@ -27,17 +26,14 @@ const useStyles = makeStyles((theme) => ({
         paddingRight: '16px',
         maxHeight: '320px',
         '& ul': {
-            backgroundColor: '#141735 !important',
             padding: 0
         },
         '& li': {
             fontSize: 12,
             fontWeight: 600,
             color: '#FFF',
-            '&:selected': {
-                backgroundColor: '#141735 !important',
-                opacity: 0.6
-            }
+            backgroundColor: '#141735 !important',
+            justifyContent: 'flex-end'
         },
     },
     selectPaper: {
@@ -66,7 +62,7 @@ const ReactionCard = ({
     const [rewardId, setRewardId] = useState(null);
     const [editingCost, setEditingCost] = useState(false);
     const [updatingCost, setUpdatingCost] = useState(false);
-    const [inputWidth, setInputWidth] = useState(0);
+    const [inputWidth, setInputWidth] = useState('');
     const inputRef = useRef(null);
     const { t } = useTranslation();
     const history = useHistory();
@@ -80,11 +76,8 @@ const ReactionCard = ({
                 const price = await getReactionPriceByLevel(user.uid, level);
                 if (price.exists()) {
                     setCost(price.val());
-                    setInputWidth(`${price.val().toString().length}ch`);
-                    console.log(`${price.val().toString().length + 1}ch`);
                 } else {
                     setCost(defaultCost);
-                    setInputWidth(`${defaultCost.toString().length}ch`);
                 }
             } catch (error) {
                 if (type === REACTION_CARD_QOINS) {
@@ -108,6 +101,7 @@ const ReactionCard = ({
                         if (reward && reward.id) {
                             setCost(reward.cost);
                             setRewardId(reward.id);
+                            setInputWidth(`${reward.cost.toString().length}ch`);
                         } else if (reward === 404) {
                             history.push('/onboarding');
                         }
@@ -191,7 +185,11 @@ const ReactionCard = ({
     }
 
     const handleCost = (e) => {
-        setNewCost(e.target.value);
+        if (type === REACTION_CARD_CHANNEL_POINTS) {
+            setNewCost(e.target.value);
+        } else {
+            setCost(e.target.value);
+        }
     }
 
     return (
@@ -272,109 +270,169 @@ const ReactionCard = ({
                         {type === REACTION_CARD_QOINS &&
                             <Bits />
                         }
-                        {type === REACTION_CARD_CHANNEL_POINTS &&
+                        {type === REACTION_CARD_CHANNEL_POINTS && inputWidth !== '' &&
                             <input ref={inputRef}
-                                className={style.costInput}
                                 style={{
-                                    width: type === REACTION_CARD_CHANNEL_POINTS ? '65%' : inputWidth
+                                    width: inputWidth
                                 }}
+                                className={style.costInput}
                                 type='number'
                                 value={editingCost ? newCost : cost}
                                 disabled={type === REACTION_CARD_QOINS || !editingCost}
                                 onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                                 onChange={type === REACTION_CARD_QOINS ? () => {} : handleCost} />
                         }
+                        {type === REACTION_CARD_CHANNEL_POINTS &&
+                            <div className={style.button} onClick={handleButton} style={{
+                                backgroundColor: editingCost ? '#3B4BF9' : '#0000'
+                            }}>
+                                {updatingCost ?
+                                    <CircularProgress size={12} className={classes.circularProgress} />
+                                    :
+                                    <>
+                                        {editingCost ?
+                                            <p className={style.buttonText}>
+                                                {t('StreamerProfile.ReactionCard.button.save')}
+                                            </p>
+                                            :
+                                            <Edit height={24}
+                                                width={24}
+                                                style={{
+                                                    transform: 'scale(.75)',
+                                                    maxWidth: '24px',
+                                                    maxHeight: '24px',
+                                                    margin: '0px -8px',
+                                            }} />
+                                        }
+                                    </>
+                                }
+                            </div>
+                        }
                         {type === REACTION_CARD_QOINS &&
-                            <FormControl>
-                                <Select MenuProps={{
-                                        classes: {
-                                            paper: classes.select
+                            <Select MenuProps={{
+                                    classes: {
+                                        paper: classes.select
+                                    },
+                                    PaperProps: {
+                                        className: classes.selectPaper
+                                    },
+                                    anchorOrigin: {
+                                        vertical: 'top',
+                                        horizontal: 'left'
                                         },
-                                        PaperProps: {
-                                            className: classes.selectPaper
+                                        transformOrigin: {
+                                        vertical: 'bottom',
+                                        horizontal: 'left'
                                         },
-                                        anchorOrigin: {
-                                            vertical: 'top',
-                                            horizontal: 'left'
-                                          },
-                                          transformOrigin: {
-                                            vertical: 'bottom',
-                                            horizontal: 'left'
-                                          },
-                                          getContentAnchorEl: null
-                                    }}
-                                    style={{
-                                        color: '#fff',
-                                        fontSize: '18px',
-                                        fontWeight: '700',
-                                        border: 'none',
-                                        outline: 'none',
-                                        borderRadius: '8px',
-                                        padding: '0px 8px',
-                                    }}
-                                    IconComponent={Show}
-                                    displayEmpty
-                                    disableUnderline>
-                                    <MenuItem>5</MenuItem>
-                                    <MenuItem>10</MenuItem>
-                                    <MenuItem>15</MenuItem>
-                                    <MenuItem>20</MenuItem>
-                                    <MenuItem>25</MenuItem>
-                                    <MenuItem>50</MenuItem>
-                                    <MenuItem>25</MenuItem>
-                                    <MenuItem>50</MenuItem>
-                                    <MenuItem>75</MenuItem>
-                                    <MenuItem>100</MenuItem>
-                                    <MenuItem>125</MenuItem>
-                                    <MenuItem>150</MenuItem>
-                                    <MenuItem>175</MenuItem>
-                                    <MenuItem>200</MenuItem>
-                                    <MenuItem>2250</MenuItem>
-                                    <MenuItem>300</MenuItem>
-                                    <MenuItem>400</MenuItem>
-                                    <MenuItem>500</MenuItem>
-                                    <MenuItem>750</MenuItem>
-                                    <MenuItem>1000</MenuItem>
-                                    <MenuItem>1250</MenuItem>
-                                    <MenuItem>1500</MenuItem>
-                                    <MenuItem>2500</MenuItem>
-                                    <MenuItem>3000</MenuItem>
-                                    <MenuItem>5000</MenuItem>
-                                    <MenuItem>7500</MenuItem>
-                                    <MenuItem>10000</MenuItem>
-                                </Select>
-                            </FormControl>
+                                        getContentAnchorEl: null
+                                }}
+                                SelectDisplayProps={{
+                                    style: {
+                                        paddingRight: '16px'
+                                    }
+                                }}
+                                style={{
+                                    color: '#fff',
+                                    fontSize: '18px',
+                                    fontWeight: '700',
+                                    border: 'none',
+                                    outline: 'none',
+                                    borderRadius: '8px',
+                                    padding: '0px 8px',
+                                }}
+                                IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
+                                displayEmpty
+                                disableUnderline
+                                value={cost}
+                                onChange={handleCost}>
+                                <MenuItem value={5}>
+                                    {(5).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem value={10}>
+                                    {(10).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(15).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(20).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(25).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(50).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(25).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(50).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(75).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(100).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(125).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(150).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(175).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(200).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(250).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(300).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(400).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(500).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(750).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(1000).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(1250).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(1500).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(2500).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(3000).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(5000).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(7500).toLocaleString()}
+                                </MenuItem>
+                                <MenuItem>
+                                    {(10000).toLocaleString()}
+                                </MenuItem>
+                            </Select>
                         }
                     </div>
-                    {type === REACTION_CARD_CHANNEL_POINTS &&
-                        <div className={style.button} onClick={handleButton} style={{
-                            backgroundColor: editingCost ? '#3B4BF9' : '#0000'
-                        }}>
-                            {updatingCost ?
-                                <CircularProgress size={12} className={classes.circularProgress} />
-                                :
-                                <>
-                                    {editingCost ?
-                                        <p className={style.buttonText}>
-                                            {t('StreamerProfile.ReactionCard.button.save')}
-                                        </p>
-                                        :
-                                        <Edit style={{
-                                            maxWidth: '24px',
-                                            maxHeight: '24px',
-                                            margin: '-6px 0px',
-                                        }} />
-                                    }
-                                </>
-                            }
-
-                        </div>
-                    }
                 </div>
             </div>
-        </div >
+        </div>
     );
-
 }
 
 export default ReactionCard;

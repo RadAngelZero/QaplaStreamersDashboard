@@ -1,26 +1,52 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from 'react';
 
 import style from './ReactionCard.module.css';
 
 import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
 import { ReactComponent as Qoin } from './../../assets/DonatedQoin.svg';
-import { REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from "../../utilities/Constants";
-import { getInteractionsRewardData, getReactionPriceByLevel, setReactionPrice, updateStreamerProfile } from "../../services/database";
-import { useHistory } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { refreshUserAccessToken } from "../../services/functions";
-import { getCustomReward, updateCustomReward } from "../../services/twitch";
-import { CircularProgress, makeStyles } from "@material-ui/core";
-import { auth } from "../../services/firebase";
+import { REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from '../../utilities/Constants';
+import { getInteractionsRewardData, getReactionPriceByLevel, setReactionPrice, updateStreamerProfile } from '../../services/database';
+import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { refreshUserAccessToken } from '../../services/functions';
+import { getCustomReward, updateCustomReward } from '../../services/twitch';
+import { CircularProgress, FormControl, makeStyles, MenuItem, Select } from '@material-ui/core';
+import { auth } from '../../services/firebase';
 
 import { ReactComponent as Edit } from './../../assets/Edit.svg';
 import { ReactComponent as Bits } from './../../assets/Bits.svg';
+import { ReactComponent as Show } from './../../assets/Show.svg';
 
 const useStyles = makeStyles((theme) => ({
     circularProgress: {
         color: '#0AFFD2',
         alignSelf: 'center'
     },
+    select: {
+        paddingLeft: '16px',
+        paddingRight: '16px',
+        maxHeight: '320px',
+        '& ul': {
+            backgroundColor: '#141735 !important',
+            padding: 0
+        },
+        '& li': {
+            fontSize: 12,
+            fontWeight: 600,
+            color: '#FFF',
+            '&:selected': {
+                backgroundColor: '#141735 !important',
+                opacity: 0.6
+            }
+        },
+    },
+    selectPaper: {
+        borderRadius: '10px',
+        backgroundColor: '#141735 !important',
+        '&::-webkit-scrollbar': {
+            width: 0
+        }
+    }
 }));
 
 const ReactionCard = ({
@@ -33,14 +59,14 @@ const ReactionCard = ({
     user,
     defaultCost,
     background = '#141735',
-    backgroundURL,
-    border,
+    backgroundURL
 }) => {
     const [cost, setCost] = useState(null);
     const [newCost, setNewCost] = useState(null);
     const [rewardId, setRewardId] = useState(null);
     const [editingCost, setEditingCost] = useState(false);
     const [updatingCost, setUpdatingCost] = useState(false);
+    const [inputWidth, setInputWidth] = useState(0);
     const inputRef = useRef(null);
     const { t } = useTranslation();
     const history = useHistory();
@@ -54,8 +80,11 @@ const ReactionCard = ({
                 const price = await getReactionPriceByLevel(user.uid, level);
                 if (price.exists()) {
                     setCost(price.val());
+                    setInputWidth(`${price.val().toString().length}ch`);
+                    console.log(`${price.val().toString().length + 1}ch`);
                 } else {
                     setCost(defaultCost);
+                    setInputWidth(`${defaultCost.toString().length}ch`);
                 }
             } catch (error) {
                 if (type === REACTION_CARD_QOINS) {
@@ -241,43 +270,106 @@ const ReactionCard = ({
                             <ChPts />
                         }
                         {type === REACTION_CARD_QOINS &&
-                            <Bits style={{
-                                // maxWidth: '18px',
-                                // maxHeight: '18px'
-                            }} />
+                            <Bits />
                         }
-                        <input
-                            ref={inputRef}
-                            className={style.costInput}
-                            type='number'
-                            value={editingCost ? newCost : cost}
-                            disabled={!editingCost}
-                            onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                            onChange={handleCost}
-                        />
+                        {type === REACTION_CARD_CHANNEL_POINTS &&
+                            <input ref={inputRef}
+                                className={style.costInput}
+                                style={{
+                                    width: type === REACTION_CARD_CHANNEL_POINTS ? '65%' : inputWidth
+                                }}
+                                type='number'
+                                value={editingCost ? newCost : cost}
+                                disabled={type === REACTION_CARD_QOINS || !editingCost}
+                                onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                                onChange={type === REACTION_CARD_QOINS ? () => {} : handleCost} />
+                        }
+                        {type === REACTION_CARD_QOINS &&
+                            <FormControl>
+                                <Select MenuProps={{
+                                        classes: {
+                                            paper: classes.select
+                                        },
+                                        PaperProps: {
+                                            className: classes.selectPaper
+                                        },
+                                        anchorOrigin: {
+                                            vertical: 'top',
+                                            horizontal: 'left'
+                                          },
+                                          transformOrigin: {
+                                            vertical: 'bottom',
+                                            horizontal: 'left'
+                                          },
+                                          getContentAnchorEl: null
+                                    }}
+                                    style={{
+                                        color: '#fff',
+                                        fontSize: '18px',
+                                        fontWeight: '700',
+                                        border: 'none',
+                                        outline: 'none',
+                                        borderRadius: '8px',
+                                        padding: '0px 8px',
+                                    }}
+                                    IconComponent={Show}
+                                    displayEmpty
+                                    disableUnderline>
+                                    <MenuItem>5</MenuItem>
+                                    <MenuItem>10</MenuItem>
+                                    <MenuItem>15</MenuItem>
+                                    <MenuItem>20</MenuItem>
+                                    <MenuItem>25</MenuItem>
+                                    <MenuItem>50</MenuItem>
+                                    <MenuItem>25</MenuItem>
+                                    <MenuItem>50</MenuItem>
+                                    <MenuItem>75</MenuItem>
+                                    <MenuItem>100</MenuItem>
+                                    <MenuItem>125</MenuItem>
+                                    <MenuItem>150</MenuItem>
+                                    <MenuItem>175</MenuItem>
+                                    <MenuItem>200</MenuItem>
+                                    <MenuItem>2250</MenuItem>
+                                    <MenuItem>300</MenuItem>
+                                    <MenuItem>400</MenuItem>
+                                    <MenuItem>500</MenuItem>
+                                    <MenuItem>750</MenuItem>
+                                    <MenuItem>1000</MenuItem>
+                                    <MenuItem>1250</MenuItem>
+                                    <MenuItem>1500</MenuItem>
+                                    <MenuItem>2500</MenuItem>
+                                    <MenuItem>3000</MenuItem>
+                                    <MenuItem>5000</MenuItem>
+                                    <MenuItem>7500</MenuItem>
+                                    <MenuItem>10000</MenuItem>
+                                </Select>
+                            </FormControl>
+                        }
                     </div>
-                    <div className={style.button} onClick={handleButton} style={{
-                        backgroundColor: editingCost ? '#3B4BF9' : '#0000'
-                    }}>
-                        {updatingCost ?
-                            <CircularProgress size={12} className={classes.circularProgress} />
-                            :
-                            <>
-                                {editingCost ?
-                                    <p className={style.buttonText}>
-                                        {t('StreamerProfile.ReactionCard.button.save')}
-                                    </p>
-                                    :
-                                    <Edit style={{
-                                        maxWidth: '24px',
-                                        maxHeight: '24px',
-                                        margin: '-6px 0px',
-                                    }} />
-                                }
-                            </>
-                        }
+                    {type === REACTION_CARD_CHANNEL_POINTS &&
+                        <div className={style.button} onClick={handleButton} style={{
+                            backgroundColor: editingCost ? '#3B4BF9' : '#0000'
+                        }}>
+                            {updatingCost ?
+                                <CircularProgress size={12} className={classes.circularProgress} />
+                                :
+                                <>
+                                    {editingCost ?
+                                        <p className={style.buttonText}>
+                                            {t('StreamerProfile.ReactionCard.button.save')}
+                                        </p>
+                                        :
+                                        <Edit style={{
+                                            maxWidth: '24px',
+                                            maxHeight: '24px',
+                                            margin: '-6px 0px',
+                                        }} />
+                                    }
+                                </>
+                            }
 
-                    </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div >

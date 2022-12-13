@@ -81,6 +81,8 @@
         "receivedCheers": "Ver cheers recibidos",
         "reactions": "Reactions",
         "reactionsSubtitle": "Define el precio en Qoins para las reacciones en tu stream.",
+        "reactionsEnabled": "Reacciones habilitadas",
+        "reactionsDisabled": "Reactions deshabilitadas",
         "cheersBalanceTooltip": {
             "title": "Realiza seguimiento de tu balance de Qoins<>Bits.",
             "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
@@ -89,7 +91,7 @@
         "postStream": "Publicar un\nStream",
         "StreamerProfileEditCoin": {
             "reactions": "Reacciones",
-            "enabled": "habilitadass",
+            "enabled": "habilitadas",
             "disabled": "deshabilitadas"
         },
         "StreamerProfileModalDisableInteractions": {

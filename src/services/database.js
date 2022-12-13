@@ -985,6 +985,10 @@ export function listenToStreamerAlertsSettings(uid, callback) {
     return streamerAlertsSettingsRef.child(uid).on('value', callback);
 }
 
+export async function getStreamerAlertSetting(uid, setting) {
+    return await streamerAlertsSettingsRef.child(uid).child(setting).once('value');
+}
+
 /**
  * QoinsToBitForStreamers
  */

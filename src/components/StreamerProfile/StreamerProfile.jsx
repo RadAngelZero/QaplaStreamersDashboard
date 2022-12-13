@@ -23,7 +23,7 @@ import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
-import { getQreatorCode, getRandomGifByLibrary, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange } from '../../services/database';
+import { getQreatorCode, getRandomGifByLibrary, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, setAlertSetting } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -218,9 +218,17 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
+        async function loadReactionsEnabled() {
+            if (user && user.uid) {
+                const reactionsEnabled = await getStreamerAlertSetting(user.uid, 'reactionsEnabled');
+                setReactionsEnabled(Boolean(reactionsEnabled.val()).valueOf());
+            }
+        }
+
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();
+        loadReactionsEnabled();
 
         if (!randomEmoteUrl) {
             getRandomEmote();
@@ -300,12 +308,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const handleReactionsSwitch = (e) => {
-        setUpdatingReactionsStatus(true);
-        console.log(e.target.checked)
-        setTimeout(() => {
-            setReactionsEnabled(!reactionsEnabled);
-            setUpdatingReactionsStatus(false);
-        }, 60000)
+        setAlertSetting(user.uid, 'reactionsEnabled', !reactionsEnabled);
+        setReactionsEnabled(!reactionsEnabled);
     }
 
     return (
@@ -416,7 +420,11 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 </div>
                                                 <div className={styles.switchContainer}>
                                                     <p className={styles.reactionsSwitchText}>
-                                                        {`Reactions enabled`}
+                                                        {reactionsEnabled ?
+                                                            t('StreamerProfile.reactionsEnabled')
+                                                            :
+                                                            t('StreamerProfile.reactionsDisabled')
+                                                        }
                                                     </p>
                                                     <ReactionsSwitch checked={reactionsEnabled} onChange={handleReactionsSwitch} disabled={updatingReactionsStatus} />
                                                 </div>

@@ -81,6 +81,8 @@
         "receivedCheers": "See received cheers",
         "reactions": "Reactions",
         "reactionsSubtitle": "Set the price in Qoins for reactions on your stream.",
+        "reactionsEnabled": "Reactions enabled",
+        "reactionsDisabled": "Reactions disabled",
         "cheersBalanceTooltip": {
             "title": "Keep track of your Qoins<>Bits balance.",
             "description": "Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period."

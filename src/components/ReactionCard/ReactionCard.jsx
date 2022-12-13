@@ -211,6 +211,7 @@ const ReactionCard = ({
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between'
                 }}>
                     <svg style={{ width: 0, height: 0, position: 'absolute' }} aria-hidden="true" focusable="false">
                         <linearGradient xmlns="http://www.w3.org/2000/svg" id="icons-gradient" x1="14.1628" y1="-0.16279" x2="3.47637" y2="16.4971" gradientUnits="userSpaceOnUse">
@@ -219,17 +220,26 @@ const ReactionCard = ({
                             <stop offset="1" stop-color="#9FFFDD" />
                         </linearGradient>
                     </svg>
-                    {
-                        icons.map((icon) => {
-                            return (
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}>
+                        {icons.map((icon) => (
                                 <div style={{
                                     marginRight: '16px',
                                 }}>
                                     {icon}
                                 </div>
-                            );
-                        })
-                    }
+                            ))
+                        }
+                    </div>
+                    <p style={{
+                        fontSize: '10px',
+                        fontWeight: '700',
+                        color: '#FFF'
+                    }}>
+                        Tier {reactionLevel}
+                    </p>
                 </div>
                 <div style={{
                     display: 'flex',

@@ -80,7 +80,7 @@
         "premiumBenefits": "Get Bits & Subs for free",
         "receivedCheers": "See received cheers",
         "reactions": "Reactions",
-        "reactionsSubtitle": "Set the price in Qoins for reactions on your stream.",
+        "reactionsSubtitle": "Set the price in Bits or Channel Points for reactions on your stream.",
         "reactionsEnabled": "Reactions enabled",
         "reactionsDisabled": "Reactions disabled",
         "cheersBalanceTooltip": {

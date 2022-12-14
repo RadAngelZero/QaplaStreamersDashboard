@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import style from './ReactionCard.module.css';
 
 import { REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from '../../utilities/Constants';
-import { getInteractionsRewardData, getReactionPriceByLevel, setReactionPrice, updateStreamerProfile } from '../../services/database';
+import { getInteractionsRewardData, getReactionPriceInBitsByLevel, setReactionPrice, setReactionPriceInBits, updateStreamerProfile } from '../../services/database';
 import { refreshUserAccessToken } from '../../services/functions';
 import { getCustomReward, updateCustomReward } from '../../services/twitch';
 import { auth } from '../../services/firebase';
@@ -74,7 +74,7 @@ const ReactionCard = ({
     useEffect(() => {
         async function getPriceData() {
             try {
-                const price = await getReactionPriceByLevel(user.uid, level);
+                const price = await getReactionPriceInBitsByLevel(user.uid, level);
                 if (price.exists()) {
                     setCost(price.val());
                 } else {
@@ -185,10 +185,14 @@ const ReactionCard = ({
         }
     }
 
-    const handleCost = (e) => {
+    const handleCost = async (e) => {
         if (type === REACTION_CARD_CHANNEL_POINTS) {
             setNewCost(e.target.value);
         } else {
+            const selectedProduct = availablePrices.find(({ cost }) => (cost === e.target.value));
+            // 10 Qoins = 1 Bit, so the cost in Qoins is the cost in Bits * 10
+            await setReactionPriceInBits(user.uid, level, e.target.value, selectedProduct.twitchSku);
+            await setReactionPrice(user.uid, level, e.target.value * 10);
             setCost(e.target.value);
         }
     }
@@ -356,8 +360,8 @@ const ReactionCard = ({
                                 disableUnderline
                                 value={cost}
                                 onChange={handleCost}>
-                                {availablePrices.map(({ cost }) => (
-                                    <MenuItem value={cost}>
+                                {availablePrices.map(({ cost, twitchSku }) => (
+                                    <MenuItem value={cost} key={twitchSku}>
                                         {cost.toLocaleString()}
                                     </MenuItem>
                                 ))}

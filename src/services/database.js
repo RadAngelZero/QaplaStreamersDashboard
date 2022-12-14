@@ -42,6 +42,8 @@ const streamsGreetingsRef = database.ref('/StreamsGreetings');
 const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
 const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
 const reactionsPricesRef = database.ref('/ReactionsPrices');
+const reactionsPricesBitsRef = database.ref('/ReactionsPricesBits');
+const reactionsPricesDefaultRef = database.ref('/ReactionsPricesDefault');
 const gifsLibrariesRef = database.ref('/GifsLibraries');
 const twitchExtensionProductsRef = database.ref('/TwitchExtensionProducts');
 
@@ -1349,13 +1351,52 @@ export async function getReactionPriceByLevel(streamerUid, level) {
 }
 
 /**
- * Sets the price of the given reaction level
+ * Sets the price (in Qoins) of the given reaction level
  * @param {string} streamerUid Streamer identifier
  * @param {string} level Reaction level to update
  * @param {number} newPrice New price of the reaction
  */
 export async function setReactionPrice(streamerUid, level, newPrice) {
     return await reactionsPricesRef.child(streamerUid).child(level).set(newPrice);
+}
+
+////////////////////////
+// Reactions Prices Bits
+////////////////////////
+
+/**
+ * Returns the price (in Bits) of the given reaction level
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} level Reaction level to get
+ */
+export async function getReactionPriceInBitsByLevel(streamerUid, level) {
+    return await reactionsPricesBitsRef.child(streamerUid).child(level).once('value');
+}
+
+/**
+ * Sets the price (in Bits) of the given reaction level
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} level Reaction level to update
+ * @param {number} newPrice New price of the reaction
+ * @param {number} twitchSku SKU of the selected Twitch Product
+ */
+export async function setReactionPriceInBits(streamerUid, level, newPrice, twitchSku) {
+    return await reactionsPricesBitsRef.child(streamerUid).child(level).set({
+        price: newPrice,
+        twitchSku
+    });
+}
+
+////////////////////////
+// Reactions Prices Default
+////////////////////////
+
+/**
+ * Returns the default price (in Bits) of the given reaction level
+ * @param {string} level Reaction level to get
+ */
+export async function getDefaultReactionPriceInBitsByLevel(level) {
+    return await reactionsPricesDefaultRef.child(level).child('bits').once('value');
 }
 
 ////////////////////////

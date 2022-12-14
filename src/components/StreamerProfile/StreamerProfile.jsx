@@ -23,7 +23,7 @@ import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
-import { getQreatorCode, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, loadTwitchExtensionReactionsPrices, setAlertSetting } from '../../services/database';
+import { getDefaultReactionPriceInBitsByLevel, getQreatorCode, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, loadTwitchExtensionReactionsPrices, setAlertSetting } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -154,6 +154,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [reactionsEnabled, setReactionsEnabled] = useState(false);
     const [updatingReactionsStatus, setUpdatingReactionsStatus] = useState(false);
     const [reactionsPrices, setReactionsPrices] = useState([]);
+    const [defaultPriceLevel2, setDefaultPriceLevel2] = useState(0);
+    const [defaultPriceLevel3, setDefaultPriceLevel3] = useState(0);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -223,11 +225,24 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
+        async function loadDefaultReactionsCosts() {
+            const defaultPriceLevel2 = await getDefaultReactionPriceInBitsByLevel('level2');
+            if (defaultPriceLevel2.exists()) {
+                setDefaultPriceLevel2(defaultPriceLevel2.val());
+            }
+
+            const defaultPriceLevel3 = await getDefaultReactionPriceInBitsByLevel('level3');
+            if (defaultPriceLevel3.exists()) {
+                setDefaultPriceLevel3(defaultPriceLevel3.val());
+            }
+        }
+
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();
         loadReactionsEnabled();
         loadTwitchExtensionPrices();
+        loadDefaultReactionsCosts();
 
         if (!randomEmoteUrl) {
             getRandomEmote();
@@ -443,41 +458,45 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 reactionLevel={1}
                                                 user={user}
                                             />
-                                            <ReactionCard
-                                                icons={
-                                                    [
-                                                        <PlusIcon fill={'url(#icons-gradient)'} />,
-                                                        <AvatarIcon fill={'url(#icons-gradient)'} />,
-                                                        <TtGiphyIcon fill={'url(#icons-gradient)'} />,
-                                                        <TTSBotIcon fill={'url(#icons-gradient)'} />,
-                                                    ]
-                                                }
-                                                title={t('StreamerProfile.ReactionCard.tier2Title')}
-                                                subtitle={t('StreamerProfile.ReactionCard.tier2Subtitle')}
-                                                textMaxWidth='160px'
-                                                type={REACTION_CARD_QOINS}
-                                                reactionLevel={2}
-                                                user={user}
-                                                defaultCost={50}
-                                                availablePrices={reactionsPrices}
-                                            />
-                                            <ReactionCard
-                                                icons={
-                                                    [
-                                                        <PlusIcon fill={'url(#icons-gradient)'} />,
-                                                        <img src={randomEmoteUrl}
-                                                            style={{ height: 24, width: 24 }} />
-                                                    ]
-                                                }
-                                                title={t('StreamerProfile.ReactionCard.tier3Title')}
-                                                subtitle={t('StreamerProfile.ReactionCard.tier3Subtitle')}
-                                                textMaxWidth='130px'
-                                                type={REACTION_CARD_QOINS}
-                                                reactionLevel={3}
-                                                user={user}
-                                                defaultCost={100}
-                                                availablePrices={reactionsPrices}
-                                            />
+                                            {defaultPriceLevel3 &&
+                                                <ReactionCard
+                                                    icons={
+                                                        [
+                                                            <PlusIcon fill={'url(#icons-gradient)'} />,
+                                                            <AvatarIcon fill={'url(#icons-gradient)'} />,
+                                                            <TtGiphyIcon fill={'url(#icons-gradient)'} />,
+                                                            <TTSBotIcon fill={'url(#icons-gradient)'} />,
+                                                        ]
+                                                    }
+                                                    title={t('StreamerProfile.ReactionCard.tier2Title')}
+                                                    subtitle={t('StreamerProfile.ReactionCard.tier2Subtitle')}
+                                                    textMaxWidth='160px'
+                                                    type={REACTION_CARD_QOINS}
+                                                    reactionLevel={2}
+                                                    user={user}
+                                                    defaultCost={defaultPriceLevel2}
+                                                    availablePrices={reactionsPrices}
+                                                />
+                                            }
+                                            {defaultPriceLevel3 &&
+                                                <ReactionCard
+                                                    icons={
+                                                        [
+                                                            <PlusIcon fill={'url(#icons-gradient)'} />,
+                                                            <img src={randomEmoteUrl}
+                                                                style={{ height: 24, width: 24 }} />
+                                                        ]
+                                                    }
+                                                    title={t('StreamerProfile.ReactionCard.tier3Title')}
+                                                    subtitle={t('StreamerProfile.ReactionCard.tier3Subtitle')}
+                                                    textMaxWidth='130px'
+                                                    type={REACTION_CARD_QOINS}
+                                                    reactionLevel={3}
+                                                    user={user}
+                                                    defaultCost={defaultPriceLevel3}
+                                                    availablePrices={reactionsPrices}
+                                                />
+                                            }
                                         </Grid>
                                         <Grid item xs={12}>
                                             <p className={styles.miniInfoText}>
@@ -562,7 +581,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         valueOfQoinsForStreamer={valueOfQoinsForStreamer}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />
-
                 </>
             }
         </StreamerDashboardContainer>

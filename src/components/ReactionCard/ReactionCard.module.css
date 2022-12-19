@@ -9,7 +9,6 @@
 
 .gradientContainer {
     content: '';
-    background: linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%);
     padding: 4px;
     border-radius: 20px;
     -webkit-box-sizing: border-box;

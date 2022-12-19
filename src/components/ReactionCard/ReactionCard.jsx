@@ -56,7 +56,8 @@ const ReactionCard = ({
     defaultCost,
     background = '#141735',
     backgroundURL,
-    availablePrices
+    availablePrices,
+    hideBorder,
 }) => {
     const [cost, setCost] = useState(null);
     const [newCost, setNewCost] = useState(null);
@@ -198,7 +199,7 @@ const ReactionCard = ({
     }
 
     return (
-        <div className={style.gradientContainer}>
+        <div className={style.gradientContainer} style={{    background: hideBorder ? 'none' : 'linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%)',        }}>
             <div className={style.container} style={{
                 display: 'flex',
                 flexDirection: 'column',

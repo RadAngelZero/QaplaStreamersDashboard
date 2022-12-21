@@ -228,12 +228,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         async function loadDefaultReactionsCosts() {
             const defaultPriceLevel2 = await getDefaultReactionPriceInBitsByLevel('level2');
             if (defaultPriceLevel2.exists()) {
-                setDefaultPriceLevel2(defaultPriceLevel2.val());
+                setDefaultPriceLevel2(defaultPriceLevel2.val().price);
             }
 
             const defaultPriceLevel3 = await getDefaultReactionPriceInBitsByLevel('level3');
             if (defaultPriceLevel3.exists()) {
-                setDefaultPriceLevel3(defaultPriceLevel3.val());
+                setDefaultPriceLevel3(defaultPriceLevel3.val().price);
             }
         }
 
@@ -458,7 +458,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 reactionLevel={1}
                                                 user={user}
                                             />
-                                            {defaultPriceLevel3 &&
+                                            {defaultPriceLevel2 &&
                                                 <ReactionCard
                                                     icons={
                                                         [

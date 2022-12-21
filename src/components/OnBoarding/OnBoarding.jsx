@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { makeStyles, Button, Checkbox } from "@material-ui/core";
+import React, { useState, useEffect } from 'react';
+import { makeStyles, Button, Checkbox, CircularProgress } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import styles from './OnBoarding.module.css';
 import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
-import { useHistory } from "react-router-dom";
-import { getEmotes } from '../../services/functions';
-import { createInteractionsReward } from "../../services/interactionsQapla";
-import { getDefaultReactionPriceInBitsByLevel, loadTwitchExtensionReactionsPrices, writeTestCheer } from "../../services/database";
-import { CHEERS_URI, REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from "../../utilities/Constants";
-import { notifyBugToDevelopTeam } from "../../services/discord";
-import ReactionCard from "../ReactionCard/ReactionCard";
+import { useHistory } from 'react-router-dom';
+import { getEmotes, getUserWebhooks, subscribeStreamerToTwitchWebhook } from '../../services/functions';
+import { createInteractionsReward } from '../../services/interactionsQapla';
+import { getDefaultReactionPriceInBitsByLevel, loadTwitchExtensionReactionsPrices, saveInteractionsRewardData, writeTestCheer } from '../../services/database';
+import { CHEERS_URI, InteractionsRewardRedemption, REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from '../../utilities/Constants';
+import { notifyBugToDevelopTeam } from '../../services/discord';
+import ReactionCard from '../ReactionCard/ReactionCard';
 
 import { ReactComponent as Unchecked } from './../../assets/Unchecked.svg';
 import { ReactComponent as Checked } from './../../assets/Checked.svg';
@@ -21,6 +21,7 @@ import { ReactComponent as AvatarIcon } from './../../assets/reactionCardsIcons/
 import { ReactComponent as TtGiphyIcon } from './../../assets/reactionCardsIcons/TtGiphy.svg';
 import { ReactComponent as TTSBotIcon } from './../../assets/reactionCardsIcons/TTSBot.svg';
 import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.svg';
+import { deleteCustomReward, getUserCustomRewards } from '../../services/twitch';
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -35,7 +36,12 @@ const useStyles = makeStyles((theme) => ({
         textTransform: 'none',
         borderRadius: '16px',
         '&:hover': {
-            backgroundColor: '#00EACB'
+            backgroundColor: '#00EACB',
+            opacity: .9
+        },
+        '&:disabled': {
+            backgroundColor: '#00EACB !important',
+            opacity: .75
         },
     },
     copyOverlayLinkButton: {
@@ -73,7 +79,6 @@ const OnBoarding = ({ user }) => {
     const classes = useStyles();
     const history = useHistory();
     const [step, setStep] = useState(0);
-    const [channelPointsRewardCost, setChannelPointsRewardCost] = useState(2000);
     const [errorCode, setErrorCode] = useState(0);
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);
     const [streamerOverlayLink, setStreamerOverlayLink] = useState(CHEERS_URI);
@@ -83,21 +88,23 @@ const OnBoarding = ({ user }) => {
     const [defaultPriceLevel3, setDefaultPriceLevel3] = useState(0);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
     const [reactionsPrices, setReactionsPrices] = useState([]);
+    const [creatingReward, setCreatingReward] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
         if (user && user.id) {
             setStreamerOverlayLink(`${CHEERS_URI}/${user.id}`);
         }
+
         async function loadDefaultReactionsCosts() {
             const defaultPriceLevel2 = await getDefaultReactionPriceInBitsByLevel('level2');
             if (defaultPriceLevel2.exists()) {
-                setDefaultPriceLevel2(defaultPriceLevel2.val());
+                setDefaultPriceLevel2(defaultPriceLevel2.val().price);
             }
 
             const defaultPriceLevel3 = await getDefaultReactionPriceInBitsByLevel('level3');
             if (defaultPriceLevel3.exists()) {
-                setDefaultPriceLevel3(defaultPriceLevel3.val());
+                setDefaultPriceLevel3(defaultPriceLevel3.val().price);
             }
         }
 
@@ -123,8 +130,8 @@ const OnBoarding = ({ user }) => {
             }
         }
 
-        loadDefaultReactionsCosts();
         loadTwitchExtensionPrices();
+        loadDefaultReactionsCosts();
 
         if (!randomEmoteUrl) {
             getRandomEmote();
@@ -135,14 +142,11 @@ const OnBoarding = ({ user }) => {
         if (step === -1) {
             return openDiscordSupport();
         }
-        if (step === 0) { // Welcome
-            setStepIndicator(1);
-        }
-        if (step === 1) { // Set channel points cost and create reward
+        if (step === 0) {
             return createChannelPointsRewards();
         }
-        if (step === 3) {
-            setStepIndicator(2);
+        if (step === 2) {
+            setStepIndicator(1);
         }
         if (step === 5) {
             return history.push('/profile');
@@ -155,39 +159,91 @@ const OnBoarding = ({ user }) => {
         window.open('https://discord.gg/2UMQ6ZXPkq', '_blank');
     }
 
-    const createChannelPointsRewards = async () => {
+    const createChannelPointsRewards = async (attempt = 1) => {
         setStep(step + 1);
-
-        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, 'Qapla Reaction', channelPointsRewardCost);
+        setCreatingReward(true);
+        // Create reward with default value, the user can change their cost in the next step
+        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, 'Qapla Reaction', 2000);
         if (result !== undefined) {
             if (result.reward.status === 200) {
-                if (result.webhookSubscription) {
-                    onSuccessfullChannelPointsCreation();
+                const webhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, InteractionsRewardRedemption.type, InteractionsRewardRedemption.callback, { reward_id: result.reward.data.id });
+
+                if (webhookSubscription.data.id) {
+                    // Store on database
+                    await saveInteractionsRewardData(user.uid, result.reward.data.id, webhookSubscription.data.id);
+
+                    setCreatingReward(false);
+                    return setStep(step + 3);
                 } else {
-                    notifyBugToDevelopTeam(`${user.uid} Reward webhook creation error`);
-                    onErrorChannelPointsCreation(500);
+                    if (attempt === 1) {
+                        // Webhook creation failed, delete reward and try again
+                        await deleteCustomReward(user.id, user.twitchAccessToken, result.reward.data.id);
+
+                        setCreatingReward(false);
+                        return createChannelPointsRewards(2);
+                    } else {
+                        // If we fail 2 times to create the webhook notify developer team
+                        notifyBugToDevelopTeam(`${user.uid} Reward webhook creation error`);
+
+                        setCreatingReward(false);
+                        return onErrorChannelPointsCreation(500);
+                    }
                 }
             } else {
-                notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: ` + JSON.stringify(result.reward));
-                onErrorChannelPointsCreation(result.reward.status);
+                // Duplicated reward
+                if (result.reward.status === 400) {
+                    const userWebhooks = await getUserWebhooks(user.id);
+
+                    const webhookExists = userWebhooks.data.some((webhook) => {
+                        if (webhook.type === 'channel.channel_points_custom_reward_redemption.add') {
+                            return true;
+                        }
+
+                        return false;
+                    });
+
+                    // Reward exists but does not have webhook linked
+                    if (!webhookExists) {
+                        if (attempt === 1) {
+                            const userRewards = await getUserCustomRewards(user.id, user.twitchAccessToken);
+
+                            if (userRewards) {
+                                return userRewards.forEach(async (reward) => {
+                                    // Find Qapla Reward
+                                    if (reward.title === 'Qapla Reaction') {
+                                        // Reward already exists, but webhook does not, delete reward and try again
+                                        await deleteCustomReward(user.id, user.twitchAccessToken, reward.id);
+
+                                        setCreatingReward(false);
+                                        return createChannelPointsRewards(2);
+                                    }
+                                });
+                            }
+                        } else {
+                            // If we fail 2 times to create the reward and webhook notify developer team
+                            notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: ` + JSON.stringify(result.reward));
+
+                            setCreatingReward(false);
+                            return onErrorChannelPointsCreation(result.reward.status);
+                        }
+                    } else {
+                        // Webhook and reward already exists
+                        setCreatingReward(false);
+                        return setStep(step + 3);
+                    }
+                }
             }
         } else {
             notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: error 0 (auth token expired)`);
-            onErrorChannelPointsCreation(0);
-        }
-    }
 
-    const onSuccessfullChannelPointsCreation = () => {
-        setStep(step + 2);
+            setCreatingReward(false);
+            return onErrorChannelPointsCreation(0);
+        }
     }
 
     const onErrorChannelPointsCreation = (eC) => {
         setErrorCode(eC);
         setStep(-1);
-    }
-
-    const handleChannePointsRewardCostChange = (e) => {
-        setChannelPointsRewardCost(e.target.value);
     }
 
     const handleCopyOverlayLink = () => {
@@ -214,7 +270,7 @@ const OnBoarding = ({ user }) => {
             alignItems: 'center',
             flexDirection: 'column',
         }}>
-            {step !== 1 &&
+            {step !== 3 &&
                 <div style={{
                     marginTop: 24,
                     position: 'relative',
@@ -257,6 +313,19 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === 1 &&
                         <>
+                            <img src='https://media.giphy.com/media/3o752nnUPE7OzLeSVW/giphy.gif' alt={`Barnaby Working`}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 256, // 256 - 8 (height of container - hidden part of the image)
+                                    width: '206px',
+                                    height: '135px',
+                                    zIndex: '1',
+                                }}
+                            />
+                        </>
+                    }
+                    {step === 2 &&
+                        <>
                             <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Fchannelpoints-pink.gif?alt=media&token=f5ca8128-99cc-4d03-9257-e5e6f960cac4'
                                 alt='channel points'
                                 style={{
@@ -280,19 +349,6 @@ const OnBoarding = ({ user }) => {
                         </>
                     }
                     {step === 2 &&
-                        <>
-                            <img src='https://media.giphy.com/media/3o752nnUPE7OzLeSVW/giphy.gif' alt={`Barnaby Working`}
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 256, // 256 - 8 (height of container - hidden part of the image)
-                                    width: '206px',
-                                    height: '135px',
-                                    zIndex: '1',
-                                }}
-                            />
-                        </>
-                    }
-                    {step === 3 &&
                         <>
                             <img src='https://media.giphy.com/media/xULW8v7LtZrgcaGvC0/giphy.gif' alt={`Barnaby Says Thanks`}
                                 style={{
@@ -354,26 +410,6 @@ const OnBoarding = ({ user }) => {
                         </>
                     }
                     {step === 1 &&
-                        <>
-                            <p className={styles.headerText}>
-                                {t('Onboarding.setRewardCost')}
-                            </p>
-                            <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                                {t('Onboarding.setRewardCostDescription')}
-                            </p>
-                            <div className={styles.qoinsMainContainer}>
-                                <div className={styles.qoinsSubContainer}>
-                                    <input
-                                        className={styles.qoins}
-                                        value={channelPointsRewardCost}
-                                        onChange={handleChannePointsRewardCostChange}
-
-                                    />
-                                </div>
-                            </div>
-                        </>
-                    }
-                    {step === 2 &&
                         <>
                             <h1 className={styles.gradientText}>
                                 {t('Onboarding.workingOnRequest')}
@@ -484,8 +520,9 @@ const OnBoarding = ({ user }) => {
                             />
                         </>
                     }
-                </div>}
-            {step === 1 &&
+                </div>
+            }
+            {step === 3 &&
                 <>
                     <div style={{
                         display: 'flex',
@@ -534,7 +571,7 @@ const OnBoarding = ({ user }) => {
                             user={user}
                             hideBorder
                         />
-                        {/*defaultPriceLevel3*/ true &&
+                        {defaultPriceLevel3 &&
                             <ReactionCard
                                 icons={
                                     [
@@ -555,7 +592,7 @@ const OnBoarding = ({ user }) => {
                                 hideBorder
                             />
                         }
-                        {/*defaultPriceLevel3*/ true &&
+                        {defaultPriceLevel3 &&
                             <ReactionCard
                                 icons={
                                     [
@@ -586,36 +623,44 @@ const OnBoarding = ({ user }) => {
                     marginTop: 24,
                 }}>
                 <Button
-                    disabled={step === 2 || (step === 4 && !overlayLinkCopied) || (step === 0 && !acceptPolicies)}
+                    disabled={step === 2 || (step === 4 && !overlayLinkCopied) || (step === 0 && !acceptPolicies) || creatingReward}
                     onClick={handleMainButton}
                     className={classes.button}
                 >
-                    {step === -1 &&
+                    {creatingReward &&
+                        <CircularProgress
+                            style={{
+                                color: '#3B4BF9',
+                                alignSelf: 'center'
+                            }}
+                            size={25} />
+                    }
+                    {!creatingReward && step === -1 &&
                         <>
                             {t('Onboarding.goToDiscord')}
                         </>
                     }
-                    {step === 0 &&
+                    {!creatingReward && step === 0 &&
                         <>
                             {t('Onboarding.letsGo')}
                         </>
                     }
-                    {step === 1 &&
+                    {!creatingReward && step === 1 &&
                         <>
                             {t('Onboarding.createCustomReward')}
                         </>
                     }
-                    {step === 2 &&
+                    {!creatingReward && step === 2 &&
                         <>
                             {t('Onboarding.waitABit')}
                         </>
                     }
-                    {step === 3 &&
+                    {!creatingReward && step === 3 &&
                         <>
                             {t('Onboarding.finishSetUp')}
                         </>
                     }
-                    {step === 4 &&
+                    {!creatingReward && step === 4 &&
                         <>
                             {overlayLinkCopied ?
                                 t('Onboarding.finishSetUp')
@@ -624,7 +669,7 @@ const OnBoarding = ({ user }) => {
                             }
                         </>
                     }
-                    {step === 5 &&
+                    {!creatingReward && step === 5 &&
                         <>
                             {t('Onboarding.goToDashboard')}
                         </>
@@ -672,15 +717,15 @@ const OnBoarding = ({ user }) => {
                     />
                     <div style={{ opacity: acceptPolicies ? 1 : 0.7, color: '#FFF', paddingLeft: '6px' }}>
                         {t('Onboarding.policiesP1')}
-                        <a href={t('Onboarding.termsOfUseUrl')} target="_blank"
-                            rel="noreferrer"
+                        <a href={t('Onboarding.termsOfUseUrl')} target='_blank'
+                            rel='noreferrer'
                             style={{ color: '#00FFDD', marginLeft: 4, marginRight: 4, textDecoration: 'none' }}>
                             {t('Onboarding.policiesP2')}
                         </a>
                         {t('Onboarding.policiesP3')}
                         <a href={t('Onboarding.privacyPolicy')}
-                            target="_blank"
-                            rel="noreferrer"
+                            target='_blank'
+                            rel='noreferrer'
                             style={{ color: '#00FFDD', marginLeft: 4, textDecoration: 'none' }}>
                             {t('Onboarding.policiesP4')}
                         </a>

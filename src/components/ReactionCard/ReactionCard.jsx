@@ -59,12 +59,12 @@ const ReactionCard = ({
     availablePrices,
     hideBorder,
 }) => {
-    const [cost, setCost] = useState(null);
+    const [cost, setCost] = useState(0);
     const [newCost, setNewCost] = useState(null);
     const [rewardId, setRewardId] = useState(null);
     const [editingCost, setEditingCost] = useState(false);
     const [updatingCost, setUpdatingCost] = useState(false);
-    const [inputWidth, setInputWidth] = useState('');
+    const [inputWidth, setInputWidth] = useState('1ch');
     const inputRef = useRef(null);
     const { t } = useTranslation();
     const history = useHistory();
@@ -77,7 +77,7 @@ const ReactionCard = ({
             try {
                 const price = await getReactionPriceInBitsByLevel(user.uid, level);
                 if (price.exists()) {
-                    setCost(price.val());
+                    setCost(price.val().price);
                 } else {
                     setCost(defaultCost);
                 }
@@ -121,10 +121,10 @@ const ReactionCard = ({
             }
         }
 
-        if (user.uid && cost === null && type === REACTION_CARD_QOINS) {
+        if (user.uid && cost === 0 && type === REACTION_CARD_QOINS) {
             getPriceData();
         }
-        if (user.uid && cost === null && type === REACTION_CARD_CHANNEL_POINTS) {
+        if (user.uid && cost === 0 && type === REACTION_CARD_CHANNEL_POINTS) {
             getChannelPointRewardData();
         }
     }, [cost, defaultCost, history, type, user.id, user.refreshToken, user.uid, reactionLevel]);
@@ -221,17 +221,18 @@ const ReactionCard = ({
                 }}>
                     <svg style={{ width: 0, height: 0, position: 'absolute' }} aria-hidden="true" focusable="false">
                         <linearGradient xmlns="http://www.w3.org/2000/svg" id="icons-gradient" x1="14.1628" y1="-0.16279" x2="3.47637" y2="16.4971" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#FFD3FB" />
-                            <stop offset="0.484375" stop-color="#F5FFCB" />
-                            <stop offset="1" stop-color="#9FFFDD" />
+                            <stop stopColor="#FFD3FB" />
+                            <stop offset="0.484375" stopColor="#F5FFCB" />
+                            <stop offset="1" stopColor="#9FFFDD" />
                         </linearGradient>
                     </svg>
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
                     }}>
-                        {icons.map((icon) => (
-                                <div style={{
+                        {icons.map((icon, index) => (
+                                <div key={`icon-${index}`}
+                                    style={{
                                     marginRight: '16px',
                                 }}>
                                     {icon}
@@ -294,7 +295,7 @@ const ReactionCard = ({
                                 className={style.costInput}
                                 type='number'
                                 value={editingCost ? newCost : cost}
-                                disabled={type === REACTION_CARD_QOINS || !editingCost}
+                                disabled={type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId)}
                                 onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                                 onChange={type === REACTION_CARD_QOINS ? () => {} : handleCost} />
                         }

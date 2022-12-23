@@ -61,7 +61,14 @@
         "done": "Looks awesome! I'm done",
         "copyToTest": "Copy link to test overlay",
         "goToDashboard": "Go to dashboard",
-        "errorTitle": "Oh no! Error {{errorCode}}",
+        "duplicatedReward": {
+            "title": "🫣 Error 400\nThe 1Zap reward already exists",
+            "description": "Please erase the 1Zap custom reward from your Twitch channel and try again. If the problem persists please contact support."
+        },
+        "tooManyRewards": {
+            "title": "🫣 Error 400\nYour Channel Rewards are full!",
+            "description": "Please erase one or two unused custom rewards from your Twitch channel and try again. If the problem persists please contact support."
+        },
         "errorDescription": "Don’t worry. Let’s try again! Make sure your channel rewards are not full",
         "policiesP1": "By signing up you accept our",
         "policiesP2": "Terms of Use",

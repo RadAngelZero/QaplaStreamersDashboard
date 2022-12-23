@@ -80,6 +80,7 @@ const OnBoarding = ({ user }) => {
     const history = useHistory();
     const [step, setStep] = useState(0);
     const [errorCode, setErrorCode] = useState(0);
+    const [errorMessage, setErrorMessage] = useState('');
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);
     const [streamerOverlayLink, setStreamerOverlayLink] = useState(CHEERS_URI);
     const [stepIndicator, setStepIndicator] = useState(0);
@@ -199,7 +200,7 @@ const OnBoarding = ({ user }) => {
                     }
                 }
             } else {
-                // Duplicated reward
+                // Duplicated reward or channel points rewards are full
                 if (result.reward.status === 400) {
                     const userWebhooks = await getUserWebhooks(user.id);
 
@@ -233,7 +234,7 @@ const OnBoarding = ({ user }) => {
                             notifyBugToDevelopTeam(`${user.uid} Reactions reward creation error: ` + JSON.stringify(result.reward));
 
                             setCreatingReward(false);
-                            return onErrorChannelPointsCreation(result.reward.status);
+                            return onErrorChannelPointsCreation(result.reward.status, result.reward.message);
                         }
                     } else {
                         // Webhook and reward already exists
@@ -250,8 +251,10 @@ const OnBoarding = ({ user }) => {
         }
     }
 
-    const onErrorChannelPointsCreation = (eC) => {
-        setErrorCode(eC);
+    const onErrorChannelPointsCreation = (errorCode, errorMessage) => {
+        setErrorCode(errorCode);
+        let errorTranslationKey = errorMessage === 'CREATE_CUSTOM_REWARD_TOO_MANY_REWARDS' ? 'tooManyRewards' : 'duplicatedReward';
+        setErrorMessage(errorTranslationKey);
         setStep(-1);
     }
 
@@ -371,11 +374,11 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === -1 &&
                         <>
-                            <p style={{ marginTop: '20px' }} className={styles.headerText}>
-                                {t('Onboarding.errorTitle', { errorCode })}
+                            <p style={{ marginTop: '42px' }} className={styles.headerText}>
+                                {t(`Onboarding.${errorMessage}.title`)}
                             </p>
                             <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                                {t('Onboarding.errorDescription')}
+                                {t(`Onboarding.${errorMessage}.description`)}
                             </p>
                         </>
                     }

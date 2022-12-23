@@ -61,7 +61,14 @@
         "done": "¡Se ve genial! Estoy listo",
         "copyToTest": "Copia el link para probar el overlay",
         "goToDashboard": "Ir al dashboard",
-        "errorTitle": "¡Oh no! Error {{errorCode}}",
+        "duplicatedReward": {
+            "title": "🫣 Error 400\nLa recompensa 1Zap ya existe en tu canal",
+            "description": "Porfavor elimina la recompensa 1Zap de tu canal de Twitch e intentalo de nuevo. Si el problema persiste contacta a soporte."
+        },
+        "tooManyRewards": {
+            "title": "🫣 Error 400\n¡Tus recompensas de canal estan llenas!",
+            "description": "Porfavor elimina una o dos recompensas que no uses de tu canal de Twitch e intentalo de nuevo. Si el problema persiste contacta a soporte."
+        },
         "errorDescription": "No te preocupes. ¡Intentemos de nuevo! Asegurate de que tus recompensas de canal no esten llenas",
         "policiesP1": "Al continuar acepto los",
         "policiesP2": "Terminos de uso",

@@ -152,6 +152,7 @@ const OnBoarding = ({ user }) => {
                 setStep(step + 1);
                 break;
             case 3:
+                setStepIndicator(2);
                 setStep(step + 1);
                 break;
             case 4:
@@ -656,7 +657,7 @@ const OnBoarding = ({ user }) => {
                     }
                 </Button>
             </div>
-            {step !== 4 &&
+            {step !== 5 &&
                 <div style={{
                     display: 'flex',
                     position: 'absolute',

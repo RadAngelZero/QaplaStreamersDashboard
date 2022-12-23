@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, Button, Checkbox, CircularProgress } from '@material-ui/core';
+import { makeStyles, Button, Checkbox } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import styles from './OnBoarding.module.css';
@@ -139,20 +139,29 @@ const OnBoarding = ({ user }) => {
     }, [user]);
 
     const handleMainButton = () => {
-        if (step === -1) {
-            return openDiscordSupport();
+        switch (step) {
+            case -1:
+                openDiscordSupport();
+                break;
+            case 0:
+                createChannelPointsRewards();
+                break;
+            case 2:
+                setStepIndicator(1);
+                setStep(step + 1);
+                break;
+            case 3:
+                setStep(step + 1);
+                break;
+            case 4:
+                setStep(step + 1);
+                break;
+            case 5:
+                history.push('/profile');
+                break;
+            default:
+                break;
         }
-        if (step === 0) {
-            return createChannelPointsRewards();
-        }
-        if (step === 2) {
-            setStepIndicator(1);
-        }
-        if (step === 5) {
-            return history.push('/profile');
-        }
-
-        setStep(step + 1);
     }
 
     const openDiscordSupport = () => {
@@ -173,7 +182,7 @@ const OnBoarding = ({ user }) => {
                     await saveInteractionsRewardData(user.uid, result.reward.data.id, webhookSubscription.data.id);
 
                     setCreatingReward(false);
-                    return setStep(step + 3);
+                    return setStep(2);
                 } else {
                     if (attempt === 1) {
                         // Webhook creation failed, delete reward and try again
@@ -229,7 +238,7 @@ const OnBoarding = ({ user }) => {
                     } else {
                         // Webhook and reward already exists
                         setCreatingReward(false);
-                        return setStep(step + 3);
+                        return setStep(2);
                     }
                 }
             }
@@ -326,30 +335,6 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === 2 &&
                         <>
-                            <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Fchannelpoints-pink.gif?alt=media&token=f5ca8128-99cc-4d03-9257-e5e6f960cac4'
-                                alt='channel points'
-                                style={{
-                                    position: 'absolute',
-                                    width: '269px',
-                                    height: '134px',
-                                    transform: 'rotate(-15deg)',
-                                    bottom: 256, // 256 (height of container)
-                                }}
-                            />
-                            <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
-                                style={{
-                                    position: 'absolute',
-                                    width: '162px',
-                                    height: '151px',
-                                    zIndex: '1000',
-                                    transform: 'rotate(-3.45deg)',
-                                    bottom: 244, // 256 - 12 (height of container - hidden part of the image)
-                                }}
-                            />
-                        </>
-                    }
-                    {step === 2 &&
-                        <>
                             <img src='https://media.giphy.com/media/xULW8v7LtZrgcaGvC0/giphy.gif' alt={`Barnaby Says Thanks`}
                                 style={{
                                     position: 'absolute',
@@ -416,7 +401,7 @@ const OnBoarding = ({ user }) => {
                             </h1>
                         </>
                     }
-                    {step === 3 &&
+                    {step === 2 &&
                         <>
                             <h1 className={styles.gradientText}>
                                 {t('Onboarding.rewardCreated')}
@@ -623,44 +608,36 @@ const OnBoarding = ({ user }) => {
                     marginTop: 24,
                 }}>
                 <Button
-                    disabled={step === 2 || (step === 4 && !overlayLinkCopied) || (step === 0 && !acceptPolicies) || creatingReward}
+                    disabled={step === 1 || (step === 4 && !overlayLinkCopied) || (step === 0 && !acceptPolicies) || creatingReward}
                     onClick={handleMainButton}
                     className={classes.button}
                 >
-                    {creatingReward &&
-                        <CircularProgress
-                            style={{
-                                color: '#3B4BF9',
-                                alignSelf: 'center'
-                            }}
-                            size={25} />
-                    }
-                    {!creatingReward && step === -1 &&
+                    {step === -1 &&
                         <>
                             {t('Onboarding.goToDiscord')}
                         </>
                     }
-                    {!creatingReward && step === 0 &&
+                    {step === 0 &&
                         <>
                             {t('Onboarding.letsGo')}
                         </>
                     }
-                    {!creatingReward && step === 1 &&
-                        <>
-                            {t('Onboarding.createCustomReward')}
-                        </>
-                    }
-                    {!creatingReward && step === 2 &&
+                    {step === 1 &&
                         <>
                             {t('Onboarding.waitABit')}
                         </>
                     }
-                    {!creatingReward && step === 3 &&
+                    {step === 2 &&
                         <>
-                            {t('Onboarding.finishSetUp')}
+                            {t('Onboarding.configureTiers')}
                         </>
                     }
-                    {!creatingReward && step === 4 &&
+                    {step === 3 &&
+                        <>
+                            {t('Onboarding.imAllSet')}
+                        </>
+                    }
+                    {step === 4 &&
                         <>
                             {overlayLinkCopied ?
                                 t('Onboarding.finishSetUp')
@@ -669,14 +646,14 @@ const OnBoarding = ({ user }) => {
                             }
                         </>
                     }
-                    {!creatingReward && step === 5 &&
+                    {step === 5 &&
                         <>
                             {t('Onboarding.goToDashboard')}
                         </>
                     }
                 </Button>
             </div>
-            {step !== 5 &&
+            {step !== 4 &&
                 <div style={{
                     display: 'flex',
                     position: 'absolute',

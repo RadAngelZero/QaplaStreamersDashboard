@@ -51,6 +51,7 @@
         "width": "Ancho",
         "height": "Alto",
         "testOverlay": "Probar Overlay",
+        "tiersPricingInstructions": "👆 Define el “precio” en puntos de canal y bits para que\ntus viewers envien alertas personalizadas en stream",
         "goToDiscord": "Ir a soporte en Discord",
         "letsGo": "¡Vamos!",
         "createCustomReward": "Crear Recompensa",

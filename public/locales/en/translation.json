@@ -51,6 +51,7 @@
         "width": "Width",
         "height": "Height",
         "testOverlay": "Test Overlay",
+        "tiersPricingInstructions": "👆 Set the “price” in channel points and bits for\nviewers to send custom alerts on stream",
         "goToDiscord": "Go Discord Support",
         "letsGo": "Let’s F* Go",
         "createCustomReward": "Create Custom Reward",

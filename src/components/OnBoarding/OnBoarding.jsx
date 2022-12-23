@@ -8,7 +8,7 @@ import { useHistory } from 'react-router-dom';
 import { getEmotes, getUserWebhooks, subscribeStreamerToTwitchWebhook } from '../../services/functions';
 import { createInteractionsReward } from '../../services/interactionsQapla';
 import { getDefaultReactionPriceInBitsByLevel, loadTwitchExtensionReactionsPrices, saveInteractionsRewardData, writeTestCheer } from '../../services/database';
-import { CHEERS_URI, InteractionsRewardRedemption, REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from '../../utilities/Constants';
+import { CHEERS_URI, InteractionsRewardRedemption, REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS, ZAP_REWARD_NAME } from '../../utilities/Constants';
 import { notifyBugToDevelopTeam } from '../../services/discord';
 import ReactionCard from '../ReactionCard/ReactionCard';
 
@@ -173,7 +173,7 @@ const OnBoarding = ({ user }) => {
         setStep(step + 1);
         setCreatingReward(true);
         // Create reward with default value, the user can change their cost in the next step
-        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, 'Qapla Reaction', 2000);
+        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, ZAP_REWARD_NAME, 200);
         if (result !== undefined) {
             if (result.reward.status === 200) {
                 const webhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, InteractionsRewardRedemption.type, InteractionsRewardRedemption.callback, { reward_id: result.reward.data.id });
@@ -220,7 +220,7 @@ const OnBoarding = ({ user }) => {
                             if (userRewards) {
                                 return userRewards.forEach(async (reward) => {
                                     // Find Qapla Reward
-                                    if (reward.title === 'Qapla Reaction') {
+                                    if (reward.title === ZAP_REWARD_NAME) {
                                         // Reward already exists, but webhook does not, delete reward and try again
                                         await deleteCustomReward(user.id, user.twitchAccessToken, reward.id);
 
@@ -602,7 +602,7 @@ const OnBoarding = ({ user }) => {
                         }
                     </div>
                     <p className={styles.headerText} style={{ marginTop: '40px', marginBottom: '16px' }}>
-                        {`We’ll create a channel reward to send custom\nalerts using channel points`}
+                        {t('Onboarding.tiersPricingInstructions')}
                     </p>
                 </>
             }

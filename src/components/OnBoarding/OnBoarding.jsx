@@ -395,6 +395,9 @@ const OnBoarding = ({ user }) => {
                                 <li className={`${styles.subText} ${styles.liMargin}`}>
                                     {t('Onboarding.processDescriptionP2')}
                                 </li>
+                                <li className={`${styles.subText} ${styles.liMargin}`}>
+                                    {t('Onboarding.processDescriptionP3')}
+                                </li>
                             </ul>
                         </>
                     }

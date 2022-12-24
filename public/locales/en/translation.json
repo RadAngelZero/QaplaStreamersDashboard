@@ -40,8 +40,9 @@
     },
     "Onboarding": {
         "letsSetUp": "Let’s set up your account",
-        "processDescriptionP1": "🔗 We’ll create a Custom Reward on your channel with one click",
-        "processDescriptionP2": "🪪 We‘ll add a browser source to your OBS/Streamlabs",
+        "processDescriptionP1": "🎁 We’ll create a Custom Reward on your channel with one click",
+        "processDescriptionP2": "💰 We’ll setup your Reactions Tiers",
+        "processDescriptionP3": "🔗 We‘ll add a browser source to your OBS/Streamlabs",
         "setRewardCost": "Set the custom reward “cost”",
         "setRewardCostDescription": "This is how much channel points your viewers will burn per reaction. You can always change it later",
         "workingOnRequest": "I’m working on your request lovely human",

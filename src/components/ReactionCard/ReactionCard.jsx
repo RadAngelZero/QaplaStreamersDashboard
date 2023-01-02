@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { CircularProgress, makeStyles, MenuItem, Select } from '@material-ui/core';
+import { CircularProgress, makeStyles, MenuItem, Select, Switch, withStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -45,6 +45,46 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
+const ChannelPoinsSwitch = withStyles((theme) => ({
+    root: {
+        width: 44.4,
+        height: 24,
+        padding: 0,
+    },
+    switchBase: {
+        color: '#999',
+        padding: 0,
+        '&$checked': {
+            transform: 'translateX(20.4px)',
+            color: '#2CE9D2',
+            '& + $track': {
+                backgroundColor: '#3B4BF9',
+                opacity: 1,
+                border: 'none',
+            },
+        },
+    },
+    checked: {
+        // idk why this must exist for the above class to work
+    },
+    thumb: {
+        width: 24,
+        height: 24,
+    },
+    disabled: {
+        opacity: 0.6,
+        '& + $track': {
+            opacity: '0.6 !important',
+            backgroundColor: '#444 !important',
+        },
+    },
+    track: {
+        borderRadius: 24 / 2,
+        backgroundColor: '#444',
+        opacity: 1,
+    },
+}))(Switch);
+
 const ReactionCard = ({
     icons,
     title,
@@ -58,6 +98,7 @@ const ReactionCard = ({
     backgroundURL,
     availablePrices,
     hideBorder,
+    subsMode,
 }) => {
     const [cost, setCost] = useState(null);
     const [newCost, setNewCost] = useState(null);
@@ -67,6 +108,7 @@ const ReactionCard = ({
     const [inputWidth, setInputWidth] = useState('');
     const inputRef = useRef(null);
     const { t } = useTranslation();
+    const isPremium = (user.premium || user.freeTrial) && user.currentPeriod;
     const history = useHistory();
     const classes = useStyles();
 
@@ -199,21 +241,9 @@ const ReactionCard = ({
     }
 
     return (
-        <div className={style.gradientContainer} style={{    background: hideBorder ? 'none' : 'linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%)',        }}>
-            <div className={style.container} style={{
-                display: 'flex',
-                flexDirection: 'column',
-                background: background ? background : `url('${backgroundURL}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                height: '288px',
-                maxWidth: '248px',
-                width: '248px',
-                borderRadius: '20px',
-                overflow: 'hidden',
-                padding: '24px',
-                justifyContent: 'space-between',
-            }}>
+        <div className={style.gradientContainer} style={{ background: hideBorder ? 'none' : subsMode ? 'linear-gradient(152.4deg, #5328FF 28.13%, #4BDEFE 100%)' : 'linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%)', }}>
+
+            <div className={style.container} style={{ background: subsMode ? 'none' : '#141735' }}>
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -231,12 +261,12 @@ const ReactionCard = ({
                         alignItems: 'center',
                     }}>
                         {icons.map((icon) => (
-                                <div style={{
-                                    marginRight: '16px',
-                                }}>
-                                    {icon}
-                                </div>
-                            ))
+                            <div style={{
+                                marginRight: '16px',
+                            }}>
+                                {icon}
+                            </div>
+                        ))
                         }
                     </div>
                     <p style={{
@@ -252,80 +282,91 @@ const ReactionCard = ({
                     flexDirection: 'column',
                     maxWidth: textMaxWidth,
                 }}>
-                    <p style={{
-                        color: '#fff',
-                        fontSize: '10px',
-                        fontWeight: '400',
-                        lineHeight: '12px',
-                    }}>
+                    <p className={style.subtitle}>
                         {subtitle}
                     </p>
-                    <p style={{
-                        color: '#fff',
-                        fontSize: '14px',
-                        fontWeight: '700',
-                        lineHeight: '17px',
-                    }}>
+                    <p className={style.title}>
                         {title}
                     </p>
                 </div>
                 <div style={{
                     display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
+                    flexDirection: 'column',
                 }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                    }}>
+                        <div style={{
+                            maxWidth: '136px',
+                        }}>
+                            <p className={style.title}>
+                                Channel Points
+                            </p>
+                            <p className={style.subtitle}>
+                                Allow viewers to send alerts using channel points
+                            </p>
+                        </div>
+                        <ChannelPoinsSwitch />
+                    </div>
                     <div style={{
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginTop: '20px'
                     }}>
-                        {type === REACTION_CARD_CHANNEL_POINTS &&
-                            <ChPts />
-                        }
-                        {type === REACTION_CARD_QOINS &&
-                            <Bits />
-                        }
-                        {type === REACTION_CARD_CHANNEL_POINTS && inputWidth !== '' &&
-                            <input ref={inputRef}
-                                style={{
-                                    width: inputWidth
-                                }}
-                                className={style.costInput}
-                                type='number'
-                                value={editingCost ? newCost : cost}
-                                disabled={type === REACTION_CARD_QOINS || !editingCost}
-                                onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                                onChange={type === REACTION_CARD_QOINS ? () => {} : handleCost} />
-                        }
-                        {type === REACTION_CARD_CHANNEL_POINTS &&
-                            <div className={style.button} onClick={handleButton} style={{
-                                backgroundColor: editingCost ? '#3B4BF9' : '#0000'
-                            }}>
-                                {updatingCost ?
-                                    <CircularProgress size={12} className={classes.circularProgress} />
-                                    :
-                                    <>
-                                        {editingCost ?
-                                            <p className={style.buttonText}>
-                                                {t('StreamerProfile.ReactionCard.button.save')}
-                                            </p>
-                                            :
-                                            <Edit height={24}
-                                                width={24}
-                                                style={{
-                                                    transform: 'scale(.75)',
-                                                    maxWidth: '24px',
-                                                    maxHeight: '24px',
-                                                    margin: '0px -8px',
-                                            }} />
-                                        }
-                                    </>
-                                }
-                            </div>
-                        }
-                        {type === REACTION_CARD_QOINS &&
-                            <Select MenuProps={{
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                        }}>
+                            {type === REACTION_CARD_CHANNEL_POINTS &&
+                                <ChPts />
+                            }
+                            {type === REACTION_CARD_QOINS &&
+                                <Bits />
+                            }
+                            {type === REACTION_CARD_CHANNEL_POINTS && inputWidth !== '' &&
+                                <input ref={inputRef}
+                                    style={{
+                                        width: inputWidth
+                                    }}
+                                    className={style.costInput}
+                                    type='number'
+                                    value={editingCost ? newCost : cost}
+                                    disabled={type === REACTION_CARD_QOINS || !editingCost}
+                                    onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                                    onChange={type === REACTION_CARD_QOINS ? () => { } : handleCost} />
+                            }
+                            {type === REACTION_CARD_CHANNEL_POINTS &&
+                                <div className={style.button} onClick={handleButton} style={{
+                                    backgroundColor: editingCost ? '#3B4BF9' : '#0000'
+                                }}>
+                                    {updatingCost ?
+                                        <CircularProgress size={12} className={classes.circularProgress} />
+                                        :
+                                        <>
+                                            {editingCost ?
+                                                <p className={style.buttonText}>
+                                                    {t('StreamerProfile.ReactionCard.button.save')}
+                                                </p>
+                                                :
+                                                <Edit height={24}
+                                                    width={24}
+                                                    style={{
+                                                        transform: 'scale(.75)',
+                                                        maxWidth: '24px',
+                                                        maxHeight: '24px',
+                                                        margin: '0px -8px',
+                                                    }} />
+                                            }
+                                        </>
+                                    }
+                                </div>
+                            }
+                            {type === REACTION_CARD_QOINS &&
+                                <Select MenuProps={{
                                     classes: {
                                         paper: classes.select
                                     },
@@ -335,39 +376,40 @@ const ReactionCard = ({
                                     anchorOrigin: {
                                         vertical: 'top',
                                         horizontal: 'left'
-                                        },
-                                        transformOrigin: {
+                                    },
+                                    transformOrigin: {
                                         vertical: 'bottom',
                                         horizontal: 'left'
-                                        },
-                                        getContentAnchorEl: null
+                                    },
+                                    getContentAnchorEl: null
                                 }}
-                                SelectDisplayProps={{
-                                    style: {
-                                        paddingRight: '16px'
-                                    }
-                                }}
-                                style={{
-                                    color: '#fff',
-                                    fontSize: '18px',
-                                    fontWeight: '700',
-                                    border: 'none',
-                                    outline: 'none',
-                                    borderRadius: '8px',
-                                    padding: '0px 8px',
-                                }}
-                                IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
-                                displayEmpty
-                                disableUnderline
-                                value={cost}
-                                onChange={handleCost}>
-                                {availablePrices.map(({ cost, twitchSku }) => (
-                                    <MenuItem value={cost} key={twitchSku}>
-                                        {cost.toLocaleString()}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        }
+                                    SelectDisplayProps={{
+                                        style: {
+                                            paddingRight: '16px'
+                                        }
+                                    }}
+                                    style={{
+                                        color: '#fff',
+                                        fontSize: '18px',
+                                        fontWeight: '700',
+                                        border: 'none',
+                                        outline: 'none',
+                                        borderRadius: '8px',
+                                        padding: '0px 8px',
+                                    }}
+                                    IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
+                                    displayEmpty
+                                    disableUnderline
+                                    value={cost}
+                                    onChange={handleCost}>
+                                    {availablePrices.map(({ cost, twitchSku }) => (
+                                        <MenuItem value={cost} key={twitchSku}>
+                                            {cost.toLocaleString()}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

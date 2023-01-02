@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch } from '@material-ui/core';
+import React, { useEffect, useRef, useState } from 'react';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, Dialog, CircularProgress } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -21,9 +21,15 @@ import { ReactComponent as TtGiphyIcon } from './../../assets/reactionCardsIcons
 import { ReactComponent as TTSBotIcon } from './../../assets/reactionCardsIcons/TTSBot.svg';
 import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.svg';
 
+import { ReactComponent as Star } from './../../assets/Star.svg';
+import { ReactComponent as Zap } from './../../assets/Zap.svg';
+import { ReactComponent as Close } from './../../assets/CloseIcon.svg';
+import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
+import { ReactComponent as Edit } from './../../assets/Edit.svg';
+
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
-import { getDefaultReactionPriceInBitsByLevel, getQreatorCode, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, loadTwitchExtensionReactionsPrices, setAlertSetting } from '../../services/database';
+import { getDefaultReactionPriceInBitsByLevel, getInteractionsRewardData, getQreatorCode, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, loadTwitchExtensionReactionsPrices, setAlertSetting, setReactionPrice, updateStreamerProfile } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
@@ -35,7 +41,9 @@ import {
 } from '../../utilities/Constants';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 import ReactionCard from '../ReactionCard/ReactionCard';
-import { getEmotes } from '../../services/functions';
+import { getEmotes, refreshUserAccessToken } from '../../services/functions';
+import { auth } from '../../services/firebase';
+import { getCustomReward, updateCustomReward } from '../../services/twitch';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -101,15 +109,15 @@ const useStyles = makeStyles((theme) => ({
 
 const ReactionsSwitch = withStyles((theme) => ({
     root: {
-        width: 58,
-        height: 30,
+        width: 44.4,
+        height: 24,
         padding: 0,
     },
     switchBase: {
         color: '#999',
         padding: 0,
         '&$checked': {
-            transform: 'translateX(28px)',
+            transform: 'translateX(20.4px)',
             color: '#2CE9D2',
             '& + $track': {
                 backgroundColor: '#3B4BF9',
@@ -122,8 +130,8 @@ const ReactionsSwitch = withStyles((theme) => ({
         // idk why this must exist for the above class to work
     },
     thumb: {
-        width: 30,
-        height: 30,
+        width: 24,
+        height: 24,
     },
     disabled: {
         opacity: 0.6,
@@ -133,11 +141,91 @@ const ReactionsSwitch = withStyles((theme) => ({
         },
     },
     track: {
-        borderRadius: 30 / 2,
+        borderRadius: 24 / 2,
         backgroundColor: '#444',
         opacity: 1,
     },
 }))(Switch);
+
+const PremiumButton = withStyles(() => ({
+    root: {
+        display: 'flex',
+        backgroundColor: '#3B4BF9',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        textTransform: 'none',
+        marginLeft: '24px',
+        '&:hover': {
+            opacity: 0.8,
+            backgroundColor: '#3B4BF9'
+        },
+        '&:active': {
+            opacity: 0.6,
+            backgroundColor: '#3B4BF9'
+
+        },
+        webkitBoxSizing: 'border-box', /* Safari/Chrome, other WebKit */
+        mozBoxSizing: 'border-box',    /* Firefox, other Gecko */
+        boxSizing: 'border-box',       /* Opera/IE 8+ */
+    },
+    label: {
+        display: 'flex',
+        color: '#fff',
+        fontSize: '12px',
+        fontWeight: '600',
+        lineHeight: '15px',
+        letterSpacing: '0.492000013589859px',
+        textAlign: 'center',
+    },
+}))(Button);
+
+const PremiumDialog = withStyles(() => ({
+    root: {
+
+    },
+    paper: {
+        backgroundColor: '#141833',
+        borderRadius: '35px',
+        padding: '40px 30px',
+    },
+}))(Dialog);
+
+const StartFreeTrialButton = withStyles(() => ({
+    root: {
+        display: 'flex',
+        backgroundColor: '#3B4BF9',
+        padding: '20px 16px',
+        borderRadius: '8px',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        textTransform: 'none',
+        width: '390px',
+        marginTop: '56px',
+        '&:hover': {
+            opacity: 0.8,
+            backgroundColor: '#3B4BF9'
+        },
+        '&:active': {
+            opacity: 0.6,
+            backgroundColor: '#3B4BF9'
+
+        },
+        webkitBoxSizing: 'border-box', /* Safari/Chrome, other WebKit */
+        mozBoxSizing: 'border-box',    /* Firefox, other Gecko */
+        boxSizing: 'border-box',       /* Opera/IE 8+ */
+    },
+    label: {
+        display: 'flex',
+        color: '#fff',
+        fontSize: '12px',
+        fontWeight: '600',
+        lineHeight: '15px',
+        letterSpacing: '0.492000013589859px',
+        justifyContent: 'center',
+    },
+}))(Button);
 
 const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const classes = useStyles();
@@ -156,6 +244,15 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [reactionsPrices, setReactionsPrices] = useState([]);
     const [defaultPriceLevel2, setDefaultPriceLevel2] = useState(0);
     const [defaultPriceLevel3, setDefaultPriceLevel3] = useState(0);
+    const [openGoPremiumDialog, setOpenGoPremiumDialog] = useState(false);
+    const inputRef = useRef(null);
+    const [editingChannelRewardCost, setEditingChannelRewardCost] = useState(false);
+    const [updatingChannelRewardCost, setUpdatingChannelRewardCost] = useState(false);
+    const [channelRewardCost, setChannelRewardCost] = useState(null);
+    const [newChannelRewardCost, setNewChannelRewardCost] = useState(null);
+    const [rewardId, setRewardId] = useState(null);
+    const [inputWidth, setInputWidth] = useState('4ch');
+    const [editingSubsRewards, setEditingSubsRewards] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -237,6 +334,39 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
+        async function getChannelPointRewardData() {
+            try {
+                const rewardData = await getInteractionsRewardData(user.uid);
+                if (rewardData.exists()) {
+                    const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+                    if (userTokensUpdated.data.status === 200) {
+                        const userCredentialsUpdated = userTokensUpdated.data;
+                        updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+                        const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
+                        if (reward && reward.id) {
+                            setChannelRewardCost(reward.cost);
+                            setRewardId(reward.id);
+                            setInputWidth(`${reward.cost.toString().length}ch`);
+                        } else if (reward === 404) {
+                            history.push('/onboarding');
+                        }
+                    } else {
+                        // Refresh token is useless, signout user
+                        alert(t('StreamCard.sessionExpired'));
+                        await auth.signOut();
+                        history.push('/');
+                    }
+                } else {
+                    history.push('/onboarding');
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        if (!editingChannelRewardCost && newChannelRewardCost === null) {
+            getChannelPointRewardData();
+        }
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();
@@ -247,7 +377,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         if (!randomEmoteUrl) {
             getRandomEmote();
         }
-    }, [switchState, user, history, randomEmoteUrl]);
+    }, [switchState, user, history, randomEmoteUrl, channelRewardCost, t, editingChannelRewardCost, newChannelRewardCost]);
 
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
@@ -322,6 +452,67 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         await setAlertSetting(user.uid, 'reactionsEnabled', !reactionsEnabled);
         setReactionsEnabled(!reactionsEnabled);
         setUpdatingReactionsStatus(false);
+    }
+
+    const handlePremiumButton = async () => {
+        if (openGoPremiumDialog) {
+            // do billing
+            return setOpenGoPremiumDialog(false);
+        }
+        setOpenGoPremiumDialog(true);
+    }
+
+    const handleChannelRewardCost = async (e) => {
+        setNewChannelRewardCost(e.target.value);
+        setInputWidth(e.target.value.length > 4 ? e.target.value.length > 9 ? '9ch' : e.target.value.length + `ch` : '4ch');
+    }
+
+    const handleChannelRewardButton = async () => {
+        if (updatingChannelRewardCost) {
+            return;
+        }
+        if (!editingChannelRewardCost) {
+            setEditingChannelRewardCost(true);
+            setNewChannelRewardCost(channelRewardCost);
+            setTimeout(() => {
+                inputRef.current.focus();
+            }, 100);
+
+            return;
+        }
+
+        let newCostInt = parseInt(newChannelRewardCost);
+
+        if (channelRewardCost === newChannelRewardCost || newChannelRewardCost === '') {
+            setEditingChannelRewardCost(false);
+
+            return;
+        }
+
+        setUpdatingChannelRewardCost(true);
+        setEditingChannelRewardCost(false);
+
+        const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+
+        if (userTokensUpdated.data.status === 200) {
+            const userCredentialsUpdated = userTokensUpdated.data;
+            updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+            const rewardUpdated = await updateCustomReward(
+                user.id,
+                userCredentialsUpdated.access_token,
+                rewardId,
+                {
+                    cost: newCostInt
+                }
+            );
+
+            if (rewardUpdated.status === 200) {
+                setChannelRewardCost(newCostInt);
+                setUpdatingChannelRewardCost(false);
+                setNewChannelRewardCost(null);
+                return;
+            }
+        }
     }
 
     return (
@@ -423,26 +614,125 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                         <Grid item xs={12}>
                                             <div className={styles.reactionsHeaderContainer}>
                                                 <div>
-                                                    <h1 className={styles.title}>
-                                                        {t('StreamerProfile.reactions')}
-                                                    </h1>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                    }}>
+                                                        <h1 className={styles.title}>
+                                                            {t('StreamerProfile.reactions')}
+                                                        </h1>
+                                                        {/* {(user.premium || user.freeTrial) && user.currentPeriod &&
+                                                            <PremiumButton startIcon={<Star />} onClick={handlePremiumButton}>
+                                                                Set Up for Subscribers
+                                                            </PremiumButton>
+                                                        } */}
+                                                    </div>
                                                     <p className={styles.subtitle}>
                                                         {t('StreamerProfile.reactionsSubtitle')}
                                                     </p>
                                                 </div>
-                                                <div className={styles.switchContainer}>
-                                                    <p className={styles.reactionsSwitchText}>
-                                                        {reactionsEnabled ?
-                                                            t('StreamerProfile.reactionsEnabled')
+                                            </div>
+                                        </Grid>
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '24px', marginTop: '3px' }} >
+                                            <div className={styles.reactionSettingContainer} style={{}}>
+                                                <div style={{ display: 'flex' }}>
+                                                    <div>
+                                                        <Zap />
+                                                    </div>
+                                                    <div style={{ marginLeft: '8px' }}>
+                                                        <p className={styles.reactionSettingTitle}>
+                                                            Zaps
+                                                        </p>
+                                                        <p className={styles.reactionSettingSubtitle}>
+                                                            Set the price for the Zap custom channel point reward
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    alignSelf: 'flex-end',
+                                                    marginTop: 'auto',
+                                                }}>
+                                                    <ChPts />
+                                                    <input ref={inputRef}
+                                                        style={{
+                                                            width: inputWidth
+                                                        }}
+                                                        className={styles.costInput}
+                                                        type='number'
+                                                        value={editingChannelRewardCost ? newChannelRewardCost : channelRewardCost}
+                                                        disabled={!editingChannelRewardCost}
+                                                        onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                                                        onChange={handleChannelRewardCost} />
+                                                    <div className={styles.editChannelRewardButton} onClick={handleChannelRewardButton} style={{
+                                                        backgroundColor: editingChannelRewardCost ? '#3B4BF9' : '#0000'
+                                                    }}>
+                                                        {updatingChannelRewardCost ?
+                                                            <CircularProgress size={12} className={classes.circularProgress} />
                                                             :
-                                                            t('StreamerProfile.reactionsDisabled')
+                                                            <>
+                                                                {editingChannelRewardCost ?
+                                                                    <p className={styles.editChannelRewardButtonText}>
+                                                                        {t('StreamerProfile.ReactionCard.button.save')}
+                                                                    </p>
+                                                                    :
+                                                                    <Edit height={24}
+                                                                        width={24}
+                                                                        style={{
+                                                                            transform: 'scale(.75)',
+                                                                            maxWidth: '24px',
+                                                                            maxHeight: '24px',
+                                                                            margin: '0px -8px',
+                                                                        }} />
+                                                                }
+                                                            </>
                                                         }
-                                                    </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={styles.reactionSettingContainer} style={{}}>
+                                                <div style={{ display: 'flex' }}>
+                                                    <div>
+                                                        <Star style={{ height: '24px', width: '24px' }} />
+                                                    </div>
+                                                    <div style={{ marginLeft: '8px' }}>
+                                                        <p className={styles.reactionSettingTitle}>
+                                                            {reactionsEnabled ?
+                                                                t('StreamerProfile.reactionsEnabled')
+                                                                :
+                                                                t('StreamerProfile.reactionsDisabled')
+                                                            }
+                                                        </p>
+                                                        <p className={styles.reactionSettingSubtitle}>
+                                                            Turn reactions on and off
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.switchContainer}>
                                                     <ReactionsSwitch checked={reactionsEnabled} onChange={handleReactionsSwitch} disabled={updatingReactionsStatus} />
                                                 </div>
                                             </div>
+                                            <div className={styles.reactionSettingContainer}
+                                                onClick={handlePremiumButton}
+                                                style={{ background: 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)', cursor: 'pointer' }}>
+                                                <div style={{ display: 'flex' }}>
+                                                    <div>
+                                                        <Star style={{ height: '24px', width: '24px' }} />
+                                                    </div>
+                                                    <div style={{ marginLeft: '8px' }}>
+                                                        <p className={styles.reactionSettingTitle}>
+                                                            Subscribers Set Up
+                                                        </p>
+                                                        <p className={styles.reactionSettingSubtitle}>
+                                                            {`Viewers can send reactions\nusing their channel points`}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </Grid>
-                                        <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '10px' }} >
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '24px', marginTop: '35px' }} >
                                             <ReactionCard
                                                 icons={
                                                     [
@@ -457,6 +747,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 type={REACTION_CARD_CHANNEL_POINTS}
                                                 reactionLevel={1}
                                                 user={user}
+                                                subsMode={editingSubsRewards}
                                             />
                                             {defaultPriceLevel3 &&
                                                 <ReactionCard
@@ -476,6 +767,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     user={user}
                                                     defaultCost={defaultPriceLevel2}
                                                     availablePrices={reactionsPrices}
+                                                    subsMode={editingSubsRewards}
                                                 />
                                             }
                                             {defaultPriceLevel3 &&
@@ -495,6 +787,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     user={user}
                                                     defaultCost={defaultPriceLevel3}
                                                     availablePrices={reactionsPrices}
+                                                    subsMode={editingSubsRewards}
                                                 />
                                             }
                                         </Grid>
@@ -581,9 +874,58 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         valueOfQoinsForStreamer={valueOfQoinsForStreamer}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />
+                    <PremiumDialog open={openGoPremiumDialog} onClose={() => setOpenGoPremiumDialog(false)}>
+                        <div style={{
+                            margin: '-16px -6px 0px auto',
+                            maxHeight: '40px',
+                            cursor: 'pointer',
+                        }} onClick={() => setOpenGoPremiumDialog(false)}>
+                            <Close style={{ width: '40px', height: '40px' }} />
+                        </div>
+                        <p style={{
+                            color: '#fff',
+                            whiteSpace: 'pre-wrap',
+                            fontSize: '18px',
+                            fontWeight: '600',
+                            lineHeight: '32px',
+                            letterSpacing: '0px',
+                            textAlign: 'center',
+                        }}> {`Benefits for your Twitch\nChannel Subscribers`}</p>
+                        <p style={{
+                            color: '#fff',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            lineHeight: '19px',
+                            letterSpacing: '0px',
+                            textAlign: 'center',
+                            marginTop: '32px',
+                        }}>
+                            Start Free Trial. <span style={{ color: '#00FFDD', fontWeight: '600', }}>No credit card required.</span>
+                        </p>
+                        <p style={{
+                            color: '#fff',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            lineHeight: '17px',
+                            letterSpacing: '0px',
+                            marginTop: '32px',
+                            whiteSpace: 'pre-line',
+                            maxWidth: '320px',
+                            alignSelf: 'center',
+                        }}>
+                            {`🪂 Reward your audience with Qoins Drops
+
+                            🫡 Add value to your Twitch subscribers with custom alerts
+
+                            👁 Visibility for your content outside of Twitch`}
+                        </p>
+                        <StartFreeTrialButton onClick={handlePremiumButton} >
+                            Start Free Trial
+                        </StartFreeTrialButton>
+                    </PremiumDialog>
                 </>
             }
-        </StreamerDashboardContainer>
+        </StreamerDashboardContainer >
     );
 }
 

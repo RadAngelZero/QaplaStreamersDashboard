@@ -416,7 +416,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         }
 
         if (!editingChannelRewardCost && newChannelRewardCost === null) {
-            // getChannelPointRewardData();
+            getChannelPointRewardData();
         }
         loadStreams();
         getValueOfQoins();

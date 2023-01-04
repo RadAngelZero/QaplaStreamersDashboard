@@ -237,3 +237,16 @@ export async function createBranchDeepLink(streamerUid, alias) {
         console.log(error);
     }
 }
+
+/**
+ * Get the list of user webhooks
+ * @param {number} userTwitchId Twitch id of the user
+ */
+export async function getUserWebhooks(userTwitchId) {
+    const getTwitchUserWebhooks = functions.httpsCallable('getTwitchUserWebhooks');
+    try {
+        return await getTwitchUserWebhooks({ userTwitchId });
+    } catch (error) {
+        console.log(error);
+    }
+}

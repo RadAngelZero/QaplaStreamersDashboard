@@ -250,3 +250,5 @@ export const streamsPlaceholderImages = {
     Phasmophobia: PhasmophobiaImage,
     ClashMini: ClashMiniImage
 };
+
+export const ZAP_REWARD_NAME = 'Zap';

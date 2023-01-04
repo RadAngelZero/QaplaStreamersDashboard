@@ -143,12 +143,12 @@ const ReactionCard = ({
     hideBorder,
     subsMode,
 }) => {
-    const [cost, setCost] = useState(null);
+    const [cost, setCost] = useState(0);
     const [newCost, setNewCost] = useState(null);
     const [rewardId, setRewardId] = useState(null);
     const [editingCost, setEditingCost] = useState(false);
     const [updatingCost, setUpdatingCost] = useState(false);
-    const [inputWidth, setInputWidth] = useState('');
+    const [inputWidth, setInputWidth] = useState('1ch');
     const inputRef = useRef(null);
     const { t } = useTranslation();
     const isPremium = (user.premium || user.freeTrial) && user.currentPeriod;
@@ -162,7 +162,7 @@ const ReactionCard = ({
             try {
                 const price = await getReactionPriceInBitsByLevel(user.uid, level);
                 if (price.exists()) {
-                    setCost(price.val());
+                    setCost(price.val().price);
                 } else {
                     setCost(defaultCost);
                 }
@@ -176,8 +176,41 @@ const ReactionCard = ({
             }
         }
 
-        if (user.uid && cost === null && type === REACTION_CARD_QOINS) {
+        async function getChannelPointRewardData() {
+            try {
+                const rewardData = await getInteractionsRewardData(user.uid);
+                if (rewardData.exists()) {
+                    const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+                    if (userTokensUpdated.data.status === 200) {
+                        const userCredentialsUpdated = userTokensUpdated.data;
+                        updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+                        const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
+                        if (reward && reward.id) {
+                            setCost(reward.cost);
+                            setRewardId(reward.id);
+                            setInputWidth(`${reward.cost.toLocaleString().length}ch`);
+                        } else if (reward === 404) {
+                            history.push('/onboarding');
+                        }
+                    } else {
+                        // Refresh token is useless, signout user
+                        alert(t('StreamCard.sessionExpired'));
+                        await auth.signOut();
+                        history.push('/');
+                    }
+                } else {
+                    history.push('/onboarding');
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        if (user && user.uid && cost === 0 && type === REACTION_CARD_QOINS) {
             getPriceData();
+        }
+        if (user && user.uid && cost === 0 && type === REACTION_CARD_CHANNEL_POINTS) {
+            getChannelPointRewardData();
         }
     }, [cost, defaultCost, history, type, user.id, user.refreshToken, user.uid, reactionLevel]);
 
@@ -230,6 +263,7 @@ const ReactionCard = ({
 
                 if (rewardUpdated.status === 200) {
                     setCost(newCostInt);
+                    setInputWidth(`${newCostInt.toLocaleString().length}ch`);
                     setUpdatingCost(false);
 
                     return;
@@ -260,22 +294,23 @@ const ReactionCard = ({
                 }}>
                     <svg style={{ width: 0, height: 0, position: 'absolute' }} aria-hidden="true" focusable="false">
                         <linearGradient xmlns="http://www.w3.org/2000/svg" id="icons-gradient" x1="14.1628" y1="-0.16279" x2="3.47637" y2="16.4971" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#FFD3FB" />
-                            <stop offset="0.484375" stop-color="#F5FFCB" />
-                            <stop offset="1" stop-color="#9FFFDD" />
+                            <stop stopColor="#FFD3FB" />
+                            <stop offset="0.484375" stopColor="#F5FFCB" />
+                            <stop offset="1" stopColor="#9FFFDD" />
                         </linearGradient>
                     </svg>
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
                     }}>
-                        {icons.map((icon) => (
-                            <div style={{
-                                marginRight: '16px',
-                            }}>
-                                {icon}
-                            </div>
-                        ))
+                        {icons.map((icon, index) => (
+                                <div key={`icon-${index}`}
+                                    style={{
+                                        marginRight: '16px',
+                                    }}>
+                                    {icon}
+                                </div>
+                            ))
                         }
                     </div>
                     <p style={{
@@ -346,14 +381,14 @@ const ReactionCard = ({
                             {type === REACTION_CARD_CHANNEL_POINTS && inputWidth !== '' &&
                                 <input ref={inputRef}
                                     style={{
-                                        width: inputWidth
+                                        width: type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId) ? inputWidth : '100%'
                                     }}
                                     className={style.costInput}
-                                    type='number'
-                                    value={editingCost ? newCost : cost}
-                                    disabled={type === REACTION_CARD_QOINS || !editingCost}
+                                    type={type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId) ? 'text' : 'number'}
+                                    value={editingCost ? newCost : cost.toLocaleString()}
+                                    disabled={type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId)}
                                     onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                                    onChange={type === REACTION_CARD_QOINS ? () => { } : handleCost} />
+                                    onChange={type === REACTION_CARD_QOINS ? () => {} : handleCost} />
                             }
                             {type === REACTION_CARD_CHANNEL_POINTS &&
                                 <div className={style.button} onClick={handleButton} style={{
@@ -375,7 +410,7 @@ const ReactionCard = ({
                                                         maxWidth: '24px',
                                                         maxHeight: '24px',
                                                         margin: '0px -8px',
-                                                    }} />
+                                                }} />
                                             }
                                         </>
                                     }
@@ -383,26 +418,21 @@ const ReactionCard = ({
                             }
                             {type === REACTION_CARD_QOINS &&
                                 <Select MenuProps={{
-                                    classes: {
-                                        paper: classes.select
-                                    },
-                                    PaperProps: {
-                                        className: classes.selectPaper
-                                    },
-                                    anchorOrigin: {
-                                        vertical: 'top',
-                                        horizontal: 'left'
-                                    },
-                                    transformOrigin: {
-                                        vertical: 'bottom',
-                                        horizontal: 'left'
-                                    },
-                                    getContentAnchorEl: null
-                                }}
-                                    SelectDisplayProps={{
-                                        style: {
-                                            paddingRight: '16px'
-                                        }
+                                        classes: {
+                                            paper: classes.select
+                                        },
+                                        PaperProps: {
+                                            className: classes.selectPaper
+                                        },
+                                        anchorOrigin: {
+                                            vertical: 'top',
+                                            horizontal: 'left'
+                                        },
+                                        transformOrigin: {
+                                            vertical: 'bottom',
+                                            horizontal: 'left'
+                                        },
+                                        getContentAnchorEl: null
                                     }}
                                     style={{
                                         color: '#fff',
@@ -411,7 +441,7 @@ const ReactionCard = ({
                                         border: 'none',
                                         outline: 'none',
                                         borderRadius: '8px',
-                                        padding: '0px 8px',
+                                        padding: '0px 0px 0px 8px'
                                     }}
                                     IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
                                     displayEmpty

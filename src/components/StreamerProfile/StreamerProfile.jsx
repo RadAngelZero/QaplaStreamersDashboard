@@ -367,7 +367,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         async function loadReactionsEnabled() {
             if (user && user.uid) {
                 const reactionsEnabled = await getStreamerAlertSetting(user.uid, 'reactionsEnabled');
-                setReactionsEnabled(Boolean(reactionsEnabled.val()).valueOf());
+
+                /**
+                 * When reactionsEnabled does not exist the reactions are enabled, they are only disabled when the user
+                 * has explicitly required them to be disabled
+                 */
+                setReactionsEnabled(reactionsEnabled.exists() ? Boolean(reactionsEnabled.val()).valueOf() : true);
             }
         }
 
@@ -381,12 +386,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         async function loadDefaultReactionsCosts() {
             const defaultPriceLevel2 = await getDefaultReactionPriceInBitsByLevel('level2');
             if (defaultPriceLevel2.exists()) {
-                setDefaultPriceLevel2(defaultPriceLevel2.val());
+                setDefaultPriceLevel2(defaultPriceLevel2.val().price);
             }
 
             const defaultPriceLevel3 = await getDefaultReactionPriceInBitsByLevel('level3');
             if (defaultPriceLevel3.exists()) {
-                setDefaultPriceLevel3(defaultPriceLevel3.val());
+                setDefaultPriceLevel3(defaultPriceLevel3.val().price);
             }
         }
 
@@ -831,7 +836,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 user={user}
                                                 subsMode={editingSubsRewards}
                                             />
-                                            {defaultPriceLevel3 &&
+                                            {defaultPriceLevel2 &&
                                                 <ReactionCard
                                                     icons={
                                                         [

@@ -42,7 +42,7 @@ export async function createCustomReward(twitchId, accessToken, title, cost, ena
 
             return { status: res.status, data: response.data[0] };
         } else if (response.error) {
-            if (res.status === 400) {
+            if (res.status === 400 || res.status === 403) {
                 return { status: res.status, error: response.error, message: response.message };
             }
         } else {
@@ -153,6 +153,34 @@ export async function getCustomReward(rewardId, twitchId, accessToken) {
             const result = (await response.json());
 
             return result.data && result.data[0] ? result.data[0] : null;
+        } else {
+            return response.status;
+        }
+    } catch (error) {
+        return error;
+    }
+}
+
+/**
+ * Returns all the rewards (created by Qapla) of the given user
+ * @param {string} twitchId Twitch identifier
+ * @param {string} accessToken Twitch access token
+ */
+export async function getUserCustomRewards(twitchId, accessToken) {
+    try {
+        let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${twitchId}&only_manageable_rewards=true`, {
+            method: 'GET',
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        });
+
+        if (response.status === 200) {
+            const result = (await response.json());
+
+            return result.data;
         } else {
             return response.status;
         }

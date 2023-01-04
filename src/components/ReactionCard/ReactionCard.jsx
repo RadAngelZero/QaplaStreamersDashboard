@@ -103,7 +103,7 @@ const ReactionCard = ({
                         if (reward && reward.id) {
                             setCost(reward.cost);
                             setRewardId(reward.id);
-                            setInputWidth(`${reward.cost.toString().length}ch`);
+                            setInputWidth(`${reward.cost.toLocaleString().length}ch`);
                         } else if (reward === 404) {
                             history.push('/onboarding');
                         }
@@ -178,6 +178,7 @@ const ReactionCard = ({
 
                 if (rewardUpdated.status === 200) {
                     setCost(newCostInt);
+                    setInputWidth(`${newCostInt.toLocaleString().length}ch`);
                     setUpdatingCost(false);
 
                     return;
@@ -290,11 +291,11 @@ const ReactionCard = ({
                         {type === REACTION_CARD_CHANNEL_POINTS && inputWidth !== '' &&
                             <input ref={inputRef}
                                 style={{
-                                    width: inputWidth
+                                    width: type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId) ? inputWidth : '100%'
                                 }}
                                 className={style.costInput}
-                                type='number'
-                                value={editingCost ? newCost : cost}
+                                type={type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId) ? 'text' : 'number'}
+                                value={editingCost ? newCost : cost.toLocaleString()}
                                 disabled={type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId)}
                                 onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                                 onChange={type === REACTION_CARD_QOINS ? () => {} : handleCost} />
@@ -345,7 +346,7 @@ const ReactionCard = ({
                                 }}
                                 SelectDisplayProps={{
                                     style: {
-                                        paddingRight: '16px'
+                                        paddingLeft: '8px'
                                     }
                                 }}
                                 style={{
@@ -355,7 +356,8 @@ const ReactionCard = ({
                                     border: 'none',
                                     outline: 'none',
                                     borderRadius: '8px',
-                                    padding: '0px 8px',
+                                    padding: '0px',
+                                    paddingLeft: '0px 0px 0px 8px'
                                 }}
                                 IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
                                 displayEmpty

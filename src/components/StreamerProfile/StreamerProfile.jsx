@@ -28,7 +28,9 @@ import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts
 import { ReactComponent as Edit } from './../../assets/Edit.svg';
 import { ReactComponent as OnEye } from './../../assets/OnEye.svg';
 import { ReactComponent as OffEye } from './../../assets/OffEye.svg';
-
+import { ReactComponent as CalendarTabIcon } from './../../assets/CalendarTab.svg';
+import { ReactComponent as ClockTabIcon } from './../../assets/ClockTab.svg';
+import { ReactComponent as Heart } from './../../assets/Heart.svg';
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
@@ -286,7 +288,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [buttonPressed, setButtonPressed] = useState('Qoins');
     const [pendingMessages, setPendingMessages] = useState(0);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
-    const [switchState, setSwitchState] = useState(false);
+    const [streamsTab, setStreamsTab] = useState(0);
     const [qreatorCode, setQreatorCode] = useState('');
     const [openTooltip, setOpenTooltip] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
@@ -325,7 +327,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
         async function loadStreams() {
             if (user) {
-                if (!switchState) {
+                if (!streamsTab) {
                     setStreamLoaded(await loadStreamsByStatusRange(user.uid, PENDING_APPROVAL_EVENT_TYPE, SCHEDULED_EVENT_TYPE));
                 } else {
                     setStreamLoaded(await loadStreamsByStatus(user.uid, PAST_STREAMS_EVENT_TYPE));
@@ -428,7 +430,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         if (!randomEmoteUrl) {
             getRandomEmote();
         }
-    }, [switchState, user, history, randomEmoteUrl, channelRewardCost, t, editingChannelRewardCost, newChannelRewardCost]);
+    }, [streamsTab, user, history, randomEmoteUrl, channelRewardCost, t, editingChannelRewardCost, newChannelRewardCost]);
 
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
@@ -486,8 +488,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         nextMilestone = 250 * Math.ceil((estimatedBits + 1) / 250);
     }
 
-    const handleSwitchEvents = () => {
-        setSwitchState(!switchState);
+    const handleStreamsTabs = (event, newValue) => {
+        setStreamsTab(newValue);
     }
 
     const copyQreatorCode = () => {
@@ -506,6 +508,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const handlePremiumButton = async () => {
+        if ((user.premium || user.freeTrial) && user.currentPeriod) {
+            return history.push('/membership')
+        }
         if (openGoPremiumDialog) {
             // do billing
             return setOpenGoPremiumDialog(false);
@@ -567,7 +572,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const handleSubsTabs = (event, newValue) => {
-        console.log(newValue)
         setEditingSubsRewards(newValue);
     }
 
@@ -779,17 +783,29 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </div>
                                             <div className={styles.reactionSettingContainer}
                                                 onClick={handlePremiumButton}
-                                                style={{ background: 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)', cursor: 'pointer' }}>
+                                                style={{ background: (user.premium || user.freeTrial) && user.currentPeriod ? '#141735' : 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)', cursor: 'pointer' }}>
                                                 <div style={{ display: 'flex' }}>
                                                     <div>
-                                                        <Star style={{ height: '24px', width: '24px' }} />
+                                                        {(user.premium || user.freeTrial) && user.currentPeriod ?
+                                                            <Heart style={{ height: '24px', width: '24px' }} />
+                                                            :
+                                                            <Star style={{ height: '24px', width: '24px' }} />
+                                                        }
                                                     </div>
                                                     <div style={{ marginLeft: '8px' }}>
                                                         <p className={styles.reactionSettingTitle}>
-                                                            Subscribers Set Up
+                                                            {(user.premium || user.freeTrial) && user.currentPeriod ?
+                                                                'You are premium'
+                                                                :
+                                                                'Subscribers Set Up'
+                                                            }
                                                         </p>
                                                         <p className={styles.reactionSettingSubtitle}>
-                                                            {`Viewers can send reactions\nusing their channel points`}
+                                                            {(user.premium || user.freeTrial) && user.currentPeriod ?
+                                                                'Viewers can send reactions using their channel points'
+                                                                :
+                                                                'Viewers can send reactions\nusing their channel points'
+                                                            }
                                                         </p>
                                                     </div>
                                                 </div>
@@ -866,9 +882,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 <h1 className={styles.title}>
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
-                                                <div style={{ marginLeft: '32px' }}>
+                                                {/* <div style={{ marginLeft: '32px' }}>
                                                     <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
-                                                </div>
+                                                </div> */}
                                                 <div style={{
                                                     marginLeft: 'auto'
                                                 }}>
@@ -880,6 +896,24 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 </div>
                                             </div>
                                         </Grid>
+                                        <div style={{
+                                            marginBottom: ''
+                                        }}>
+                                            <QaplaTabs value={streamsTab} onChange={handleStreamsTabs}>
+                                                <QaplaTab label="Scheduled" value={0} icon={<CalendarTabIcon style={{ marginBottom: '0px' }} />} />
+                                                <QaplaTab label="History" value={1} icon={<ClockTabIcon style={{ marginBottom: '0px' }} />} />
+                                            </QaplaTabs>
+                                        </div>
+                                        <div style={{
+                                            marginTop: '14px',
+                                        }}>
+                                            <p style={{
+                                                color: '#FFFFFF9A',
+                                                fontSize: '16px',
+                                                fontWeight: '400',
+                                                lineHeight: '19px',
+                                            }}>Schedule Qoins drops for your streams</p>
+                                        </div>
                                     </Grid>
                                 </Grid>
                                 <Grid item xs={12} className={styles.streamsCardContainer}>

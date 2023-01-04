@@ -289,7 +289,7 @@ body {
 
 .myStreamsContainer {
     margin-top: 56px;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
     max-width: 1000px;
 }
 
@@ -307,6 +307,7 @@ body {
 
 .streamsCardContainer {
     min-height: 400px;
+    margin-top: 42px !important;
 }
 
 .innerStreamsCardContainer {

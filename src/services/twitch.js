@@ -42,7 +42,7 @@ export async function createCustomReward(twitchId, accessToken, title, cost, ena
 
             return { status: res.status, data: response.data[0] };
         } else if (response.error) {
-            if (res.status === 400) {
+            if (res.status === 400 || res.status === 403) {
                 return { status: res.status, error: response.error, message: response.message };
             }
         } else {

@@ -90,6 +90,7 @@ const OnBoarding = ({ user }) => {
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
     const [reactionsPrices, setReactionsPrices] = useState([]);
     const [creatingReward, setCreatingReward] = useState(false);
+    const [loadingDots, setLoadingDots] = useState('.');
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -139,10 +140,22 @@ const OnBoarding = ({ user }) => {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (creatingReward) {
+            setTimeout(() => {
+                setLoadingDots(loadingDots.length < 3 ? loadingDots + '.' : '.');
+            }, 750);
+        }
+    }, [creatingReward, loadingDots]);
+
     const handleMainButton = () => {
         switch (step) {
             case -1:
-                openDiscordSupport();
+                if (errorCode === 403) {
+                    openTwitchAffiliateProgram();
+                } else {
+                    openDiscordSupport();
+                }
                 break;
             case 0:
                 createChannelPointsRewards();
@@ -170,11 +183,16 @@ const OnBoarding = ({ user }) => {
         window.open('https://discord.gg/2UMQ6ZXPkq', '_blank');
     }
 
+    const openTwitchAffiliateProgram = () => {
+        window.open('https://help.twitch.tv/s/article/joining-the-affiliate-program', '_blank');
+    }
+
     const createChannelPointsRewards = async (attempt = 1) => {
         setStep(step + 1);
         setCreatingReward(true);
         // Create reward with default value, the user can change their cost in the next step
         const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, ZAP_REWARD_NAME, 200);
+        console.log(result);
         if (result !== undefined) {
             if (result.reward.status === 200) {
                 const webhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, InteractionsRewardRedemption.type, InteractionsRewardRedemption.callback, { reward_id: result.reward.data.id });
@@ -242,6 +260,9 @@ const OnBoarding = ({ user }) => {
                         setCreatingReward(false);
                         return setStep(2);
                     }
+                } else if (result.reward.status === 403) {
+                    setCreatingReward(false);
+                    onErrorChannelPointsCreation(result.reward.status, result.reward.error);
                 }
             }
         } else {
@@ -254,8 +275,12 @@ const OnBoarding = ({ user }) => {
 
     const onErrorChannelPointsCreation = (errorCode, errorMessage) => {
         setErrorCode(errorCode);
-        let errorTranslationKey = errorMessage === 'CREATE_CUSTOM_REWARD_TOO_MANY_REWARDS' ? 'tooManyRewards' : 'duplicatedReward';
-        setErrorMessage(errorTranslationKey);
+        if (errorCode === 403) {
+            setErrorMessage('noAffiliate');
+        } else {
+            let errorTranslationKey = errorMessage === 'CREATE_CUSTOM_REWARD_TOO_MANY_REWARDS' ? 'tooManyRewards' : 'duplicatedReward';
+            setErrorMessage(errorTranslationKey);
+        }
         setStep(-1);
     }
 
@@ -404,7 +429,7 @@ const OnBoarding = ({ user }) => {
                     {step === 1 &&
                         <>
                             <h1 className={styles.gradientText}>
-                                {t('Onboarding.workingOnRequest')}
+                                {t('Onboarding.workingOnRequest', { loadingDots })}
                             </h1>
                         </>
                     }
@@ -621,7 +646,11 @@ const OnBoarding = ({ user }) => {
                 >
                     {step === -1 &&
                         <>
-                            {t('Onboarding.goToDiscord')}
+                            {errorCode === 403 ?
+                                t('Onboarding.goToTwitch')
+                                :
+                                t('Onboarding.goToDiscord')
+                            }
                         </>
                     }
                     {step === 0 &&

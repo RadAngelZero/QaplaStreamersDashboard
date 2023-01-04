@@ -45,7 +45,7 @@
         "processDescriptionP3": "🔗 We‘ll add a browser source to your OBS/Streamlabs",
         "setRewardCost": "Set the custom reward “cost”",
         "setRewardCostDescription": "This is how much channel points your viewers will burn per reaction. You can always change it later",
-        "workingOnRequest": "I’m working on your request lovely human",
+        "workingOnRequest": "I’m working on your request lovely human{{loadingDots}}",
         "rewardCreated": "Custom reward created successfully!",
         "addReactionsToOverlay": "Add the reactions overlay",
         "copyLink": "Copy the link and add it as a browser source on your OBS/Streamlabs",
@@ -53,6 +53,7 @@
         "height": "Height",
         "testOverlay": "Test Overlay",
         "tiersPricingInstructions": "👆 Set the “price” in channel points and bits for\nviewers to send custom alerts on stream",
+        "goToTwitch": "Join the affiliate program",
         "goToDiscord": "Go Discord Support",
         "letsGo": "Let’s F* Go",
         "createCustomReward": "Create Custom Reward",
@@ -70,6 +71,10 @@
         "tooManyRewards": {
             "title": "🫣 Error 400\nYour Channel Rewards are full!",
             "description": "Please erase one or two unused custom rewards from your Twitch channel and try again. If the problem persists please contact support."
+        },
+        "noAffiliate": {
+            "title": "Oh no! You need to be an affiliate 🫣 ",
+            "description": "To use Qapla you need to have channel points rewards available in your channel. To unlock them you need t become an affiliate on Twitch. We highly encourage you to become one and comeback!"
         },
         "errorDescription": "Don’t worry. Let’s try again! Make sure your channel rewards are not full",
         "policiesP1": "By signing up you accept our",

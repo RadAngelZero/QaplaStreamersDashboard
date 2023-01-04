@@ -45,7 +45,7 @@
         "processDescriptionP3": "🔗 Agregaremos una fuente de navegador a tu OBS/Streamlabs",
         "setRewardCost": "Define el “costo” de la recompensa",
         "setRewardCostDescription": "Esto seran los puntos que tus viewers gastaran por reacción. Siempre puedes cambiarlo después",
-        "workingOnRequest": "Estoy trabajando en tu solicitud adorable humano",
+        "workingOnRequest": "Estoy trabajando en tu solicitud adorable humano{{loadingDots}}",
         "rewardCreated": "Recompensa creada exitosamente!",
         "addReactionsToOverlay": "Agrega el overlay de reacciones",
         "copyLink": "Copia el link y agregalo en una fuente de navegador en tu OBS/Streamlabs",
@@ -53,6 +53,7 @@
         "height": "Alto",
         "testOverlay": "Probar Overlay",
         "tiersPricingInstructions": "👆 Define el “precio” en puntos de canal y bits para que\ntus viewers envien alertas personalizadas en stream",
+        "goToTwitch": "Unete al programa de afiliados",
         "goToDiscord": "Ir a soporte en Discord",
         "letsGo": "¡Vamos!",
         "createCustomReward": "Crear Recompensa",
@@ -70,6 +71,10 @@
         "tooManyRewards": {
             "title": "🫣 Error 400\n¡Tus recompensas de canal estan llenas!",
             "description": "Porfavor elimina una o dos recompensas que no uses de tu canal de Twitch e intentalo de nuevo. Si el problema persiste contacta a soporte."
+        },
+        "noAffiliate": {
+            "title": "¡Oh no! Necesitas ser afiliado 🫣",
+            "description": "Para usar Qapla necesitas recompensas de puntos de canal en tu canal. Para desbloquearlas debes ser afiliado en Twitch. ¡Te animamos a que te conviertas en uno y regreses!"
         },
         "errorDescription": "No te preocupes. ¡Intentemos de nuevo! Asegurate de que tus recompensas de canal no esten llenas",
         "policiesP1": "Al continuar acepto los",

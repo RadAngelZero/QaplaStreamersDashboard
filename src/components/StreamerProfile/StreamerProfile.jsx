@@ -214,7 +214,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         async function loadReactionsEnabled() {
             if (user && user.uid) {
                 const reactionsEnabled = await getStreamerAlertSetting(user.uid, 'reactionsEnabled');
-                setReactionsEnabled(Boolean(reactionsEnabled.val()).valueOf());
+
+                /**
+                 * When reactionsEnabled does not exist the reactions are enabled, they are only disabled when the user
+                 * has explicitly required them to be disabled
+                 */
+                setReactionsEnabled(reactionsEnabled.exists() ? Boolean(reactionsEnabled.val()).valueOf() : true);
             }
         }
 

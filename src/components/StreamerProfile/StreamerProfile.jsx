@@ -33,6 +33,7 @@ import { ReactComponent as CalendarOffTabIcon } from './../../assets/CalendarTab
 import { ReactComponent as ClockOnTabIcon } from './../../assets/ClockTabOn.svg';
 import { ReactComponent as ClockOffTabIcon } from './../../assets/ClockTabOff.svg';
 import { ReactComponent as Heart } from './../../assets/Heart.svg';
+import { ReactComponent as SlidersSettings } from './../../assets/SlidersSettings.svg';
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
@@ -764,7 +765,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             <div className={styles.reactionSettingContainer} style={{}}>
                                                 <div style={{ display: 'flex' }}>
                                                     <div>
-                                                        <Star style={{ height: '24px', width: '24px' }} />
+                                                        <SlidersSettings style={{ height: '24px', width: '24px' }} />
                                                     </div>
                                                     <div style={{ marginLeft: '8px' }}>
                                                         <p className={styles.reactionSettingTitle}>

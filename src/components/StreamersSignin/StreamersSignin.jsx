@@ -119,7 +119,7 @@ const StreamersSignin = ({ user, title }) => {
         setIsLoadingAuth(false);
     }
 
-    if (user === undefined) {
+    if (user === undefined || isLoadingAuth) {
         return (
             <StreamerDashboardContainer>
                 <Grid item md='1' />

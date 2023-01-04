@@ -1,7 +1,22 @@
 .container {
-    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box;         /* Opera/IE 8+ */
+    -webkit-box-sizing: border-box;
+    /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;
+    /* Firefox, other Gecko */
+    box-sizing: border-box;
+    /* Opera/IE 8+ */
+}
+
+.gradientContainer {
+    content: '';
+    padding: 4px;
+    border-radius: 20px;
+    -webkit-box-sizing: border-box;
+    /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;
+    /* Firefox, other Gecko */
+    box-sizing: border-box;
+    /* Opera/IE 8+ */
 }
 
 .costInput {
@@ -9,14 +24,13 @@
     color: #fff;
     font-size: 18px;
     font-weight: 700;
-    margin-left: 8px;
     background-color: #0000;
     border: none;
     outline: none;
     height: 36px;
     border-radius: 8px;
     padding: 0px 8px;
-    width: 65%;
+    padding-left: 8px;
 }
 
 .costInput:focus {
@@ -25,7 +39,6 @@
 
 .button {
     display: flex;
-    background-color: #3B4BF9;
     border-radius: 8px;
     padding: 8px 8px;
     /* min-width: 20px; */

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, Dialog, CircularProgress } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, Dialog, CircularProgress, Tab, Tabs } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -26,6 +26,9 @@ import { ReactComponent as Zap } from './../../assets/Zap.svg';
 import { ReactComponent as Close } from './../../assets/CloseIcon.svg';
 import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
 import { ReactComponent as Edit } from './../../assets/Edit.svg';
+import { ReactComponent as OnEye } from './../../assets/OnEye.svg';
+import { ReactComponent as OffEye } from './../../assets/OffEye.svg';
+
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
@@ -192,6 +195,54 @@ const PremiumDialog = withStyles(() => ({
     },
 }))(Dialog);
 
+const QaplaTabs = withStyles(() => ({
+    root: {
+        webkitBoxSizing: 'border-box',
+        mozBoxSizing: 'border-box',
+        boxSizing: 'border-box',
+        marginTop: '24px',
+    },
+    flexContainer: {
+        webkitBoxSizing: 'border-box',
+        mozBoxSizing: 'border-box',
+        boxSizing: 'border-box',
+    },
+    indicator: {
+        backgroundColor: '#0000'
+    }
+}))(Tabs);
+
+const QaplaTab = withStyles(() => ({
+    root: {
+        height: '35px',
+        maxHeight: '35px',
+        padding: '8px 12px',
+        webkitBoxSizing: 'border-box',
+        mozBoxSizing: 'border-box',
+        boxSizing: 'border-box',
+        color: '#fff',
+        borderRadius: '6px',
+        marginRight: '16px',
+        minWidth: 'auto',
+        minHeight: 'auto',
+        textTransform: 'none',
+        fontSize: '16px',
+        fontWeight: '600',
+        lineHeight: '19px',
+        letterSpacing: '-0.33764705061912537px',
+        textAlign: 'center',
+
+    },
+    selected: {
+        backgroundColor: '#29326B',
+    },
+    wrapper: {
+        flexDirection: 'row',
+        justifyItems: 'center',
+        gap: '4px',
+    }
+}))(Tab);
+
 const StartFreeTrialButton = withStyles(() => ({
     root: {
         display: 'flex',
@@ -252,7 +303,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [newChannelRewardCost, setNewChannelRewardCost] = useState(null);
     const [rewardId, setRewardId] = useState(null);
     const [inputWidth, setInputWidth] = useState('4ch');
-    const [editingSubsRewards, setEditingSubsRewards] = useState(false);
+    const [editingSubsRewards, setEditingSubsRewards] = useState(0);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -365,7 +416,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         }
 
         if (!editingChannelRewardCost && newChannelRewardCost === null) {
-            getChannelPointRewardData();
+            // getChannelPointRewardData();
         }
         loadStreams();
         getValueOfQoins();
@@ -515,6 +566,11 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         }
     }
 
+    const handleSubsTabs = (event, newValue) => {
+        console.log(newValue)
+        setEditingSubsRewards(newValue);
+    }
+
     return (
         <StreamerDashboardContainer user={user}>
             {user &&
@@ -627,6 +683,13 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                             </PremiumButton>
                                                         } */}
                                                     </div>
+                                                    <QaplaTabs value={editingSubsRewards} onChange={handleSubsTabs}>
+                                                        {/* Must be 0 & 1 because false deselect tabs */}
+                                                        <QaplaTab label="All Viewers" value={0} icon={editingSubsRewards === 1 ? <OffEye style={{ marginBottom: '0px' }} /> : <OnEye style={{ marginBottom: '0px' }} />} />
+                                                        <QaplaTab label="Subscribers" value={1} icon={<Star style={{ marginBottom: '0px' }} />} style={{
+                                                            background: editingSubsRewards === 1 ? 'linear-gradient(93.52deg, #6F11F9 0%, #FA5668 108.72%)' : '#0000',
+                                                        }} />
+                                                    </QaplaTabs>
                                                     <p className={styles.subtitle}>
                                                         {t('StreamerProfile.reactionsSubtitle')}
                                                     </p>

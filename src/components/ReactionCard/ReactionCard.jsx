@@ -15,6 +15,7 @@ import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts
 import { ReactComponent as Edit } from './../../assets/Edit.svg';
 import { ReactComponent as Bits } from './../../assets/Bits.svg';
 import { ReactComponent as Show } from './../../assets/Show.svg';
+import { ReactComponent as Zap } from './../../assets/Zap.svg';
 
 const useStyles = makeStyles(() => ({
     circularProgress: {
@@ -85,6 +86,48 @@ const ChannelPoinsSwitch = withStyles((theme) => ({
     },
 }))(Switch);
 
+const SubsSwitch = withStyles((theme) => ({
+    root: {
+        width: 32,
+        height: 24,
+        padding: 0,
+        borderRadius: 16,
+    },
+    switchBase: {
+        color: '#FF5862',
+        padding: 4,
+        paddingTop: 6,
+        '&$checked': {
+            transform: 'translateX(13px)',
+            color: '#FF5862',
+            '& + $track': {
+                backgroundColor: '#fff',
+                opacity: 1,
+                border: 'none',
+            },
+        },
+    },
+    checked: {
+        // idk why this must exist for the above class to work
+    },
+    thumb: {
+        width: 12,
+        height: 12,
+    },
+    disabled: {
+        opacity: 0.6,
+        '& + $track': {
+            opacity: '0.6 !important',
+            backgroundColor: '#fff !important',
+        },
+    },
+    track: {
+        borderRadius: 12 / 2,
+        backgroundColor: '#FFFFFF99',
+        opacity: 1,
+    },
+}))(Switch);
+
 const ReactionCard = ({
     icons,
     title,
@@ -133,41 +176,8 @@ const ReactionCard = ({
             }
         }
 
-        async function getChannelPointRewardData() {
-            try {
-                const rewardData = await getInteractionsRewardData(user.uid);
-                if (rewardData.exists()) {
-                    const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
-                    if (userTokensUpdated.data.status === 200) {
-                        const userCredentialsUpdated = userTokensUpdated.data;
-                        updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
-                        const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
-                        if (reward && reward.id) {
-                            setCost(reward.cost);
-                            setRewardId(reward.id);
-                            setInputWidth(`${reward.cost.toString().length}ch`);
-                        } else if (reward === 404) {
-                            history.push('/onboarding');
-                        }
-                    } else {
-                        // Refresh token is useless, signout user
-                        alert(t('StreamCard.sessionExpired'));
-                        await auth.signOut();
-                        history.push('/');
-                    }
-                } else {
-                    history.push('/onboarding');
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
         if (user.uid && cost === null && type === REACTION_CARD_QOINS) {
             getPriceData();
-        }
-        if (user.uid && cost === null && type === REACTION_CARD_CHANNEL_POINTS) {
-            getChannelPointRewardData();
         }
     }, [cost, defaultCost, history, type, user.id, user.refreshToken, user.uid, reactionLevel]);
 
@@ -241,9 +251,8 @@ const ReactionCard = ({
     }
 
     return (
-        <div className={style.gradientContainer} style={{ background: hideBorder ? 'none' : subsMode ? 'linear-gradient(152.4deg, #5328FF 28.13%, #4BDEFE 100%)' : 'linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%)', }}>
-
-            <div className={style.container} style={{ background: subsMode ? 'none' : '#141735' }}>
+        <div className={style.gradientContainer} style={{ background: hideBorder ? 'none' : subsMode === 1 ? 'linear-gradient(152.4deg, #690EFF 0%, #FF5862 100%)' : 'linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%)', }}>
+            <div className={style.container} style={{ background: subsMode === 1 ? 'none' : '#141735' }}>
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -307,7 +316,11 @@ const ReactionCard = ({
                                 Allow viewers to send alerts using channel points
                             </p>
                         </div>
-                        <ChannelPoinsSwitch />
+                        {subsMode === 1 ?
+                            <SubsSwitch />
+                            :
+                            <ChannelPoinsSwitch />
+                        }
                     </div>
                     <div style={{
                         display: 'flex',
@@ -322,7 +335,10 @@ const ReactionCard = ({
                             alignItems: 'center',
                         }}>
                             {type === REACTION_CARD_CHANNEL_POINTS &&
-                                <ChPts />
+                                <Zap style={{
+                                    width: '16px',
+                                    heigt: '16px',
+                                }} />
                             }
                             {type === REACTION_CARD_QOINS &&
                                 <Bits />

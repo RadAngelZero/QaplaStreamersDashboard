@@ -28,8 +28,10 @@ import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts
 import { ReactComponent as Edit } from './../../assets/Edit.svg';
 import { ReactComponent as OnEye } from './../../assets/OnEye.svg';
 import { ReactComponent as OffEye } from './../../assets/OffEye.svg';
-import { ReactComponent as CalendarTabIcon } from './../../assets/CalendarTab.svg';
-import { ReactComponent as ClockTabIcon } from './../../assets/ClockTab.svg';
+import { ReactComponent as CalendarOnTabIcon } from './../../assets/CalendarTabOn.svg';
+import { ReactComponent as CalendarOffTabIcon } from './../../assets/CalendarTabOff.svg';
+import { ReactComponent as ClockOnTabIcon } from './../../assets/ClockTabOn.svg';
+import { ReactComponent as ClockOffTabIcon } from './../../assets/ClockTabOff.svg';
 import { ReactComponent as Heart } from './../../assets/Heart.svg';
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
@@ -900,8 +902,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             marginBottom: ''
                                         }}>
                                             <QaplaTabs value={streamsTab} onChange={handleStreamsTabs}>
-                                                <QaplaTab label="Scheduled" value={0} icon={<CalendarTabIcon style={{ marginBottom: '0px' }} />} />
-                                                <QaplaTab label="History" value={1} icon={<ClockTabIcon style={{ marginBottom: '0px' }} />} />
+                                                <QaplaTab label="Scheduled" value={0} icon={streamsTab === 0 ? <CalendarOnTabIcon style={{ marginBottom: '0px' }} /> : <CalendarOffTabIcon style={{ marginBottom: '0px' }} /> } />
+                                                <QaplaTab label="History" value={1} icon={streamsTab === 1 ? <ClockOnTabIcon style={{ marginBottom: '0px' }} /> : <ClockOffTabIcon style={{ marginBottom: '0px' }} />} />
                                             </QaplaTabs>
                                         </div>
                                         <div style={{

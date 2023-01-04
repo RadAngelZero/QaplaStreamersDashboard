@@ -407,7 +407,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         if (reward && reward.id) {
                             setChannelRewardCost(reward.cost);
                             setRewardId(reward.id);
-                            setInputWidth(`${reward.cost.toString().length}ch`);
+                            setInputWidth(`${reward.cost.toLocaleString().length}ch`);
                         } else if (reward === 404) {
                             history.push('/onboarding');
                         }
@@ -528,7 +528,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
     const handleChannelRewardCost = async (e) => {
         setNewChannelRewardCost(e.target.value);
-        setInputWidth(e.target.value.length > 4 ? e.target.value.length > 9 ? '9ch' : e.target.value.length + `ch` : '4ch');
+        setInputWidth(e.target.value.length > 0 ? (e.target.value.length > 9 ? '9ch' : e.target.value.length + 'ch') : '1ch');
     }
 
     const handleChannelRewardButton = async () => {
@@ -549,6 +549,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
         if (channelRewardCost === newChannelRewardCost || newChannelRewardCost === '') {
             setEditingChannelRewardCost(false);
+            setInputWidth(channelRewardCost.toLocaleString().length > 0 ? channelRewardCost.toLocaleString().length + 'ch' : '1ch');
 
             return;
         }
@@ -572,6 +573,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
             if (rewardUpdated.status === 200) {
                 setChannelRewardCost(newCostInt);
+                setInputWidth(newCostInt.toLocaleString().length > 0 ? newCostInt.toLocaleString().length + 'ch' : '1ch');
                 setUpdatingChannelRewardCost(false);
                 setNewChannelRewardCost(null);
                 return;
@@ -709,7 +711,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </div>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '24px', marginTop: '3px' }} >
-                                            <div className={styles.reactionSettingContainer} style={{}}>
+                                            <div className={styles.reactionSettingContainer}>
                                                 <div style={{ display: 'flex' }}>
                                                     <div>
                                                         <Zap />
@@ -733,11 +735,11 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     <ChPts />
                                                     <input ref={inputRef}
                                                         style={{
-                                                            width: inputWidth
+                                                            width: !editingChannelRewardCost ? inputWidth : '100%'
                                                         }}
                                                         className={styles.costInput}
-                                                        type='number'
-                                                        value={editingChannelRewardCost ? newChannelRewardCost : channelRewardCost}
+                                                        type={!editingChannelRewardCost ? 'text' : 'number'}
+                                                        value={editingChannelRewardCost ? newChannelRewardCost : channelRewardCost ? channelRewardCost.toLocaleString() : ''}
                                                         disabled={!editingChannelRewardCost}
                                                         onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                                                         onChange={handleChannelRewardCost} />

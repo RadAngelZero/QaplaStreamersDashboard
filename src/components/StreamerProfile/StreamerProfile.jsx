@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import StreamsSwitch from '../StreamsSwitch/StreamsSwitch';
 import StreamsLeft from '../StreamsLeft/StreamsLeft';
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
@@ -155,43 +154,8 @@ const ReactionsSwitch = withStyles((theme) => ({
     },
 }))(Switch);
 
-const PremiumButton = withStyles(() => ({
-    root: {
-        display: 'flex',
-        backgroundColor: '#3B4BF9',
-        padding: '12px 16px',
-        borderRadius: '8px',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        textTransform: 'none',
-        marginLeft: '24px',
-        '&:hover': {
-            opacity: 0.8,
-            backgroundColor: '#3B4BF9'
-        },
-        '&:active': {
-            opacity: 0.6,
-            backgroundColor: '#3B4BF9'
-
-        },
-        webkitBoxSizing: 'border-box', /* Safari/Chrome, other WebKit */
-        mozBoxSizing: 'border-box',    /* Firefox, other Gecko */
-        boxSizing: 'border-box',       /* Opera/IE 8+ */
-    },
-    label: {
-        display: 'flex',
-        color: '#fff',
-        fontSize: '12px',
-        fontWeight: '600',
-        lineHeight: '15px',
-        letterSpacing: '0.492000013589859px',
-        textAlign: 'center',
-    },
-}))(Button);
-
 const PremiumDialog = withStyles(() => ({
     root: {
-
     },
     paper: {
         backgroundColor: '#141833',
@@ -691,11 +655,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                         <h1 className={styles.title}>
                                                             {t('StreamerProfile.reactions')}
                                                         </h1>
-                                                        {/* {(user.premium || user.freeTrial) && user.currentPeriod &&
-                                                            <PremiumButton startIcon={<Star />} onClick={handlePremiumButton}>
-                                                                Set Up for Subscribers
-                                                            </PremiumButton>
-                                                        } */}
                                                     </div>
                                                     <QaplaTabs value={editingSubsRewards} onChange={handleSubsTabs}>
                                                         {/* Must be 0 & 1 because false deselect tabs */}
@@ -892,9 +851,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 <h1 className={styles.title}>
                                                     {t('StreamerProfile.myStreams')}
                                                 </h1>
-                                                {/* <div style={{ marginLeft: '32px' }}>
-                                                    <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
-                                                </div> */}
                                                 <div style={{
                                                     marginLeft: 'auto'
                                                 }}>

@@ -7,8 +7,8 @@ import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { useHistory } from 'react-router-dom';
 import { getEmotes, getUserWebhooks, subscribeStreamerToTwitchWebhook } from '../../services/functions';
 import { createInteractionsReward } from '../../services/interactionsQapla';
-import { getDefaultReactionPriceInBitsByLevel, loadTwitchExtensionReactionsPrices, saveInteractionsRewardData, writeTestCheer } from '../../services/database';
-import { CHEERS_URI, InteractionsRewardRedemption, REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS, ZAP_REWARD_NAME } from '../../utilities/Constants';
+import { getReactionsLevelDefaultPrices, loadTwitchExtensionReactionsPrices, saveInteractionsRewardData, writeTestCheer } from '../../services/database';
+import { CHEERS_URI, InteractionsRewardRedemption, ZAP, QOIN, ZAP_REWARD_NAME } from '../../utilities/Constants';
 import { notifyBugToDevelopTeam } from '../../services/discord';
 import ReactionCard from '../ReactionCard/ReactionCard';
 
@@ -85,6 +85,7 @@ const OnBoarding = ({ user }) => {
     const [streamerOverlayLink, setStreamerOverlayLink] = useState(CHEERS_URI);
     const [stepIndicator, setStepIndicator] = useState(0);
     const [acceptPolicies, setAcceptPolicies] = useState(true);
+    const [defaultPriceLevel1, setDefaultPriceLevel1] = useState(0);
     const [defaultPriceLevel2, setDefaultPriceLevel2] = useState(0);
     const [defaultPriceLevel3, setDefaultPriceLevel3] = useState(0);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
@@ -99,15 +100,22 @@ const OnBoarding = ({ user }) => {
         }
 
         async function loadDefaultReactionsCosts() {
-            const defaultPriceLevel2 = await getDefaultReactionPriceInBitsByLevel('level2');
-            if (defaultPriceLevel2.exists()) {
-                setDefaultPriceLevel2(defaultPriceLevel2.val().price);
-            }
-
-            const defaultPriceLevel3 = await getDefaultReactionPriceInBitsByLevel('level3');
-            if (defaultPriceLevel3.exists()) {
-                setDefaultPriceLevel3(defaultPriceLevel3.val().price);
-            }
+            const prices = await getReactionsLevelDefaultPrices();
+            prices.forEach((price) => {
+                switch (price.key) {
+                    case 'level1':
+                        setDefaultPriceLevel1({ price: price.val().type === ZAP ? price.val().price : price.val().bitsPrice, type: price.val().type });
+                        break;
+                    case 'level2':
+                        setDefaultPriceLevel2({ price: price.val().type === ZAP ? price.val().price : price.val().bitsPrice, type: price.val().type });
+                        break;
+                    case 'level3':
+                        setDefaultPriceLevel3({ price: price.val().type === ZAP ? price.val().price : price.val().bitsPrice, type: price.val().type });
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
 
         async function getRandomEmote() {
@@ -572,23 +580,27 @@ const OnBoarding = ({ user }) => {
                         gap: '24px',
                         flexWrap: 'wrap',
                     }}>
-                        <ReactionCard
-                            icons={
-                                [
-                                    <GIFIcon />,
-                                    <MemesIcon />,
-                                    <MegaStickerIcon />,
-                                ]
-                            }
-                            title={t('StreamerProfile.ReactionCard.tier1Title')}
-                            subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
-                            textMaxWidth='110px'
-                            type={REACTION_CARD_CHANNEL_POINTS}
-                            reactionLevel={1}
-                            user={user}
-                            hideBorder
-                        />
-                        {defaultPriceLevel3 &&
+                        {defaultPriceLevel1 &&
+                            <ReactionCard
+                                icons={
+                                    [
+                                        <GIFIcon />,
+                                        <MemesIcon />,
+                                        <MegaStickerIcon />,
+                                    ]
+                                }
+                                title={t('StreamerProfile.ReactionCard.tier1Title')}
+                                subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
+                                textMaxWidth='110px'
+                                reactionLevel={1}
+                                user={user}
+                                defaultCost={defaultPriceLevel1.price}
+                                defaultType={defaultPriceLevel1.type}
+                                availablePrices={reactionsPrices}
+                                hideBorder
+                            />
+                        }
+                        {defaultPriceLevel2 &&
                             <ReactionCard
                                 icons={
                                     [
@@ -601,10 +613,10 @@ const OnBoarding = ({ user }) => {
                                 title={t('StreamerProfile.ReactionCard.tier2Title')}
                                 subtitle={t('StreamerProfile.ReactionCard.tier2Subtitle')}
                                 textMaxWidth='160px'
-                                type={REACTION_CARD_QOINS}
                                 reactionLevel={2}
                                 user={user}
-                                defaultCost={defaultPriceLevel2}
+                                defaultCost={defaultPriceLevel2.price}
+                                defaultType={defaultPriceLevel2.type}
                                 availablePrices={reactionsPrices}
                                 hideBorder
                             />
@@ -621,10 +633,10 @@ const OnBoarding = ({ user }) => {
                                 title={t('StreamerProfile.ReactionCard.tier3Title')}
                                 subtitle={t('StreamerProfile.ReactionCard.tier3Subtitle')}
                                 textMaxWidth='130px'
-                                type={REACTION_CARD_QOINS}
                                 reactionLevel={3}
                                 user={user}
-                                defaultCost={defaultPriceLevel3}
+                                defaultCost={defaultPriceLevel3.price}
+                                defaultType={defaultPriceLevel3.type}
                                 availablePrices={reactionsPrices}
                                 hideBorder
                             />

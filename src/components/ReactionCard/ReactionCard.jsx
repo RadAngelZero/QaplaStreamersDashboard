@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles, MenuItem, Select, Switch, withStyles } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import style from './ReactionCard.module.css';
 
 import { QOIN, ZAP } from '../../utilities/Constants';
-import { getReactionLevelPrice, setReactionLevelPrice } from '../../services/database';
+import { getReactionLevelDefaultPrice, getReactionLevelPrice, getReactionSubscriberLevelPrice, getReactionSubscribersLevelDefaultPrice, setReactionLevelPrice, setReactionSubscriberLevelPrice } from '../../services/database';
 
 import { ReactComponent as Bits } from './../../assets/Bits.svg';
 import { ReactComponent as Show } from './../../assets/Show.svg';
@@ -132,16 +131,13 @@ const ReactionCard = ({
     textMaxWidth = '100%',
     reactionLevel = 1,
     user,
-    defaultCost,
-    defaultType,
     availablePrices,
     hideBorder,
     subsMode = 0,
 }) => {
     const [cost, setCost] = useState(0);
-    const [type, setType] = useState(defaultType);
+    const [type, setType] = useState(ZAP);
     const { t } = useTranslation();
-    const history = useHistory();
     const classes = useStyles();
 
     const level = `level${reactionLevel}`;
@@ -149,40 +145,65 @@ const ReactionCard = ({
     useEffect(() => {
         async function getPriceData() {
             try {
-                const price = await getReactionLevelPrice(user.uid, level);
+                let price = null;
+                if (subsMode === 0) {
+                    price = await getReactionLevelPrice(user.uid, level);
+                } else {
+                    price = await getReactionSubscriberLevelPrice(user.uid, level);
+                }
+
                 if (price.exists()) {
                     setCost(price.val().type === ZAP ? price.val().price : price.val().bitsPrice);
                     setType(price.val().type);
                 } else {
-                    setCost(defaultCost);
+                    if (subsMode === 0) {
+                        price = await getReactionLevelDefaultPrice(level);
+                    } else {
+                        price = await getReactionSubscribersLevelDefaultPrice(level);
+                    }
+
+                    setCost(price.val().type === ZAP ? price.val().price : price.val().bitsPrice);
+                    setType(price.val().type);
                 }
             } catch (error) {
                 if (type === QOIN) {
                     console.log('error on qoins card: ' + level);
                 } else {
-                    console.log('error on channel points card');
+                    console.log('error on channel points card: ' + level);
                 }
                 console.log(error);
             }
         }
 
-        if (user && user.uid && cost === 0) {
+        if (user && user.uid) {
             getPriceData();
         }
-    }, [cost, defaultCost, history, type, user.id, user.refreshToken, user.uid, reactionLevel]);
+    }, [cost, type, user.uid, subsMode]);
 
     const handleCost = async (value, priceType) => {
         const selectedProduct = availablePrices?.find(({ cost }) => (cost === value));
 
-        await setReactionLevelPrice(
-            user.uid,
-            level,
-            priceType,
-            // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
-            priceType === ZAP ? value : value * 10,
-            priceType === ZAP ? null : value,
-            selectedProduct?.twitchSku
-        );
+        if (subsMode === 0) {
+            await setReactionLevelPrice(
+                user.uid,
+                level,
+                priceType,
+                // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
+                priceType === ZAP ? value : value * 10,
+                priceType === ZAP ? null : value,
+                selectedProduct?.twitchSku
+            );
+        } else {
+            await setReactionSubscriberLevelPrice(
+                user.uid,
+                level,
+                priceType,
+                // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
+                priceType === ZAP ? value : value * 10,
+                priceType === ZAP ? null : value,
+                selectedProduct?.twitchSku
+            );
+        }
 
         setCost(value);
     }
@@ -266,7 +287,8 @@ const ReactionCard = ({
                             </p>
                         </div>
                         {subsMode === 1 ?
-                            <SubsSwitch />
+                            <SubsSwitch checked={type === ZAP}
+                                onChange={toggleReactionType} />
                             :
                             <ChannelPoinsSwitch checked={type === ZAP}
                                 onChange={toggleReactionType} />

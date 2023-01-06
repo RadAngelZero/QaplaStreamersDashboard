@@ -373,7 +373,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
-        if (!editingChannelRewardCost && newChannelRewardCost === null) {
+        if (!editingChannelRewardCost && newChannelRewardCost === null && rewardId === null) {
             getChannelPointRewardData();
         }
         loadStreams();
@@ -532,6 +532,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         setEditingSubsRewards(newValue);
     }
 
+    const isPremium = user && (user.premium || user.freeTrial);
+
     return (
         <StreamerDashboardContainer user={user}>
             {user &&
@@ -639,13 +641,15 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                             {t('StreamerProfile.reactions')}
                                                         </h1>
                                                     </div>
-                                                    <QaplaTabs value={editingSubsRewards} onChange={handleSubsTabs}>
-                                                        {/* Must be 0 & 1 because false deselect tabs */}
-                                                        <QaplaTab label="All Viewers" value={0} icon={editingSubsRewards === 1 ? <OffEye style={{ marginBottom: '0px' }} /> : <OnEye style={{ marginBottom: '0px' }} />} />
-                                                        <QaplaTab label="Subscribers" value={1} icon={<Star style={{ marginBottom: '0px' }} />} style={{
-                                                            background: editingSubsRewards === 1 ? 'linear-gradient(93.52deg, #6F11F9 0%, #FA5668 108.72%)' : '#0000',
-                                                        }} />
-                                                    </QaplaTabs>
+                                                    {isPremium &&
+                                                        <QaplaTabs value={editingSubsRewards} onChange={handleSubsTabs}>
+                                                            {/* Must be 0 & 1 because false deselect tabs */}
+                                                            <QaplaTab label="All Viewers" value={0} icon={editingSubsRewards === 1 ? <OffEye style={{ marginBottom: '0px' }} /> : <OnEye style={{ marginBottom: '0px' }} />} />
+                                                            <QaplaTab label="Subscribers" value={1} icon={<Star style={{ marginBottom: '0px' }} />} style={{
+                                                                background: editingSubsRewards === 1 ? 'linear-gradient(93.52deg, #6F11F9 0%, #FA5668 108.72%)' : '#0000',
+                                                            }} />
+                                                        </QaplaTabs>
+                                                    }
                                                     <p className={styles.subtitle}>
                                                         {t('StreamerProfile.reactionsSubtitle')}
                                                     </p>
@@ -735,10 +739,10 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </div>
                                             <div className={styles.reactionSettingContainer}
                                                 onClick={handlePremiumButton}
-                                                style={{ background: (user.premium || user.freeTrial) && user.currentPeriod ? '#141735' : 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)', cursor: 'pointer' }}>
+                                                style={{ background: isPremium && user.currentPeriod ? '#141735' : 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)', cursor: 'pointer' }}>
                                                 <div style={{ display: 'flex' }}>
                                                     <div>
-                                                        {(user.premium || user.freeTrial) && user.currentPeriod ?
+                                                        {isPremium && user.currentPeriod ?
                                                             <Heart style={{ height: '24px', width: '24px' }} />
                                                             :
                                                             <Star style={{ height: '24px', width: '24px' }} />
@@ -746,14 +750,14 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     </div>
                                                     <div style={{ marginLeft: '8px' }}>
                                                         <p className={styles.reactionSettingTitle}>
-                                                            {(user.premium || user.freeTrial) && user.currentPeriod ?
+                                                            {isPremium && user.currentPeriod ?
                                                                 'You are premium'
                                                                 :
                                                                 'Subscribers Set Up'
                                                             }
                                                         </p>
                                                         <p className={styles.reactionSettingSubtitle}>
-                                                            {(user.premium || user.freeTrial) && user.currentPeriod ?
+                                                            {isPremium && user.currentPeriod ?
                                                                 'Viewers can send reactions using their channel points'
                                                                 :
                                                                 'Viewers can send reactions\nusing their channel points'

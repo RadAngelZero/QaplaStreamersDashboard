@@ -158,7 +158,9 @@ const PremiumDialog = withStyles(() => ({
     paper: {
         backgroundColor: '#141833',
         borderRadius: '35px',
-        padding: '40px 30px',
+        flexDirection: 'row',
+        overflow: 'hidden',
+        maxWidth: 'min-content',
     },
 }))(Dialog);
 
@@ -215,12 +217,14 @@ const StartFreeTrialButton = withStyles(() => ({
         display: 'flex',
         backgroundColor: '#3B4BF9',
         padding: '20px 16px',
-        borderRadius: '8px',
+        borderRadius: '16px',
         alignItems: 'center',
         justifyContent: 'space-between',
         textTransform: 'none',
-        width: '390px',
-        marginTop: '56px',
+        width: '300px',
+        marginTop: '32px',
+        height: '60px',
+        boxShadow: '0px 20px 40px -10px rgba(59, 75, 249, 0.4)',
         '&:hover': {
             opacity: 0.8,
             backgroundColor: '#3B4BF9'
@@ -237,9 +241,9 @@ const StartFreeTrialButton = withStyles(() => ({
     label: {
         display: 'flex',
         color: '#fff',
-        fontSize: '12px',
+        fontSize: '16px',
         fontWeight: '600',
-        lineHeight: '15px',
+        lineHeight: '19px',
         letterSpacing: '0.492000013589859px',
         justifyContent: 'center',
     },
@@ -463,9 +467,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const handlePremiumButton = async () => {
-        if ((user.premium || user.freeTrial) && user.currentPeriod) {
-            return history.push('/membership')
-        }
+        // if ((user.premium || user.freeTrial) && user.currentPeriod) {
+        //     return history.push('/membership')
+        // }
         if (openGoPremiumDialog) {
             // do billing
             return setOpenGoPremiumDialog(false);
@@ -845,7 +849,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             marginBottom: ''
                                         }}>
                                             <QaplaTabs value={streamsTab} onChange={handleStreamsTabs}>
-                                                <QaplaTab label="Scheduled" value={0} icon={streamsTab === 0 ? <CalendarOnTabIcon style={{ marginBottom: '0px' }} /> : <CalendarOffTabIcon style={{ marginBottom: '0px' }} /> } />
+                                                <QaplaTab label="Scheduled" value={0} icon={streamsTab === 0 ? <CalendarOnTabIcon style={{ marginBottom: '0px' }} /> : <CalendarOffTabIcon style={{ marginBottom: '0px' }} />} />
                                                 <QaplaTab label="History" value={1} icon={streamsTab === 1 ? <ClockOnTabIcon style={{ marginBottom: '0px' }} /> : <ClockOffTabIcon style={{ marginBottom: '0px' }} />} />
                                             </QaplaTabs>
                                         </div>
@@ -917,7 +921,55 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />
                     <PremiumDialog open={openGoPremiumDialog} onClose={() => setOpenGoPremiumDialog(false)}>
-                        <div style={{
+                        <div className={styles.goPremiumFancyContainer}>
+                            <p className={styles.goPremiumMainTitle}>
+                                Retain your Twitch subscribers
+                            </p>
+                            <img src='https://media.giphy.com/media/UV4YhmkUDTfaUPopRN/giphy.gif' alt='Cool alien abducting pizza' style={{
+                                marginTop: '43px',
+                                width: '264px',
+                            }} />
+                        </div>
+                        <div className={styles.goPremiumInfoContainer}>
+                            <div className={styles.goPremiumCloseIconContainer} onClick={() => setOpenGoPremiumDialog(false)}>
+                                <Close style={{ width: '40px', height: '40px' }} />
+                            </div>
+                            <p className={styles.goPremiumHeading}>
+                                $5
+                            </p>
+                            <p className={styles.goPremiumCaption}>
+                                per month
+                            </p>
+                            <p className={styles.goPremiumSubheading} style={{ marginTop: '32px' }}>
+                                Add value to your Twitch subscription letting your Subs interact for less or for free
+                            </p>
+                            <p className={styles.goPremiumDescription} style={{ marginTop: '8px' }}>
+                                Set a preferential reaction price configuration for channel subscribers than regular viewers
+                            </p>
+                            <p className={styles.goPremiumSubheading} style={{ marginTop: '24px' }}>
+                                Also includes:
+                            </p>
+                            <p className={styles.goPremiumDescription} style={{ marginTop: '8px' }}>
+                                50 Bits minimum cash out (10 times lower)
+                            </p>
+                            <div style={{ marginTop: '5.5px', display: 'flex' }}>
+                                <p className={styles.goPremiumDescription} >
+                                    Add a mod to your dashboard
+                                </p>
+                                <div className={styles.goPremiumSoonBorder}>
+                                    <div className={styles.goPremiumSoonInnerContainer}>
+                                        <p className={styles.goPremiumSoonText}>
+                                            Soon
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <StartFreeTrialButton onClick={handlePremiumButton} >
+                                Start 30-Day Free Trial
+                            </StartFreeTrialButton>
+                        </div>
+                        {/* <div style={{
                             margin: '-16px -6px 0px auto',
                             maxHeight: '40px',
                             cursor: 'pointer',
@@ -963,7 +1015,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         </p>
                         <StartFreeTrialButton onClick={handlePremiumButton} >
                             Start Free Trial
-                        </StartFreeTrialButton>
+                        </StartFreeTrialButton> */}
                     </PremiumDialog>
                 </>
             }

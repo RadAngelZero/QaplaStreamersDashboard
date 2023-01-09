@@ -467,9 +467,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const handlePremiumButton = async () => {
-        // if ((user.premium || user.freeTrial) && user.currentPeriod) {
-        //     return history.push('/membership')
-        // }
+        if ((user.premium || user.freeTrial) && user.currentPeriod) {
+            return history.push('/membership')
+        }
         if (openGoPremiumDialog) {
             // do billing
             return setOpenGoPremiumDialog(false);

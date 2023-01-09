@@ -1,18 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { CircularProgress, makeStyles, MenuItem, Select, Switch, withStyles } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { makeStyles, MenuItem, Select, Switch, withStyles } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 
 import style from './ReactionCard.module.css';
 
-import { REACTION_CARD_CHANNEL_POINTS, REACTION_CARD_QOINS } from '../../utilities/Constants';
-import { getInteractionsRewardData, getReactionPriceInBitsByLevel, setReactionPrice, setReactionPriceInBits, updateStreamerProfile } from '../../services/database';
-import { refreshUserAccessToken } from '../../services/functions';
-import { getCustomReward, updateCustomReward } from '../../services/twitch';
-import { auth } from '../../services/firebase';
+import { QOIN, ZAP } from '../../utilities/Constants';
+import { getReactionLevelDefaultPrice, getReactionLevelPrice, getReactionSubscriberLevelPrice, getReactionSubscribersLevelDefaultPrice, setReactionLevelPrice, setReactionSubscriberLevelPrice } from '../../services/database';
 
-import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
-import { ReactComponent as Edit } from './../../assets/Edit.svg';
 import { ReactComponent as Bits } from './../../assets/Bits.svg';
 import { ReactComponent as Show } from './../../assets/Show.svg';
 import { ReactComponent as Zap } from './../../assets/Zap.svg';
@@ -128,31 +122,22 @@ const SubsSwitch = withStyles((theme) => ({
     },
 }))(Switch);
 
+const zapsCostArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
 const ReactionCard = ({
     icons,
     title,
     subtitle,
     textMaxWidth = '100%',
-    type,
     reactionLevel = 1,
     user,
-    defaultCost,
-    background = '#141735',
-    backgroundURL,
     availablePrices,
     hideBorder,
-    subsMode,
+    subsMode = 0,
 }) => {
     const [cost, setCost] = useState(0);
-    const [newCost, setNewCost] = useState(null);
-    const [rewardId, setRewardId] = useState(null);
-    const [editingCost, setEditingCost] = useState(false);
-    const [updatingCost, setUpdatingCost] = useState(false);
-    const [inputWidth, setInputWidth] = useState('1ch');
-    const inputRef = useRef(null);
+    const [type, setType] = useState(ZAP);
     const { t } = useTranslation();
-    const isPremium = (user.premium || user.freeTrial) && user.currentPeriod;
-    const history = useHistory();
     const classes = useStyles();
 
     const level = `level${reactionLevel}`;
@@ -160,127 +145,77 @@ const ReactionCard = ({
     useEffect(() => {
         async function getPriceData() {
             try {
-                const price = await getReactionPriceInBitsByLevel(user.uid, level);
-                if (price.exists()) {
-                    setCost(price.val().price);
+                let price = null;
+                if (subsMode === 0) {
+                    price = await getReactionLevelPrice(user.uid, level);
                 } else {
-                    setCost(defaultCost);
+                    price = await getReactionSubscriberLevelPrice(user.uid, level);
+                }
+
+                if (price.exists()) {
+                    setCost(price.val().type === ZAP ? price.val().price : price.val().bitsPrice);
+                    setType(price.val().type);
+                } else {
+                    if (subsMode === 0) {
+                        price = await getReactionLevelDefaultPrice(level);
+                    } else {
+                        price = await getReactionSubscribersLevelDefaultPrice(level);
+                    }
+
+                    setCost(price.val().type === ZAP ? price.val().price : price.val().bitsPrice);
+                    setType(price.val().type);
                 }
             } catch (error) {
-                if (type === REACTION_CARD_QOINS) {
+                if (type === QOIN) {
                     console.log('error on qoins card: ' + level);
                 } else {
-                    console.log('error on channel points card');
+                    console.log('error on channel points card: ' + level);
                 }
                 console.log(error);
             }
         }
 
-        async function getChannelPointRewardData() {
-            try {
-                const rewardData = await getInteractionsRewardData(user.uid);
-                if (rewardData.exists()) {
-                    const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
-                    if (userTokensUpdated.data.status === 200) {
-                        const userCredentialsUpdated = userTokensUpdated.data;
-                        updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
-                        const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
-                        if (reward && reward.id) {
-                            setCost(reward.cost);
-                            setRewardId(reward.id);
-                            setInputWidth(`${reward.cost.toLocaleString().length}ch`);
-                        } else if (reward === 404) {
-                            history.push('/onboarding');
-                        }
-                    } else {
-                        // Refresh token is useless, signout user
-                        alert(t('StreamCard.sessionExpired'));
-                        await auth.signOut();
-                        history.push('/');
-                    }
-                } else {
-                    history.push('/onboarding');
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        if (user && user.uid && cost === 0 && type === REACTION_CARD_QOINS) {
+        if (user && user.uid) {
             getPriceData();
         }
-        if (user && user.uid && cost === 0 && type === REACTION_CARD_CHANNEL_POINTS) {
-            getChannelPointRewardData();
-        }
-    }, [cost, defaultCost, history, type, user.id, user.refreshToken, user.uid, reactionLevel]);
+    }, [cost, type, user.uid, subsMode]);
 
-    const handleButton = async () => {
-        if (updatingCost) {
-            return;
-        }
-        if (!editingCost) {
-            setEditingCost(true);
-            setNewCost(cost);
-            setTimeout(() => {
-                inputRef.current.focus();
-            }, 100);
+    const handleCost = async (value, priceType) => {
+        const selectedProduct = availablePrices?.find(({ cost }) => (cost === value));
 
-            return;
-        }
-
-        let newCostInt = parseInt(newCost);
-
-        if (cost === newCost) {
-            setEditingCost(false);
-
-            return;
-        }
-
-        setUpdatingCost(true);
-        setEditingCost(false);
-
-        if (type === REACTION_CARD_QOINS) {
-            await setReactionPrice(user.uid, level, newCostInt);
-            setCost(newCostInt);
-            setUpdatingCost(false);
-            return;
+        if (subsMode === 0) {
+            await setReactionLevelPrice(
+                user.uid,
+                level,
+                priceType,
+                // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
+                priceType === ZAP ? value : value * 10,
+                priceType === ZAP ? null : value,
+                selectedProduct?.twitchSku
+            );
+        } else {
+            await setReactionSubscriberLevelPrice(
+                user.uid,
+                level,
+                priceType,
+                // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
+                priceType === ZAP ? value : value * 10,
+                priceType === ZAP ? null : value,
+                selectedProduct?.twitchSku
+            );
         }
 
-        if (type === REACTION_CARD_CHANNEL_POINTS) {
-            const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
-
-            if (userTokensUpdated.data.status === 200) {
-                const userCredentialsUpdated = userTokensUpdated.data;
-                updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
-                const rewardUpdated = await updateCustomReward(
-                    user.id,
-                    userCredentialsUpdated.access_token,
-                    rewardId,
-                    {
-                        cost: newCostInt
-                    }
-                );
-
-                if (rewardUpdated.status === 200) {
-                    setCost(newCostInt);
-                    setInputWidth(`${newCostInt.toLocaleString().length}ch`);
-                    setUpdatingCost(false);
-
-                    return;
-                }
-            }
-        }
+        setCost(value);
     }
 
-    const handleCost = async (e) => {
-        if (type === REACTION_CARD_CHANNEL_POINTS) {
-            setNewCost(e.target.value);
+    const toggleReactionType = async () => {
+        // Changes in type will trigger the 2nd useEffect, update the cost there
+        if (type === ZAP) {
+            setType(QOIN);
+            handleCost(availablePrices[0].cost, QOIN);
         } else {
-            const selectedProduct = availablePrices.find(({ cost }) => (cost === e.target.value));
-            // 10 Qoins = 1 Bit, so the cost in Qoins is the cost in Bits * 10
-            await setReactionPriceInBits(user.uid, level, e.target.value, selectedProduct.twitchSku);
-            await setReactionPrice(user.uid, level, e.target.value * 10);
-            setCost(e.target.value);
+            setType(ZAP);
+            handleCost(1, ZAP);
         }
     }
 
@@ -352,9 +287,11 @@ const ReactionCard = ({
                             </p>
                         </div>
                         {subsMode === 1 ?
-                            <SubsSwitch />
+                            <SubsSwitch checked={type === ZAP}
+                                onChange={toggleReactionType} />
                             :
-                            <ChannelPoinsSwitch />
+                            <ChannelPoinsSwitch checked={type === ZAP}
+                                onChange={toggleReactionType} />
                         }
                     </div>
                     <div style={{
@@ -369,92 +306,60 @@ const ReactionCard = ({
                             flexDirection: 'row',
                             alignItems: 'center',
                         }}>
-                            {type === REACTION_CARD_CHANNEL_POINTS &&
+                            {type === ZAP &&
                                 <Zap style={{
                                     width: '16px',
                                     heigt: '16px',
                                 }} />
                             }
-                            {type === REACTION_CARD_QOINS &&
+                            {type === QOIN &&
                                 <Bits />
                             }
-                            {type === REACTION_CARD_CHANNEL_POINTS && inputWidth !== '' &&
-                                <input ref={inputRef}
-                                    style={{
-                                        width: type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId) ? inputWidth : '100%'
-                                    }}
-                                    className={style.costInput}
-                                    type={type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId) ? 'text' : 'number'}
-                                    value={editingCost ? newCost : cost.toLocaleString()}
-                                    disabled={type === REACTION_CARD_QOINS || !editingCost || (type === REACTION_CARD_CHANNEL_POINTS && !rewardId)}
-                                    onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                                    onChange={type === REACTION_CARD_QOINS ? () => {} : handleCost} />
-                            }
-                            {type === REACTION_CARD_CHANNEL_POINTS &&
-                                <div className={style.button} onClick={handleButton} style={{
-                                    backgroundColor: editingCost ? '#3B4BF9' : '#0000'
-                                }}>
-                                    {updatingCost ?
-                                        <CircularProgress size={12} className={classes.circularProgress} />
-                                        :
-                                        <>
-                                            {editingCost ?
-                                                <p className={style.buttonText}>
-                                                    {t('StreamerProfile.ReactionCard.button.save')}
-                                                </p>
-                                                :
-                                                <Edit height={24}
-                                                    width={24}
-                                                    style={{
-                                                        transform: 'scale(.75)',
-                                                        maxWidth: '24px',
-                                                        maxHeight: '24px',
-                                                        margin: '0px -8px',
-                                                }} />
-                                            }
-                                        </>
-                                    }
-                                </div>
-                            }
-                            {type === REACTION_CARD_QOINS &&
-                                <Select MenuProps={{
-                                        classes: {
-                                            paper: classes.select
-                                        },
-                                        PaperProps: {
-                                            className: classes.selectPaper
-                                        },
-                                        anchorOrigin: {
-                                            vertical: 'top',
-                                            horizontal: 'left'
-                                        },
-                                        transformOrigin: {
-                                            vertical: 'bottom',
-                                            horizontal: 'left'
-                                        },
-                                        getContentAnchorEl: null
-                                    }}
-                                    style={{
-                                        color: '#fff',
-                                        fontSize: '18px',
-                                        fontWeight: '700',
-                                        border: 'none',
-                                        outline: 'none',
-                                        borderRadius: '8px',
-                                        padding: '0px 0px 0px 8px'
-                                    }}
-                                    IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
-                                    displayEmpty
-                                    disableUnderline
-                                    value={cost}
-                                    onChange={handleCost}>
-                                    {availablePrices.map(({ cost, twitchSku }) => (
+                            <Select MenuProps={{
+                                    classes: {
+                                        paper: classes.select
+                                    },
+                                    PaperProps: {
+                                        className: classes.selectPaper
+                                    },
+                                    anchorOrigin: {
+                                        vertical: 'top',
+                                        horizontal: 'left'
+                                    },
+                                    transformOrigin: {
+                                        vertical: 'bottom',
+                                        horizontal: 'left'
+                                    },
+                                    getContentAnchorEl: null
+                                }}
+                                style={{
+                                    color: '#fff',
+                                    fontSize: '18px',
+                                    fontWeight: '700',
+                                    border: 'none',
+                                    outline: 'none',
+                                    borderRadius: '8px',
+                                    padding: '0px 0px 0px 8px'
+                                }}
+                                IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
+                                displayEmpty
+                                disableUnderline
+                                value={cost}
+                                onChange={({ target: { value } }) => handleCost(value, type)}>
+                                {type === QOIN ?
+                                    availablePrices.map(({ cost, twitchSku }) => (
                                         <MenuItem value={cost} key={twitchSku}>
                                             {cost.toLocaleString()}
                                         </MenuItem>
-                                    ))}
-                                </Select>
-                            }
+                                    ))
+                                    :
+                                    zapsCostArray.map((zapNumber) => (
+                                        <MenuItem value={zapNumber} key={zapNumber}>
+                                            {zapNumber.toLocaleString()}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </Select>
                         </div>
                     </div>
                 </div>

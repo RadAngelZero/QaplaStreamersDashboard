@@ -24,3 +24,19 @@ body {
 p {
   font-family: 'Inter' !important;
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #202750;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4040FF;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8080FF;
+}

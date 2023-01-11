@@ -169,22 +169,6 @@
     margin: 0.3rem 0.2rem;
 }
 
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: #202750;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #4040FF;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #8080FF;
-}
-
 .minLengthIndicator {
     margin-top: auto !important;
     margin-bottom: 36px;

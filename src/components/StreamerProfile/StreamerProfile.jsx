@@ -272,6 +272,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [rewardId, setRewardId] = useState(null);
     const [inputWidth, setInputWidth] = useState('4ch');
     const [editingSubsRewards, setEditingSubsRewards] = useState(0);
+    const [loadingBillingRequest, setLoadingBillingRequest] = useState(false);
     const inputRef = useRef(null);
     const { t } = useTranslation();
 
@@ -317,7 +318,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             if (user && user.uid) {
                 const emotesRequest = await getEmotes(user.uid);
 
-                const emotes = emotesRequest.data ? emotesRequest.data : null;
+                const emotes = emotesRequest ? emotesRequest.data : null;
                 if (emotes) {
                     // Find the first array who has more than 0 elements
                     const array = emotes.find((typeOfEmote) => typeOfEmote.data[0].length > 0);
@@ -466,15 +467,24 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         setUpdatingReactionsStatus(false);
     }
 
-    const handlePremiumButton = async () => {
-        if ((user.premium || user.freeTrial) && user.currentPeriod) {
-            return history.push('/membership')
+    const handlePremiumButton = async (e) => {
+        const isPremium = user && (user.premium || user.freeTrial);
+        if (!isPremium) {
+            e.preventDefault();
+
+            return setOpenGoPremiumDialog(true);
         }
-        if (openGoPremiumDialog) {
-            // do billing
-            return setOpenGoPremiumDialog(false);
+    }
+
+    const startFreeTrial = async () => {
+        setLoadingBillingRequest(true);
+        // If free trial field exists, it means the user already made a free trial
+        // TODO: Replace cloud functions with production url's
+        if (user.freeTrial !== undefined) {
+            return window.location.replace(`http://127.0.0.1:5001/qapplaapp/us-central1/streamerSubscriptionCheckoutIntent?uid=${user.uid}&stripeCustomerId=${user.stripeCustomerId}`);
         }
-        setOpenGoPremiumDialog(true);
+
+        return window.location.replace(`http://127.0.0.1:5001/qapplaapp/us-central1/activateUserFreeTrial?uid=${user.uid}`);
     }
 
     const handleChannelRewardCost = async (e) => {
@@ -537,6 +547,17 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const isPremium = user && (user.premium || user.freeTrial);
+
+    let dateRenovation;
+    let renovationDay;
+    let renovationMonth;
+    let monthsArray;
+    if (user && user.currentPeriod) {
+        dateRenovation = new Date(user.currentPeriod.endDate);
+        renovationDay = (dateRenovation.getDate().toString().length < 2 ? '0' : '') + dateRenovation.getDate().toString();
+        renovationMonth = dateRenovation.getMonth();
+        monthsArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    }
 
     return (
         <StreamerDashboardContainer user={user}>
@@ -741,35 +762,42 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     <ReactionsSwitch checked={reactionsEnabled} onChange={handleReactionsSwitch} disabled={updatingReactionsStatus} />
                                                 </div>
                                             </div>
-                                            <div className={styles.reactionSettingContainer}
-                                                onClick={handlePremiumButton}
-                                                style={{ background: isPremium && user.currentPeriod ? '#141735' : 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)', cursor: 'pointer' }}>
-                                                <div style={{ display: 'flex' }}>
-                                                    <div>
-                                                        {isPremium && user.currentPeriod ?
-                                                            <Heart style={{ height: '24px', width: '24px' }} />
-                                                            :
-                                                            <Star style={{ height: '24px', width: '24px' }} />
-                                                        }
-                                                    </div>
-                                                    <div style={{ marginLeft: '8px' }}>
-                                                        <p className={styles.reactionSettingTitle}>
+                                            <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal'
+                                                method='post'
+                                                className={styles.reactionSettingContainer}
+                                                onSubmit={handlePremiumButton}
+                                                style={{ background: isPremium && user.currentPeriod ? '#141735' : 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)' }}>
+                                                <button className={styles.reactionSettingContainer}
+                                                    style={{ background: 'transparent', padding: 0, border: 'none', cursor: 'pointer' }}
+                                                    type='submit'>
+                                                    <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
+                                                    <div style={{ display: 'flex' }}>
+                                                        <div>
                                                             {isPremium && user.currentPeriod ?
-                                                                'You are premium'
+                                                                <Heart style={{ height: '24px', width: '24px' }} />
                                                                 :
-                                                                'Subscribers Set Up'
+                                                                <Star style={{ height: '24px', width: '24px' }} />
                                                             }
-                                                        </p>
-                                                        <p className={styles.reactionSettingSubtitle}>
-                                                            {isPremium && user.currentPeriod ?
-                                                                'Viewers can send reactions using their channel points'
-                                                                :
-                                                                'Viewers can send reactions\nusing their channel points'
-                                                            }
-                                                        </p>
+                                                        </div>
+                                                        <div style={{ marginLeft: '8px' }}>
+                                                            <p className={styles.reactionSettingTitle}>
+                                                                {isPremium && user.currentPeriod ?
+                                                                    'You are premium'
+                                                                    :
+                                                                    'Subscribers Set Up'
+                                                                }
+                                                            </p>
+                                                            <p className={styles.reactionSettingSubtitle}>
+                                                                {isPremium && user.currentPeriod ?
+                                                                    t('StreamsLeft.renewsOn', { date: renovationDay, month: t(`months.${monthsArray[renovationMonth]}`) })
+                                                                    :
+                                                                    'Set a different reactions price for your Twitch subscribers'
+                                                                }
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
+                                                </button>
+                                            </form>
                                         </Grid>
                                         <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '24px', marginTop: '35px' }} >
                                             <ReactionCard
@@ -837,7 +865,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 <div style={{
                                                     marginLeft: 'auto'
                                                 }}>
-                                                    {(user.premium || user.freeTrial) && user.currentPeriod &&
+                                                    {isPremium && user.currentPeriod &&
                                                         <StreamsLeft uid={user.uid}
                                                             qoinsDrops={qoinsDrops}
                                                             renovationDate={user.currentPeriod.endDate} />
@@ -965,57 +993,17 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
                                 </div>
                             </div>
-                            <StartFreeTrialButton onClick={handlePremiumButton} >
-                                Start 30-Day Free Trial
+                            <StartFreeTrialButton onClick={startFreeTrial} disabled={loadingBillingRequest}>
+                                {loadingBillingRequest ?
+                                    <CircularProgress style={{ color: '#FFF' }} />
+                                    :
+                                    user.freeTrial !== undefined ?
+                                        'Resume subscription'
+                                        :
+                                        'Start 30-Day Free Trial'
+                                }
                             </StartFreeTrialButton>
                         </div>
-                        {/* <div style={{
-                            margin: '-16px -6px 0px auto',
-                            maxHeight: '40px',
-                            cursor: 'pointer',
-                        }} onClick={() => setOpenGoPremiumDialog(false)}>
-                            <Close style={{ width: '40px', height: '40px' }} />
-                        </div>
-                        <p style={{
-                            color: '#fff',
-                            whiteSpace: 'pre-wrap',
-                            fontSize: '18px',
-                            fontWeight: '600',
-                            lineHeight: '32px',
-                            letterSpacing: '0px',
-                            textAlign: 'center',
-                        }}> {`Benefits for your Twitch\nChannel Subscribers`}</p>
-                        <p style={{
-                            color: '#fff',
-                            fontSize: '16px',
-                            fontWeight: '500',
-                            lineHeight: '19px',
-                            letterSpacing: '0px',
-                            textAlign: 'center',
-                            marginTop: '32px',
-                        }}>
-                            Start Free Trial. <span style={{ color: '#00FFDD', fontWeight: '600', }}>No credit card required.</span>
-                        </p>
-                        <p style={{
-                            color: '#fff',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            lineHeight: '17px',
-                            letterSpacing: '0px',
-                            marginTop: '32px',
-                            whiteSpace: 'pre-line',
-                            maxWidth: '320px',
-                            alignSelf: 'center',
-                        }}>
-                            {`🪂 Reward your audience with Qoins Drops
-
-                            🫡 Add value to your Twitch subscribers with custom alerts
-
-                            👁 Visibility for your content outside of Twitch`}
-                        </p>
-                        <StartFreeTrialButton onClick={handlePremiumButton} >
-                            Start Free Trial
-                        </StartFreeTrialButton> */}
                     </PremiumDialog>
                 </>
             }

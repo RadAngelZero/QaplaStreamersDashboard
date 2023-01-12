@@ -22,7 +22,6 @@ import EventSent from './components/EventSent/EventSent';
 import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
-import PlanPicker from './components/PlanPicker/PlanPicker';
 // import Lottery from './components/Lottery/Lottery';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
@@ -106,11 +105,6 @@ const Routes = ({ user, games, qoinsDrops }) => {
             <Route exact path='/settings'>
                 <PageContainer>
                     <Settings user={user} />
-                </PageContainer>
-            </Route>
-            <Route exact path='/membership'>
-                <PageContainer>
-                    <PlanPicker user={user} />
                 </PageContainer>
             </Route>
             <Route exact path='/buyStreams'>

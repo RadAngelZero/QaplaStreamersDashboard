@@ -1,5 +1,7 @@
 // ref https://codepen.io/ItsConnor/pen/epBGzM
-export function EmoteExplosion (container, emote) {
+import { gsap } from "gsap";
+import styles from '../components/LiveDonations/LiveDonations.module.css';
+export function EmoteExplosion(container, emote) {
     var flyingMen = [];
 
     // var text = document.getElementById("face");
@@ -85,4 +87,126 @@ export function EmoteExplosion (container, emote) {
     }
 
     render();
+}
+
+export function EmoteRain(container, emote) {
+
+    /**
+         * Emoji rain functions
+         */
+    let circles = [];
+
+    function addEmoteCircle(delay, range, color) {
+        setTimeout(function () {
+            let c = new EmoteCircle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
+                x: -0.15 + Math.random() * 0.3,
+                y: 1 + Math.random() * 10
+            }, range);
+
+            circles.push(c);
+        }, delay);
+    }
+
+    class EmoteCircle {
+        constructor(x, y, color, velocity, range) {
+            let _this = this;
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.velocity = velocity;
+            this.range = range;
+            this.element = document.createElement('img');
+            /*this.element.style.display = 'block';*/
+            this.element.style.opacity = 0;
+            this.element.style.position = 'absolute';
+            this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
+            this.element.style.width = '30px'
+            this.element.style.height = '30px'
+            this.element.src = color;
+            const localContainer = container;
+            if (localContainer) {
+                localContainer.appendChild(this.element);
+            }
+
+            this.update = function () {
+                if (_this.y > 800) {
+                    _this.y = 80 + Math.random() * 4;
+                    _this.x = _this.range[0] + Math.random() * _this.range[1];
+                }
+                _this.y += _this.velocity.y;
+                _this.x += _this.velocity.x;
+                this.element.style.opacity = 1;
+                this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+                this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
+            };
+        }
+    }
+
+    function animate() {
+        for (let i in circles) {
+            circles[i].update();
+        }
+
+        return requestAnimationFrame(animate);
+    }
+
+    function executeEmoteRain(emote) {
+        for (let i = 0; i < 10; i++) {
+            addEmoteCircle(i * 350, [10 + 0, 300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 + 0, -300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 - 200, -300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 + 200, 300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 - 400, -300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 + 400, 300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 - 600, -300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+            addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
+        }
+
+        animate();
+    }
+
+    executeEmoteRain(emote);
+
+}
+
+export function EmoteTunel(container, emote) {
+
+    function fiesta() {
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            const image = document.createElement('img');
+            confetti.className = styles.confetti;
+            image.src = emote;
+            image.style.width = '64px';
+            confetti.appendChild(image);
+            container.appendChild(confetti);
+        }
+    }
+
+    fiesta();
+
+    animateConfettis();
+
+
+    function animateConfettis() {
+        const TLCONF = gsap.timeline();
+
+        TLCONF
+            .to('#emote-tunel-container img', {
+                y: 'random(-400,400)',
+                x: 'random(-400,400)',
+                z: 'random(0,1000)',
+                rotation: 'random(-90, 90)',
+                duration: 10,
+            })
+            .to('#emote-tunel-conatainer img', { autoAlpha: 0, duration: 0.3 },
+                '-=0.2')
+            .add(() => {
+                container.innerHTML = "";
+            })
+    }
+
 }

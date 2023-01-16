@@ -22,7 +22,7 @@ import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 import ChatBubbleiOS from '../ChatBubbleiOS/ChatBubbleiOS';
-import { EmoteExplosion } from '../../utilities/OverlayEmotesAnimation';
+import { EmoteExplosion, EmoteRain, EmoteTunel } from '../../utilities/OverlayEmotesAnimation';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
 
@@ -48,11 +48,19 @@ const LiveDonations = () => {
     const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
     const happyTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarHappy.glb?alt=media&token=2c2d24f1-a8bf-47be-850f-06eeda6fe885');
     const emoteExplosionContainer = useRef();
+    const emoteRainContainer = useRef();
+    const emoteTunelContainer = useRef();
     const { streamerId } = useParams();
     const { t } = useTranslation();
 
     useEffect(() => {
-        EmoteExplosion(emoteExplosionContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke')
+        // EmoteExplosion(emoteExplosionContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke')
+        // setTimeout(() => {
+        //     setShowEmojiRain(false)
+        // }, 5000)
+        // setShowEmojiRain(true);
+        // EmoteRain(emoteRainContainer.current, ['https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke']);
+        // EmoteTunel(emoteTunelContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke');
         queueAnimation();
         const pushDonation = (donation) => {
             setDonationQueue((array) => [donation, ...array]);
@@ -195,148 +203,6 @@ const LiveDonations = () => {
             });
         }
 
-        /**
-         * Emoji rain functions
-         */
-        let circles = [];
-
-        function addCircle(delay, range, color) {
-            setTimeout(function () {
-                let c = new Circle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
-                    x: -0.15 + Math.random() * 0.3,
-                    y: 1 + Math.random() * 10
-                }, range);
-
-                circles.push(c);
-            }, delay);
-        }
-
-        function addEmoteCircle(delay, range, color) {
-            setTimeout(function () {
-                let c = new EmoteCircle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
-                    x: -0.15 + Math.random() * 0.3,
-                    y: 1 + Math.random() * 10
-                }, range);
-
-                circles.push(c);
-            }, delay);
-        }
-
-        class Circle {
-            constructor(x, y, color, velocity, range) {
-                let _this = this;
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.velocity = velocity;
-                this.range = range;
-                this.element = document.createElement('span');
-                /*this.element.style.display = 'block';*/
-                this.element.style.opacity = 0;
-                this.element.style.position = 'absolute';
-                this.element.style.fontSize = '26px';
-                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
-                this.element.innerHTML = color;
-                const container = document.getElementById('animate');
-                if (container) {
-                    container.appendChild(this.element);
-                }
-
-                this.update = function () {
-                    if (_this.y > 800) {
-                        _this.y = 80 + Math.random() * 4;
-                        _this.x = _this.range[0] + Math.random() * _this.range[1];
-                    }
-                    _this.y += _this.velocity.y;
-                    _this.x += _this.velocity.x;
-                    this.element.style.opacity = 1;
-                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                };
-            }
-        }
-
-        class EmoteCircle {
-            constructor(x, y, color, velocity, range) {
-                let _this = this;
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.velocity = velocity;
-                this.range = range;
-                this.element = document.createElement('img');
-                /*this.element.style.display = 'block';*/
-                this.element.style.opacity = 0;
-                this.element.style.position = 'absolute';
-                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
-                this.element.style.width = '30px'
-                this.element.style.height = '30px'
-                this.element.src = color;
-                const container = document.getElementById('animate');
-                if (container) {
-                    container.appendChild(this.element);
-                }
-
-                this.update = function () {
-                    if (_this.y > 800) {
-                        _this.y = 80 + Math.random() * 4;
-                        _this.x = _this.range[0] + Math.random() * _this.range[1];
-                    }
-                    _this.y += _this.velocity.y;
-                    _this.x += _this.velocity.x;
-                    this.element.style.opacity = 1;
-                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                };
-            }
-        }
-
-        function animate() {
-            for (let i in circles) {
-                circles[i].update();
-            }
-
-            return requestAnimationFrame(animate);
-        }
-
-        function executeEmojiRain(emoji) {
-            setShowEmojiRain(true);
-            for (let i = 0; i < 10; i++) {
-                addCircle(i * 350, [10 + 0, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 0, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 200, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 200, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 400, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 400, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 600, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-            }
-
-            animate();
-        }
-
-        function executeEmoteRain(emote) {
-            setShowEmojiRain(true);
-            for (let i = 0; i < 10; i++) {
-                addEmoteCircle(i * 350, [10 + 0, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 0, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 200, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 200, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 400, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 400, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 600, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-            }
-
-            animate();
-        }
-
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
@@ -434,9 +300,14 @@ const LiveDonations = () => {
 
                     if (donation.emojiRain && donation.emojiRain.emojis) {
                         if (donation.emojiRain.type === EMOTE) {
-                            executeEmoteRain(donation.emojiRain.emojis);
+                            setTimeout(() => {
+                                setShowEmojiRain(false)
+                            }, 5000)
+                            setShowEmojiRain(true);
+                            // EmoteRain(emoteRainContainer.current, ['https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke']);
+                            EmoteRain(emoteRainContainer.current, donation.emojiRain.emojis);
                         } else {
-                            executeEmojiRain(donation.emojiRain.emojis);
+                            // executeEmojiRain(donation.emojiRain.emojis);
                         }
                     }
 
@@ -645,7 +516,7 @@ const LiveDonations = () => {
                 </div>
             }
             {showEmojiRain &&
-                <div id="animate" style={{
+                <div id="emote-rain" ref={emoteRainContainer} style={{
                     position: 'fixed',
                     top: 100,
                     bottom: 0,
@@ -654,7 +525,8 @@ const LiveDonations = () => {
                     transform: 'scale(1.5)',
                 }}></div>
             }
-            <div id='emoji-explosion-container' ref={emoteExplosionContainer} style={{ overflow: 'hidden' }}></div>
+            <div id='emote-explosion-container' ref={emoteExplosionContainer} style={{ overflow: 'hidden' }}></div>
+            <div id='emote-tunel-container' className={styles.emoteTunelContainer} ref={emoteTunelContainer}></div>
             {donationToShow &&
                 <ErrorBoundary onFail={(error, errorInfo) => onReactionFailed(error, errorInfo, donationToShow)}>
                     <DonationHandler donationToShow={donationToShow}

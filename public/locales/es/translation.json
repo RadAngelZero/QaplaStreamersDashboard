@@ -86,7 +86,7 @@
     },
     "StreamerProfile": {
         "balance": "Balance",
-        "balanceSubtitle": "Mira y retira los Qoins que obtienes de las reacciones",
+        "balanceSubtitle": "Mira y redime los Qoins que obtienes de las reacciones",
         "stimatedBits": "Bits estimados",
         "myStreams": "Mis Streams",
         "scheduled": "Programados",
@@ -120,7 +120,7 @@
         "BarProgressBit": {
             "nextMilestone": "Siguiente Milestone",
             "available": "Disponible",
-            "cashOut": "Cash Out",
+            "cashOut": "Redimir",
             "confirmCashOut": "Confirma que quieres cambiar tus Qoins por Bits en Twitch",
             "cancel": "Cancelar",
             "weGotYouRequestP1": "¡Tenemos tu solicitud! Te enviaremos ",
@@ -291,32 +291,6 @@
         "deliveredCheers": "Cheers entregados",
         "cheersReceivedAt": "Cheers recibidos al {{date}}",
         "repeatCheer": "Repetir"
-    },
-    "PlanPicker": {
-        "titlePart1": "Genera visibilidad para tu contenido",
-        "titlePart1FreeTrial": "Continua generando visibilidad a tu contenido",
-        "titlePart2": "publicando tus streams en Qapla",
-        "plansPeriods": {
-            "monthly": "Mensual",
-            "quarterly": "Trimestral",
-            "yearly": "Anual"
-        },
-        "plansDescriptions": {
-            "essential": "Genera tráfico de valor a tu canal",
-            "growth": "Recompensa a tu comunidad mientras creces"
-        },
-        "month": "mes",
-        "payment": "Pago",
-        "totalPeriodPayment": "${{totalPayment}}",
-        "saving": "Ahorras {{saving}}%",
-        "monthlyPublications": "{{numberOfPublications}} publicaciones al mes",
-        "with": "con",
-        "qaplaReactions": "Reacciones Qapla",
-        "cashOut": "Cash out de Qoins",
-        "drops": "{{numberOfDrops}} Drops de Qoins por mes",
-        "postAlways": "Publica en Qapla mientras tengas drops",
-        "getVisibility": "Dale visibilidad a tu contenido",
-        "rewardYourCommunity": "Recompensa a tu comunidad"
     },
     "StreamerProfileEditor": {
         "editCover": "Editar cover",

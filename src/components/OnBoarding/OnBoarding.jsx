@@ -21,6 +21,9 @@ import { ReactComponent as AvatarIcon } from './../../assets/reactionCardsIcons/
 import { ReactComponent as TtGiphyIcon } from './../../assets/reactionCardsIcons/TtGiphy.svg';
 import { ReactComponent as TTSBotIcon } from './../../assets/reactionCardsIcons/TTSBot.svg';
 import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.svg';
+import { ReactComponent as ArrowRight } from './../../assets/arrowRight.svg';
+import { ReactComponent as Zap } from './../../assets/Zap.svg';
+import ChannelPointsImage from './../../assets/channel-pts-twitch-icon@4x.png';
 import { deleteCustomReward, getUserCustomRewards } from '../../services/twitch';
 
 const useStyles = makeStyles((theme) => ({
@@ -89,6 +92,7 @@ const OnBoarding = ({ user }) => {
     const [reactionsPrices, setReactionsPrices] = useState([]);
     const [creatingReward, setCreatingReward] = useState(false);
     const [loadingDots, setLoadingDots] = useState('.');
+    const [zapPrice, setZapPrice] = useState(200);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -143,20 +147,23 @@ const OnBoarding = ({ user }) => {
                 }
                 break;
             case 0:
+                setStep(step + 1);
+                break;
+            case 1:
                 createChannelPointsRewards();
                 break;
-            case 2:
+            case 3:
                 setStepIndicator(1);
                 setStep(step + 1);
                 break;
-            case 3:
+            case 4:
                 setStepIndicator(2);
                 setStep(step + 1);
                 break;
-            case 4:
+            case 5:
                 setStep(step + 1);
                 break;
-            case 5:
+            case 6:
                 history.push('/profile');
                 break;
             default:
@@ -176,8 +183,8 @@ const OnBoarding = ({ user }) => {
         setStep(step + 1);
         setCreatingReward(true);
         // Create reward with default value, the user can change their cost in the next step
-        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, ZAP_REWARD_NAME, 200);
-        console.log(result);
+        const result = await createInteractionsReward(user.uid, user.id, user.refreshToken, ZAP_REWARD_NAME, zapPrice);
+
         if (result !== undefined) {
             if (result.reward.status === 200) {
                 const webhookSubscription = await subscribeStreamerToTwitchWebhook(user.id, InteractionsRewardRedemption.type, InteractionsRewardRedemption.callback, { reward_id: result.reward.data.id });
@@ -187,7 +194,7 @@ const OnBoarding = ({ user }) => {
                     await saveInteractionsRewardData(user.uid, result.reward.data.id, webhookSubscription.data.id);
 
                     setCreatingReward(false);
-                    return setStep(2);
+                    return setStep(3);
                 } else {
                     if (attempt === 1) {
                         // Webhook creation failed, delete reward and try again
@@ -243,7 +250,7 @@ const OnBoarding = ({ user }) => {
                     } else {
                         // Webhook and reward already exists
                         setCreatingReward(false);
-                        return setStep(2);
+                        return setStep(3);
                     }
                 } else if (result.reward.status === 403) {
                     setCreatingReward(false);
@@ -293,14 +300,14 @@ const OnBoarding = ({ user }) => {
             alignItems: 'center',
             flexDirection: 'column',
         }}>
-            {step !== 3 &&
+            {step !== 4 &&
                 <div style={{
                     marginTop: 24,
                     position: 'relative',
                     display: 'flex',
                     backgroundColor: '#141833',
                     width: '450px',
-                    height: step === 4 ? '402px' : '256px',
+                    height: step === 5 ? '402px' : '256px',
                     borderRadius: '35px',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -336,6 +343,29 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === 1 &&
                         <>
+                            <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2FZaps%2520(3).gif?alt=media&token=8501e6c2-a17b-4b7e-aa6c-2ba8a1ed5acd'
+                                alt='Zaps'
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 256, // height of container
+                                    width: '300px',
+                                    height: '150px',
+                                }}
+                            />
+                            <img src={`https://media.giphy.com/media/3oFzlW8dht4DdvwBqg/giphy.gif`} alt={`Barnaby Looking`}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 244, // 256 - 12 (height of container - hidden part of the image)
+                                    width: '162px',
+                                    height: '151px',
+                                    zIndex: '1000',
+                                    transform: 'rotate(-3.45deg)',
+                                }}
+                            />
+                        </>
+                    }
+                    {step === 2 &&
+                        <>
                             <img src='https://media.giphy.com/media/3o752nnUPE7OzLeSVW/giphy.gif' alt={`Barnaby Working`}
                                 style={{
                                     position: 'absolute',
@@ -347,7 +377,7 @@ const OnBoarding = ({ user }) => {
                             />
                         </>
                     }
-                    {step === 2 &&
+                    {step === 3 &&
                         <>
                             <img src='https://media.giphy.com/media/xULW8v7LtZrgcaGvC0/giphy.gif' alt={`Barnaby Says Thanks`}
                                 style={{
@@ -360,7 +390,7 @@ const OnBoarding = ({ user }) => {
                             />
                         </>
                     }
-                    {step === 4 &&
+                    {step === 5 &&
                         <>
                             <img src='https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/OnboardingGifs%2Foverlay.gif?alt=media&token=178044eb-f697-44ad-860c-81e93741d276'
                                 alt='overlay'
@@ -413,19 +443,67 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === 1 &&
                         <>
+                            <h1 className={styles.headerText}>
+                                Set the Zap custom reward price
+                            </h1>
+                            <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
+                                Zaps allow your audience to send reactions using their channel points, with only one custom reward
+                            </p>
+                            <div className={styles.zapPriceContainer}>
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                    <div style={{
+                                        height: '32px',
+                                        width: '32px',
+                                        borderRadius: '5px',
+                                        background: '#8B46FF',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        marginRight: '8px'
+                                    }}>
+                                        <img src={ChannelPointsImage} style={{
+                                            width: '20px',
+                                            height: '30px',
+                                            objectFit: 'contain'
+                                        }} />
+                                    </div>
+                                    <div className={styles.qoinsMainContainer}>
+                                        <div className={styles.qoinsSubContainer}>
+                                        <input
+                                            className={styles.qoins}
+                                            value={zapPrice}
+                                            onChange={(e) => setZapPrice(parseInt(e.target.value) >= 1 ? parseInt(e.target.value) : 1)}
+                                            min={1}
+                                            type='number'
+                                            onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <ArrowRight />
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                    <Zap />
+                                    <p style={{ marginLeft: '4px', fontSize: '18px', fontWeight: '700', color: '#FFF' }}>
+                                        1 Zap
+                                    </p>
+                                </div>
+                            </div>
+                        </>
+                    }
+                    {step === 2 &&
+                        <>
                             <h1 className={styles.gradientText}>
                                 {t('Onboarding.workingOnRequest', { loadingDots })}
                             </h1>
                         </>
                     }
-                    {step === 2 &&
+                    {step === 3 &&
                         <>
                             <h1 className={styles.gradientText}>
                                 {t('Onboarding.rewardCreated')}
                             </h1>
                         </>
                     }
-                    {step === 4 &&
+                    {step === 5 &&
                         <>
                             <h1 className={styles.headerText}>
                                 {t('Onboarding.addReactionsToOverlay')}
@@ -500,7 +578,7 @@ const OnBoarding = ({ user }) => {
                             </div>
                         </>
                     }
-                    {step === 5 &&
+                    {step === 6 &&
                         <>
                             <img src={`https://media.giphy.com/media/3o751SMzZ5TjLWInoQ/giphy.gif`} alt={`Barnaby Thats Rad`}
                                 style={{
@@ -524,7 +602,7 @@ const OnBoarding = ({ user }) => {
                     }
                 </div>
             }
-            {step === 3 &&
+            {step === 4 &&
                 <>
                     <div style={{
                         display: 'flex',
@@ -617,7 +695,7 @@ const OnBoarding = ({ user }) => {
                     marginTop: 24,
                 }}>
                 <Button
-                    disabled={step === 1 || (step === 4 && !overlayLinkCopied) || (step === 0 && !acceptPolicies) || creatingReward}
+                    disabled={step === 2 || (step === 5 && !overlayLinkCopied) || (step === 0 && !acceptPolicies) || creatingReward}
                     onClick={handleMainButton}
                     className={classes.button}
                 >
@@ -637,20 +715,25 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === 1 &&
                         <>
-                            {t('Onboarding.waitABit')}
+                            Create Zap Custom Reward
                         </>
                     }
                     {step === 2 &&
                         <>
-                            {t('Onboarding.configureTiers')}
+                            {t('Onboarding.waitABit')}
                         </>
                     }
                     {step === 3 &&
                         <>
-                            {t('Onboarding.imAllSet')}
+                            {t('Onboarding.configureTiers')}
                         </>
                     }
                     {step === 4 &&
+                        <>
+                            {t('Onboarding.imAllSet')}
+                        </>
+                    }
+                    {step === 5 &&
                         <>
                             {overlayLinkCopied ?
                                 t('Onboarding.finishSetUp')
@@ -659,14 +742,14 @@ const OnBoarding = ({ user }) => {
                             }
                         </>
                     }
-                    {step === 5 &&
+                    {step === 6 &&
                         <>
                             {t('Onboarding.goToDashboard')}
                         </>
                     }
                 </Button>
             </div>
-            {step !== 5 &&
+            {step !== 6 &&
                 <div style={{
                     display: 'flex',
                     position: 'absolute',

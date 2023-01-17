@@ -33,7 +33,7 @@ const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amou
     }, [amountBits]);
 
   const confirmCashOut = async () => {
-        const qoinsCashOut = amountBits / 10 * 200;
+        const qoinsCashOut = amountBits / 10 * 100;
 
         setDisableButton(true);
         await saveStreamerCashOutRequest(user.uid, qoinsCashOut, amountBits);
@@ -60,7 +60,7 @@ const CasthQutDialog = ({ user, setOpen, setOpenConfirm, setConfirmCashOut, amou
                 {bits.toLocaleString()}
                 </h1>
             </div>
-            <p className={style.calculated_Bit}>200 Qoins = 10 Bits</p>
+            <p className={style.calculated_Bit}>10 Qoins = 1 Bit</p>
             <p className={style.text}>
                 {t('StreamerProfile.BarProgressBit.confirmCashOut')}
             </p>

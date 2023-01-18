@@ -116,6 +116,9 @@ const CheersSettings = ({ uid, twitchId }) => {
             if (settings.exists()) {
                 setOverlayAreaSelected(settings.val().reactionGridIndex || 0);
                 setOverlayAreaSelectedQaplaLogo(settings.val().qaplaOnGridIndex || 0);
+            } else {
+                setOverlayAreaSelected(0);
+                setOverlayAreaSelectedQaplaLogo(0);
             }
         }
 

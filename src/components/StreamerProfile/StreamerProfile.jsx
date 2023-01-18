@@ -393,7 +393,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
     if (user) {
         cheersQoins = user.qoinsBalance || 0;
-        const tensOfBits = cheersQoins / 200;
+        const tensOfBits = cheersQoins / 100;
         estimatedBits = (tensOfBits) * valueOfQoinsForStreamer;
         availableBits = 250 * Math.floor((estimatedBits) / 250);
         nextMilestone = 250 * Math.ceil((estimatedBits + 1) / 250);

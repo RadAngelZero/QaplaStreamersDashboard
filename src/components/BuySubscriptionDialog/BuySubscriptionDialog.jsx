@@ -116,7 +116,7 @@ const BuySubscriptionDialog = ({ user, open, onClose }) => {
                 </div>
                 <StartFreeTrialButton onClick={startFreeTrial} disabled={loadingBillingRequest}>
                     {loadingBillingRequest ?
-                        <CircularProgress style={{ color: '#FFF' }} />
+                        <CircularProgress style={{ color: 'rgba(255, 255, 255, .4)' }} size={32} />
                         :
                         (user && user.freeTrial !== undefined) ?
                             t('resumeSub')

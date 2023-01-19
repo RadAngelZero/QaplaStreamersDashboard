@@ -29,7 +29,6 @@ import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeCo
 import { useTranslation } from 'react-i18next'
 import OnBoarding from './components/OnBoarding/OnBoarding';
 import GiphyTextGenerator from './components/GiphyTextGenerator/GiphyTextGenerator';
-import RequestActivation from './components/RequestActivation/RequestActivation';
 import { getCurrentLanguage } from './utilities/i18n';
 
 window.onbeforeunload = function () {

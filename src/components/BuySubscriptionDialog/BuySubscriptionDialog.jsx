@@ -61,12 +61,11 @@ const BuySubscriptionDialog = ({ user, open, onClose }) => {
     const startFreeTrial = async () => {
         setLoadingBillingRequest(true);
         // If free trial field exists, it means the user already made a free trial
-        // TODO: Replace cloud functions with production url's
         if (user.freeTrial !== undefined) {
-            return window.location.replace(`http://127.0.0.1:5001/qapplaapp/us-central1/streamerSubscriptionCheckoutIntent?uid=${user.uid}&stripeCustomerId=${user.stripeCustomerId}`);
+            return window.location.replace(`https://us-central1-qapplaapp.cloudfunctions.net/streamerSubscriptionCheckoutIntent?uid=${user.uid}&stripeCustomerId=${user.stripeCustomerId}`);
         }
 
-        return window.location.replace(`http://127.0.0.1:5001/qapplaapp/us-central1/activateUserFreeTrial?uid=${user.uid}`);
+        return window.location.replace(`https://us-central1-qapplaapp.cloudfunctions.net/activateUserFreeTrial?uid=${user.uid}`);
     }
 
     return (

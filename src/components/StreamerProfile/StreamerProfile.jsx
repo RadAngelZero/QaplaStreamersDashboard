@@ -22,7 +22,6 @@ import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.
 
 import { ReactComponent as Star } from './../../assets/Star.svg';
 import { ReactComponent as Zap } from './../../assets/Zap.svg';
-import { ReactComponent as Close } from './../../assets/CloseIcon.svg';
 import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
 import { ReactComponent as Edit } from './../../assets/Edit.svg';
 import { ReactComponent as OnEye } from './../../assets/OnEye.svg';
@@ -343,6 +342,13 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         }
     }, [streamsTab, user, history, randomEmoteUrl, channelRewardCost, t, editingChannelRewardCost, newChannelRewardCost]);
 
+    useEffect(() => {
+        if (user) {
+            const isPremium = user && (user.premium || user.freeTrial);
+            setEditingSubsRewards(isPremium ? 0 : 1);
+        }
+    }, [user]);
+
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
         if (user.premium === undefined && user.freeTrial === undefined) {
@@ -609,10 +615,10 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     {isPremium &&
                                                         <QaplaTabs value={editingSubsRewards} onChange={handleSubsTabs}>
                                                             {/* Must be 0 & 1 because false deselect tabs */}
-                                                            <QaplaTab label="All Viewers" value={0} icon={editingSubsRewards === 1 ? <OffEye style={{ marginBottom: '0px' }} /> : <OnEye style={{ marginBottom: '0px' }} />} />
-                                                            <QaplaTab label="Subscribers" value={1} icon={<Star style={{ marginBottom: '0px' }} />} style={{
-                                                                background: editingSubsRewards === 1 ? 'linear-gradient(93.52deg, #6F11F9 0%, #FA5668 108.72%)' : '#0000',
+                                                            <QaplaTab label={t('StreamerProfile.subscribers')} value={0} icon={<Star style={{ marginBottom: '0px' }} />} style={{
+                                                                background: editingSubsRewards === 0 ? 'linear-gradient(93.52deg, #6F11F9 0%, #FA5668 108.72%)' : '#0000',
                                                             }} />
+                                                            <QaplaTab label={t('StreamerProfile.allViewers')} value={1} icon={editingSubsRewards === 0 ? <OffEye style={{ marginBottom: '0px' }} /> : <OnEye style={{ marginBottom: '0px' }} />} />
                                                         </QaplaTabs>
                                                     }
                                                     <p className={styles.subtitle}>
@@ -629,10 +635,10 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                     </div>
                                                     <div style={{ marginLeft: '8px' }}>
                                                         <p className={styles.reactionSettingTitle}>
-                                                            Zaps
+                                                            {t('StreamerProfile.zaps')}
                                                         </p>
                                                         <p className={styles.reactionSettingSubtitle}>
-                                                            Set the price for the Zap custom channel point reward
+                                                            {t('StreamerProfile.setZapsPrice')}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -694,7 +700,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                             }
                                                         </p>
                                                         <p className={styles.reactionSettingSubtitle}>
-                                                            Turn reactions on and off
+                                                            {t('StreamerProfile.toggleReactions')}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -722,16 +728,16 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                         <div style={{ marginLeft: '8px' }}>
                                                             <p className={styles.reactionSettingTitle}>
                                                                 {isPremium && user.currentPeriod ?
-                                                                    'You are premium'
+                                                                    t('StreamerProfile.youArePremium')
                                                                     :
-                                                                    'Subscribers Set Up'
+                                                                    t('StreamerProfile.subsSetUp')
                                                                 }
                                                             </p>
                                                             <p className={styles.reactionSettingSubtitle}>
                                                                 {isPremium && user.currentPeriod ?
                                                                     t('StreamsLeft.renewsOn', { date: renovationDay, month: t(`months.${monthsArray[renovationMonth]}`) })
                                                                     :
-                                                                    'Set a different reactions price for your Twitch subscribers'
+                                                                    t('StreamerProfile.subsSetUpDescription')
                                                                 }
                                                             </p>
                                                         </div>
@@ -792,7 +798,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                         </Grid>
                                         <Grid item xs={12}>
                                             <p className={styles.miniInfoText}>
-                                                {`☝ People reacting from the mobile app will see prices in Qoins instead of Bits.`}
+                                                {t('StreamerProfile.peopleUsingTheApp')}
                                             </p>
                                         </Grid>
                                     </Grid>

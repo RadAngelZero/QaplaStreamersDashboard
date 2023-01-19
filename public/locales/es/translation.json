@@ -97,8 +97,16 @@
         "receivedCheers": "Ver cheers recibidos",
         "reactions": "Reactions",
         "reactionsSubtitle": "Define el precio en Bits o Puntos de Canal para reacciones en tu stream.",
+        "zaps": "Zaps",
+        "setZapsPrice": "Define el precio de la recompensa Zap de puntos de canal",
         "reactionsEnabled": "Reacciones habilitadas",
         "reactionsDisabled": "Reactions deshabilitadas",
+        "toggleReactions": "Apaga y prende las reacciones",
+        "allViewers": "Viewers",
+        "subscribers": "Suscriptores",
+        "youArePremium": "Eres premium",
+        "subsSetUp": "Suscriptores del canal",
+        "subsSetUpDescription": "Define precios diferentes para las reacciones de tus suscriptores de Twitch",
         "cheersBalanceTooltip": {
             "title": "Realiza seguimiento de tu balance de Qoins<>Bits.",
             "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
@@ -136,8 +144,11 @@
             "button": {
                 "edit": "Editar",
                 "save": "Guardar"
-            }
-        }
+            },
+            "channelPoints": "Puntos de Canal",
+            "allowViewers": "Permite a tus viewers enviar alertas usando puntos de canal"
+        },
+        "peopleUsingTheApp": "☝ La gente que reaccione desde la app verá el precio en Qoins en lugar de Bits."
     },
     "StreamCard": {
         "deleteConfirmation": "¿Estas seguro que deseas eliminar este stream?",

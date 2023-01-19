@@ -137,7 +137,7 @@ const ReactionCard = ({
 }) => {
     const [cost, setCost] = useState(0);
     const [type, setType] = useState(ZAP);
-    const { t } = useTranslation();
+    const { t } = useTranslation('translation', { keyPrefix: 'StreamerProfile.ReactionCard' });
     const classes = useStyles();
 
     const level = `level${reactionLevel}`;
@@ -146,7 +146,7 @@ const ReactionCard = ({
         async function getPriceData() {
             try {
                 let price = null;
-                if (subsMode === 0) {
+                if (subsMode === 1) {
                     price = await getReactionLevelPrice(user.uid, level);
                 } else {
                     price = await getReactionSubscriberLevelPrice(user.uid, level);
@@ -156,7 +156,7 @@ const ReactionCard = ({
                     setCost(price.val().type === ZAP ? price.val().price : price.val().bitsPrice);
                     setType(price.val().type);
                 } else {
-                    if (subsMode === 0) {
+                    if (subsMode === 1) {
                         price = await getReactionLevelDefaultPrice(level);
                     } else {
                         price = await getReactionSubscribersLevelDefaultPrice(level);
@@ -183,7 +183,7 @@ const ReactionCard = ({
     const handleCost = async (value, priceType) => {
         const selectedProduct = availablePrices?.find(({ cost }) => (cost === value));
 
-        if (subsMode === 0) {
+        if (subsMode === 1) {
             await setReactionLevelPrice(
                 user.uid,
                 level,
@@ -220,8 +220,8 @@ const ReactionCard = ({
     }
 
     return (
-        <div className={style.gradientContainer} style={{ background: hideBorder ? 'none' : subsMode === 1 ? 'linear-gradient(152.4deg, #690EFF 0%, #FF5862 100%)' : 'linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%)', }}>
-            <div className={style.container} style={{ background: subsMode === 1 ? 'none' : '#141735' }}>
+        <div className={style.gradientContainer} style={{ background: hideBorder ? 'none' : subsMode === 0 ? 'linear-gradient(152.4deg, #690EFF 0%, #FF5862 100%)' : 'linear-gradient(141.89deg, #4657FF 0%, #8F4EFF 100%)', }}>
+            <div className={style.container} style={{ background: subsMode === 0 ? 'none' : '#141735' }}>
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -280,13 +280,13 @@ const ReactionCard = ({
                             maxWidth: '136px',
                         }}>
                             <p className={style.title}>
-                                Channel Points
+                                {t('channelPoints')}
                             </p>
                             <p className={style.subtitle}>
-                                Allow viewers to send alerts using channel points
+                                {t('allowViewers')}
                             </p>
                         </div>
-                        {subsMode === 1 ?
+                        {subsMode === 0 ?
                             <SubsSwitch checked={type === ZAP}
                                 onChange={toggleReactionType} />
                             :

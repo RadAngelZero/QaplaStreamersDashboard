@@ -251,3 +251,5 @@ export const streamsPlaceholderImages = {
 };
 
 export const ZAP_REWARD_NAME = 'Zap';
+
+export const BITS_DONATION = 'bits';

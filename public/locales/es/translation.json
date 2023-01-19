@@ -405,7 +405,9 @@
     "LiveDonations": {
         "greetingMessage": "{{viewerName}} dice: {{message}}",
         "bigQoinsDonationMessage": "{{viewerName}} envió {{qoins}} coins y dice: {{message}}",
+        "bigBitsDonationMessage": "{{viewerName}} envió {{bits}} Bits y dice: {{message}}",
         "qoinsWithoutMessage": "{{viewerName}} envió {{qoins}} Coins",
+        "bitsWithoutMessage": "{{viewerName}} envió {{bits}} Bits",
         "donationMessage": "{{viewerName}} dice: {{message}}",
         "sent": "envió",
         "reacted": "reaccionó",

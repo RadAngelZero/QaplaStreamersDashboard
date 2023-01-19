@@ -349,14 +349,6 @@
         "publishStream": "Publica un stream",
         "backToDashboard": "Volver al dashboard"
     },
-    "RequestActivation": {
-        "title": "Agenda tu stream en\nla app de Qapla 🚀",
-        "startTrial": "Inicia tu Free Trial. ",
-        "noCardRequired": "No requiere tarjeta.",
-        "drops": "🪂 Recompensa a tu audiencia con Drops de Qoins",
-        "visibility": "👁 Visibilidad para tu contenido fuera de Twitch",
-        "startFreeTrial": "Activar Free Trial"
-    },
     "StreamsLeft": {
         "drops": "Drops disponibles: ",
         "dropsLeft": "{{available}} de {{total}}",
@@ -386,6 +378,18 @@
         "limit" : "Limite de 140 caracteres",
         "cancelStream": "Cancelar Stream",
         "cancelStreamDescription": "Usar solo en caso de emergencias 😬"
+    },
+    "BuySubscriptionDialog": {
+        "retainSubs": "Reten a tus subs de Twitch",
+        "perMonth": "Por mes",
+        "addValue": "Añade valor a tu subscripción de Twitch dejando a tus subs interactuar por menos o gratis",
+        "subsConfig": "Define precios preferenciales para que reaccionen tus suscriptores del canal",
+        "alsoIncludes": "También incluye:",
+        "cashOutPolicy": "Cash out desde 50 Bits (10 veces menos)",
+        "addMod": "Agrega un mod a tu dashboard",
+        "soon": "Proximamente",
+        "resumeSub": "Reanudar subscripción",
+        "startFreeTrial": "Iniciar prueba gratis de 14 días"
     },
     "LiveDonations": {
         "greetingMessage": "{{viewerName}} dice: {{message}}",

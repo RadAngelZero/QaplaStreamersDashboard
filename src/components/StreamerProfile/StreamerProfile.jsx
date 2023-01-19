@@ -346,10 +346,10 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
         if (user.premium === undefined && user.freeTrial === undefined) {
-            history.push('/freeTrial');
+            setOpenGoPremiumDialog(true);
             // User was premium at least once but now is not premium, suggest him to buy a membership
         } else if (user.premium === false) {
-            history.push('/membership');
+            setOpenGoPremiumDialog(true);
         } else {
             history.push('/create');
         }

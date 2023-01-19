@@ -127,11 +127,6 @@ const Routes = ({ user, games, qoinsDrops }) => {
                     <OnBoarding user={user} />
                 </PageContainer>
             </Route>
-            <Route exact path='/freeTrial'>
-                <PageContainer>
-                    <RequestActivation user={user} />
-                </PageContainer>
-            </Route>
             <Route exact path='/giphyTextGenerator/:uid/:text'>
                 <PageContainer>
                     <GiphyTextGenerator user={user} />

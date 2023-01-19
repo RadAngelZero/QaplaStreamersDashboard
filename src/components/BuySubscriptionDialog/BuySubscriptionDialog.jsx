@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, CircularProgress, Dialog, withStyles } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../../assets/CloseIcon.svg';
 import styles from './BuySubscriptionDialog.module.css';
@@ -55,6 +56,7 @@ const StartFreeTrialButton = withStyles(() => ({
 
 const BuySubscriptionDialog = ({ user, open, onClose }) => {
     const [loadingBillingRequest, setLoadingBillingRequest] = useState(false);
+    const { t } = useTranslation('translation', { keyPrefix: 'BuySubscriptionDialog' });
 
     const startFreeTrial = async () => {
         setLoadingBillingRequest(true);
@@ -71,7 +73,7 @@ const BuySubscriptionDialog = ({ user, open, onClose }) => {
         <PremiumDialog open={open} onClose={onClose}>
             <div className={styles.goPremiumFancyContainer}>
                 <p className={styles.goPremiumMainTitle}>
-                    Retain your Twitch subscribers
+                    {t('retainSubs')}
                 </p>
                 <img src='https://media.giphy.com/media/UV4YhmkUDTfaUPopRN/giphy.gif' alt='Cool alien abducting pizza' style={{
                     marginTop: '43px',
@@ -86,28 +88,28 @@ const BuySubscriptionDialog = ({ user, open, onClose }) => {
                     $5
                 </p>
                 <p className={styles.goPremiumCaption}>
-                    per month
+                    {t('perMonth')}
                 </p>
                 <p className={styles.goPremiumSubheading} style={{ marginTop: '32px' }}>
-                    Add value to your Twitch subscription letting your Subs interact for less or for free
+                    {t('addValue')}
                 </p>
                 <p className={styles.goPremiumDescription} style={{ marginTop: '8px' }}>
-                    Set a preferential reaction price configuration for channel subscribers than regular viewers
+                    {t('subsConfig')}
                 </p>
                 <p className={styles.goPremiumSubheading} style={{ marginTop: '24px' }}>
-                    Also includes:
+                    {t('alsoIncludes')}
                 </p>
                 <p className={styles.goPremiumDescription} style={{ marginTop: '8px' }}>
-                    50 Bits minimum cash out (10 times lower)
+                    {t('cashOutPolicy')}
                 </p>
                 <div style={{ marginTop: '5.5px', display: 'flex' }}>
                     <p className={styles.goPremiumDescription} >
-                        Add a mod to your dashboard
+                        {t('addMod')}
                     </p>
                     <div className={styles.goPremiumSoonBorder}>
                         <div className={styles.goPremiumSoonInnerContainer}>
                             <p className={styles.goPremiumSoonText}>
-                                Soon
+                                {t('soon')}
                             </p>
                         </div>
 
@@ -118,9 +120,9 @@ const BuySubscriptionDialog = ({ user, open, onClose }) => {
                         <CircularProgress style={{ color: '#FFF' }} />
                         :
                         (user && user.freeTrial !== undefined) ?
-                            'Resume subscription'
+                            t('resumeSub')
                             :
-                            'Start 30-Day Free Trial'
+                            t('startFreeTrial')
                     }
                 </StartFreeTrialButton>
             </div>

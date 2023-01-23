@@ -1,7 +1,6 @@
 // ref https://codepen.io/ItsConnor/pen/epBGzM
 import { gsap } from "gsap";
 import { Engine, Render, Runner, Bodies, Composite, Body, Events } from "matter-js";
-import { createElement } from "react";
 import styles from '../components/LiveDonations/LiveDonations.module.css';
 export function EmoteExplosion(container, emote) {
     var flyingMen = [];
@@ -150,7 +149,6 @@ function generateDrop(engine, emote, duration, count) {
         },
         label: 'drop',
         frictionAir: randomAirFriction,
-        // density: 1,
     });
 
     Composite.add(engine.world, drop);
@@ -213,7 +211,6 @@ export function EmoteTunel(container, emote) {
 }
 
 export function StartMatterEngine(container, refEngine) {
-    // const canvas = document.getElementById('matterjs-canvas');
     const canvas = container.current.firstChild;
 
     var engine = Engine.create();
@@ -237,10 +234,6 @@ export function StartMatterEngine(container, refEngine) {
     Runner.run(runner, engine);
 
     refEngine.current = engine;
-
-    // setTimeout(() => {
-    //     StartEmoteFireworks(engine, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke', 10);
-    // }, 600)
 }
 
 export function StartEmoteFireworks(engine, emote, amount) {

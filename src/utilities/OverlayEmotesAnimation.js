@@ -1,5 +1,7 @@
 // ref https://codepen.io/ItsConnor/pen/epBGzM
 import { gsap } from "gsap";
+import { Engine, Render, Runner, Bodies, Composite, Body, Events } from "matter-js";
+import { createElement } from "react";
 import styles from '../components/LiveDonations/LiveDonations.module.css';
 export function EmoteExplosion(container, emote) {
     var flyingMen = [];
@@ -59,7 +61,6 @@ export function EmoteExplosion(container, emote) {
 
     function goB() {
         var fontsize = "24";
-        console.log(document.body.clientWidth, document.body.clientHeight)
         var xv = document.body.clientWidth / 2;
         var yv = document.body.clientHeight / 2;
         var fl = document.body.clientHeight;
@@ -89,89 +90,91 @@ export function EmoteExplosion(container, emote) {
     render();
 }
 
-export function EmoteRain(container, emote) {
+export function StartEmoteRain(engine, emote, duration) {
 
-    /**
-         * Emoji rain functions
-         */
-    let circles = [];
+    let bottomDetector = Bodies.rectangle(document.body.clientWidth / 2, document.body.clientHeight + 200, document.body.clientWidth * 3, 80, {
+        isStatic: true,
+        label: 'deathzone'
+    });
 
-    function addEmoteCircle(delay, range, color) {
-        setTimeout(function () {
-            let c = new EmoteCircle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
-                x: -0.15 + Math.random() * 0.3,
-                y: 1 + Math.random() * 10
-            }, range);
+    Events.on(engine, 'collisionStart', ({ pairs }) => {
+        var bodies = pairs;
 
-            circles.push(c);
-        }, delay);
-    }
-
-    class EmoteCircle {
-        constructor(x, y, color, velocity, range) {
-            let _this = this;
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            this.velocity = velocity;
-            this.range = range;
-            this.element = document.createElement('img');
-            /*this.element.style.display = 'block';*/
-            this.element.style.opacity = 0;
-            this.element.style.position = 'absolute';
-            this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
-            this.element.style.width = '30px'
-            this.element.style.height = '30px'
-            this.element.src = color;
-            const localContainer = container;
-            if (localContainer) {
-                localContainer.appendChild(this.element);
-            }
-
-            this.update = function () {
-                if (_this.y > 800) {
-                    _this.y = 80 + Math.random() * 4;
-                    _this.x = _this.range[0] + Math.random() * _this.range[1];
+        bodies.forEach(pair => {
+            if (pair.bodyA.label !== pair.bodyB.label) {
+                if (pair.bodyA.label === 'drop') {
+                    Composite.remove(engine.world, pair.bodyA, true);
+                } else {
+                    Composite.remove(engine.world, pair.bodyB, true);
                 }
-                _this.y += _this.velocity.y;
-                _this.x += _this.velocity.x;
-                this.element.style.opacity = 1;
-                this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-            };
-        }
-    }
+            }
+        })
 
-    function animate() {
-        for (let i in circles) {
-            circles[i].update();
-        }
+    })
 
-        return requestAnimationFrame(animate);
-    }
+    engine.world.gravity.y = 0.4
+    engine.world.gravity.x = 0.02
 
-    function executeEmoteRain(emote) {
-        for (let i = 0; i < 10; i++) {
-            addEmoteCircle(i * 350, [10 + 0, 300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 + 0, -300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 - 200, -300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 + 200, 300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 - 400, -300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 + 400, 300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 - 600, -300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-            addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-        }
+    setTimeout(() => {
+        resetEngine(engine);
+    }, (duration + 5) * 1000);
 
-        animate();
-    }
+    Composite.add(engine.world, bottomDetector);
 
-    executeEmoteRain(emote);
+    generateDrop(engine, emote, duration, 0);
+
+    manageWind(engine, duration, 0);
 
 }
 
+function resetEngine(engine) {
+    engine.world.gravity.y = 1;
+    engine.world.gravity.x = 0;
+    Events.off(engine, 'collisionStart');
+    Composite.clear(engine.world, false, true);
+}
+
+function generateDrop(engine, emote, duration, count) {
+    if (count >= duration * 1000) return;
+    let randomInterval = Math.floor((Math.random() * 100) + 20);
+    let randomXPos = Math.floor((Math.random() * (document.body.clientWidth - 100)) + 100);
+    let randomAirFriction = Math.random() * 0.05;
+
+    let drop = Bodies.rectangle(randomXPos, -100, 2, 2, {
+        render: {
+            sprite: {
+                texture: emote,
+                xScale: 0.8,
+                yScale: 0.8,
+            }
+        },
+        label: 'drop',
+        frictionAir: randomAirFriction,
+        // density: 1,
+    });
+
+    Composite.add(engine.world, drop);
+
+    setTimeout(() => {
+        generateDrop(engine, emote, duration, count + randomInterval);
+    }, randomInterval);
+
+}
+
+function manageWind(engine, duration, count) {
+    if (count >= (duration + 4.5) * 1000) return;
+
+    let randomInterval = Math.floor((Math.random() * 800) + 200);
+
+    engine.world.gravity.x = engine.world.gravity.x >= 0 ? -0.2 : 0.2;
+
+    setTimeout(() => {
+        manageWind(engine, duration, count + randomInterval);
+    }, randomInterval);
+
+}
+
+// https://www.youtube.com/watch?v=4NhLMNkyeh4
 export function EmoteTunel(container, emote) {
 
     function fiesta() {
@@ -190,7 +193,6 @@ export function EmoteTunel(container, emote) {
 
     animateConfettis();
 
-
     function animateConfettis() {
         const TLCONF = gsap.timeline();
 
@@ -200,13 +202,92 @@ export function EmoteTunel(container, emote) {
                 x: 'random(-400,400)',
                 z: 'random(0,1000)',
                 rotation: 'random(-90, 90)',
-                duration: 10,
+                duration: 2,
             })
-            .to('#emote-tunel-conatainer img', { autoAlpha: 0, duration: 0.3 },
+            .to('#emote-tunel-conatainer img', { alpha: 0, duration: 1.3 },
                 '-=0.2')
             .add(() => {
                 container.innerHTML = "";
             })
     }
+}
 
+export function StartMatterEngine(container, refEngine) {
+    // const canvas = document.getElementById('matterjs-canvas');
+    const canvas = container.current.firstChild;
+
+    var engine = Engine.create();
+
+    var render = Render.create({
+        element: container,
+        engine,
+        options: {
+            background: '#0000',
+            width: document.body.clientWidth,
+            height: document.body.clientHeight,
+            wireframes: false,
+        },
+        canvas
+    });
+
+    Render.run(render);
+
+    var runner = Runner.create();
+
+    Runner.run(runner, engine);
+
+    refEngine.current = engine;
+
+    // setTimeout(() => {
+    //     StartEmoteFireworks(engine, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke', 10);
+    // }, 600)
+}
+
+export function StartEmoteFireworks(engine, emote, amount) {
+    SpawnFirework(engine, emote, amount, 0);
+}
+
+export function SpawnFirework(engine, emote, amount = 0, count = 1) {
+    if (amount <= count) {
+        return;
+    }
+    var sparks = [];
+    var startX = Math.floor(Math.random() * ((document.body.clientWidth - 100) - 100 + 1)) + 100;
+    var startY = Math.floor(Math.random() * ((document.body.clientHeight - 100) - 100 + 1)) + 100;
+    var randomDelay = Math.floor(Math.random() * (1500 - 200 + 200)) + 200;
+
+    for (let i = 0; i < 50; i++) {
+        let spark = Bodies.rectangle(startX, startY, 80, 80, {
+            render: {
+                sprite: {
+                    texture: emote,
+                    xScale: 0.8,
+                    yScale: 0.8,
+                }
+            },
+            collisionFilter: {
+                group: -1,
+                category: 2,
+                mask: 0,
+            }
+        });
+        sparks.push(spark);
+    }
+
+    Composite.add(engine.world, sparks);
+
+    sparks.forEach(body => {
+        let forceOffsetX = (Math.floor(Math.random() * (20 - 20 + 1)) + 20) * (Math.round(Math.random()) ? 1 : -1);
+        let forceY = (Math.random() * (0.5 - 0.1 + 0.1) + 0.1) * (Math.round(Math.random()) ? 1 : -1);
+        let forceX = (Math.random() * (0.6 - 0.2 + 0.1) + 0.2) * (Math.round(Math.random()) ? 1 : -1);
+        Body.applyForce(body, { x: (body.position.x + forceOffsetX), y: body.position.y }, { x: forceX, y: forceY });
+    });
+    setTimeout(() => {
+        sparks.forEach(spark => {
+            Composite.remove(engine.world, spark)
+        })
+    }, 2000);
+    setTimeout(() => {
+        SpawnFirework(engine, emote, amount, count + 1);
+    }, randomDelay);
 }

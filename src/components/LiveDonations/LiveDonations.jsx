@@ -22,7 +22,7 @@ import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 import ChatBubbleiOS from '../ChatBubbleiOS/ChatBubbleiOS';
-import { EmoteExplosion, EmoteRain, EmoteTunel } from '../../utilities/OverlayEmotesAnimation';
+import { EmoteExplosion, StartEmoteRain, EmoteTunel, StartMatterEngine, StartEmoteFireworks } from '../../utilities/OverlayEmotesAnimation';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
 
@@ -50,17 +50,18 @@ const LiveDonations = () => {
     const emoteExplosionContainer = useRef();
     const emoteRainContainer = useRef();
     const emoteTunelContainer = useRef();
+    const matterjsContainer = useRef();
+    const matterjsEngine = useRef();
     const { streamerId } = useParams();
     const { t } = useTranslation();
 
     useEffect(() => {
+        StartMatterEngine(matterjsContainer, matterjsEngine);
         // EmoteExplosion(emoteExplosionContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke')
-        // setTimeout(() => {
-        //     setShowEmojiRain(false)
-        // }, 5000)
         // setShowEmojiRain(true);
-        // EmoteRain(emoteRainContainer.current, ['https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke']);
+        StartEmoteRain(matterjsEngine.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0'], 10);
         // EmoteTunel(emoteTunelContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke');
+        // StartEmoteFireworks(matterjsEngine.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke', 10);
         queueAnimation();
         const pushDonation = (donation) => {
             setDonationQueue((array) => [donation, ...array]);
@@ -305,7 +306,7 @@ const LiveDonations = () => {
                             }, 5000)
                             setShowEmojiRain(true);
                             // EmoteRain(emoteRainContainer.current, ['https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke']);
-                            EmoteRain(emoteRainContainer.current, donation.emojiRain.emojis);
+                            StartEmoteRain(emoteRainContainer.current, donation.emojiRain.emojis, 10);
                         } else {
                             // executeEmojiRain(donation.emojiRain.emojis);
                         }
@@ -515,18 +516,13 @@ const LiveDonations = () => {
                     <img src={qaplaOnOffsets.left === 'auto' ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
                 </div>
             }
-            {showEmojiRain &&
-                <div id="emote-rain" ref={emoteRainContainer} style={{
-                    position: 'fixed',
-                    top: 100,
-                    bottom: 0,
-                    left: '800px',
-                    right: 0,
-                    transform: 'scale(1.5)',
-                }}></div>
-            }
             <div id='emote-explosion-container' ref={emoteExplosionContainer} style={{ overflow: 'hidden' }}></div>
             <div id='emote-tunel-container' className={styles.emoteTunelContainer} ref={emoteTunelContainer}></div>
+            <div id='matterjs-container' className={styles.emoteFireworkContainer} ref={matterjsContainer}>
+                <canvas width={document.body.clientWidth} height={document.body.clientWidth} id='matterjs-canvas'>
+
+                </canvas>
+            </div>
             {donationToShow &&
                 <ErrorBoundary onFail={(error, errorInfo) => onReactionFailed(error, errorInfo, donationToShow)}>
                     <DonationHandler donationToShow={donationToShow}

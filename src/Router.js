@@ -22,7 +22,6 @@ import EventSent from './components/EventSent/EventSent';
 import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent';
 import LiveDonations from './components/LiveDonations/LiveDonations';
 import Settings from './components/Settings/Settings';
-import PlanPicker from './components/PlanPicker/PlanPicker';
 // import Lottery from './components/Lottery/Lottery';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
 import StreamerProfileEditor from './components/StreamerProfileEditor/StreamerProfileEditor';
@@ -30,7 +29,6 @@ import ChargeConfirmationPage from './components/ChargeConfirmationPage/ChargeCo
 import { useTranslation } from 'react-i18next'
 import OnBoarding from './components/OnBoarding/OnBoarding';
 import GiphyTextGenerator from './components/GiphyTextGenerator/GiphyTextGenerator';
-import RequestActivation from './components/RequestActivation/RequestActivation';
 import { getCurrentLanguage } from './utilities/i18n';
 
 window.onbeforeunload = function () {
@@ -108,11 +106,6 @@ const Routes = ({ user, games, qoinsDrops }) => {
                     <Settings user={user} />
                 </PageContainer>
             </Route>
-            <Route exact path='/membership'>
-                <PageContainer>
-                    <PlanPicker user={user} />
-                </PageContainer>
-            </Route>
             <Route exact path='/buyStreams'>
                 <PageContainer>
                     <StreamsPackages user={user} games={games} />
@@ -131,11 +124,6 @@ const Routes = ({ user, games, qoinsDrops }) => {
             <Route exact path='/onboarding'>
                 <PageContainer>
                     <OnBoarding user={user} />
-                </PageContainer>
-            </Route>
-            <Route exact path='/freeTrial'>
-                <PageContainer>
-                    <RequestActivation user={user} />
                 </PageContainer>
             </Route>
             <Route exact path='/giphyTextGenerator/:uid/:text'>

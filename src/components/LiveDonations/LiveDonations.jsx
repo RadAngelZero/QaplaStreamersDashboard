@@ -10,12 +10,13 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './LiveDonations.module.css';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
+import { ReactComponent as Bits } from './../../assets/Bits.svg';
 import { listenToUserStreamingStatus, getStreamerUidWithTwitchId, listenForUnreadStreamerCheers, markDonationAsRead, removeListenerForUnreadStreamerCheers, listenForTestCheers, removeTestDonation, listenToStreamerAlertsSettings, markOverlayAsActive, onLiveDonationsDisconnect, listenForUberduckAudio, removeListenerForUberduckAudio, listenForUnreadUsersGreetings, removeListenerForUnreadUsersGreetings, markGreetingAsRead, getAvatarAnimationData, logOverlayError, getStreamerDashboardUserLanguage, listenStreamerDashboardUserLanguage } from '../../services/database';
 import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp3';
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import QoinsDropsAudio from '../../assets/siu.mp3';
 import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
-import { EMOTE, GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import { BITS_DONATION, EMOTE, GIPHY_CLIP, GIPHY_CLIPS, GIPHY_GIF, GIPHY_GIFS, GIPHY_STICKER, GIPHY_STICKERS, MEME, MEMES, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
@@ -393,7 +394,10 @@ const LiveDonations = () => {
                                 voiceBotMessage = new Audio(TEST_MESSAGE_SPEECH_URL);
                             } else {
                                 const messageToRead = bigQoinsDonation ?
-                                    t('LiveDonations.bigQoinsDonationMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins, message: donation.message })
+                                        donation.donationType === BITS_DONATION ?
+                                            t('LiveDonations.bigBitsDonationMessage', { viewerName: donation.twitchUserName, bits: donation.amountQoins, message: donation.message })
+                                            :
+                                            t('LiveDonations.bigQoinsDonationMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins, message: donation.message })
                                     :
                                     t('LiveDonations.donationMessage', { viewerName: donation.twitchUserName, message: donation.message });
 
@@ -406,7 +410,10 @@ const LiveDonations = () => {
                                 voiceBotMessage = new Audio(audioUrl ? audioUrl : cheerMessageUrl.data);
                             }
                         } else if (bigQoinsDonation) {
-                            const messageToRead = t('LiveDonations.qoinsWithoutMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins });;
+                            const messageToRead = donation.donationType === BITS_DONATION ?
+                                t('LiveDonations.bitsWithoutMessage', { viewerName: donation.twitchUserName, bits: donation.amountQoins })
+                                :
+                                t('LiveDonations.qoinsWithoutMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins });
 
                             window.analytics.track('Cheer received', {
                                 user: donation.twitchUserName,
@@ -705,6 +712,15 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
             if (avatarReady && donation.message && !donation.media && !(donation.messageExtraData && donation.messageExtraData.giphyText)) {
                 displayDonation();
             }
+
+            /**
+             * Extreme case, only known use: Testing
+             * The donation is basically empty but can contain a donation, this will be useful also if in the future
+             * we allow empty reactions only containing Qoins or Bits
+             */
+            if (avatarReady && !donation.message && !donation.media && !(donation.messageExtraData && donation.messageExtraData.giphyText)) {
+                displayDonation();
+            }
         }
     }, [avatarReady, clip, mediaReady, giphyTextReady]);
 
@@ -892,7 +908,11 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                                     {t('LiveDonations.sent')}
                                 </div>
                                 <b style={{ color: '#0AFFD2', fontWeight: '700', }}>
-                                    {`${donation.amountQoins.toLocaleString()} Qoins`}
+                                    {donation.donationType === BITS_DONATION ?
+                                        `${donation.amountQoins.toLocaleString()} Bits`
+                                        :
+                                        `${donation.amountQoins.toLocaleString()} Qoins`
+                                    }
                                 </b>
                                 </>
                                 :
@@ -906,7 +926,11 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                         <>
                         <div style={{ width: '10px' }}></div>
                         <div style={{ display: 'flex', alignSelf: 'center' }}>
-                            <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
+                            {donation.donationType === BITS_DONATION ?
+                                <Bits style={{ display: 'flex', width: '38px', height: '38px' }} />
+                                :
+                                <DonatedQoin style={{ display: 'flex', width: '38px', height: '38px' }} />
+                            }
                         </div>
                         </>
                         :

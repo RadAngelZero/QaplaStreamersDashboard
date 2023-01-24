@@ -36,18 +36,18 @@ li {
 
 .qoinsMainContainer {
     display: flex;
-    width: 128px;
-    height: 38px;
+    width: 10ch;
+    height: 34px;
     border-radius: 8px;
-    margin-top: 28px;
     background: linear-gradient(91deg, #881CEE -1.34%, #FF4BA2 50.99%, #FFBD8B 100.15%);
     padding: 2px;
 }
 
 .qoinsSubContainer {
     display: flex;
+    width: 10ch;
     flex: 1;
-    border-radius: 8px;
+    border-radius: 6px;
     background-color: #202750;
     justify-content: center;
     align-items: center;
@@ -59,7 +59,7 @@ li {
     font-size: 18px;
     font-weight: 600;
     line-height: 22px;
-    width: 115px;
+    width: 8ch;
     text-align: center;
     border: none;
     outline: none;
@@ -115,4 +115,13 @@ input[type=number] {
     font-weight: 700;
     line-height: 20px;
     text-align: center;
+}
+
+.zapPriceContainer {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
 }

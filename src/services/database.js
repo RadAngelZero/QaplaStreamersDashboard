@@ -41,11 +41,12 @@ const streamerCashOutRef = database.ref('/StreamersCashOut');
 const streamsGreetingsRef = database.ref('/StreamsGreetings');
 const avatarsAnimationsOverlayRef = database.ref('/AvatarsAnimationsOverlay');
 const streamersDashboardsUserLanguageRef = database.ref('/StreamersDashboardsUserLanguage');
-const reactionsPricesRef = database.ref('/ReactionsPrices');
-const reactionsPricesBitsRef = database.ref('/ReactionsPricesBits');
-const reactionsPricesDefaultRef = database.ref('/ReactionsPricesDefault');
 const gifsLibrariesRef = database.ref('/GifsLibraries');
 const twitchExtensionProductsRef = database.ref('/TwitchExtensionProducts');
+const reactionsPricesLevelsRef = database.ref('/ReactionsPricesLevels');
+const reactionsPricesLevelsSubsRef = database.ref('/ReactionsPricesLevelsSubs');
+const reactionsPricesLevelsDefaultsRef = database.ref('/ReactionsPricesLevelsDefaults');
+const reactionsPricesLevelsSubsDefaultsRef = database.ref('/ReactionsPricesLevelsSubsDefaults');
 
 /**
  * Load all the games ordered by platform from GamesResources
@@ -1338,65 +1339,87 @@ export async function logOverlayError(uid, error) {
 }
 
 ////////////////////////
-// Reactions Prices
+// Reactions Prices Levels
 ////////////////////////
 
 /**
- * Returns the price of the given reaction level
- * @param {string} streamerUid Streamer identifier
- * @param {string} level Reaction level to get
+ * Sets the price of the given reaction level (use this function to set both Zaps and Qoins prices)
+ * @param {'level1' | 'level2' | 'level3'} level Name of the level to set the price
+ * @param {'zap' | 'qoin'} type Type of price
+ * @param {number} price Price (in Qoins or Zaps, depending of type)
+ * @param {number | null} bitsPrice Price in bits (null if type is 'zap')
+ * @param {number | null} twitchSku Sku of the Twitch product (null if type is 'zap')
  */
-export async function getReactionPriceByLevel(streamerUid, level) {
-    return await reactionsPricesRef.child(streamerUid).child(level).once('value');
-}
-
-/**
- * Sets the price (in Qoins) of the given reaction level
- * @param {string} streamerUid Streamer identifier
- * @param {string} level Reaction level to update
- * @param {number} newPrice New price of the reaction
- */
-export async function setReactionPrice(streamerUid, level, newPrice) {
-    return await reactionsPricesRef.child(streamerUid).child(level).set(newPrice);
-}
-
-////////////////////////
-// Reactions Prices Bits
-////////////////////////
-
-/**
- * Returns the price (in Bits) of the given reaction level
- * @param {string} streamerUid Streamer identifier
- * @param {string} level Reaction level to get
- */
-export async function getReactionPriceInBitsByLevel(streamerUid, level) {
-    return await reactionsPricesBitsRef.child(streamerUid).child(level).once('value');
-}
-
-/**
- * Sets the price (in Bits) of the given reaction level
- * @param {string} streamerUid Streamer identifier
- * @param {string} level Reaction level to update
- * @param {number} newPrice New price of the reaction
- * @param {number} twitchSku SKU of the selected Twitch Product
- */
-export async function setReactionPriceInBits(streamerUid, level, newPrice, twitchSku) {
-    return await reactionsPricesBitsRef.child(streamerUid).child(level).set({
-        price: newPrice,
+export async function setReactionLevelPrice(streamerUid, level, type, price, bitsPrice = null, twitchSku = null) {
+    return await reactionsPricesLevelsRef.child(streamerUid).child(level).set({
+        type,
+        price,
+        bitsPrice,
         twitchSku
     });
 }
 
+/**
+ * Gets the price of the given reaction level
+ * @param {string} streamerUid Streamer identifier
+ * @param {'level1' | 'level2' | 'level3'} level Name of the level to get the price
+ */
+export async function getReactionLevelPrice(streamerUid, level) {
+    return await reactionsPricesLevelsRef.child(streamerUid).child(level).once('value');
+}
+
 ////////////////////////
-// Reactions Prices Default
+// Reactions Prices Levels Subs
 ////////////////////////
 
 /**
- * Returns the default price (in Bits) of the given reaction level
- * @param {string} level Reaction level to get
+ * Sets the price of the given reaction level (use this function to set both Zaps and Qoins prices)
+ * @param {'level1' | 'level2' | 'level3'} level Name of the level to set the price
+ * @param {'zap' | 'qoin'} type Type of price
+ * @param {number} price Price (in Qoins or Zaps, depending of type)
+ * @param {number | null} bitsPrice Price in bits (null if type is 'zap')
+ * @param {number | null} twitchSku Sku of the Twitch product (null if type is 'zap')
  */
-export async function getDefaultReactionPriceInBitsByLevel(level) {
-    return await reactionsPricesDefaultRef.child(level).child('bits').once('value');
+export async function setReactionSubscriberLevelPrice(streamerUid, level, type, price, bitsPrice = null, twitchSku = null) {
+    return await reactionsPricesLevelsSubsRef.child(streamerUid).child(level).set({
+        type,
+        price,
+        bitsPrice,
+        twitchSku
+    });
+}
+
+/**
+ * Gets the price of the given reaction level
+ * @param {string} streamerUid Streamer identifier
+ * @param {'level1' | 'level2' | 'level3'} level Name of the level to get the price
+ */
+export async function getReactionSubscriberLevelPrice(streamerUid, level) {
+    return await reactionsPricesLevelsSubsRef.child(streamerUid).child(level).once('value');
+}
+
+////////////////////////
+// Reactions Prices Levels Defaults
+////////////////////////
+
+/**
+ * Gets the default price for the given reactions level for subscribers
+ * @param {'level1' | 'level2' | 'level3'} level Name of the level to get the price
+ */
+export async function getReactionLevelDefaultPrice(level) {
+    return await reactionsPricesLevelsDefaultsRef.child(level).once('value');
+}
+
+////////////////////////
+// Reactions Prices Levels Subs Defaults
+////////////////////////
+
+/**
+ * Gets the default price for the given reactions level for subscribers
+ * @param {'level1' | 'level2' | 'level3'} level Name of the level to get the price
+ */
+export async function getReactionSubscribersLevelDefaultPrice(level) {
+    return await reactionsPricesLevelsSubsDefaultsRef.child(level).once('value');
 }
 
 ////////////////////////

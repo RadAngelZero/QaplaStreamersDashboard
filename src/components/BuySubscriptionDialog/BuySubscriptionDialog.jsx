@@ -98,22 +98,22 @@ const BuySubscriptionDialog = ({ user, open, onClose }) => {
                 <p className={styles.goPremiumSubheading} style={{ marginTop: '24px' }}>
                     {t('alsoIncludes')}
                 </p>
-                <p className={styles.goPremiumDescription} style={{ marginTop: '8px' }}>
-                    {t('cashOutPolicy')}
-                </p>
-                <div style={{ marginTop: '5.5px', display: 'flex' }}>
-                    <p className={styles.goPremiumDescription} >
-                        {t('addMod')}
-                    </p>
-                    <div className={styles.goPremiumSoonBorder}>
-                        <div className={styles.goPremiumSoonInnerContainer}>
-                            <p className={styles.goPremiumSoonText}>
-                                {t('soon')}
-                            </p>
-                        </div>
+                <ul className={styles.perksList}>
+                    <li className={styles.goPremiumDescription}>
+                        {t('cashOutPolicy')}
+                    </li>
+                    <li style={{ marginTop: '5.5px', display: 'flex' }} className={styles.goPremiumDescription}>
+                            {t('addMod')}
+                            <div className={styles.goPremiumSoonBorder}>
+                                <div className={styles.goPremiumSoonInnerContainer}>
+                                    <p className={styles.goPremiumSoonText}>
+                                        {t('soon')}
+                                    </p>
+                                </div>
 
-                    </div>
-                </div>
+                            </div>
+                    </li>
+                </ul>
                 <StartFreeTrialButton onClick={startFreeTrial} disabled={loadingBillingRequest}>
                     {loadingBillingRequest ?
                         <CircularProgress style={{ color: 'rgba(255, 255, 255, .4)' }} size={32} />

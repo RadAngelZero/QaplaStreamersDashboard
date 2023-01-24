@@ -223,6 +223,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [rewardId, setRewardId] = useState(null);
     const [inputWidth, setInputWidth] = useState('4ch');
     const [editingSubsRewards, setEditingSubsRewards] = useState(0);
+    const [nextMilestone, setNextMilestone] = useState(0);
+    const [availableBits, setAvailableBits] = useState(0);
+    const [estimatedBits, setEstimatedBits] = useState(0);
     const inputRef = useRef(null);
     const { t } = useTranslation();
 
@@ -343,9 +346,24 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }, [streamsTab, user, history, randomEmoteUrl, channelRewardCost, t, editingChannelRewardCost, newChannelRewardCost]);
 
     useEffect(() => {
+        async function calculateAvailableBits(isPremium) {
+            let cheersQoins = 0;
+            let nextMilestone = isPremium ? 50 : 500;
+            let availableBits = 0;
+            let estimatedBits = 0;
+
+            cheersQoins = user.qoinsBalance || 0;
+            const tensOfBits = cheersQoins / 100;
+            estimatedBits = Math.floor((tensOfBits) * valueOfQoinsForStreamer);
+            setEstimatedBits(estimatedBits);
+            setAvailableBits(nextMilestone * Math.floor((estimatedBits) / nextMilestone));
+            setNextMilestone(nextMilestone * Math.ceil((estimatedBits + 1) / nextMilestone));
+        }
+
         if (user) {
             const isPremium = user && (user.premium || user.freeTrial);
             setEditingSubsRewards(isPremium ? 0 : 1);
+            calculateAvailableBits(isPremium);
         }
     }, [user]);
 
@@ -390,19 +408,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         const streamsCopy = { ...streams };
         delete streamsCopy[streamId];
         setStreams(streamsCopy);
-    }
-
-    let cheersQoins = 0;
-    let availableBits = 0;
-    let nextMilestone = 250;
-    let estimatedBits = 0;
-
-    if (user) {
-        cheersQoins = user.qoinsBalance || 0;
-        const tensOfBits = cheersQoins / 100;
-        estimatedBits = (tensOfBits) * valueOfQoinsForStreamer;
-        availableBits = 250 * Math.floor((estimatedBits) / 250);
-        nextMilestone = 250 * Math.ceil((estimatedBits + 1) / 250);
     }
 
     const handleStreamsTabs = (event, newValue) => {
@@ -493,6 +498,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const isPremium = user && (user.premium || user.freeTrial);
+
+    let cheersQoins = 0;
+
+    if (user) {
+        cheersQoins = user.qoinsBalance || 0;
+    }
 
     let dateRenovation;
     let renovationDay;

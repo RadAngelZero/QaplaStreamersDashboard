@@ -397,8 +397,8 @@
     "BuySubscriptionDialog": {
         "retainSubs": "Retain your Twitch subscribers",
         "perMonth": "Per month",
-        "addValue": "Add value to your Twitch subscription letting your Subs interact for less or for free",
-        "subsConfig": "Set a preferential reaction price configuration for channel subscribers than regular viewers",
+        "addValue": "Let your Twitch subs react for free",
+        "subsConfig": "Go premium and add a special configuration for your Twitch subscribers ",
         "alsoIncludes": "Also includes:",
         "cashOutPolicy": "50 Bits minimum cash out (10 times lower)",
         "addMod": "Add a mod to your dashboard",

@@ -444,10 +444,10 @@ const OnBoarding = ({ user }) => {
                     {step === 1 &&
                         <>
                             <h1 className={styles.headerText}>
-                                Set the Zap custom reward price
+                                {t('Onboarding.setZapPrice')}
                             </h1>
                             <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                                Zaps allow your audience to send reactions using their channel points, with only one custom reward
+                                {t('Onboarding.zapBenefits')}
                             </p>
                             <div className={styles.zapPriceContainer}>
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -718,7 +718,7 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === 1 &&
                         <>
-                            Create Zap Custom Reward
+                            {t('Onboarding.createZap')}
                         </>
                     }
                     {step === 2 &&

@@ -650,6 +650,7 @@ const OnBoarding = ({ user }) => {
                             user={user}
                             availablePrices={reactionsPrices}
                             hideBorder
+                            subsMode={1}
                         />
                         <ReactionCard
                             icons={
@@ -667,6 +668,7 @@ const OnBoarding = ({ user }) => {
                             user={user}
                             availablePrices={reactionsPrices}
                             hideBorder
+                            subsMode={1}
                         />
                         <ReactionCard
                             icons={
@@ -683,6 +685,7 @@ const OnBoarding = ({ user }) => {
                             user={user}
                             availablePrices={reactionsPrices}
                             hideBorder
+                            subsMode={1}
                         />
                     </div>
                     <p className={styles.headerText} style={{ marginTop: '40px', marginBottom: '16px' }}>

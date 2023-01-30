@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, Dialog, CircularProgress, Tab, Tabs } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, CircularProgress, Tab, Tabs } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -516,6 +516,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         monthsArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
     }
 
+    const showMyStreamsSection = user && user.stripeCustomerId === 'cus_MBJ0NIAvYpOMKp' || user.stripeCustomerId === 'cus_LykciwEvMsa8a4' || user.stripeCustomerId === 'cus_LLERvJxaTrTmIQ' || user.stripeCustomerId === 'cus_KDlRHV8yZzVb5K';
+
     return (
         <StreamerDashboardContainer user={user}>
             {user &&
@@ -813,87 +815,91 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             </p>
                                         </Grid>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <Grid container className={styles.myStreamsContainer}>
-                                            <div style={{ display: 'flex', flex: 1, }}>
-                                                <h1 className={styles.title}>
-                                                    {t('StreamerProfile.myStreams')}
-                                                </h1>
-                                                <div style={{
-                                                    marginLeft: 'auto'
-                                                }}>
-                                                    {isPremium && user.currentPeriod &&
-                                                        <StreamsLeft uid={user.uid}
-                                                            qoinsDrops={qoinsDrops}
-                                                            renovationDate={user.currentPeriod.endDate} />
-                                                    }
+                                    {showMyStreamsSection &&
+                                        <Grid item xs={12}>
+                                            <Grid container className={styles.myStreamsContainer}>
+                                                <div style={{ display: 'flex', flex: 1, }}>
+                                                    <h1 className={styles.title}>
+                                                        {t('StreamerProfile.myStreams')}
+                                                    </h1>
+                                                    <div style={{
+                                                        marginLeft: 'auto'
+                                                    }}>
+                                                        {isPremium && user.currentPeriod &&
+                                                            <StreamsLeft uid={user.uid}
+                                                                qoinsDrops={qoinsDrops}
+                                                                renovationDate={user.currentPeriod.endDate} />
+                                                        }
+                                                    </div>
                                                 </div>
+                                            </Grid>
+                                            <div style={{
+                                                marginBottom: ''
+                                            }}>
+                                                <QaplaTabs value={streamsTab} onChange={handleStreamsTabs}>
+                                                    <QaplaTab label="Scheduled" value={0} icon={streamsTab === 0 ? <CalendarOnTabIcon style={{ marginBottom: '0px' }} /> : <CalendarOffTabIcon style={{ marginBottom: '0px' }} />} />
+                                                    <QaplaTab label="History" value={1} icon={streamsTab === 1 ? <ClockOnTabIcon style={{ marginBottom: '0px' }} /> : <ClockOffTabIcon style={{ marginBottom: '0px' }} />} />
+                                                </QaplaTabs>
+                                            </div>
+                                            <div style={{
+                                                marginTop: '14px',
+                                            }}>
+                                                <p style={{
+                                                    color: '#FFFFFF9A',
+                                                    fontSize: '16px',
+                                                    fontWeight: '400',
+                                                    lineHeight: '19px',
+                                                }}>Schedule Qoins drops for your streams</p>
                                             </div>
                                         </Grid>
-                                        <div style={{
-                                            marginBottom: ''
-                                        }}>
-                                            <QaplaTabs value={streamsTab} onChange={handleStreamsTabs}>
-                                                <QaplaTab label="Scheduled" value={0} icon={streamsTab === 0 ? <CalendarOnTabIcon style={{ marginBottom: '0px' }} /> : <CalendarOffTabIcon style={{ marginBottom: '0px' }} />} />
-                                                <QaplaTab label="History" value={1} icon={streamsTab === 1 ? <ClockOnTabIcon style={{ marginBottom: '0px' }} /> : <ClockOffTabIcon style={{ marginBottom: '0px' }} />} />
-                                            </QaplaTabs>
-                                        </div>
-                                        <div style={{
-                                            marginTop: '14px',
-                                        }}>
-                                            <p style={{
-                                                color: '#FFFFFF9A',
-                                                fontSize: '16px',
-                                                fontWeight: '400',
-                                                lineHeight: '19px',
-                                            }}>Schedule Qoins drops for your streams</p>
-                                        </div>
-                                    </Grid>
+                                    }
                                 </Grid>
-                                <Grid item xs={12} className={styles.streamsCardContainer}>
-                                    <Grid container spacing={4} className={styles.innerStreamsCardContainer}>
-                                        <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
-                                            <Card className={styles.createEventCard} onClick={createStream}>
-                                                <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
-                                                    {t('StreamerProfile.postStream')}
-                                                </h1>
-                                                <CardContent classes={{
-                                                    root: classes.createCardContentRoot,
-                                                }}>
-                                                    <Box display='flex' justifyContent='center'>
-                                                        <IconButton className={styles.createButton} classes={{
-                                                            label: classes.buttonIconLabel
-                                                        }}>
-                                                            <AddIcon />
-                                                        </IconButton>
-                                                    </Box>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between'
-                                        }}>
-                                            {streams && Object.keys(streams).reverse().map((streamId) => (
-                                                <StreamCard
-                                                    key={streamId}
-                                                    streamType={streams[streamId].status}
-                                                    streamId={streamId}
-                                                    image={streams[streamId].image}
-                                                    user={user}
-                                                    game={streams[streamId].game}
-                                                    games={games}
-                                                    date={formatDate(streams[streamId].timestamp)}
-                                                    hour={formatHour(streams[streamId].timestamp)}
-                                                    timestamp={streams[streamId].timestamp}
-                                                    drops={streams[streamId].drops}
-                                                    usedDrops={streams[streamId].usedDrops}
-                                                    onRemoveStream={onRemoveStream} />
-                                            ))}
-                                        </div>
+                                {showMyStreamsSection &&
+                                    <Grid item xs={12} className={styles.streamsCardContainer}>
+                                        <Grid container spacing={4} className={styles.innerStreamsCardContainer}>
+                                            <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
+                                                <Card className={styles.createEventCard} onClick={createStream}>
+                                                    <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
+                                                        {t('StreamerProfile.postStream')}
+                                                    </h1>
+                                                    <CardContent classes={{
+                                                        root: classes.createCardContentRoot,
+                                                    }}>
+                                                        <Box display='flex' justifyContent='center'>
+                                                            <IconButton className={styles.createButton} classes={{
+                                                                label: classes.buttonIconLabel
+                                                            }}>
+                                                                <AddIcon />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </CardContent>
+                                                </Card>
+                                            </Grid>
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between'
+                                            }}>
+                                                {streams && Object.keys(streams).reverse().map((streamId) => (
+                                                    <StreamCard
+                                                        key={streamId}
+                                                        streamType={streams[streamId].status}
+                                                        streamId={streamId}
+                                                        image={streams[streamId].image}
+                                                        user={user}
+                                                        game={streams[streamId].game}
+                                                        games={games}
+                                                        date={formatDate(streams[streamId].timestamp)}
+                                                        hour={formatHour(streams[streamId].timestamp)}
+                                                        timestamp={streams[streamId].timestamp}
+                                                        drops={streams[streamId].drops}
+                                                        usedDrops={streams[streamId].usedDrops}
+                                                        onRemoveStream={onRemoveStream} />
+                                                ))}
+                                            </div>
 
+                                        </Grid>
                                     </Grid>
-                                </Grid>
+                                }
                             </Grid>
                         </Grid>
                     </Grid>

@@ -664,6 +664,9 @@ export function removeListenerForUnreadStreamerCheers(streamerUid) {
  * @param {string} errorMessage Message to show if the write operation fails
  */
 export async function writeTestCheer(streamerUid, completeMessage, errorMessage) {
+    const possibleEmotes = ['https://static-cdn.jtvnw.net/emoticons/v2/25/default/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/58127/default/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/304486301/default/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/305954156/default/light/3.0'];
+    const emoteIndex = Math.floor(Math.random() * (possibleEmotes.length));
+
     streamersDonationsTestRef.child(streamerUid).push({
         amountQoins: 0,
         message: 'Test',
@@ -671,8 +674,12 @@ export async function writeTestCheer(streamerUid, completeMessage, errorMessage)
         uid: '',
         read: false,
         twitchUserName: 'QAPLA',
+        avatar: {
+            avatarId: '63a0a200e9048e0586dd96e1'
+        },
         emojiRain: {
-            emojis: ['👋']
+            type: EMOTE,
+            emojis: [possibleEmotes[emoteIndex]]
         },
         media: {
             id: 'Iz0eDDbIrrItMCp2lO',

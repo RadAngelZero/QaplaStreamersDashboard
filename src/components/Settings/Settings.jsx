@@ -23,13 +23,13 @@ const Settings = ({ user }) => {
                 <QaplaTab label={t('Settings.chatbotCommand')} />
             </QaplaTabs>
             {/* Both components exists and are loaded but we only show the selected component */}
-            {user && user.uid && user.id &&
-                <Box display={value === 0 ? 'block' : 'none'}>
+            {user && user.uid && user.id && value === 0 &&
+                <Box>
                     <CheersSettings uid={user.uid} twitchId={user.id} />
                 </Box>
             }
-            {user && user.uid && user.id &&
-                <Box display={value === 1 ? 'block' : 'none'}>
+            {user && user.uid && user.id && value === 1 &&
+                <Box>
                     <ChatbotCommandSettings uid={user.uid} />
                 </Box>
             }

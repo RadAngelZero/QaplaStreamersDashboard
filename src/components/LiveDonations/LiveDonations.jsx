@@ -576,13 +576,10 @@ const LiveDonations = () => {
         if (bigQoinsDonation) {
             voiceBotMessage.play();
         } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIP || donationToShow.media.type !== GIPHY_CLIPS)) {
-            audioAlert.play();
             if (donationToShow.message) {
-                audioAlert.onended = () => {
-                    setTimeout(() => {
-                        voiceBotMessage.play();
-                    }, 750);
-                }
+                voiceBotMessage.play();
+            } else {
+                audioAlert.play();
             }
         }
     }

@@ -937,7 +937,7 @@ const ReactionAvatar = ({
                 style={{
                     marginTop: containsGiphyText ? 0 : '-100px',
                     width: TALKING_AVATAR_ANIMATION_SIZE,
-                    height: '220px',
+                    height: TALKING_AVATAR_ANIMATION_SIZE - 50,
                     alignSelf: 'flex-end'
                 }}>
                 <ambientLight intensity={1} />

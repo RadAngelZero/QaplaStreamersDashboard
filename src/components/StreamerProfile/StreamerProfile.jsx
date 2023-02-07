@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, Dialog, CircularProgress, Tab, Tabs } from '@material-ui/core';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, CircularProgress, Tab, Tabs } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -517,8 +517,6 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const showMyStreamsSection = user && (user.stripeCustomerId === 'cus_MBJ0NIAvYpOMKp' || user.stripeCustomerId === 'cus_LykciwEvMsa8a4' || user.stripeCustomerId === 'cus_LLERvJxaTrTmIQ' || user.stripeCustomerId === 'cus_KDlRHV8yZzVb5K');
-
-    console.log(showMyStreamsSection);
 
     return (
         <StreamerDashboardContainer user={user}>

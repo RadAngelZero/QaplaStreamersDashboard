@@ -516,7 +516,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         monthsArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
     }
 
-    const showMyStreamsSection = user && user.stripeCustomerId === 'cus_MBJ0NIAvYpOMKp' || user.stripeCustomerId === 'cus_LykciwEvMsa8a4' || user.stripeCustomerId === 'cus_LLERvJxaTrTmIQ' || user.stripeCustomerId === 'cus_KDlRHV8yZzVb5K';
+    const showMyStreamsSection = user && (user.stripeCustomerId === 'cus_MBJ0NIAvYpOMKp' || user.stripeCustomerId === 'cus_LykciwEvMsa8a4' || user.stripeCustomerId === 'cus_LLERvJxaTrTmIQ' || user.stripeCustomerId === 'cus_KDlRHV8yZzVb5K');
 
     return (
         <StreamerDashboardContainer user={user}>

@@ -20,7 +20,7 @@ import StreamerProfile from './components/StreamerProfile/StreamerProfile';
 import NewStream from './components/NewStream/NewStream';
 import EventSent from './components/EventSent/EventSent';
 import EditStreamerEvent from './components/EditStreamerEvent/EditStreamerEvent';
-import LiveDonations from './components/LiveDonations/LiveDonations';
+import Overlay from './components/Overlay/Overlay';
 import Settings from './components/Settings/Settings';
 // import Lottery from './components/Lottery/Lottery';
 import StreamsPackages from './components/StreamsPackages/StreamsPackages';
@@ -41,7 +41,7 @@ window.onbeforeunload = null;
 /**
  * Most of our pages need a background color of #0D1021 but not all, this container ensures
  * to apply the right background color to any page, especially because in some cases (like on
- * LiveDonations component) we need the background color to be applied inmediately
+ * Overlay component) we need the background color to be applied inmediately
  */
 const PageContainer = ({ backgroundColor = '#0D1021', children }) => (
     <div style={{ backgroundColor, minHeight: '100vh', minWidth: '100vw' }}>
@@ -98,7 +98,7 @@ const Routes = ({ user, games, qoinsDrops }) => {
             </Route>
             <Route exact path='/liveDonations/:streamerId'>
                 <PageContainer backgroundColor='transparent'>
-                    <LiveDonations user={user} />
+                    <Overlay user={user} />
                 </PageContainer>
             </Route>
             <Route exact path='/settings'>

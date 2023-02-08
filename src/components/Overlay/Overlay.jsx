@@ -203,7 +203,7 @@ const LiveDonations = () => {
 
         function loadLanguage() {
             listenStreamerDashboardUserLanguage(streamerUid, (language) => {
-                changeLanguage(language.val() ?? 'es');
+                changeLanguage(language.exists() ? language.val() : 'es');
             });
         }
 
@@ -352,10 +352,10 @@ const LiveDonations = () => {
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
+                loadLanguage();
                 if (isStreaming.exists() && isStreaming.val()) {
                     loadGreetings();
                     loadDonations();
-                    loadLanguage();
                 } else {
                     removeListenerForUnreadUsersGreetings(streamerUid);
                     setGreetingsQueue([]);
@@ -401,7 +401,7 @@ const LiveDonations = () => {
                     }
 
                     if (audioUrl || !donation.repeating) {
-                        const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : 'es-US-Standard-A';
+                        const voiceToUse = donation.messageExtraData && donation.messageExtraData.voiceAPIName ? donation.messageExtraData.voiceAPIName : (getCurrentLanguage() === 'en' ? 'en-US-Standard-C' : 'es-US-Standard-A');
 
                         if (donation.message) {
                             if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {

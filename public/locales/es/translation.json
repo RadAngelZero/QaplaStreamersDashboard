@@ -43,6 +43,8 @@
         "processDescriptionP1": "🎁 Crearemos una recompensa en tu canal con un click",
         "processDescriptionP2": "💰 Configuraremos tus Reactions Tiers",
         "processDescriptionP3": "🔗 Agregaremos una fuente de navegador a tu OBS/Streamlabs",
+        "setZapPrice": "Define el precio de la recompensa Zap",
+        "zapBenefits": "Los Zaps permiten a tu audiencia enviar reacciones usando puntos de canal, con una sola recompensa",
         "setRewardCost": "Define el “costo” de la recompensa",
         "setRewardCostDescription": "Esto seran los puntos que tus viewers gastaran por reacción. Siempre puedes cambiarlo después",
         "workingOnRequest": "Estoy trabajando en tu solicitud adorable humano{{loadingDots}}",
@@ -56,6 +58,7 @@
         "goToTwitch": "Unete al programa de afiliados",
         "goToDiscord": "Ir a soporte en Discord",
         "letsGo": "¡Vamos!",
+        "createZap": "Crear recompensa Zap",
         "createCustomReward": "Crear Recompensa",
         "waitABit": "Espera un poco",
         "configureTiers": "Configurar Reactions Tiers",
@@ -86,7 +89,7 @@
     },
     "StreamerProfile": {
         "balance": "Balance",
-        "balanceSubtitle": "Mira y retira los Qoins que obtienes de las reacciones",
+        "balanceSubtitle": "Mira y redime los Qoins que obtienes de las reacciones",
         "stimatedBits": "Bits estimados",
         "myStreams": "Mis Streams",
         "scheduled": "Programados",
@@ -97,8 +100,16 @@
         "receivedCheers": "Ver cheers recibidos",
         "reactions": "Reactions",
         "reactionsSubtitle": "Define el precio en Bits o Puntos de Canal para reacciones en tu stream.",
+        "zaps": "Zaps",
+        "setZapsPrice": "Define el precio de la recompensa Zap de puntos de canal",
         "reactionsEnabled": "Reacciones habilitadas",
         "reactionsDisabled": "Reactions deshabilitadas",
+        "toggleReactions": "Apaga y prende las reacciones",
+        "allViewers": "Viewers",
+        "subscribers": "Suscriptores",
+        "youArePremium": "Eres premium",
+        "subsSetUp": "Suscriptores del canal",
+        "subsSetUpDescription": "Define precios diferentes para las reacciones de tus suscriptores de Twitch",
         "cheersBalanceTooltip": {
             "title": "Realiza seguimiento de tu balance de Qoins<>Bits.",
             "description": "Tu comunidad puede enviarte Qoins de forma gratuita desde la app de Qapla. Nosotros te enviamos tus Qoins como Bits directamente a tu canal de Twitch al final de cada periodo."
@@ -120,7 +131,7 @@
         "BarProgressBit": {
             "nextMilestone": "Siguiente Milestone",
             "available": "Disponible",
-            "cashOut": "Cash Out",
+            "cashOut": "Redimir",
             "confirmCashOut": "Confirma que quieres cambiar tus Qoins por Bits en Twitch",
             "cancel": "Cancelar",
             "weGotYouRequestP1": "¡Tenemos tu solicitud! Te enviaremos ",
@@ -136,8 +147,11 @@
             "button": {
                 "edit": "Editar",
                 "save": "Guardar"
-            }
-        }
+            },
+            "channelPoints": "Puntos de Canal",
+            "allowViewers": "Permite a tus viewers enviar alertas usando puntos de canal"
+        },
+        "peopleUsingTheApp": "☝ La gente que reaccione desde la app verá el precio en Qoins en lugar de Bits."
     },
     "StreamCard": {
         "deleteConfirmation": "¿Estas seguro que deseas eliminar este stream?",
@@ -292,32 +306,6 @@
         "cheersReceivedAt": "Cheers recibidos al {{date}}",
         "repeatCheer": "Repetir"
     },
-    "PlanPicker": {
-        "titlePart1": "Genera visibilidad para tu contenido",
-        "titlePart1FreeTrial": "Continua generando visibilidad a tu contenido",
-        "titlePart2": "publicando tus streams en Qapla",
-        "plansPeriods": {
-            "monthly": "Mensual",
-            "quarterly": "Trimestral",
-            "yearly": "Anual"
-        },
-        "plansDescriptions": {
-            "essential": "Genera tráfico de valor a tu canal",
-            "growth": "Recompensa a tu comunidad mientras creces"
-        },
-        "month": "mes",
-        "payment": "Pago",
-        "totalPeriodPayment": "${{totalPayment}}",
-        "saving": "Ahorras {{saving}}%",
-        "monthlyPublications": "{{numberOfPublications}} publicaciones al mes",
-        "with": "con",
-        "qaplaReactions": "Reacciones Qapla",
-        "cashOut": "Cash out de Qoins",
-        "drops": "{{numberOfDrops}} Drops de Qoins por mes",
-        "postAlways": "Publica en Qapla mientras tengas drops",
-        "getVisibility": "Dale visibilidad a tu contenido",
-        "rewardYourCommunity": "Recompensa a tu comunidad"
-    },
     "StreamerProfileEditor": {
         "editCover": "Editar cover",
         "editBio": "Editar bio",
@@ -375,14 +363,6 @@
         "publishStream": "Publica un stream",
         "backToDashboard": "Volver al dashboard"
     },
-    "RequestActivation": {
-        "title": "Agenda tu stream en\nla app de Qapla 🚀",
-        "startTrial": "Inicia tu Free Trial. ",
-        "noCardRequired": "No requiere tarjeta.",
-        "drops": "🪂 Recompensa a tu audiencia con Drops de Qoins",
-        "visibility": "👁 Visibilidad para tu contenido fuera de Twitch",
-        "startFreeTrial": "Activar Free Trial"
-    },
     "StreamsLeft": {
         "drops": "Drops disponibles: ",
         "dropsLeft": "{{available}} de {{total}}",
@@ -413,10 +393,24 @@
         "cancelStream": "Cancelar Stream",
         "cancelStreamDescription": "Usar solo en caso de emergencias 😬"
     },
+    "BuySubscriptionDialog": {
+        "retainSubs": "Reten a tus subs de Twitch",
+        "perMonth": "Por mes",
+        "addValue": "Deja a tus subs reaccionar gratis",
+        "subsConfig": "Hazte premium y agrega una configuración especial para tus suscriptores de Twitch",
+        "alsoIncludes": "También incluye:",
+        "cashOutPolicy": "Cash out desde 50 Bits (10 veces menos)",
+        "addMod": "Agrega un mod a tu dashboard",
+        "soon": "Proximamente",
+        "resumeSub": "Reanudar subscripción",
+        "startFreeTrial": "Iniciar prueba gratis de 14 días"
+    },
     "LiveDonations": {
         "greetingMessage": "{{viewerName}} dice: {{message}}",
         "bigQoinsDonationMessage": "{{viewerName}} envió {{qoins}} coins y dice: {{message}}",
+        "bigBitsDonationMessage": "{{viewerName}} envió {{bits}} Bits y dice: {{message}}",
         "qoinsWithoutMessage": "{{viewerName}} envió {{qoins}} Coins",
+        "bitsWithoutMessage": "{{viewerName}} envió {{bits}} Bits",
         "donationMessage": "{{viewerName}} dice: {{message}}",
         "sent": "envió",
         "reacted": "reaccionó",

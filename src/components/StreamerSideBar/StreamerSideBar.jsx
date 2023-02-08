@@ -8,6 +8,7 @@ import { signOut } from './../../services/auth';
 import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';
 import { ReactComponent as QaplaLongLogo } from './../../assets/QaplaLongLogo.svg';
 import LanguageSelect from '../LanguageSelect/LanguageSelect';
+import BuySubscriptionDialog from '../BuySubscriptionDialog/BuySubscriptionDialog';
 
 const drawerWidth = 240;
 
@@ -73,6 +74,7 @@ const StreamerSideBar = ({ user }) => {
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [loadingStripeCustomerPortal, setLoadingStripeCustomerPortal] = useState(false);
+    const [openGoPremiumDialog, setOpenGoPremiumDialog] = useState(false);
     const { t } = useTranslation();
 
     const closeSession = async () => {
@@ -162,7 +164,7 @@ const StreamerSideBar = ({ user }) => {
                         </ListItem>
                     </form>
                     :
-                    <ListItem button onClick={() => history.push('/membership')} className={classes.listItem}>
+                    <ListItem button onClick={() => setOpenGoPremiumDialog(true)} className={classes.listItem}>
                         <ListItemIcon style={{ minWidth: 40 }}>
                             <MembershipIcon active={currentScreen === 'membership'} />
                         </ListItemIcon>
@@ -234,6 +236,9 @@ const StreamerSideBar = ({ user }) => {
                     </Hidden>
                 }
             </nav>
+            <BuySubscriptionDialog open={openGoPremiumDialog}
+                onClose={() => setOpenGoPremiumDialog(false)}
+                user={user} />
         </Box>
     );
 }

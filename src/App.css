@@ -23,6 +23,7 @@ body {
 }
 p {
   font-family: 'Inter' !important;
+  margin: 0;
 }
 
 ::-webkit-scrollbar {

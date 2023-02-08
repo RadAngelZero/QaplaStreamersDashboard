@@ -43,6 +43,8 @@
         "processDescriptionP1": "🎁 We’ll create a Custom Reward on your channel with one click",
         "processDescriptionP2": "💰 We’ll setup your Reactions Tiers",
         "processDescriptionP3": "🔗 We‘ll add a browser source to your OBS/Streamlabs",
+        "setZapPrice": "Set the Zap custom reward price",
+        "zapBenefits": "Zaps allow your audience to send reactions using their channel points, with only one custom reward",
         "setRewardCost": "Set the custom reward “cost”",
         "setRewardCostDescription": "This is how much channel points your viewers will burn per reaction. You can always change it later",
         "workingOnRequest": "I’m working on your request lovely human{{loadingDots}}",
@@ -56,6 +58,7 @@
         "goToTwitch": "Join the affiliate program",
         "goToDiscord": "Go Discord Support",
         "letsGo": "Let’s F* Go",
+        "createZap": "Create Zap Custom Reward",
         "createCustomReward": "Create Custom Reward",
         "waitABit": "Wait a bit",
         "configureTiers": "Configure Reactions Tiers",
@@ -86,7 +89,7 @@
     },
     "StreamerProfile": {
         "balance": "Balance",
-        "balanceSubtitle": "Track and cash out the Qoins you get from reactions.",
+        "balanceSubtitle": "Track and redeem the Qoins you get from reactions.",
         "stimatedBits": "Estimated bits",
         "myStreams": "My Streams",
         "scheduled": "Scheduled",
@@ -97,8 +100,16 @@
         "receivedCheers": "See received cheers",
         "reactions": "Reactions",
         "reactionsSubtitle": "Set the price in Bits or Channel Points for reactions on your stream.",
+        "zaps": "Zaps",
+        "setZapsPrice": "Set the price for the Zap custom channel point reward",
         "reactionsEnabled": "Reactions enabled",
         "reactionsDisabled": "Reactions disabled",
+        "toggleReactions": "Turn reactions on and off",
+        "allViewers": "All Viewers",
+        "subscribers": "Subscribers",
+        "youArePremium": "You are premium",
+        "subsSetUp": "Channel Subscribers",
+        "subsSetUpDescription": "Set a different reactions price for your Twitch subscribers",
         "cheersBalanceTooltip": {
             "title": "Keep track of your Qoins<>Bits balance.",
             "description": "Your community can send you Qoins for free directly from the Qapla app. We send you your Qoins as Bits directly to your Twitch channel at the end of each period."
@@ -120,7 +131,7 @@
         "BarProgressBit": {
             "nextMilestone": "Next Milestone",
             "available": "Available",
-            "cashOut": "Cash Out",
+            "cashOut": "Redeem",
             "confirmCashOut": "Confirm you are cashing out your Qoins for Bits on Twitch",
             "cancel": "Cancel",
             "weGotYouRequestP1": "We got your request! We'll send you ",
@@ -136,8 +147,11 @@
             "button": {
                 "edit": "Edit",
                 "save": "Save"
-            }
-        }
+            },
+            "channelPoints": "Channel Points",
+            "allowViewers": "Allow viewers to send alerts using channel points"
+        },
+        "peopleUsingTheApp": "☝ People reacting from the mobile app will see prices in Qoins instead of Bits."
     },
     "StreamCard": {
         "deleteConfirmation": "Are you sure you want to delete this stream?",
@@ -291,32 +305,6 @@
         "cheersReceivedAt": "Cheers received at {{date}}",
         "repeatCheer": "Repeat"
     },
-    "PlanPicker": {
-        "titlePart1": "Generate visibility for your content",
-        "titlePart1FreeTrial": "Continue generating visibility to your content",
-        "titlePart2": "by publishing your streams on Qapla",
-        "plansPeriods": {
-            "monthly": "Monthly",
-            "quarterly": "Quarterly",
-            "yearly": "Yearly"
-        },
-        "plansDescriptions": {
-            "essential": "Generate valuable traffic to your channel",
-            "growth": "Reward your community as you grow"
-        },
-        "month": "month",
-        "payment": "Payment",
-        "totalPeriodPayment": "${{totalPayment}}",
-        "saving": "You save {{saving}}%",
-        "monthlyPublications": "{{numberOfPublications}} monthly publications",
-        "with": "with",
-        "qaplaReactions": "Qapla Reactions",
-        "cashOut": "Qoins cash out",
-        "drops": "{{numberOfDrops}} Qoins Drops per month",
-        "postAlways": "Post streams on Qapla as long as you have drops",
-        "getVisibility": "Get visibility for your content",
-        "rewardYourCommunity": "Reward your community"
-    },
     "StreamerProfileEditor": {
         "editCover": "Edit cover",
         "editBio": "Edit bio",
@@ -379,14 +367,6 @@
         "publishStream": "Post a stream",
         "backToDashboard": "Back to dashboard"
     },
-    "RequestActivation": {
-        "title": "Schedule your streams on\nthe Qapla app 🚀",
-        "startTrial": "Start Free Trial. ",
-        "noCardRequired": "No credit card required.",
-        "drops": "🪂 Reward your audience with Qoins Drops",
-        "visibility": "👁 Visibility for your content outside of Twitch",
-        "startFreeTrial": "Start Free Trial"
-    },
     "StreamsLeft": {
         "drops": "Remaining drops: ",
         "dropsLeft": "{{available}} of {{total}}",
@@ -417,10 +397,24 @@
         "cancelStream": "Cancel Stream",
         "cancelStreamDescription": "Use only in case of emergencies 😬"
     },
+    "BuySubscriptionDialog": {
+        "retainSubs": "Retain your Twitch subscribers",
+        "perMonth": "Per month",
+        "addValue": "Let your Twitch subs react for free",
+        "subsConfig": "Go premium and add a special configuration for your Twitch subscribers ",
+        "alsoIncludes": "Also includes:",
+        "cashOutPolicy": "50 Bits minimum cash out (10 times lower)",
+        "addMod": "Add a mod to your dashboard",
+        "soon": "Soon",
+        "resumeSub": "Resume subscription",
+        "startFreeTrial": "Start 14-Day Free Trial"
+    },
     "LiveDonations": {
         "greetingMessage": "{{viewerName}} say: {{message}}",
         "bigQoinsDonationMessage": "{{viewerName}} sent {{qoins}} coins and says: {{message}}",
+        "bigBitsDonationMessage": "{{viewerName}} sent {{bits}} bits and says: {{message}}",
         "qoinsWithoutMessage": "{{viewerName}} sent {{qoins}} Coins",
+        "bitsWithoutMessage": "{{viewerName}} sent {{bits}} Bits",
         "donationMessage": "{{viewerName}} say: {{message}}",
         "sent": "sent",
         "reacted": "reacted",

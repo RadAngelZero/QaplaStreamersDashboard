@@ -68,7 +68,8 @@ const BarProgressBit = ({ user, estimatedBits, availableBits, nextMilestone }) =
         setOpen(true);
     };
 
-    const milestoneProgress = ((250 - (nextMilestone - estimatedBits)) / 250) * 100;
+    const nextLevel = user && user.premium ? 50 : 500;
+    const milestoneProgress = ((nextLevel - (nextMilestone - estimatedBits)) / nextLevel) * 100;
 
     return (
     <>

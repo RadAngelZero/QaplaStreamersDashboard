@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch } from '@material-ui/core';
+import React, { useEffect, useRef, useState } from 'react';
+import { withStyles, Grid, Avatar, Button, Card, CardContent, Box, IconButton, Hidden, makeStyles, Switch, CircularProgress, Tab, Tabs } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import styles from './StreamerProfile.module.css';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
-import StreamsSwitch from '../StreamsSwitch/StreamsSwitch';
 import StreamsLeft from '../StreamsLeft/StreamsLeft';
 import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
@@ -21,21 +20,35 @@ import { ReactComponent as TtGiphyIcon } from './../../assets/reactionCardsIcons
 import { ReactComponent as TTSBotIcon } from './../../assets/reactionCardsIcons/TTSBot.svg';
 import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.svg';
 
+import { ReactComponent as Star } from './../../assets/Star.svg';
+import { ReactComponent as Zap } from './../../assets/Zap.svg';
+import { ReactComponent as ChPts } from './../../assets/reactionCardsIcons/ChPts.svg';
+import { ReactComponent as Edit } from './../../assets/Edit.svg';
+import { ReactComponent as OnEye } from './../../assets/OnEye.svg';
+import { ReactComponent as OffEye } from './../../assets/OffEye.svg';
+import { ReactComponent as CalendarOnTabIcon } from './../../assets/CalendarTabOn.svg';
+import { ReactComponent as CalendarOffTabIcon } from './../../assets/CalendarTabOff.svg';
+import { ReactComponent as ClockOnTabIcon } from './../../assets/ClockTabOn.svg';
+import { ReactComponent as ClockOffTabIcon } from './../../assets/ClockTabOff.svg';
+import { ReactComponent as Heart } from './../../assets/Heart.svg';
+import { ReactComponent as SlidersSettings } from './../../assets/SlidersSettings.svg';
+
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
-import { getDefaultReactionPriceInBitsByLevel, getQreatorCode, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, loadTwitchExtensionReactionsPrices, setAlertSetting } from '../../services/database';
+import { getInteractionsRewardData, getQreatorCode, getStreamerAlertSetting, getStreamerValueOfQoins, loadStreamsByStatus, loadStreamsByStatusRange, loadTwitchExtensionReactionsPrices, setAlertSetting, updateStreamerProfile } from '../../services/database';
 import StreamCard from '../StreamCard/StreamCard';
 import {
     SCHEDULED_EVENT_TYPE,
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE,
-    PREMIUM,
-    REACTION_CARD_CHANNEL_POINTS,
-    REACTION_CARD_QOINS
+    PREMIUM
 } from '../../utilities/Constants';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
+import BuySubscriptionDialog from '../BuySubscriptionDialog/BuySubscriptionDialog';
 import ReactionCard from '../ReactionCard/ReactionCard';
-import { getEmotes } from '../../services/functions';
+import { getEmotes, refreshUserAccessToken } from '../../services/functions';
+import { auth } from '../../services/firebase';
+import { getCustomReward, updateCustomReward } from '../../services/twitch';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -101,15 +114,15 @@ const useStyles = makeStyles((theme) => ({
 
 const ReactionsSwitch = withStyles((theme) => ({
     root: {
-        width: 58,
-        height: 30,
+        width: 44.4,
+        height: 24,
         padding: 0,
     },
     switchBase: {
         color: '#999',
         padding: 0,
         '&$checked': {
-            transform: 'translateX(28px)',
+            transform: 'translateX(20.4px)',
             color: '#2CE9D2',
             '& + $track': {
                 backgroundColor: '#3B4BF9',
@@ -122,8 +135,8 @@ const ReactionsSwitch = withStyles((theme) => ({
         // idk why this must exist for the above class to work
     },
     thumb: {
-        width: 30,
-        height: 30,
+        width: 24,
+        height: 24,
     },
     disabled: {
         opacity: 0.6,
@@ -133,11 +146,59 @@ const ReactionsSwitch = withStyles((theme) => ({
         },
     },
     track: {
-        borderRadius: 30 / 2,
+        borderRadius: 24 / 2,
         backgroundColor: '#444',
         opacity: 1,
     },
 }))(Switch);
+
+const QaplaTabs = withStyles(() => ({
+    root: {
+        webkitBoxSizing: 'border-box',
+        mozBoxSizing: 'border-box',
+        boxSizing: 'border-box',
+        marginTop: '24px',
+    },
+    flexContainer: {
+        webkitBoxSizing: 'border-box',
+        mozBoxSizing: 'border-box',
+        boxSizing: 'border-box',
+    },
+    indicator: {
+        backgroundColor: '#0000'
+    }
+}))(Tabs);
+
+const QaplaTab = withStyles(() => ({
+    root: {
+        height: '35px',
+        maxHeight: '35px',
+        padding: '8px 12px',
+        webkitBoxSizing: 'border-box',
+        mozBoxSizing: 'border-box',
+        boxSizing: 'border-box',
+        color: '#fff',
+        borderRadius: '6px',
+        marginRight: '16px',
+        minWidth: 'auto',
+        minHeight: 'auto',
+        textTransform: 'none',
+        fontSize: '16px',
+        fontWeight: '600',
+        lineHeight: '19px',
+        letterSpacing: '-0.33764705061912537px',
+        textAlign: 'center',
+
+    },
+    selected: {
+        backgroundColor: '#29326B',
+    },
+    wrapper: {
+        flexDirection: 'row',
+        justifyItems: 'center',
+        gap: '4px',
+    }
+}))(Tab);
 
 const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const classes = useStyles();
@@ -147,15 +208,25 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [buttonPressed, setButtonPressed] = useState('Qoins');
     const [pendingMessages, setPendingMessages] = useState(0);
     const [valueOfQoinsForStreamer, setValueOfQoinsForStreamer] = useState(0);
-    const [switchState, setSwitchState] = useState(false);
+    const [streamsTab, setStreamsTab] = useState(0);
     const [qreatorCode, setQreatorCode] = useState('');
     const [openTooltip, setOpenTooltip] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState('');
     const [reactionsEnabled, setReactionsEnabled] = useState(false);
     const [updatingReactionsStatus, setUpdatingReactionsStatus] = useState(false);
     const [reactionsPrices, setReactionsPrices] = useState([]);
-    const [defaultPriceLevel2, setDefaultPriceLevel2] = useState(0);
-    const [defaultPriceLevel3, setDefaultPriceLevel3] = useState(0);
+    const [openGoPremiumDialog, setOpenGoPremiumDialog] = useState(false);
+    const [editingChannelRewardCost, setEditingChannelRewardCost] = useState(false);
+    const [updatingChannelRewardCost, setUpdatingChannelRewardCost] = useState(false);
+    const [channelRewardCost, setChannelRewardCost] = useState(null);
+    const [newChannelRewardCost, setNewChannelRewardCost] = useState(null);
+    const [rewardId, setRewardId] = useState(null);
+    const [inputWidth, setInputWidth] = useState('4ch');
+    const [editingSubsRewards, setEditingSubsRewards] = useState(0);
+    const [nextMilestone, setNextMilestone] = useState(0);
+    const [availableBits, setAvailableBits] = useState(0);
+    const [estimatedBits, setEstimatedBits] = useState(0);
+    const inputRef = useRef(null);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -177,7 +248,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
 
         async function loadStreams() {
             if (user) {
-                if (!switchState) {
+                if (!streamsTab) {
                     setStreamLoaded(await loadStreamsByStatusRange(user.uid, PENDING_APPROVAL_EVENT_TYPE, SCHEDULED_EVENT_TYPE));
                 } else {
                     setStreamLoaded(await loadStreamsByStatus(user.uid, PAST_STREAMS_EVENT_TYPE));
@@ -200,7 +271,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             if (user && user.uid) {
                 const emotesRequest = await getEmotes(user.uid);
 
-                const emotes = emotesRequest.data ? emotesRequest.data : null;
+                const emotes = emotesRequest ? emotesRequest.data : null;
                 if (emotes) {
                     // Find the first array who has more than 0 elements
                     const array = emotes.find((typeOfEmote) => typeOfEmote.data[0].length > 0);
@@ -230,37 +301,79 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
-        async function loadDefaultReactionsCosts() {
-            const defaultPriceLevel2 = await getDefaultReactionPriceInBitsByLevel('level2');
-            if (defaultPriceLevel2.exists()) {
-                setDefaultPriceLevel2(defaultPriceLevel2.val().price);
-            }
-
-            const defaultPriceLevel3 = await getDefaultReactionPriceInBitsByLevel('level3');
-            if (defaultPriceLevel3.exists()) {
-                setDefaultPriceLevel3(defaultPriceLevel3.val().price);
+        async function getChannelPointRewardData() {
+            try {
+                const rewardData = await getInteractionsRewardData(user.uid);
+                if (rewardData.exists()) {
+                    const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+                    if (userTokensUpdated.data.status === 200) {
+                        const userCredentialsUpdated = userTokensUpdated.data;
+                        updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+                        const reward = await getCustomReward(rewardData.val().rewardId, user.id, userCredentialsUpdated.access_token);
+                        if (reward && reward.id) {
+                            setChannelRewardCost(reward.cost);
+                            setRewardId(reward.id);
+                            setInputWidth(reward.cost.toLocaleString().length > 0 ? (reward.cost.toLocaleString().length > 8 ? '8ch' : reward.cost.toLocaleString().length + 'ch') : '1ch');
+                        } else if (reward === 404) {
+                            history.push('/onboarding');
+                        }
+                    } else {
+                        // Refresh token is useless, signout user
+                        alert(t('StreamCard.sessionExpired'));
+                        await auth.signOut();
+                        history.push('/');
+                    }
+                } else {
+                    history.push('/onboarding');
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
 
+        if (!editingChannelRewardCost && newChannelRewardCost === null && rewardId === null) {
+            getChannelPointRewardData();
+        }
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();
         loadReactionsEnabled();
         loadTwitchExtensionPrices();
-        loadDefaultReactionsCosts();
 
         if (!randomEmoteUrl) {
             getRandomEmote();
         }
-    }, [switchState, user, history, randomEmoteUrl]);
+    }, [streamsTab, user, history, randomEmoteUrl, channelRewardCost, t, editingChannelRewardCost, newChannelRewardCost]);
+
+    useEffect(() => {
+        async function calculateAvailableBits(isPremium) {
+            let cheersQoins = 0;
+            let nextMilestone = isPremium ? 50 : 500;
+            let availableBits = 0;
+            let estimatedBits = 0;
+
+            cheersQoins = user.qoinsBalance || 0;
+            const tensOfBits = cheersQoins / 100;
+            estimatedBits = Math.floor((tensOfBits) * valueOfQoinsForStreamer);
+            setEstimatedBits(estimatedBits);
+            setAvailableBits(nextMilestone * Math.floor((estimatedBits) / nextMilestone));
+            setNextMilestone(nextMilestone * Math.ceil((estimatedBits + 1) / nextMilestone));
+        }
+
+        if (user) {
+            const isPremium = user && (user.premium || user.freeTrial);
+            setEditingSubsRewards(isPremium ? 0 : 1);
+            calculateAvailableBits(isPremium);
+        }
+    }, [user]);
 
     const createStream = () => {
         // User never has been premium and has never used a Free Trial
         if (user.premium === undefined && user.freeTrial === undefined) {
-            history.push('/freeTrial');
+            setOpenGoPremiumDialog(true);
             // User was premium at least once but now is not premium, suggest him to buy a membership
         } else if (user.premium === false) {
-            history.push('/membership');
+            setOpenGoPremiumDialog(true);
         } else {
             history.push('/create');
         }
@@ -297,21 +410,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         setStreams(streamsCopy);
     }
 
-    let cheersQoins = 0;
-    let availableBits = 0;
-    let nextMilestone = 250;
-    let estimatedBits = 0;
-
-    if (user) {
-        cheersQoins = user.qoinsBalance || 0;
-        const tensOfBits = cheersQoins / 200;
-        estimatedBits = (tensOfBits) * valueOfQoinsForStreamer;
-        availableBits = 250 * Math.floor((estimatedBits) / 250);
-        nextMilestone = 250 * Math.ceil((estimatedBits + 1) / 250);
-    }
-
-    const handleSwitchEvents = () => {
-        setSwitchState(!switchState);
+    const handleStreamsTabs = (event, newValue) => {
+        setStreamsTab(newValue);
     }
 
     const copyQreatorCode = () => {
@@ -328,6 +428,95 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         setReactionsEnabled(!reactionsEnabled);
         setUpdatingReactionsStatus(false);
     }
+
+    const handlePremiumButton = async (e) => {
+        const isPremium = user && (user.premium || user.freeTrial);
+        if (!isPremium) {
+            e.preventDefault();
+
+            return setOpenGoPremiumDialog(true);
+        }
+    }
+
+    const handleChannelRewardCost = async (e) => {
+        setNewChannelRewardCost(e.target.value);
+        setInputWidth(e.target.value.length > 0 ? (e.target.value.length > 8 ? '8ch' : e.target.value.length + 'ch') : '1ch');
+    }
+
+    const handleChannelRewardButton = async () => {
+        if (updatingChannelRewardCost) {
+            return;
+        }
+        if (!editingChannelRewardCost) {
+            setEditingChannelRewardCost(true);
+            setNewChannelRewardCost(channelRewardCost);
+            setTimeout(() => {
+                inputRef.current.focus();
+            }, 100);
+
+            return;
+        }
+
+        let newCostInt = parseInt(newChannelRewardCost);
+
+        if (channelRewardCost === newChannelRewardCost || newChannelRewardCost === '') {
+            setEditingChannelRewardCost(false);
+            setInputWidth(channelRewardCost.toLocaleString().length > 0 ? (channelRewardCost.toLocaleString().length > 8 ? '8ch' : channelRewardCost.toLocaleString().length + 'ch') : '1ch');
+
+            return;
+        }
+
+        setUpdatingChannelRewardCost(true);
+        setEditingChannelRewardCost(false);
+
+        const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+
+        if (userTokensUpdated.data.status === 200) {
+            const userCredentialsUpdated = userTokensUpdated.data;
+            updateStreamerProfile(user.uid, { twitchAccessToken: userCredentialsUpdated.access_token, refreshToken: userCredentialsUpdated.refresh_token });
+            const rewardUpdated = await updateCustomReward(
+                user.id,
+                userCredentialsUpdated.access_token,
+                rewardId,
+                {
+                    cost: newCostInt
+                }
+            );
+
+            if (rewardUpdated.status === 200) {
+                setChannelRewardCost(newCostInt);
+                setInputWidth(newCostInt.toLocaleString().length > 0 ? (newCostInt.toLocaleString().length > 8 ? '8ch' : newCostInt.toLocaleString().length + 'ch') : '1ch');
+                setUpdatingChannelRewardCost(false);
+                setNewChannelRewardCost(null);
+                return;
+            }
+        }
+    }
+
+    const handleSubsTabs = async (event, newValue) => {
+        setEditingSubsRewards(newValue);
+    }
+
+    const isPremium = user && (user.premium || user.freeTrial);
+
+    let cheersQoins = 0;
+
+    if (user) {
+        cheersQoins = user.qoinsBalance || 0;
+    }
+
+    let dateRenovation;
+    let renovationDay;
+    let renovationMonth;
+    let monthsArray;
+    if (user && user.currentPeriod) {
+        dateRenovation = new Date(user.currentPeriod.endDate);
+        renovationDay = (dateRenovation.getDate().toString().length < 2 ? '0' : '') + dateRenovation.getDate().toString();
+        renovationMonth = dateRenovation.getMonth();
+        monthsArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    }
+
+    const showMyStreamsSection = user && (user.stripeCustomerId === 'cus_MBJ0NIAvYpOMKp' || user.stripeCustomerId === 'cus_LykciwEvMsa8a4' || user.stripeCustomerId === 'cus_LLERvJxaTrTmIQ' || user.stripeCustomerId === 'cus_KDlRHV8yZzVb5K');
 
     return (
         <StreamerDashboardContainer user={user}>
@@ -428,26 +617,148 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                         <Grid item xs={12}>
                                             <div className={styles.reactionsHeaderContainer}>
                                                 <div>
-                                                    <h1 className={styles.title}>
-                                                        {t('StreamerProfile.reactions')}
-                                                    </h1>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                    }}>
+                                                        <h1 className={styles.title}>
+                                                            {t('StreamerProfile.reactions')}
+                                                        </h1>
+                                                    </div>
+                                                    {isPremium &&
+                                                        <QaplaTabs value={editingSubsRewards} onChange={handleSubsTabs}>
+                                                            {/* Must be 0 & 1 because false deselect tabs */}
+                                                            <QaplaTab label={t('StreamerProfile.subscribers')} value={0} icon={<Star style={{ marginBottom: '0px' }} />} style={{
+                                                                background: editingSubsRewards === 0 ? 'linear-gradient(93.52deg, #6F11F9 0%, #FA5668 108.72%)' : '#0000',
+                                                            }} />
+                                                            <QaplaTab label={t('StreamerProfile.allViewers')} value={1} icon={editingSubsRewards === 0 ? <OffEye style={{ marginBottom: '0px' }} /> : <OnEye style={{ marginBottom: '0px' }} />} />
+                                                        </QaplaTabs>
+                                                    }
                                                     <p className={styles.subtitle}>
                                                         {t('StreamerProfile.reactionsSubtitle')}
                                                     </p>
                                                 </div>
-                                                <div className={styles.switchContainer}>
-                                                    <p className={styles.reactionsSwitchText}>
-                                                        {reactionsEnabled ?
-                                                            t('StreamerProfile.reactionsEnabled')
+                                            </div>
+                                        </Grid>
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '24px', marginTop: '3px' }} >
+                                            <div className={styles.reactionSettingContainer}>
+                                                <div style={{ display: 'flex' }}>
+                                                    <div>
+                                                        <Zap />
+                                                    </div>
+                                                    <div style={{ marginLeft: '8px' }}>
+                                                        <p className={styles.reactionSettingTitle}>
+                                                            {t('StreamerProfile.zaps')}
+                                                        </p>
+                                                        <p className={styles.reactionSettingSubtitle}>
+                                                            {t('StreamerProfile.setZapsPrice')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    alignSelf: 'flex-end',
+                                                    marginTop: 'auto',
+                                                }}>
+                                                    <ChPts />
+                                                    <input ref={inputRef}
+                                                        style={{
+                                                            width: !editingChannelRewardCost ? inputWidth : '100%'
+                                                        }}
+                                                        className={styles.costInput}
+                                                        type={!editingChannelRewardCost ? 'text' : 'number'}
+                                                        value={editingChannelRewardCost ? newChannelRewardCost : channelRewardCost ? channelRewardCost.toLocaleString() : ''}
+                                                        disabled={!editingChannelRewardCost}
+                                                        onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                                                        onChange={handleChannelRewardCost} />
+                                                    <div className={styles.editChannelRewardButton} onClick={handleChannelRewardButton} style={{
+                                                        backgroundColor: editingChannelRewardCost ? '#3B4BF9' : '#0000'
+                                                    }}>
+                                                        {updatingChannelRewardCost ?
+                                                            <CircularProgress size={12} className={classes.circularProgress} />
                                                             :
-                                                            t('StreamerProfile.reactionsDisabled')
+                                                            <>
+                                                                {editingChannelRewardCost ?
+                                                                    <p className={styles.editChannelRewardButtonText}>
+                                                                        {t('StreamerProfile.ReactionCard.button.save')}
+                                                                    </p>
+                                                                    :
+                                                                    <Edit height={24}
+                                                                        width={24}
+                                                                        style={{
+                                                                            transform: 'scale(.75)',
+                                                                            maxWidth: '24px',
+                                                                            maxHeight: '24px',
+                                                                            margin: '0px -8px',
+                                                                        }} />
+                                                                }
+                                                            </>
                                                         }
-                                                    </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={styles.reactionSettingContainer} style={{}}>
+                                                <div style={{ display: 'flex' }}>
+                                                    <div>
+                                                        <SlidersSettings style={{ height: '24px', width: '24px' }} />
+                                                    </div>
+                                                    <div style={{ marginLeft: '8px' }}>
+                                                        <p className={styles.reactionSettingTitle}>
+                                                            {reactionsEnabled ?
+                                                                t('StreamerProfile.reactionsEnabled')
+                                                                :
+                                                                t('StreamerProfile.reactionsDisabled')
+                                                            }
+                                                        </p>
+                                                        <p className={styles.reactionSettingSubtitle}>
+                                                            {t('StreamerProfile.toggleReactions')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.switchContainer}>
                                                     <ReactionsSwitch checked={reactionsEnabled} onChange={handleReactionsSwitch} disabled={updatingReactionsStatus} />
                                                 </div>
                                             </div>
+                                            <form action='https://us-central1-qapplaapp.cloudfunctions.net/stripeCustomerPortal'
+                                                method='post'
+                                                className={styles.reactionSettingContainer}
+                                                onSubmit={handlePremiumButton}
+                                                style={{ background: isPremium && user.currentPeriod ? '#141735' : 'linear-gradient(318.55deg, #4BDEFE 9.94%, #5328FF 90.92%)' }}>
+                                                <button className={styles.reactionSettingContainer}
+                                                    style={{ background: 'transparent', padding: 0, border: 'none', cursor: 'pointer' }}
+                                                    type='submit'>
+                                                    <input type='hidden' name='stripeCustomerId' value={user.stripeCustomerId || ''} />
+                                                    <div style={{ display: 'flex' }}>
+                                                        <div>
+                                                            {isPremium && user.currentPeriod ?
+                                                                <Heart style={{ height: '24px', width: '24px' }} />
+                                                                :
+                                                                <Star style={{ height: '24px', width: '24px' }} />
+                                                            }
+                                                        </div>
+                                                        <div style={{ marginLeft: '8px' }}>
+                                                            <p className={styles.reactionSettingTitle}>
+                                                                {isPremium && user.currentPeriod ?
+                                                                    t('StreamerProfile.youArePremium')
+                                                                    :
+                                                                    t('StreamerProfile.subsSetUp')
+                                                                }
+                                                            </p>
+                                                            <p className={styles.reactionSettingSubtitle}>
+                                                                {isPremium && user.currentPeriod ?
+                                                                    t('StreamsLeft.renewsOn', { date: renovationDay, month: t(`months.${monthsArray[renovationMonth]}`) })
+                                                                    :
+                                                                    t('StreamerProfile.subsSetUpDescription')
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            </form>
                                         </Grid>
-                                        <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '10px' }} >
+                                        <Grid container xs={12} style={{ justifyContent: 'space-between', gap: '24px', marginTop: '35px' }} >
                                             <ReactionCard
                                                 icons={
                                                     [
@@ -459,122 +770,136 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                 title={t('StreamerProfile.ReactionCard.tier1Title')}
                                                 subtitle={t('StreamerProfile.ReactionCard.tier1Subtitle')}
                                                 textMaxWidth='110px'
-                                                type={REACTION_CARD_CHANNEL_POINTS}
                                                 reactionLevel={1}
                                                 user={user}
+                                                availablePrices={reactionsPrices}
+                                                subsMode={editingSubsRewards}
                                             />
-                                            {defaultPriceLevel2 &&
-                                                <ReactionCard
-                                                    icons={
-                                                        [
-                                                            <PlusIcon fill={'url(#icons-gradient)'} />,
-                                                            <AvatarIcon fill={'url(#icons-gradient)'} />,
-                                                            <TtGiphyIcon fill={'url(#icons-gradient)'} />,
-                                                            <TTSBotIcon fill={'url(#icons-gradient)'} />,
-                                                        ]
-                                                    }
-                                                    title={t('StreamerProfile.ReactionCard.tier2Title')}
-                                                    subtitle={t('StreamerProfile.ReactionCard.tier2Subtitle')}
-                                                    textMaxWidth='160px'
-                                                    type={REACTION_CARD_QOINS}
-                                                    reactionLevel={2}
-                                                    user={user}
-                                                    defaultCost={defaultPriceLevel2}
-                                                    availablePrices={reactionsPrices}
-                                                />
-                                            }
-                                            {defaultPriceLevel3 &&
-                                                <ReactionCard
-                                                    icons={
-                                                        [
-                                                            <PlusIcon fill={'url(#icons-gradient)'} />,
-                                                            <img src={randomEmoteUrl}
-                                                                style={{ height: 24, width: 24 }} />
-                                                        ]
-                                                    }
-                                                    title={t('StreamerProfile.ReactionCard.tier3Title')}
-                                                    subtitle={t('StreamerProfile.ReactionCard.tier3Subtitle')}
-                                                    textMaxWidth='130px'
-                                                    type={REACTION_CARD_QOINS}
-                                                    reactionLevel={3}
-                                                    user={user}
-                                                    defaultCost={defaultPriceLevel3}
-                                                    availablePrices={reactionsPrices}
-                                                />
-                                            }
+                                            <ReactionCard
+                                                icons={
+                                                    [
+                                                        <PlusIcon fill={'url(#icons-gradient)'} />,
+                                                        <AvatarIcon fill={'url(#icons-gradient)'} />,
+                                                        <TtGiphyIcon fill={'url(#icons-gradient)'} />,
+                                                        <TTSBotIcon fill={'url(#icons-gradient)'} />,
+                                                    ]
+                                                }
+                                                title={t('StreamerProfile.ReactionCard.tier2Title')}
+                                                subtitle={t('StreamerProfile.ReactionCard.tier2Subtitle')}
+                                                textMaxWidth='160px'
+                                                reactionLevel={2}
+                                                user={user}
+                                                availablePrices={reactionsPrices}
+                                                subsMode={editingSubsRewards}
+                                            />
+                                            <ReactionCard
+                                                icons={
+                                                    [
+                                                        <PlusIcon fill={'url(#icons-gradient)'} />,
+                                                        <img src={randomEmoteUrl}
+                                                            style={{ height: 24, width: 24 }} />
+                                                    ]
+                                                }
+                                                title={t('StreamerProfile.ReactionCard.tier3Title')}
+                                                subtitle={t('StreamerProfile.ReactionCard.tier3Subtitle')}
+                                                textMaxWidth='130px'
+                                                reactionLevel={3}
+                                                user={user}
+                                                availablePrices={reactionsPrices}
+                                                subsMode={editingSubsRewards}
+                                            />
                                         </Grid>
                                         <Grid item xs={12}>
                                             <p className={styles.miniInfoText}>
-                                                {`☝ People reacting from the mobile app will see prices in Qoins instead of Bits.`}
+                                                {t('StreamerProfile.peopleUsingTheApp')}
                                             </p>
                                         </Grid>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <Grid container className={styles.myStreamsContainer}>
-                                            <div style={{ display: 'flex', flex: 1, }}>
-                                                <h1 className={styles.title}>
-                                                    {t('StreamerProfile.myStreams')}
-                                                </h1>
-                                                <div style={{ marginLeft: '32px' }}>
-                                                    <StreamsSwitch switchPosition={switchState} onClick={handleSwitchEvents} />
+                                    {showMyStreamsSection &&
+                                        <Grid item xs={12}>
+                                            <Grid container className={styles.myStreamsContainer}>
+                                                <div style={{ display: 'flex', flex: 1, }}>
+                                                    <h1 className={styles.title}>
+                                                        {t('StreamerProfile.myStreams')}
+                                                    </h1>
+                                                    <div style={{
+                                                        marginLeft: 'auto'
+                                                    }}>
+                                                        {isPremium && user.currentPeriod &&
+                                                            <StreamsLeft uid={user.uid}
+                                                                qoinsDrops={qoinsDrops}
+                                                                renovationDate={user.currentPeriod.endDate} />
+                                                        }
+                                                    </div>
                                                 </div>
-                                                <div style={{
-                                                    marginLeft: 'auto'
-                                                }}>
-                                                    {(user.premium || user.freeTrial) && user.currentPeriod &&
-                                                        <StreamsLeft uid={user.uid}
-                                                            qoinsDrops={qoinsDrops}
-                                                            renovationDate={user.currentPeriod.endDate} />
-                                                    }
-                                                </div>
+                                            </Grid>
+                                            <div style={{
+                                                marginBottom: ''
+                                            }}>
+                                                <QaplaTabs value={streamsTab} onChange={handleStreamsTabs}>
+                                                    <QaplaTab label="Scheduled" value={0} icon={streamsTab === 0 ? <CalendarOnTabIcon style={{ marginBottom: '0px' }} /> : <CalendarOffTabIcon style={{ marginBottom: '0px' }} />} />
+                                                    <QaplaTab label="History" value={1} icon={streamsTab === 1 ? <ClockOnTabIcon style={{ marginBottom: '0px' }} /> : <ClockOffTabIcon style={{ marginBottom: '0px' }} />} />
+                                                </QaplaTabs>
+                                            </div>
+                                            <div style={{
+                                                marginTop: '14px',
+                                            }}>
+                                                <p style={{
+                                                    color: '#FFFFFF9A',
+                                                    fontSize: '16px',
+                                                    fontWeight: '400',
+                                                    lineHeight: '19px',
+                                                }}>Schedule Qoins drops for your streams</p>
                                             </div>
                                         </Grid>
-                                    </Grid>
+                                    }
                                 </Grid>
-                                <Grid item xs={12} className={styles.streamsCardContainer}>
-                                    <Grid container spacing={4} className={styles.innerStreamsCardContainer}>
-                                        <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
-                                            <Card className={styles.createEventCard} onClick={createStream}>
-                                                <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
-                                                    {t('StreamerProfile.postStream')}
-                                                </h1>
-                                                <CardContent classes={{
-                                                    root: classes.createCardContentRoot,
-                                                }}>
-                                                    <Box display='flex' justifyContent='center'>
-                                                        <IconButton className={styles.createButton} classes={{
-                                                            label: classes.buttonIconLabel
-                                                        }}>
-                                                            <AddIcon />
-                                                        </IconButton>
-                                                    </Box>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between'
-                                        }}>
-                                            {streams && Object.keys(streams).reverse().map((streamId) => (
-                                                <StreamCard
-                                                    key={streamId}
-                                                    streamType={streams[streamId].status}
-                                                    streamId={streamId}
-                                                    image={streams[streamId].image}
-                                                    user={user}
-                                                    game={streams[streamId].game}
-                                                    games={games}
-                                                    date={formatDate(streams[streamId].timestamp)}
-                                                    hour={formatHour(streams[streamId].timestamp)}
-                                                    timestamp={streams[streamId].timestamp}
-                                                    drops={streams[streamId].drops}
-                                                    usedDrops={streams[streamId].usedDrops}
-                                                    onRemoveStream={onRemoveStream} />
-                                            ))}
-                                        </div>
+                                {showMyStreamsSection &&
+                                    <Grid item xs={12} className={styles.streamsCardContainer}>
+                                        <Grid container spacing={4} className={styles.innerStreamsCardContainer}>
+                                            <Grid item xl={2} lg={3} md={3} sm={4} xs={10} className={styles.cardContainer}>
+                                                <Card className={styles.createEventCard} onClick={createStream}>
+                                                    <h1 className={styles.newStream} style={{ whiteSpace: 'pre-line' }}>
+                                                        {t('StreamerProfile.postStream')}
+                                                    </h1>
+                                                    <CardContent classes={{
+                                                        root: classes.createCardContentRoot,
+                                                    }}>
+                                                        <Box display='flex' justifyContent='center'>
+                                                            <IconButton className={styles.createButton} classes={{
+                                                                label: classes.buttonIconLabel
+                                                            }}>
+                                                                <AddIcon />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </CardContent>
+                                                </Card>
+                                            </Grid>
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between'
+                                            }}>
+                                                {streams && Object.keys(streams).reverse().map((streamId) => (
+                                                    <StreamCard
+                                                        key={streamId}
+                                                        streamType={streams[streamId].status}
+                                                        streamId={streamId}
+                                                        image={streams[streamId].image}
+                                                        user={user}
+                                                        game={streams[streamId].game}
+                                                        games={games}
+                                                        date={formatDate(streams[streamId].timestamp)}
+                                                        hour={formatHour(streams[streamId].timestamp)}
+                                                        timestamp={streams[streamId].timestamp}
+                                                        drops={streams[streamId].drops}
+                                                        usedDrops={streams[streamId].usedDrops}
+                                                        onRemoveStream={onRemoveStream} />
+                                                ))}
+                                            </div>
 
+                                        </Grid>
                                     </Grid>
-                                </Grid>
+                                }
                             </Grid>
                         </Grid>
                     </Grid>
@@ -586,9 +911,12 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         valueOfQoinsForStreamer={valueOfQoinsForStreamer}
                         pressed={buttonPressed}
                         setPendingMessages={setPendingMessages} />
+                    <BuySubscriptionDialog open={openGoPremiumDialog}
+                        onClose={() => setOpenGoPremiumDialog(false)}
+                        user={user} />
                 </>
             }
-        </StreamerDashboardContainer>
+        </StreamerDashboardContainer >
     );
 }
 

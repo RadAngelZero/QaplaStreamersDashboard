@@ -180,11 +180,10 @@ export const MAX_ROWS_IN_BIO = 5;
 export const TEST_MESSAGE_SPEECH_URL = 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/CheersTestAudios%2FTest.mp3?alt=media&token=3a77f0c1-e5ce-445a-a848-cd5a00a4c361';
 
 /**
- * Reaction Card Type
+ * Type of reactions prices
  */
-
-export const REACTION_CARD_CHANNEL_POINTS = 0;
-export const REACTION_CARD_QOINS = 1;
+export const ZAP = 'zap';
+export const QOIN = 'qoin';
 
 export const streamsPlaceholderImages = {
     DBD: DBDImage,
@@ -252,3 +251,5 @@ export const streamsPlaceholderImages = {
 };
 
 export const ZAP_REWARD_NAME = 'Zap';
+
+export const BITS_DONATION = 'bits';

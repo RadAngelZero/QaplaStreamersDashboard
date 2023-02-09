@@ -227,12 +227,12 @@ export function spawnFirework(engine, emotesArray, amount = 0, count = 1) {
     let startY = Math.floor(Math.random() * ((document.body.clientHeight - 100) - 100 + 1)) + 100;
     let randomDelay = Math.floor(Math.random() * (1500 - 200 + 200)) + 200;
 
-    const randomEmoteIndex = Math.floor(Math.random() * emotesArray.length);
+    const emoteIndex = count % emotesArray.length;
     for (let i = 0; i < 50; i++) {
         let spark = Bodies.rectangle(startX, startY, 80, 80, {
             render: {
                 sprite: {
-                    texture: emotesArray[randomEmoteIndex],
+                    texture: emotesArray[emoteIndex],
                     xScale: 0.8,
                     yScale: 0.8,
                 }

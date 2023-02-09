@@ -259,3 +259,8 @@ export const EMOTE_RAIN = 'emoteRain';
 export const EMOTE_EXPLOSION = 'emoteExplosion';
 export const EMOTE_TUNNEL = 'emoteTunnel';
 export const EMOTE_FIREWORKS = 'emoteFireworks';
+
+// Overlay avatars talking animations
+export const TALKING_AVATAR_ANGRY = 'avatarTalkingAngry';
+export const TALKING_AVATAR_HAPPY = 'avatarTalkingHappy'
+export const TALKING_AVATAR_SAD = 'avatarTalkingSad'

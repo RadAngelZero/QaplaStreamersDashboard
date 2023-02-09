@@ -29,7 +29,7 @@ const Reaction = ({
         donationType,
         startDonation,
         alertSideRight,
-        happyTalkingAnimation,
+        talkingAnimation,
         reactionsCoordinates
     }) => {
     const avatarShouldTalk = avatar && avatar.avatarId !== '' && !avatar.avatarAnimationId && message !== '';
@@ -135,7 +135,7 @@ const Reaction = ({
                         setAvatarReady={setAvatarReady}
                         avatarAnimationFinished={avatarAnimationFinished}
                         setIsLoopAnimation={setIsLoopAnimation}
-                        happyTalkingAnimation={happyTalkingAnimation}
+                        talkingAnimation={talkingAnimation}
                         photoURL={photoURL}
                         containsGiphyText={containsGiphyText}
                         isLoopAnimation={isLoopAnimation} />
@@ -204,7 +204,7 @@ const Reaction = ({
                             setAvatarReady={setAvatarReady}
                             avatarAnimationFinished={avatarAnimationFinished}
                             setIsLoopAnimation={setIsLoopAnimation}
-                            happyTalkingAnimation={happyTalkingAnimation}
+                            talkingAnimation={talkingAnimation}
                             photoURL={photoURL}
                             containsGiphyText={containsGiphyText}
                             isLoopAnimation={isLoopAnimation} />
@@ -257,7 +257,7 @@ const Reaction = ({
                         setAvatarReady={setAvatarReady}
                         avatarAnimationFinished={avatarAnimationFinished}
                         setIsLoopAnimation={setIsLoopAnimation}
-                        happyTalkingAnimation={happyTalkingAnimation}
+                        talkingAnimation={talkingAnimation}
                         photoURL={photoURL}
                         containsGiphyText={containsGiphyText}
                         isLoopAnimation={isLoopAnimation} />
@@ -312,7 +312,7 @@ const Reaction = ({
                             setAvatarReady={setAvatarReady}
                             avatarAnimationFinished={avatarAnimationFinished}
                             setIsLoopAnimation={setIsLoopAnimation}
-                            happyTalkingAnimation={happyTalkingAnimation}
+                            talkingAnimation={talkingAnimation}
                             photoURL={photoURL}
                             containsGiphyText={containsGiphyText}
                             isLoopAnimation={isLoopAnimation} />
@@ -375,7 +375,7 @@ const Reaction = ({
                             setAvatarReady={setAvatarReady}
                             avatarAnimationFinished={avatarAnimationFinished}
                             setIsLoopAnimation={setIsLoopAnimation}
-                            happyTalkingAnimation={happyTalkingAnimation}
+                            talkingAnimation={talkingAnimation}
                             photoURL={photoURL}
                             containsGiphyText={containsGiphyText}
                             isLoopAnimation={isLoopAnimation} />
@@ -431,7 +431,7 @@ const Reaction = ({
                             setAvatarReady={setAvatarReady}
                             avatarAnimationFinished={avatarAnimationFinished}
                             setIsLoopAnimation={setIsLoopAnimation}
-                            happyTalkingAnimation={happyTalkingAnimation}
+                            talkingAnimation={talkingAnimation}
                             photoURL={photoURL}
                             containsGiphyText={containsGiphyText}
                             isLoopAnimation={isLoopAnimation} />
@@ -496,7 +496,7 @@ const Reaction = ({
                                 setAvatarReady={setAvatarReady}
                                 avatarAnimationFinished={avatarAnimationFinished}
                                 setIsLoopAnimation={setIsLoopAnimation}
-                                happyTalkingAnimation={happyTalkingAnimation}
+                                talkingAnimation={talkingAnimation}
                                 photoURL={photoURL}
                                 containsGiphyText={containsGiphyText}
                                 isLoopAnimation={isLoopAnimation} />
@@ -549,7 +549,7 @@ const Reaction = ({
                             setAvatarReady={setAvatarReady}
                             avatarAnimationFinished={avatarAnimationFinished}
                             setIsLoopAnimation={setIsLoopAnimation}
-                            happyTalkingAnimation={happyTalkingAnimation}
+                            talkingAnimation={talkingAnimation}
                             photoURL={photoURL}
                             containsGiphyText={containsGiphyText}
                             isLoopAnimation={isLoopAnimation} />
@@ -624,7 +624,7 @@ const Reaction = ({
                             setAvatarReady={setAvatarReady}
                             avatarAnimationFinished={avatarAnimationFinished}
                             setIsLoopAnimation={setIsLoopAnimation}
-                            happyTalkingAnimation={happyTalkingAnimation}
+                            talkingAnimation={talkingAnimation}
                             photoURL={photoURL}
                             containsGiphyText={containsGiphyText}
                             isLoopAnimation={isLoopAnimation} />
@@ -684,7 +684,7 @@ const Reaction = ({
                                 setAvatarReady={setAvatarReady}
                                 avatarAnimationFinished={avatarAnimationFinished}
                                 setIsLoopAnimation={setIsLoopAnimation}
-                                happyTalkingAnimation={happyTalkingAnimation}
+                                talkingAnimation={talkingAnimation}
                                 photoURL={photoURL}
                                 containsGiphyText={containsGiphyText}
                                 isLoopAnimation={isLoopAnimation} />
@@ -881,7 +881,7 @@ const ReactionAvatar = ({
     avatarAnimationFinished,
     setIsLoopAnimation,
     isLoopAnimation,
-    happyTalkingAnimation,
+    talkingAnimation,
     photoURL,
     containsGiphyText
 }) => {
@@ -944,7 +944,7 @@ const ReactionAvatar = ({
                 <directionalLight intensity={0.4} />
                 <Suspense fallback={null}>
                     <TalkingAvatarAnimation avatarId={avatar.avatarId}
-                        animations={happyTalkingAnimation}
+                        animations={talkingAnimation}
                         setAvatarReady={() => setAvatarReady(true)} />
                 </Suspense>
             </Canvas>

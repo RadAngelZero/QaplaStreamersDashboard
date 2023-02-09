@@ -38,6 +38,9 @@ import {
     EMOTE_TUNNEL,
     GIPHY_CLIP,
     GIPHY_CLIPS,
+    TALKING_AVATAR_ANGRY,
+    TALKING_AVATAR_HAPPY,
+    TALKING_AVATAR_SAD,
     TEST_MESSAGE_SPEECH_URL
 } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
@@ -68,9 +71,10 @@ const LiveDonations = () => {
     const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
     const [reactionsCoordinates, setReactionsCoordinates] = useState({ x: 0, y: 0 });
     const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
+    const angryTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarAngry.glb?alt=media&token=fae7a5b2-c247-456a-ab2c-222e7dc38077');
     const happyTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarHappy.glb?alt=media&token=2c2d24f1-a8bf-47be-850f-06eeda6fe885');
+    const sadTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarSad.glb?alt=media&token=f1174119-0bf7-480c-9a35-6e7c67cb57e6');
     const emoteExplosionContainer = useRef();
-    const emoteRainContainer = useRef();
     const emoteTunelContainer = useRef();
     const matterjsContainer = useRef();
     const matterjsEngine = useRef();
@@ -324,7 +328,27 @@ const LiveDonations = () => {
                         }
                     }
 
-                    setDonationToShow(donation);
+                    // Set avatar talking animation to show if necessary
+                    let talkingAnimation = happyTalkingAnimation.animations;
+
+                    switch (donation.talkingAnimationId) {
+                        case TALKING_AVATAR_ANGRY:
+                            talkingAnimation = angryTalkingAnimation.animations;
+                            break;
+                        case TALKING_AVATAR_HAPPY:
+                            talkingAnimation = happyTalkingAnimation.animations;
+                            break;
+                        case TALKING_AVATAR_SAD:
+                            talkingAnimation = sadTalkingAnimation.animations;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    setDonationToShow({
+                        ...donation,
+                        talkingAnimation
+                    });
 
                     if (!donation.message && !bigQoinsDonation) {
                         audioAlert.onended = () => {
@@ -559,7 +583,6 @@ const LiveDonations = () => {
                     <Reaction {...donationToShow}
                         startDonation={startDonation}
                         alertSideRight={alertSideRight}
-                        happyTalkingAnimation={happyTalkingAnimation.animations}
                         reactionsCoordinates={reactionsCoordinates} />
                 </ErrorBoundary>
             }

@@ -23,7 +23,7 @@ import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 import ChatBubbleiOS from '../ChatBubbleiOS/ChatBubbleiOS';
-import { EmoteExplosion, StartEmoteRain, EmoteTunel, StartMatterEngine, StartEmoteFireworks } from '../../utilities/OverlayEmotesAnimation';
+import { EmoteExplosion, startEmoteRain, EmoteTunel, startMatterEngine, StartEmoteFireworks } from '../../utilities/OverlayEmotesAnimation';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
 
@@ -57,10 +57,10 @@ const LiveDonations = () => {
     const { t } = useTranslation();
 
     useEffect(() => {
-        StartMatterEngine(matterjsContainer, matterjsEngine);
+        startMatterEngine(matterjsContainer, matterjsEngine);
         // EmoteExplosion(emoteExplosionContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke')
         // setShowEmojiRain(true);
-        StartEmoteRain(matterjsEngine.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0'], 10);
+        startEmoteRain(matterjsEngine.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 10);
         // EmoteTunel(emoteTunelContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke');
         // StartEmoteFireworks(matterjsEngine.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke', 10);
         queueAnimation();
@@ -313,7 +313,7 @@ const LiveDonations = () => {
                             }, 5000)
                             setShowEmojiRain(true);
                             // EmoteRain(emoteRainContainer.current, ['https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke']);
-                            StartEmoteRain(emoteRainContainer.current, donation.emojiRain.emojis, 10);
+                            startEmoteRain(emoteRainContainer.current, donation.emojiRain.emojis, 10);
                         } else {
                             // executeEmojiRain(donation.emojiRain.emojis);
                         }

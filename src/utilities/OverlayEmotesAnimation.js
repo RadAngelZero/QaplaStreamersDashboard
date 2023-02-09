@@ -1,82 +1,59 @@
-// ref https://codepen.io/ItsConnor/pen/epBGzM
-import { gsap } from "gsap";
-import { Engine, Render, Runner, Bodies, Composite, Body, Events } from "matter-js";
-import styles from '../components/LiveDonations/LiveDonations.module.css';
-export function EmoteExplosion(container, emote) {
-    var flyingMen = [];
+import { gsap } from 'gsap';
+import { Engine, Render, Runner, Bodies, Composite, Body, Events } from 'matter-js';
 
-    // var text = document.getElementById("face");
-    // var button = document.getElementById('btn');
-    // var fsize = document.getElementById("fsize");
-    // text.value = "Hello 🌍";
-    // fsize.value = "24";
-    //emoji object
-    function emoji(face, startx, starty, flour, fs, flyUpMax) {
-        this.isAlive = true;
-        this.face = face;
-        this.x = startx;
-        this.y = starty;
-        this.flourLevel = flour;
-        this.increment = -Math.floor((Math.random() * flyUpMax) + 10);
-        this.xincrement = Math.floor((Math.random() * 10) + 1);
-        this.xincrement *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
-        this.element = document.createElement('img');
-        this.element.src = face;
-        this.element.style.position = "absolute";
-        this.element.style.width = "64px";
-        // this.element.style.fontSize = fs + "px";
-        // this.element.style.color = "black";
-        container.appendChild(this.element);
+export function emoteExplosion(container, emotesArray) {
+    let flyingMen = [];
 
-        this.refresh = function () {
-            if (this.isAlive) {
-                //------Y axis-----
+    class Emote {
+        constructor(face, startx, starty, flour, flyUpMax) {
+            this.isAlive = true;
+            this.face = face;
+            this.x = startx;
+            this.y = starty;
+            this.flourLevel = flour;
+            this.increment = -Math.floor((Math.random() * flyUpMax) + 10);
+            this.xincrement = Math.floor((Math.random() * 10) + 1);
+            this.xincrement *= Math.floor(Math.random() * 2) === 1 ? 1 : -1;
+            this.element = document.createElement('img');
+            this.element.src = face;
+            this.element.style.position = 'absolute';
+            this.element.style.width = '64px';
+            container.appendChild(this.element);
 
+            this.refresh = function () {
+                if (this.isAlive) {
+                    this.y += this.increment;
+                    this.x += this.xincrement;
+                    this.increment += 0.25;
 
-
-
-                this.y += this.increment;
-                this.x += this.xincrement;
-                this.increment += 0.25;
-
-                if (this.y >= this.flourLevel) {
-                    if (this.increment <= 5) {
-                        this.isAlive = false;
+                    if (this.y >= this.flourLevel) {
+                        if (this.increment <= 5) {
+                            this.isAlive = false;
+                        }
+                        this.increment = -this.increment + 5;
                     }
-                    this.increment = -this.increment + 5;
-                }
 
-                this.element.style.transform = "translate(" + this.x + "px, " + this.y + "px)";
-            } else {
-                this.element.style.transform = "translate(px, px)";
+                    this.element.style.transform = 'translate(' + this.x + 'px, ' + this.y + 'px)';
+                } else {
+                    this.element.style.transform = 'translate(px, px)';
+                }
             }
         }
-
     }
 
-
-
-    // button.addEventListener("click", goB);
-
-    function goB() {
-        var fontsize = "24";
-        var xv = document.body.clientWidth / 2;
-        var yv = document.body.clientHeight / 2;
-        var fl = document.body.clientHeight;
-        var face = emote;
-        for (var i = 0; i < 50; i++) {
-            var coolGuy = new emoji(face, xv, yv, fl, fontsize, 12);
-            flyingMen.push(coolGuy);
-        }
-
+    const xv = document.body.clientWidth / 2;
+    const yv = document.body.clientHeight / 2;
+    const fl = document.body.clientHeight;
+    for (let i = 0; i < 50; i++) {
+        const randomEmoteIndex = Math.floor(Math.random() * emotesArray.length);
+        const face = emotesArray[randomEmoteIndex];
+        const coolGuy = new Emote(face, xv, yv, fl, 12);
+        flyingMen.push(coolGuy);
     }
 
-    goB();
-
-    //Rendering
     function render() {
-        for (var i = 0; i < flyingMen.length; i++) {
-            if (flyingMen[i].isAlive == true) {
+        for (let i = 0; i < flyingMen.length; i++) {
+            if (flyingMen[i].isAlive) {
                 flyingMen[i].refresh();
             } else {
                 flyingMen[i].element.remove();
@@ -89,7 +66,10 @@ export function EmoteExplosion(container, emote) {
     render();
 }
 
-export function StartEmoteRain(engine, emote, duration) {
+export function startEmoteRain(engine, emotesArray, duration) {
+    if (isNaN(duration)) {
+        duration = 10
+    }
 
     let bottomDetector = Bodies.rectangle(document.body.clientWidth / 2, document.body.clientHeight + 200, document.body.clientWidth * 3, 80, {
         isStatic: true,
@@ -97,7 +77,7 @@ export function StartEmoteRain(engine, emote, duration) {
     });
 
     Events.on(engine, 'collisionStart', ({ pairs }) => {
-        var bodies = pairs;
+        let bodies = pairs;
 
         bodies.forEach(pair => {
             if (pair.bodyA.label !== pair.bodyB.label) {
@@ -120,7 +100,7 @@ export function StartEmoteRain(engine, emote, duration) {
 
     Composite.add(engine.world, bottomDetector);
 
-    generateDrop(engine, emote, duration, 0);
+    generateDrop(engine, emotesArray, duration, 0);
 
     manageWind(engine, duration, 0);
 
@@ -133,16 +113,17 @@ function resetEngine(engine) {
     Composite.clear(engine.world, false, true);
 }
 
-function generateDrop(engine, emote, duration, count) {
+function generateDrop(engine, emotesArray, duration, count) {
     if (count >= duration * 1000) return;
     let randomInterval = Math.floor((Math.random() * 100) + 20);
     let randomXPos = Math.floor((Math.random() * (document.body.clientWidth - 100)) + 100);
     let randomAirFriction = Math.random() * 0.05;
 
+    const randomEmoteIndex = Math.floor(Math.random() * emotesArray.length);
     let drop = Bodies.rectangle(randomXPos, -100, 2, 2, {
         render: {
             sprite: {
-                texture: emote,
+                texture: emotesArray[randomEmoteIndex],
                 xScale: 0.8,
                 yScale: 0.8,
             }
@@ -154,7 +135,7 @@ function generateDrop(engine, emote, duration, count) {
     Composite.add(engine.world, drop);
 
     setTimeout(() => {
-        generateDrop(engine, emote, duration, count + randomInterval);
+        generateDrop(engine, emotesArray, duration, count + randomInterval);
     }, randomInterval);
 
 }
@@ -173,49 +154,41 @@ function manageWind(engine, duration, count) {
 }
 
 // https://www.youtube.com/watch?v=4NhLMNkyeh4
-export function EmoteTunel(container, emote) {
-
-    function fiesta() {
-        for (let i = 0; i < 50; i++) {
-            const confetti = document.createElement('div');
-            const image = document.createElement('img');
-            confetti.className = styles.confetti;
-            image.src = emote;
-            image.style.width = '64px';
-            confetti.appendChild(image);
-            container.appendChild(confetti);
-        }
+export function emoteTunnel(container, emotesArray, duration) {
+    for (let i = 0; i < 50; i++) {
+        const randomEmoteIndex = Math.floor(Math.random() * emotesArray.length);
+        const confetti = document.createElement('div');
+        const image = document.createElement('img');
+        confetti.style = 'position: absolute; perspective: 1000px; top: 50%; left: 50%; transform: translate(-50%, -50%);';
+        image.src = emotesArray[randomEmoteIndex];
+        image.style.width = '64px';
+        confetti.appendChild(image);
+        container.appendChild(confetti);
     }
 
-    fiesta();
+    const TLCONF = gsap.timeline();
 
-    animateConfettis();
-
-    function animateConfettis() {
-        const TLCONF = gsap.timeline();
-
-        TLCONF
-            .to('#emote-tunel-container img', {
-                y: 'random(-400,400)',
-                x: 'random(-400,400)',
-                z: 'random(0,1000)',
-                rotation: 'random(-90, 90)',
-                duration: 2,
-            })
-            .to('#emote-tunel-conatainer img', { alpha: 0, duration: 1.3 },
-                '-=0.2')
-            .add(() => {
-                container.innerHTML = "";
-            })
-    }
+    TLCONF
+        .to('#emote-tunel-container img', {
+            y: 'random(-400,400)',
+            x: 'random(-400,400)',
+            z: 'random(0,1000)',
+            rotation: 'random(-90, 90)',
+            duration: !isNaN(duration) ? duration : 10,
+        })
+        .to('#emote-tunel-conatainer img', { alpha: 0, duration: 1.3 },
+            '-=0.2')
+        .add(() => {
+            container.innerHTML = '';
+        })
 }
 
-export function StartMatterEngine(container, refEngine) {
+export function startMatterEngine(container, refEngine) {
     const canvas = container.current.firstChild;
 
-    var engine = Engine.create();
+    let engine = Engine.create();
 
-    var render = Render.create({
+    let render = Render.create({
         element: container,
         engine,
         options: {
@@ -229,31 +202,37 @@ export function StartMatterEngine(container, refEngine) {
 
     Render.run(render);
 
-    var runner = Runner.create();
+    let runner = Runner.create();
 
     Runner.run(runner, engine);
 
     refEngine.current = engine;
 }
 
-export function StartEmoteFireworks(engine, emote, amount) {
-    SpawnFirework(engine, emote, amount, 0);
+export function startEmoteFireworks(engine, emotesArray, amount) {
+    if (isNaN(amount)) {
+        amount = 10;
+    }
+
+    spawnFirework(engine, emotesArray, amount, 0);
 }
 
-export function SpawnFirework(engine, emote, amount = 0, count = 1) {
+export function spawnFirework(engine, emotesArray, amount = 0, count = 1) {
     if (amount <= count) {
         return;
     }
-    var sparks = [];
-    var startX = Math.floor(Math.random() * ((document.body.clientWidth - 100) - 100 + 1)) + 100;
-    var startY = Math.floor(Math.random() * ((document.body.clientHeight - 100) - 100 + 1)) + 100;
-    var randomDelay = Math.floor(Math.random() * (1500 - 200 + 200)) + 200;
 
+    let sparks = [];
+    let startX = Math.floor(Math.random() * ((document.body.clientWidth - 100) - 100 + 1)) + 100;
+    let startY = Math.floor(Math.random() * ((document.body.clientHeight - 100) - 100 + 1)) + 100;
+    let randomDelay = Math.floor(Math.random() * (1500 - 200 + 200)) + 200;
+
+    const randomEmoteIndex = Math.floor(Math.random() * emotesArray.length);
     for (let i = 0; i < 50; i++) {
         let spark = Bodies.rectangle(startX, startY, 80, 80, {
             render: {
                 sprite: {
-                    texture: emote,
+                    texture: emotesArray[randomEmoteIndex],
                     xScale: 0.8,
                     yScale: 0.8,
                 }
@@ -275,12 +254,14 @@ export function SpawnFirework(engine, emote, amount = 0, count = 1) {
         let forceX = (Math.random() * (0.6 - 0.2 + 0.1) + 0.2) * (Math.round(Math.random()) ? 1 : -1);
         Body.applyForce(body, { x: (body.position.x + forceOffsetX), y: body.position.y }, { x: forceX, y: forceY });
     });
+
     setTimeout(() => {
         sparks.forEach(spark => {
             Composite.remove(engine.world, spark)
         })
     }, 2000);
+
     setTimeout(() => {
-        SpawnFirework(engine, emote, amount, count + 1);
+        spawnFirework(engine, emotesArray, amount, count + 1);
     }, randomDelay);
 }

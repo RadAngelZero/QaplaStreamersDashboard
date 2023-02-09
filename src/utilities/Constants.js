@@ -253,3 +253,9 @@ export const streamsPlaceholderImages = {
 export const ZAP_REWARD_NAME = 'Zap';
 
 export const BITS_DONATION = 'bits';
+
+// Overlay emotes animations
+export const EMOTE_RAIN = 'emoteRain';
+export const EMOTE_EXPLOSION = 'emoteExplosion';
+export const EMOTE_TUNNEL = 'emoteTunnel';
+export const EMOTE_FIREWORKS = 'emoteFireworks';

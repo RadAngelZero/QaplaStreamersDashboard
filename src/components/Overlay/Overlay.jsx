@@ -38,9 +38,9 @@ import {
     EMOTE_TUNNEL,
     GIPHY_CLIP,
     GIPHY_CLIPS,
-    TALKING_AVATAR_ANGRY,
-    TALKING_AVATAR_HAPPY,
-    TALKING_AVATAR_SAD,
+    ANGRY_VIBE,
+    HAPPY_VIBE,
+    SAD_VIBE,
     TEST_MESSAGE_SPEECH_URL
 } from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
@@ -331,14 +331,14 @@ const LiveDonations = () => {
                     // Set avatar talking animation to show if necessary
                     let talkingAnimation = happyTalkingAnimation.animations;
 
-                    switch (donation.talkingAnimationId) {
-                        case TALKING_AVATAR_ANGRY:
+                    switch (donation.vibe) {
+                        case ANGRY_VIBE:
                             talkingAnimation = angryTalkingAnimation.animations;
                             break;
-                        case TALKING_AVATAR_HAPPY:
+                        case HAPPY_VIBE:
                             talkingAnimation = happyTalkingAnimation.animations;
                             break;
-                        case TALKING_AVATAR_SAD:
+                        case SAD_VIBE:
                             talkingAnimation = sadTalkingAnimation.animations;
                             break;
                         default:

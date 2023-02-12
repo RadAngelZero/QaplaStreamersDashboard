@@ -149,7 +149,8 @@
                 "save": "Save"
             },
             "channelPoints": "Channel Points",
-            "allowViewers": "Allow viewers to send alerts using channel points"
+            "allowViewers": "Allow viewers to send alerts using channel points",
+            "free": "Free"
         },
         "peopleUsingTheApp": "☝ People reacting from the mobile app will see prices in Qoins instead of Bits."
     },

@@ -149,7 +149,8 @@
                 "save": "Guardar"
             },
             "channelPoints": "Puntos de Canal",
-            "allowViewers": "Permite a tus viewers enviar alertas usando puntos de canal"
+            "allowViewers": "Permite a tus viewers enviar alertas usando puntos de canal",
+            "free": "Gratis"
         },
         "peopleUsingTheApp": "☝ La gente que reaccione desde la app verá el precio en Qoins en lugar de Bits."
     },

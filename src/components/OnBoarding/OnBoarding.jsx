@@ -93,6 +93,7 @@ const OnBoarding = ({ user }) => {
     const [creatingReward, setCreatingReward] = useState(false);
     const [loadingDots, setLoadingDots] = useState('.');
     const [zapPrice, setZapPrice] = useState(200);
+    const [segmentCallMade, setSegmentCallMade] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -130,6 +131,18 @@ const OnBoarding = ({ user }) => {
     }, [user]);
 
     useEffect(() => {
+        if (user && user.id && !segmentCallMade) {
+            window.analytics.track('User Opened Onboarding', {
+                StreamerId: user.id,
+                StreamerUid: user.uid,
+                StreamerName: user.displayName
+            });
+
+            setSegmentCallMade(true);
+        }
+    }, [user, segmentCallMade]);
+
+    useEffect(() => {
         if (creatingReward) {
             setTimeout(() => {
                 setLoadingDots(loadingDots.length < 3 ? loadingDots + '.' : '.');
@@ -137,7 +150,7 @@ const OnBoarding = ({ user }) => {
         }
     }, [creatingReward, loadingDots]);
 
-    const handleMainButton = () => {
+    const handleMainButton = async () => {
         switch (step) {
             case -1:
                 if (errorCode === 403) {
@@ -164,7 +177,11 @@ const OnBoarding = ({ user }) => {
                 setStep(step + 1);
                 break;
             case 6:
-                history.push('/profile');
+                await window.analytics.track('User Finished Onboarding', {
+                    StreamerId: user.id,
+                    StreamerUid: user.uid,
+                    StreamerName: user.displayName
+                }, () => history.push('/profile'));
                 break;
             default:
                 break;

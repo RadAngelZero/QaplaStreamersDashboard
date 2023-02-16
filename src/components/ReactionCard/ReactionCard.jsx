@@ -184,25 +184,48 @@ const ReactionCard = ({
         const selectedProduct = availablePrices?.find(({ cost }) => (cost === value));
 
         if (subsMode === 1) {
-            await setReactionLevelPrice(
-                user.uid,
-                level,
-                priceType,
-                // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
-                priceType === ZAP ? value : value * 10,
-                priceType === ZAP ? null : value,
-                selectedProduct?.twitchSku
-            );
+
+            if (value !== 0) {
+                await setReactionLevelPrice(
+                    user.uid,
+                    level,
+                    priceType,
+                    // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
+                    priceType === ZAP ? value : value * 10,
+                    priceType === ZAP ? null : value,
+                    selectedProduct?.twitchSku
+                );
+            } else {
+                await setReactionLevelPrice(
+                    user.uid,
+                    level,
+                    ZAP,
+                    0,
+                    null,
+                    null
+                );
+            }
         } else {
-            await setReactionSubscriberLevelPrice(
-                user.uid,
-                level,
-                priceType,
-                // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
-                priceType === ZAP ? value : value * 10,
-                priceType === ZAP ? null : value,
-                selectedProduct?.twitchSku
-            );
+            if (value !== 0) {
+                await setReactionSubscriberLevelPrice(
+                    user.uid,
+                    level,
+                    priceType,
+                    // 10 Qoins = 1 Bit, so the price in Qoins is the price in Bits * 10
+                    priceType === ZAP ? value : value * 10,
+                    priceType === ZAP ? null : value,
+                    selectedProduct?.twitchSku
+                );
+            } else {
+                await setReactionSubscriberLevelPrice(
+                    user.uid,
+                    level,
+                    ZAP,
+                    0,
+                    null,
+                    null
+                );
+            }
         }
 
         setCost(value);
@@ -344,8 +367,12 @@ const ReactionCard = ({
                                 IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
                                 displayEmpty
                                 disableUnderline
-                                value={cost}
+                                disabled={!user.broadcasterType}
+                                value={user.broadcasterType ? cost : 0}
                                 onChange={({ target: { value } }) => handleCost(value, type)}>
+                                <MenuItem value={0}>
+                                    {t('free')}
+                                </MenuItem>
                                 {type === QOIN ?
                                     availablePrices.map(({ cost, twitchSku }) => (
                                         <MenuItem value={cost} key={twitchSku}>

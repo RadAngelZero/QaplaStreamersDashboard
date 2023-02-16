@@ -523,6 +523,25 @@ const LiveDonations = () => {
 
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100vh', width: '100%' }}>
+            <style>
+            {
+                `::-webkit-scrollbar {
+                    width: 0px;
+                }
+
+                ::-webkit-scrollbar-track {
+                    background: #202750;
+                }
+
+                ::-webkit-scrollbar-thumb {
+                    background: #4040FF;
+                }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #8080FF;
+                }`
+            }
+            </style>
             {reactionsEnabled &&
                 <div
                     onAnimationEnd={() => {
@@ -575,7 +594,7 @@ const LiveDonations = () => {
                 top: 0,
                 left: 0
             }} ref={matterjsContainer}>
-                <canvas width={document.body.clientWidth} height={document.body.clientWidth} id='matterjs-canvas'>
+                <canvas width='100vw' height='100vh' id='matterjs-canvas'>
                 </canvas>
             </div>
             {donationToShow &&

@@ -22,6 +22,7 @@ import { ReactComponent as TtGiphyIcon } from './../../assets/reactionCardsIcons
 import { ReactComponent as TTSBotIcon } from './../../assets/reactionCardsIcons/TTSBot.svg';
 import { ReactComponent as PlusIcon } from './../../assets/reactionCardsIcons/+.svg';
 import { ReactComponent as ArrowRight } from './../../assets/arrowRight.svg';
+import { ReactComponent as VideoIcon } from './../../assets/VideoPlus.svg';
 import { ReactComponent as Zap } from './../../assets/Zap.svg';
 import ChannelPointsImage from './../../assets/channel-pts-twitch-icon@4x.png';
 import { deleteCustomReward, getUserCustomRewards } from '../../services/twitch';
@@ -363,7 +364,7 @@ const OnBoarding = ({ user }) => {
                     display: 'flex',
                     backgroundColor: '#141833',
                     width: '450px',
-                    height: step === 5 ? '402px' : '256px',
+                    height: step === 5 ? '402px' : (step === 0 ? '350px' : '256px'),
                     borderRadius: '35px',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -389,7 +390,7 @@ const OnBoarding = ({ user }) => {
                                 style={{
                                     zIndex: -1,
                                     position: 'absolute',
-                                    bottom: 256, // 256 - 23 (height of container - hidden part of the image)
+                                    bottom: 350, // 256 - 23 (height of container - hidden part of the image)
                                     width: '334px',
                                     height: '179px',
                                     resize: ''
@@ -495,6 +496,11 @@ const OnBoarding = ({ user }) => {
                                     {t('Onboarding.processDescriptionP3')}
                                 </li>
                             </ul>
+                            <Button startIcon={<VideoIcon />}
+                                className={styles.watchConfigButton}
+                                onClick={() => window.open('https://youtu.be/w1Y2HQNGZyo', '_blank')}>
+                                {t('Onboarding.watchConfigGuide')}
+                            </Button>
                         </>
                     }
                     {step === 1 &&

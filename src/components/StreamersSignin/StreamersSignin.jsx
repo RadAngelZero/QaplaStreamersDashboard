@@ -102,7 +102,11 @@ const StreamersSignin = ({ user, title }) => {
                     }
                 }
             } else {
-                history.push('/onboarding');
+                if (user.broadcasterType) {
+                    history.push('/onboarding');
+                } else {
+                    history.push('/profile');
+                }
             }
         }
 

@@ -311,10 +311,12 @@ const ReactionCard = ({
                         </div>
                         {subsMode === 0 ?
                             <SubsSwitch checked={type === ZAP}
-                                onChange={toggleReactionType} />
+                                onChange={toggleReactionType}
+                                disabled={!user.broadcasterType} />
                             :
                             <ChannelPoinsSwitch checked={type === ZAP}
-                                onChange={toggleReactionType} />
+                                onChange={toggleReactionType}
+                                disabled={!user.broadcasterType} />
                         }
                     </div>
                     <div style={{
@@ -368,7 +370,7 @@ const ReactionCard = ({
                                 displayEmpty
                                 disableUnderline
                                 disabled={!user.broadcasterType}
-                                value={user.broadcasterType ? cost : 0}
+                                value={cost}
                                 onChange={({ target: { value } }) => handleCost(value, type)}>
                                 <MenuItem value={0}>
                                     {t('free')}

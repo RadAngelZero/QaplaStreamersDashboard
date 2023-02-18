@@ -7,8 +7,8 @@ import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { useHistory } from 'react-router-dom';
 import { getEmotes, getUserWebhooks, subscribeStreamerToTwitchWebhook } from '../../services/functions';
 import { createInteractionsReward } from '../../services/interactionsQapla';
-import { loadTwitchExtensionReactionsPrices, saveInteractionsRewardData, writeTestCheer } from '../../services/database';
-import { CHEERS_URI, InteractionsRewardRedemption, ZAP_REWARD_NAME } from '../../utilities/Constants';
+import { loadTwitchExtensionReactionsPrices, saveInteractionsRewardData, setReactionLevelPrice, writeTestCheer } from '../../services/database';
+import { CHEERS_URI, InteractionsRewardRedemption, ZAP, ZAP_REWARD_NAME } from '../../utilities/Constants';
 import { notifyBugToDevelopTeam } from '../../services/discord';
 import ReactionCard from '../ReactionCard/ReactionCard';
 
@@ -163,7 +163,11 @@ const OnBoarding = ({ user }) => {
                 setStep(step + 1);
                 break;
             case 1:
-                createChannelPointsRewards();
+                if (user.broadcasterType) {
+                    createChannelPointsRewards();
+                } else {
+                    setPricesForNoAfilliateStreamer();
+                }
                 break;
             case 3:
                 setStepIndicator(1);
@@ -177,7 +181,7 @@ const OnBoarding = ({ user }) => {
                 setStep(step + 1);
                 break;
             case 6:
-                await window.analytics.track('User Finished Onboarding', {
+                window.analytics.track('User Finished Onboarding', {
                     StreamerId: user.id,
                     StreamerUid: user.uid,
                     StreamerName: user.displayName
@@ -280,6 +284,41 @@ const OnBoarding = ({ user }) => {
             setCreatingReward(false);
             return onErrorChannelPointsCreation(0);
         }
+    }
+
+    const setPricesForNoAfilliateStreamer = async () => {
+        setStep(step + 1);
+        setCreatingReward(true);
+
+        await setReactionLevelPrice(
+            user.uid,
+            'level1',
+            ZAP,
+            0,
+            null,
+            null
+        );
+
+        await setReactionLevelPrice(
+            user.uid,
+            'level2',
+            ZAP,
+            0,
+            null,
+            null
+        );
+
+        await setReactionLevelPrice(
+            user.uid,
+            'level3',
+            ZAP,
+            0,
+            null,
+            null
+        );
+
+        setStep(5);
+        setCreatingReward(false);
     }
 
     const onErrorChannelPointsCreation = (errorCode, errorMessage) => {
@@ -461,49 +500,59 @@ const OnBoarding = ({ user }) => {
                     {step === 1 &&
                         <>
                             <h1 className={styles.headerText}>
-                                {t('Onboarding.setZapPrice')}
+                                {user.broadcasterType ?
+                                    t('Onboarding.setZapPrice')
+                                    :
+                                    t('Onboarding.youAreNotAnAffiliate')
+                                }
                             </h1>
                             <p className={`${styles.subText} ${styles.subTextMartinTop} ${styles.alignTextCenter}`}>
-                                {t('Onboarding.zapBenefits')}
+                                {user.broadcasterType ?
+                                    t('Onboarding.zapBenefits')
+                                    :
+                                    t('Onboarding.reactionsWillBeFree')
+                                }
                             </p>
-                            <div className={styles.zapPriceContainer}>
-                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                    <div style={{
-                                        height: '32px',
-                                        width: '32px',
-                                        borderRadius: '5px',
-                                        background: '#8B46FF',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        marginRight: '8px'
-                                    }}>
-                                        <img src={ChannelPointsImage} style={{
-                                            width: '20px',
-                                            height: '30px',
-                                            objectFit: 'contain'
-                                        }} />
-                                    </div>
-                                    <div className={styles.qoinsMainContainer}>
-                                        <div className={styles.qoinsSubContainer}>
-                                        <input
-                                            className={styles.qoins}
-                                            value={zapPrice}
-                                            onChange={(e) => setZapPrice(parseInt(e.target.value) >= 1 ? parseInt(e.target.value) : 1)}
-                                            min={1}
-                                            type='number'
-                                            onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()} />
+                            {user.broadcasterType !== '' &&
+                                <div className={styles.zapPriceContainer}>
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <div style={{
+                                            height: '32px',
+                                            width: '32px',
+                                            borderRadius: '5px',
+                                            background: '#8B46FF',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            marginRight: '8px'
+                                        }}>
+                                            <img src={ChannelPointsImage} style={{
+                                                width: '20px',
+                                                height: '30px',
+                                                objectFit: 'contain'
+                                            }} />
+                                        </div>
+                                        <div className={styles.qoinsMainContainer}>
+                                            <div className={styles.qoinsSubContainer}>
+                                            <input
+                                                className={styles.qoins}
+                                                value={zapPrice}
+                                                onChange={(e) => setZapPrice(parseInt(e.target.value) >= 1 ? parseInt(e.target.value) : 1)}
+                                                min={1}
+                                                type='number'
+                                                onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()} />
+                                            </div>
                                         </div>
                                     </div>
+                                    <ArrowRight />
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <Zap />
+                                        <p style={{ marginLeft: '4px', fontSize: '18px', fontWeight: '700', color: '#FFF' }}>
+                                            1 Zap
+                                        </p>
+                                    </div>
                                 </div>
-                                <ArrowRight />
-                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                    <Zap />
-                                    <p style={{ marginLeft: '4px', fontSize: '18px', fontWeight: '700', color: '#FFF' }}>
-                                        1 Zap
-                                    </p>
-                                </div>
-                            </div>
+                            }
                         </>
                     }
                     {step === 2 &&
@@ -735,7 +784,11 @@ const OnBoarding = ({ user }) => {
                     }
                     {step === 1 &&
                         <>
-                            {t('Onboarding.createZap')}
+                            {user.broadcasterType ?
+                                t('Onboarding.createZap')
+                                :
+                                t('Onboarding.continueAsACommunityStreamer')
+                            }
                         </>
                     }
                     {step === 2 &&

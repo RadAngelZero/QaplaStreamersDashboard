@@ -23,6 +23,7 @@ import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 import ChatBubbleiOS from '../ChatBubbleiOS/ChatBubbleiOS';
+import { EmoteExplosion, startEmoteRain, EmoteTunel, startMatterEngine, StartEmoteFireworks } from '../../utilities/OverlayEmotesAnimation';
 
 const gf = new GiphyFetch('1WgsSOSfrTXTN4IGMMuhajM7WsfxoSdq');
 
@@ -47,10 +48,21 @@ const LiveDonations = () => {
     const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
     const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
     const happyTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarHappy.glb?alt=media&token=2c2d24f1-a8bf-47be-850f-06eeda6fe885');
+    const emoteExplosionContainer = useRef();
+    const emoteRainContainer = useRef();
+    const emoteTunelContainer = useRef();
+    const matterjsContainer = useRef();
+    const matterjsEngine = useRef();
     const { streamerId } = useParams();
     const { t } = useTranslation();
 
     useEffect(() => {
+        startMatterEngine(matterjsContainer, matterjsEngine);
+        // EmoteExplosion(emoteExplosionContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke')
+        // setShowEmojiRain(true);
+        startEmoteRain(matterjsEngine.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 10);
+        // EmoteTunel(emoteTunelContainer.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke');
+        // StartEmoteFireworks(matterjsEngine.current, 'https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke', 10);
         queueAnimation();
         const pushDonation = (donation) => {
             setDonationQueue((array) => [donation, ...array]);
@@ -193,148 +205,6 @@ const LiveDonations = () => {
             });
         }
 
-        /**
-         * Emoji rain functions
-         */
-         let circles = [];
-
-         function addCircle(delay, range, color) {
-             setTimeout(function () {
-                let c = new Circle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
-                    x: -0.15 + Math.random() * 0.3,
-                    y: 1 + Math.random() * 10
-                }, range);
-
-                circles.push(c);
-            }, delay);
-         }
-
-         function addEmoteCircle(delay, range, color) {
-            setTimeout(function () {
-               let c = new EmoteCircle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
-                   x: -0.15 + Math.random() * 0.3,
-                   y: 1 + Math.random() * 10
-               }, range);
-
-               circles.push(c);
-           }, delay);
-        }
-
-         class Circle {
-            constructor(x, y, color, velocity, range) {
-                let _this = this;
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.velocity = velocity;
-                this.range = range;
-                this.element = document.createElement('span');
-                /*this.element.style.display = 'block';*/
-                this.element.style.opacity = 0;
-                this.element.style.position = 'absolute';
-                this.element.style.fontSize = '26px';
-                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
-                this.element.innerHTML = color;
-                const container = document.getElementById('animate');
-                if (container) {
-                    container.appendChild(this.element);
-                }
-
-                this.update = function () {
-                    if (_this.y > 800) {
-                        _this.y = 80 + Math.random() * 4;
-                        _this.x = _this.range[0] + Math.random() * _this.range[1];
-                    }
-                    _this.y += _this.velocity.y;
-                    _this.x += _this.velocity.x;
-                    this.element.style.opacity = 1;
-                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                };
-            }
-        }
-
-        class EmoteCircle {
-            constructor(x, y, color, velocity, range) {
-                let _this = this;
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.velocity = velocity;
-                this.range = range;
-                this.element = document.createElement('img');
-                /*this.element.style.display = 'block';*/
-                this.element.style.opacity = 0;
-                this.element.style.position = 'absolute';
-                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
-                this.element.style.width = '30px'
-                this.element.style.height = '30px'
-                this.element.src = color;
-                const container = document.getElementById('animate');
-                if (container) {
-                    container.appendChild(this.element);
-                }
-
-                this.update = function () {
-                    if (_this.y > 800) {
-                        _this.y = 80 + Math.random() * 4;
-                        _this.x = _this.range[0] + Math.random() * _this.range[1];
-                    }
-                    _this.y += _this.velocity.y;
-                    _this.x += _this.velocity.x;
-                    this.element.style.opacity = 1;
-                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                };
-            }
-        }
-
-         function animate() {
-            for (let i in circles) {
-                circles[i].update();
-            }
-
-            return requestAnimationFrame(animate);
-         }
-
-        function executeEmojiRain(emoji) {
-            setShowEmojiRain(true);
-            for (let i = 0; i < 10; i++) {
-                addCircle(i * 350, [10 + 0, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 0, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 200, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 200, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 400, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 400, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 600, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-            }
-
-            animate();
-        }
-
-        function executeEmoteRain(emote) {
-            setShowEmojiRain(true);
-            for (let i = 0; i < 10; i++) {
-                addEmoteCircle(i * 350, [10 + 0, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 0, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 200, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 200, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 400, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 400, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 600, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-            }
-
-            animate();
-        }
-
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
@@ -438,9 +308,14 @@ const LiveDonations = () => {
 
                     if (donation.emojiRain && donation.emojiRain.emojis) {
                         if (donation.emojiRain.type === EMOTE) {
-                            executeEmoteRain(donation.emojiRain.emojis);
+                            setTimeout(() => {
+                                setShowEmojiRain(false)
+                            }, 5000)
+                            setShowEmojiRain(true);
+                            // EmoteRain(emoteRainContainer.current, ['https://blog.cdn.own3d.tv/resize=fit:crop,height:400,width:600/qVcKVGMZQIKR0Z2jggke']);
+                            startEmoteRain(emoteRainContainer.current, donation.emojiRain.emojis, 10);
                         } else {
-                            executeEmojiRain(donation.emojiRain.emojis);
+                            // executeEmojiRain(donation.emojiRain.emojis);
                         }
                     }
 
@@ -466,9 +341,9 @@ const LiveDonations = () => {
                         const bigQoinsDonation = Boolean(qoinsDonation && donation.amountQoins >= 1000).valueOf();
 
                         const messageToRead = bigQoinsDonation ?
-                                    t('LiveDonations.bigQoinsDonationMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins, message: donation.message })
-                                    :
-                                    t('LiveDonations.donationMessage', { viewerName: donation.twitchUserName, message: donation.message });
+                            t('LiveDonations.bigQoinsDonationMessage', { viewerName: donation.twitchUserName, qoins: donation.amountQoins, message: donation.message })
+                            :
+                            t('LiveDonations.donationMessage', { viewerName: donation.twitchUserName, message: donation.message });
 
                         const voiceUuid = donation.messageExtraData.voiceAPIName.substring(9);
                         await speakCheerMessageUberDuck(donation.id, messageToRead, voiceUuid);
@@ -589,7 +464,22 @@ const LiveDonations = () => {
     }
 
     return (
-        <div style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end' }}>
+        <div id="overlay" style={{ display: 'flex', backgroundColor: 'transparent', maxHeight: '100vh', width: '100%', placeItems: 'flex-end', overflow: 'hidden' }}>
+            {/* No scrollbar on overlay */}
+            <style>
+                {`
+                body {
+                    -ms-overflow-style: none;
+                    /* IE and Edge */
+                    scrollbar-width: none;
+                    /* Firefox */
+                }
+
+                body::-webkit-scrollbar {
+                    display: none;
+                }
+                `}
+            </style>
             {reactionsEnabled &&
                 <div
                     onAnimationEnd={() => {
@@ -630,16 +520,13 @@ const LiveDonations = () => {
                     <img src={qaplaOnOffsets.left === 'auto' ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
                 </div>
             }
-            {showEmojiRain &&
-                <div id="animate" style={{
-                    position: 'fixed',
-                    top: 100,
-                    bottom: 0,
-                    left: '800px',
-                    right: 0,
-                    transform: 'scale(1.5)',
-                }}></div>
-            }
+            <div id='emote-explosion-container' ref={emoteExplosionContainer} style={{ overflow: 'hidden' }}></div>
+            <div id='emote-tunel-container' className={styles.emoteTunelContainer} ref={emoteTunelContainer}></div>
+            <div id='matterjs-container' className={styles.emoteFireworkContainer} ref={matterjsContainer}>
+                <canvas width={document.body.clientWidth} height={document.body.clientWidth} id='matterjs-canvas'>
+
+                </canvas>
+            </div>
             {donationToShow &&
                 <ErrorBoundary onFail={(error, errorInfo) => onReactionFailed(error, errorInfo, donationToShow)}>
                     <DonationHandler donationToShow={donationToShow}
@@ -733,7 +620,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                     }, 1645.714);
                 }
                 // If the donation don´t have message we never hide the bubble
-            // If the donation does not have Qoins
+                // If the donation does not have Qoins
             } else {
                 // If the donation has message
                 if (donation.message) {
@@ -822,29 +709,29 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
         }}>
             {donation.media &&
                 <>
-                {donation.media && (donation.media.type === MEME || donation.media.type === GIPHY_GIF || donation.media.type === GIPHY_STICKER || donation.media.type === MEMES || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) ?
-                    <img src={donation.media.url} alt='' style={{
-                        aspectRatio: donation.media.width / donation.media.height,
-                        display: 'flex',
-                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                        maxHeight: '250px',
-                        objectFit: 'scale-down'
-                    }}
-                    onLoad={() => setMediaReady(true)} />
-                    :
-                    donation.media && (donation.media.type === GIPHY_CLIP || donation.media.type === GIPHY_CLIPS) && clip ?
-                        <div style={{
-                            display: 'flex',
+                    {donation.media && (donation.media.type === MEME || donation.media.type === GIPHY_GIF || donation.media.type === GIPHY_STICKER || donation.media.type === MEMES || donation.media.type === GIPHY_GIFS || donation.media.type === GIPHY_STICKERS) ?
+                        <img src={donation.media.url} alt='' style={{
                             aspectRatio: donation.media.width / donation.media.height,
+                            display: 'flex',
                             alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                             maxHeight: '250px',
                             objectFit: 'scale-down'
-                        }}>
-                            <Video hideAttribution gif={clip} height={250} muted={muteClip} loop onLoop={onClipEnded} />
-                        </div>
-                    :
-                    null
-                }
+                        }}
+                            onLoad={() => setMediaReady(true)} />
+                        :
+                        donation.media && (donation.media.type === GIPHY_CLIP || donation.media.type === GIPHY_CLIPS) && clip ?
+                            <div style={{
+                                display: 'flex',
+                                aspectRatio: donation.media.width / donation.media.height,
+                                alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                                maxHeight: '250px',
+                                objectFit: 'scale-down'
+                            }}>
+                                <Video hideAttribution gif={clip} height={250} muted={muteClip} loop onLoop={onClipEnded} />
+                            </div>
+                            :
+                            null
+                    }
                 </>
             }
             <div style={{
@@ -852,7 +739,7 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                 opacity: showQoinsBubble ? 1 : 0,
                 alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
                 height: showQoinsBubble ? undefined : 0,
-                marginTop: showQoinsBubble ?  ' 40px' : 0
+                marginTop: showQoinsBubble ? ' 40px' : 0
             }}>
                 {donation.message === '' && donation.uid !== 'Anonymus' &&
                     (donation.avatar ?
@@ -970,9 +857,9 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                         :
                         avatarShouldTalk ?
                             <Canvas camera={{
-                                    position: [0, 1.6871838845728084, 0.403600876626397],
-                                    aspect: 1
-                                }}
+                                position: [0, 1.6871838845728084, 0.403600876626397],
+                                aspect: 1
+                            }}
                                 style={{
                                     width: '180px',
                                     height: '180px',
@@ -1016,14 +903,14 @@ const DonationHandler = ({ donationToShow, finishReaction, startDonation, alertS
                                 maxHeight: '250px',
                                 objectFit: 'scale-down'
                             }}
-                            onLoad={() => setGiphyTextReady(true)} />
+                                onLoad={() => setGiphyTextReady(true)} />
                         </div>
                     }
                     {(donation.message !== '' && !(donation.messageExtraData && donation.messageExtraData.giphyText)) &&
                         <div style={{
                             position: 'absolute',
                             top: avatarShouldDance ? (avatarFinishPosition ? '100px' : '20px') : '10px',
-                            left: alertSideRight ? undefined : (avatarShouldDance ? (avatarFinishPosition ? '320px' : '250px') :'136px'),
+                            left: alertSideRight ? undefined : (avatarShouldDance ? (avatarFinishPosition ? '320px' : '250px') : '136px'),
                             right: alertSideRight ? (avatarShouldDance ? (avatarFinishPosition ? '320px' : '230px') : '136px') : undefined,
                             display: 'flex',
                             width: '400px',
@@ -1119,10 +1006,10 @@ const AvatarAnimationReaction = (props) => {
         );
         state.camera.position.lerp(
             (new THREE.Vector3(
-                    props.animationData.camera.position.x,
-                    props.animationData.camera.position.y,
-                    props.animationData.camera.position.z
-                )
+                props.animationData.camera.position.x,
+                props.animationData.camera.position.y,
+                props.animationData.camera.position.z
+            )
             ),
             1
         );
@@ -1195,7 +1082,7 @@ const Greeting = ({ id, startGreeting, twitchUsername, animationId, avatarId, al
              * Render Timeout error is the only timeout, but it could be duplicated so we remove all
              * the timeouts
              */
-            let id = setTimeout(function() {}, 0);
+            let id = setTimeout(function () { }, 0);
 
             while (id--) {
                 clearTimeout(id);
@@ -1230,38 +1117,40 @@ const Greeting = ({ id, startGreeting, twitchUsername, animationId, avatarId, al
         }}>
             {animationData && textOpts &&
                 <>
-                <div style={{
-                    display: 'flex',
-                    alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
-                    width: '1000px',
-                    height: '1000px'
-                }}>
-                    <Canvas camera={{ position: [
+                    <div style={{
+                        display: 'flex',
+                        alignSelf: alertSideRight ? 'flex-end' : 'flex-start',
+                        width: '1000px',
+                        height: '1000px'
+                    }}>
+                        <Canvas camera={{
+                            position: [
                                 animationData.camera.position.x,
                                 animationData.camera.position.y,
                                 animationData.camera.position.z
-                            ], aspect: animationData.camera.aspect ?? 1 }}
-                        style={{
-                            width: '100%',
-                            height: '100%'
-                        }}>
-                        <ambientLight intensity={1} />
-                        <directionalLight intensity={0.4} />
-                        <Suspense fallback={null}>
-                            <AvatarAnimation animationData={animationData}
-                                avatarId={avatarId}
-                                showGreeting={showGreeting}
-                                setAvatarReady={() => setAvatarReady(true)}
-                                finishGreeting={finishGreeting}
-                                greetingId={id} />
-                        </Suspense>
-                        <Suspense fallback={null}>
-                            <Text3DTest textOpts={textOpts}
-                                showGreeting={showGreeting}
-                                setTextReady={() => setTextReady(true)} />
-                        </Suspense>
-                    </Canvas>
-                </div>
+                            ], aspect: animationData.camera.aspect ?? 1
+                        }}
+                            style={{
+                                width: '100%',
+                                height: '100%'
+                            }}>
+                            <ambientLight intensity={1} />
+                            <directionalLight intensity={0.4} />
+                            <Suspense fallback={null}>
+                                <AvatarAnimation animationData={animationData}
+                                    avatarId={avatarId}
+                                    showGreeting={showGreeting}
+                                    setAvatarReady={() => setAvatarReady(true)}
+                                    finishGreeting={finishGreeting}
+                                    greetingId={id} />
+                            </Suspense>
+                            <Suspense fallback={null}>
+                                <Text3DTest textOpts={textOpts}
+                                    showGreeting={showGreeting}
+                                    setTextReady={() => setTextReady(true)} />
+                            </Suspense>
+                        </Canvas>
+                    </div>
                 </>
             }
         </div>
@@ -1292,10 +1181,10 @@ const AvatarAnimation = (props) => {
                     avatarMixer.removeEventListener('finished');
                     props.finishGreeting(props.greetingId);
                 });
-            /**
-             * If the animation is in loop or the voice bot duration is greater than the animation duration
-             * then wait for the voice bot to end to finish the greeting
-             */
+                /**
+                 * If the animation is in loop or the voice bot duration is greater than the animation duration
+                 * then wait for the voice bot to end to finish the greeting
+                 */
             } else {
                 voiceBotMessage.onended = () => {
                     props.finishGreeting(props.greetingId);
@@ -1318,10 +1207,10 @@ const AvatarAnimation = (props) => {
             );
             state.camera.position.lerp(
                 (new THREE.Vector3(
-                        props.animationData.camera.position.x,
-                        props.animationData.camera.position.y,
-                        props.animationData.camera.position.z
-                    )
+                    props.animationData.camera.position.x,
+                    props.animationData.camera.position.y,
+                    props.animationData.camera.position.z
+                )
                 ),
                 1
             );
@@ -1364,44 +1253,44 @@ const Text3DTest = ({ textOpts, setTextReady, showGreeting }) => {
 
     return (
         <>
-        <mesh position={[textOpts.x, textOpts.y, textOpts.z]} onAfterRender={() => setText1Ready(true)}>
-            <text {...textOpts}
-                font={fonts[textOpts.font]}
-                ref={textP1}
-                text={textOpts.name}
-                anchorX='center'
-                anchorY='middle'
-                color='#FFF'
-                outlineBlur={0}
-                outlineOffsetX='-6%'
-                outlineOffsetY='6%'
-                outlineColor='#7000FF'
-                textAlign='center'>
-                <meshBasicMaterial attach='material'>
-                    <GradientTexture
-                        stops={[0, 1]}
-                        colors={['#FFB097', '#42FFC7']}
-                        center={[.5, .5]}
-                        rotation={1.5} />
-                </meshBasicMaterial>
-            </text>
-        </mesh>
-        <mesh position={[textOpts.x1, textOpts.y1, textOpts.z1]} onAfterRender={() => setText2Ready(true)}>
-            <text {...textOpts}
-                font={fonts[textOpts.font]}
-                ref={textP2}
-                text={t('LiveDonations.viewerArrived')}
-                anchorX='center'
-                anchorY='middle'
-                color='#FFF'
-                outlineBlur={0}
-                outlineOffsetX='-6%'
-                outlineOffsetY='6%'
-                outlineColor='#7000FF'
-                textAlign='center'>
-                <meshBasicMaterial attach='material' />
-            </text>
-        </mesh>
+            <mesh position={[textOpts.x, textOpts.y, textOpts.z]} onAfterRender={() => setText1Ready(true)}>
+                <text {...textOpts}
+                    font={fonts[textOpts.font]}
+                    ref={textP1}
+                    text={textOpts.name}
+                    anchorX='center'
+                    anchorY='middle'
+                    color='#FFF'
+                    outlineBlur={0}
+                    outlineOffsetX='-6%'
+                    outlineOffsetY='6%'
+                    outlineColor='#7000FF'
+                    textAlign='center'>
+                    <meshBasicMaterial attach='material'>
+                        <GradientTexture
+                            stops={[0, 1]}
+                            colors={['#FFB097', '#42FFC7']}
+                            center={[.5, .5]}
+                            rotation={1.5} />
+                    </meshBasicMaterial>
+                </text>
+            </mesh>
+            <mesh position={[textOpts.x1, textOpts.y1, textOpts.z1]} onAfterRender={() => setText2Ready(true)}>
+                <text {...textOpts}
+                    font={fonts[textOpts.font]}
+                    ref={textP2}
+                    text={t('LiveDonations.viewerArrived')}
+                    anchorX='center'
+                    anchorY='middle'
+                    color='#FFF'
+                    outlineBlur={0}
+                    outlineOffsetX='-6%'
+                    outlineOffsetY='6%'
+                    outlineColor='#7000FF'
+                    textAlign='center'>
+                    <meshBasicMaterial attach='material' />
+                </text>
+            </mesh>
         </>
     );
 }

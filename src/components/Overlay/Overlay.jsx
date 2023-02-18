@@ -30,13 +30,26 @@ import channelPointReactionAudio from '../../assets/channelPointReactionAudio.mp
 import qoinsReactionAudio from '../../assets/qoinsReactionAudio.mp3';
 import QoinsDropsAudio from '../../assets/siu.mp3';
 import { speakCheerMessage, speakCheerMessageUberDuck } from '../../services/functions';
-import { BITS_DONATION, EMOTE, GIPHY_CLIP, GIPHY_CLIPS, TEST_MESSAGE_SPEECH_URL } from '../../utilities/Constants';
+import {
+    BITS_DONATION,
+    EMOTE_EXPLOSION,
+    EMOTE_FIREWORKS,
+    EMOTE_RAIN,
+    EMOTE_TUNNEL,
+    GIPHY_CLIP,
+    GIPHY_CLIPS,
+    ANGRY_VIBE,
+    HAPPY_VIBE,
+    SAD_VIBE,
+    TEST_MESSAGE_SPEECH_URL
+} from '../../utilities/Constants';
 import QaplaOnLeft from '../../assets/Qapla-On-Overlay-Left.png';
 import QaplaOnRight from '../../assets/Qapla-On-Overlay-Right.png';
 import { getCheerVoiceMessage } from '../../services/storage';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import { changeLanguage, getCurrentLanguage } from '../../utilities/i18n';
 import Reaction from './Components/Reaction';
+import { emoteExplosion, emoteTunnel, startEmoteFireworks, startEmoteRain, startMatterEngine } from '../../utilities/OverlayEmotesAnimation';
 
 extend({ Text });
 
@@ -54,14 +67,23 @@ const LiveDonations = () => {
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
     const [qaplaOnOpacity, setQaplaOnOpacity] = useState(1);
     const [playQaplaOnAnimation, setPlayQaplaOnAnimation] = useState("false");
-    const [showEmojiRain, setShowEmojiRain] = useState(false);
     const [reactionsEnabled, setReactionsEnabled] = useState(true);
     const [alertOffsets, setAlertOffsets] = useState({ top: 0, left: 0 });
     const [reactionsCoordinates, setReactionsCoordinates] = useState({ x: 0, y: 0 });
     const [qaplaOnOffsets, setQaplaOnOffsets] = useState({ left: 0, right: 0, bottom: 0 });
+    const angryTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarAngry.glb?alt=media&token=fae7a5b2-c247-456a-ab2c-222e7dc38077');
     const happyTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarHappy.glb?alt=media&token=2c2d24f1-a8bf-47be-850f-06eeda6fe885');
+    const sadTalkingAnimation = useGLTF('https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsAnimations%2FTalkingAvatarSad.glb?alt=media&token=f1174119-0bf7-480c-9a35-6e7c67cb57e6');
+    const emoteExplosionContainer = useRef();
+    const emoteTunelContainer = useRef();
+    const matterjsContainer = useRef();
+    const matterjsEngine = useRef();
     const { streamerId } = useParams();
     const { t } = useTranslation();
+
+    useEffect(() => {
+        startMatterEngine(matterjsContainer, matterjsEngine);
+    }, []);
 
     useEffect(() => {
         queueAnimation();
@@ -207,148 +229,6 @@ const LiveDonations = () => {
             });
         }
 
-        /**
-         * Emoji rain functions
-         */
-         let circles = [];
-
-         function addCircle(delay, range, color) {
-             setTimeout(function () {
-                let c = new Circle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
-                    x: -0.15 + Math.random() * 0.3,
-                    y: 1 + Math.random() * 10
-                }, range);
-
-                circles.push(c);
-            }, delay);
-         }
-
-         function addEmoteCircle(delay, range, color) {
-            setTimeout(function () {
-               let c = new EmoteCircle(range[0] + Math.random() * range[1], 80 + Math.random() * 4, color, {
-                   x: -0.15 + Math.random() * 0.3,
-                   y: 1 + Math.random() * 10
-               }, range);
-
-               circles.push(c);
-           }, delay);
-        }
-
-         class Circle {
-            constructor(x, y, color, velocity, range) {
-                let _this = this;
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.velocity = velocity;
-                this.range = range;
-                this.element = document.createElement('span');
-                /*this.element.style.display = 'block';*/
-                this.element.style.opacity = 0;
-                this.element.style.position = 'absolute';
-                this.element.style.fontSize = '26px';
-                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
-                this.element.innerHTML = color;
-                const container = document.getElementById('animate');
-                if (container) {
-                    container.appendChild(this.element);
-                }
-
-                this.update = function () {
-                    if (_this.y > 800) {
-                        _this.y = 80 + Math.random() * 4;
-                        _this.x = _this.range[0] + Math.random() * _this.range[1];
-                    }
-                    _this.y += _this.velocity.y;
-                    _this.x += _this.velocity.x;
-                    this.element.style.opacity = 1;
-                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                };
-            }
-        }
-
-        class EmoteCircle {
-            constructor(x, y, color, velocity, range) {
-                let _this = this;
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.velocity = velocity;
-                this.range = range;
-                this.element = document.createElement('img');
-                /*this.element.style.display = 'block';*/
-                this.element.style.opacity = 0;
-                this.element.style.position = 'absolute';
-                this.element.style.color = 'hsl(' + (Math.random() * 360 | 0) + ',80%,50%)';
-                this.element.style.width = '30px'
-                this.element.style.height = '30px'
-                this.element.src = color;
-                const container = document.getElementById('animate');
-                if (container) {
-                    container.appendChild(this.element);
-                }
-
-                this.update = function () {
-                    if (_this.y > 800) {
-                        _this.y = 80 + Math.random() * 4;
-                        _this.x = _this.range[0] + Math.random() * _this.range[1];
-                    }
-                    _this.y += _this.velocity.y;
-                    _this.x += _this.velocity.x;
-                    this.element.style.opacity = 1;
-                    this.element.style.transform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.webkitTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                    this.element.style.mozTransform = 'translate3d(' + _this.x + 'px, ' + _this.y + 'px, 0px)';
-                };
-            }
-        }
-
-         function animate() {
-            for (let i in circles) {
-                circles[i].update();
-            }
-
-            return requestAnimationFrame(animate);
-         }
-
-        function executeEmojiRain(emoji) {
-            setShowEmojiRain(true);
-            for (let i = 0; i < 10; i++) {
-                addCircle(i * 350, [10 + 0, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 0, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 200, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 200, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 400, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 400, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 - 600, -300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-                addCircle(i * 350, [10 + 600, 300], emoji[Math.floor(Math.random() * emoji.length)]);
-            }
-
-            animate();
-        }
-
-        function executeEmoteRain(emote) {
-            setShowEmojiRain(true);
-            for (let i = 0; i < 10; i++) {
-                addEmoteCircle(i * 350, [10 + 0, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 0, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 200, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 200, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 400, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 400, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 - 600, -300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-                addEmoteCircle(i * 350, [10 + 600, 300], emote[Math.floor(Math.random() * emote.length)]);
-            }
-
-            animate();
-        }
-
         if (streamerUid && !listenersAreSetted) {
             listenToUserStreamingStatus(streamerUid, (isStreaming) => {
                 setListenersAreSetted(true);
@@ -448,15 +328,27 @@ const LiveDonations = () => {
                         }
                     }
 
-                    setDonationToShow(donation);
+                    // Set avatar talking animation to show if necessary
+                    let talkingAnimation = happyTalkingAnimation.animations;
 
-                    if (donation.emojiRain && donation.emojiRain.emojis) {
-                        if (donation.emojiRain.type === EMOTE) {
-                            executeEmoteRain(donation.emojiRain.emojis);
-                        } else {
-                            executeEmojiRain(donation.emojiRain.emojis);
-                        }
+                    switch (donation.vibe) {
+                        case ANGRY_VIBE:
+                            talkingAnimation = angryTalkingAnimation.animations;
+                            break;
+                        case HAPPY_VIBE:
+                            talkingAnimation = happyTalkingAnimation.animations;
+                            break;
+                        case SAD_VIBE:
+                            talkingAnimation = sadTalkingAnimation.animations;
+                            break;
+                        default:
+                            break;
                     }
+
+                    setDonationToShow({
+                        ...donation,
+                        talkingAnimation
+                    });
 
                     if (!donation.message && !bigQoinsDonation) {
                         audioAlert.onended = () => {
@@ -526,7 +418,7 @@ const LiveDonations = () => {
 
     function finishReaction(donation) {
         setDonationToShow(null);
-        setShowEmojiRain(false);
+        emoteExplosionContainer.current.innerHTML = '';
         if (donation.twitchUserName === 'QAPLA' && donation.message === 'Test') {
             removeTestDonation(streamerUid, donation.id);
         } else {
@@ -587,6 +479,33 @@ const LiveDonations = () => {
     const startDonation = () => {
         const qoinsDonation = donationToShow.amountQoins && donationToShow.amountQoins >= 100;
         const bigQoinsDonation = Boolean(qoinsDonation && donationToShow.amountQoins >= 1000).valueOf();
+
+        const emoteAnimation = donationToShow.emojiRain;
+
+        if (emoteAnimation && emoteAnimation.emojis) {
+            const reactionDurationInSeconds = ((!donationToShow.message && !bigQoinsDonation) ? audioAlert.duration : voiceBotMessage.duration) + 5;
+            const animationId = emoteAnimation.animationId;
+
+            switch (animationId) {
+                case EMOTE_RAIN:
+                    startEmoteRain(matterjsEngine.current, emoteAnimation.emojis, reactionDurationInSeconds);
+                    break;
+                case EMOTE_EXPLOSION:
+                    emoteExplosion(emoteExplosionContainer.current, emoteAnimation.emojis)
+                    break;
+                case EMOTE_TUNNEL:
+                    emoteTunnel(emoteTunelContainer.current, emoteAnimation.emojis, reactionDurationInSeconds);
+                    break;
+                case EMOTE_FIREWORKS:
+                    startEmoteFireworks(matterjsEngine.current, emoteAnimation.emojis, reactionDurationInSeconds);
+                    break;
+                default:
+                    // Could not find animation id but we have emotes, show emote rain
+                    startEmoteRain(matterjsEngine.current, emoteAnimation.emojis, reactionDurationInSeconds);
+                    break;
+            }
+        }
+
         if (bigQoinsDonation) {
             voiceBotMessage.play();
         } else if ((!donationToShow.media || donationToShow.media.type !== GIPHY_CLIP || donationToShow.media.type !== GIPHY_CLIPS)) {
@@ -604,6 +523,25 @@ const LiveDonations = () => {
 
     return (
         <div style={{ display: 'flex', backgroundColor: 'transparent', height: '100vh', width: '100%' }}>
+            <style>
+            {
+                `::-webkit-scrollbar {
+                    width: 0px;
+                }
+
+                ::-webkit-scrollbar-track {
+                    background: #202750;
+                }
+
+                ::-webkit-scrollbar-thumb {
+                    background: #4040FF;
+                }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #8080FF;
+                }`
+            }
+            </style>
             {reactionsEnabled &&
                 <div
                     onAnimationEnd={() => {
@@ -644,22 +582,26 @@ const LiveDonations = () => {
                     <img src={qaplaOnOffsets.left === 'auto' ? QaplaOnRight : QaplaOnLeft} alt="qapla logo" />
                 </div>
             }
-            {showEmojiRain &&
-                <div id="animate" style={{
-                    position: 'fixed',
-                    top: 100,
-                    bottom: 0,
-                    left: '800px',
-                    right: 0,
-                    transform: 'scale(1.5)',
-                }}></div>
-            }
+            <div id='emote-explosion-container' ref={emoteExplosionContainer} style={{ overflow: 'hidden' }} />
+            <div id='emote-tunel-container' style={{
+                position: 'absolute',
+                top: '40%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+            }} ref={emoteTunelContainer} />
+            <div id='matterjs-container' style={{
+                position: 'absolute',
+                top: 0,
+                left: 0
+            }} ref={matterjsContainer}>
+                <canvas width='100vw' height='100vh' id='matterjs-canvas'>
+                </canvas>
+            </div>
             {donationToShow &&
                 <ErrorBoundary onFail={(error, errorInfo) => onReactionFailed(error, errorInfo, donationToShow)}>
                     <Reaction {...donationToShow}
                         startDonation={startDonation}
                         alertSideRight={alertSideRight}
-                        happyTalkingAnimation={happyTalkingAnimation.animations}
                         reactionsCoordinates={reactionsCoordinates} />
                 </ErrorBoundary>
             }

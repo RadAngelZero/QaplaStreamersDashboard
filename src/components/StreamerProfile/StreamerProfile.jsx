@@ -48,7 +48,7 @@ import BuySubscriptionDialog from '../BuySubscriptionDialog/BuySubscriptionDialo
 import ReactionCard from '../ReactionCard/ReactionCard';
 import { getEmotes, refreshUserAccessToken } from '../../services/functions';
 import { auth } from '../../services/firebase';
-import { getCustomReward, updateCustomReward } from '../../services/twitch';
+import { getCustomReward, getTwitchUserData, updateCustomReward } from '../../services/twitch';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -301,6 +301,23 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
+        async function checkIfUserIsAffiliateNow() {
+            const userTokensUpdated = await refreshUserAccessToken(user.refreshToken);
+            if (userTokensUpdated.data.status === 200) {
+                const userCredentialsUpdated = userTokensUpdated.data;
+                const userData = await getTwitchUserData(userCredentialsUpdated.access_token);
+
+                // If the user gets the affiliate or partner, save the data
+                if (userData.broadcaster_type) {
+                    updateStreamerProfile(user.uid, {
+                        displayName: userData.display_name,
+                        photoUrl: userData.profile_image_url,
+                        broadcasterType: userData.broadcaster_type
+                    });
+                }
+            }
+        }
+
         async function getChannelPointRewardData() {
             try {
                 const rewardData = await getInteractionsRewardData(user.uid);
@@ -335,9 +352,13 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
             }
         }
 
-        if (!editingChannelRewardCost && newChannelRewardCost === null && rewardId === null) {
+        if (user && !editingChannelRewardCost && newChannelRewardCost === null && rewardId === null) {
+            if (!user.broadcasterType) {
+                checkIfUserIsAffiliateNow();
+            }
             getChannelPointRewardData();
         }
+
         loadStreams();
         getValueOfQoins();
         getUserQreatorCode();

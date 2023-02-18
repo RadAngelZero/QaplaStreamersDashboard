@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 const OnBoarding = ({ user }) => {
     const classes = useStyles();
     const history = useHistory();
-    const [step, setStep] = useState(5);
+    const [step, setStep] = useState(0);
     const [errorCode, setErrorCode] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);

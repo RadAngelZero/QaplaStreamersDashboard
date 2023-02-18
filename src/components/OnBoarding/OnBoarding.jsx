@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     testButton: {
         backgroundColor: '#3B4BF9',
         color: '#fff',
-        width: '346px',
+        padding: '8px 16px',
         height: '60px',
         fontsize: '16px',
         fontWeight: '600',
@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 const OnBoarding = ({ user }) => {
     const classes = useStyles();
     const history = useHistory();
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(5);
     const [errorCode, setErrorCode] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
     const [overlayLinkCopied, setOverlayLinkCopied] = useState(false);

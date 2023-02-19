@@ -49,6 +49,7 @@ import ReactionCard from '../ReactionCard/ReactionCard';
 import { getEmotes, refreshUserAccessToken } from '../../services/functions';
 import { auth } from '../../services/firebase';
 import { getCustomReward, getTwitchUserData, updateCustomReward } from '../../services/twitch';
+import NoAffiliateDialog from '../NoAffiliateDialog/NoAffiliateDialog';
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -226,6 +227,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [nextMilestone, setNextMilestone] = useState(0);
     const [availableBits, setAvailableBits] = useState(0);
     const [estimatedBits, setEstimatedBits] = useState(0);
+    const [openNoAffiliateDialog, setOpenNoAffiliateDialog] = useState(false);
     const inputRef = useRef(null);
     const { t } = useTranslation();
 
@@ -455,11 +457,16 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const handlePremiumButton = async (e) => {
-        const isPremium = user && (user.premium || user.freeTrial);
-        if (!isPremium) {
-            e.preventDefault();
+        if (user.broadcasterType) {
+            const isPremium = user && (user.premium || user.freeTrial);
+            if (!isPremium) {
+                e.preventDefault();
 
-            return setOpenGoPremiumDialog(true);
+                return setOpenGoPremiumDialog(true);
+            }
+        } else {
+            e.preventDefault();
+            setOpenNoAffiliateDialog(true);
         }
     }
 
@@ -469,6 +476,10 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     }
 
     const handleChannelRewardButton = async () => {
+        if (!user.broadcasterType) {
+            return setOpenNoAffiliateDialog(true);
+        }
+
         if (updatingChannelRewardCost) {
             return;
         }
@@ -694,7 +705,7 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                                         }}
                                                         className={styles.costInput}
                                                         type={!editingChannelRewardCost ? 'text' : 'number'}
-                                                        value={editingChannelRewardCost ? newChannelRewardCost : channelRewardCost ? channelRewardCost.toLocaleString() : ''}
+                                                        value={editingChannelRewardCost ? newChannelRewardCost : channelRewardCost ? channelRewardCost.toLocaleString() : 0}
                                                         disabled={!editingChannelRewardCost}
                                                         onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                                                         onChange={handleChannelRewardCost} />
@@ -939,6 +950,8 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                     <BuySubscriptionDialog open={openGoPremiumDialog}
                         onClose={() => setOpenGoPremiumDialog(false)}
                         user={user} />
+                    <NoAffiliateDialog open={openNoAffiliateDialog}
+                        onClose={() => setOpenNoAffiliateDialog(false)} />
                 </>
             }
         </StreamerDashboardContainer >

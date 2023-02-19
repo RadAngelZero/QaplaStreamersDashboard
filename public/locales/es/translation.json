@@ -410,6 +410,13 @@
         "resumeSub": "Reanudar subscripción",
         "startFreeTrial": "Iniciar prueba gratis de 14 días"
     },
+    "NoAffiliateDialog": {
+        "becomeAffiliate": "🏁 Conviertete en afiliado de Twitch para desbloquear todas las capacidades de Qapla",
+        "qaplaFeaturesP1": "Qapla te ayuda a potenciar el uso de puntos de canal, Bits y suscripciones para aumentar tus ingresos.",
+        "qaplaFeaturesP2": "Por ahora, puede obtener todas las reacciones que desee de forma gratuita. ",
+        "qaplaFeaturesP3": "¡Creemos en ti!",
+        "understood": "Entendido"
+    },
     "LiveDonations": {
         "greetingMessage": "{{viewerName}} dice: {{message}}",
         "bigQoinsDonationMessage": "{{viewerName}} envió {{qoins}} coins y dice: {{message}}",

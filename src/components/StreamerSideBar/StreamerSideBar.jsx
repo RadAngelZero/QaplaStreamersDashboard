@@ -9,6 +9,7 @@ import { ReactComponent as LogoutIcon } from './../../assets/LogoutIcon.svg';
 import { ReactComponent as QaplaLongLogo } from './../../assets/QaplaLongLogo.svg';
 import LanguageSelect from '../LanguageSelect/LanguageSelect';
 import BuySubscriptionDialog from '../BuySubscriptionDialog/BuySubscriptionDialog';
+import NoAffiliateDialog from '../NoAffiliateDialog/NoAffiliateDialog';
 
 const drawerWidth = 240;
 
@@ -75,6 +76,7 @@ const StreamerSideBar = ({ user }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [loadingStripeCustomerPortal, setLoadingStripeCustomerPortal] = useState(false);
     const [openGoPremiumDialog, setOpenGoPremiumDialog] = useState(false);
+    const [openNoAffiliateDialog, setOpenNoAffiliateDialog] = useState(false);
     const { t } = useTranslation();
 
     const closeSession = async () => {
@@ -164,7 +166,7 @@ const StreamerSideBar = ({ user }) => {
                         </ListItem>
                     </form>
                     :
-                    <ListItem button onClick={() => setOpenGoPremiumDialog(true)} className={classes.listItem}>
+                    <ListItem button onClick={() => user.broadcasterType ? setOpenGoPremiumDialog(true) : setOpenNoAffiliateDialog(true)} className={classes.listItem}>
                         <ListItemIcon style={{ minWidth: 40 }}>
                             <MembershipIcon active={currentScreen === 'membership'} />
                         </ListItemIcon>
@@ -239,6 +241,8 @@ const StreamerSideBar = ({ user }) => {
             <BuySubscriptionDialog open={openGoPremiumDialog}
                 onClose={() => setOpenGoPremiumDialog(false)}
                 user={user} />
+            <NoAffiliateDialog open={openNoAffiliateDialog}
+                onClose={() => setOpenNoAffiliateDialog(false)} />
         </Box>
     );
 }

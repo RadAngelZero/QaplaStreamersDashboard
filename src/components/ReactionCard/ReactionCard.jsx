@@ -10,6 +10,7 @@ import { getReactionLevelDefaultPrice, getReactionLevelPrice, getReactionSubscri
 import { ReactComponent as Bits } from './../../assets/Bits.svg';
 import { ReactComponent as Show } from './../../assets/Show.svg';
 import { ReactComponent as Zap } from './../../assets/Zap.svg';
+import NoAffiliateDialog from '../NoAffiliateDialog/NoAffiliateDialog';
 
 const useStyles = makeStyles(() => ({
     circularProgress: {
@@ -137,6 +138,8 @@ const ReactionCard = ({
 }) => {
     const [cost, setCost] = useState(0);
     const [type, setType] = useState(ZAP);
+    const [openSelect, setOpenSelect] = useState(false);
+    const [openNoAffiliateDialog, setOpenNoAffiliateDialog] = useState(false);
     const { t } = useTranslation('translation', { keyPrefix: 'StreamerProfile.ReactionCard' });
     const classes = useStyles();
 
@@ -229,6 +232,7 @@ const ReactionCard = ({
         }
 
         setCost(value);
+        setOpenSelect(false);
     }
 
     const toggleReactionType = async () => {
@@ -295,30 +299,30 @@ const ReactionCard = ({
                     display: 'flex',
                     flexDirection: 'column',
                 }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                    }}>
+                    {user.broadcasterType &&
                         <div style={{
-                            maxWidth: '136px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
                         }}>
-                            <p className={style.title}>
-                                {t('channelPoints')}
-                            </p>
-                            <p className={style.subtitle}>
-                                {t('allowViewers')}
-                            </p>
+                            <div style={{
+                                maxWidth: '136px',
+                            }}>
+                                <p className={style.title}>
+                                    {t('channelPoints')}
+                                </p>
+                                <p className={style.subtitle}>
+                                    {t('allowViewers')}
+                                </p>
+                            </div>
+                            {subsMode === 0 ?
+                                <SubsSwitch checked={type === ZAP}
+                                    onChange={toggleReactionType} />
+                                :
+                                <ChannelPoinsSwitch checked={type === ZAP}
+                                    onChange={toggleReactionType} />
+                            }
                         </div>
-                        {subsMode === 0 ?
-                            <SubsSwitch checked={type === ZAP}
-                                onChange={toggleReactionType}
-                                disabled={!user.broadcasterType} />
-                            :
-                            <ChannelPoinsSwitch checked={type === ZAP}
-                                onChange={toggleReactionType}
-                                disabled={!user.broadcasterType} />
-                        }
-                    </div>
+                    }
                     <div style={{
                         display: 'flex',
                         flexDirection: 'row',
@@ -369,9 +373,11 @@ const ReactionCard = ({
                                 IconComponent={(props) => <Show {...props} style={{ marginTop: '4px' }} />}
                                 displayEmpty
                                 disableUnderline
-                                disabled={!user.broadcasterType}
                                 value={cost}
-                                onChange={({ target: { value } }) => handleCost(value, type)}>
+                                onChange={({ target: { value } }) => handleCost(value, type)}
+                                open={openSelect}
+                                onClose={() => setOpenSelect(false)}
+                                onClick={() => user.broadcasterType ? (!openSelect ? setOpenSelect(true) : null) : setOpenNoAffiliateDialog(true)}>
                                 <MenuItem value={0}>
                                     {t('free')}
                                 </MenuItem>
@@ -393,6 +399,8 @@ const ReactionCard = ({
                     </div>
                 </div>
             </div>
+            <NoAffiliateDialog open={openNoAffiliateDialog}
+                onClose={() => setOpenNoAffiliateDialog(false)} />
         </div>
     );
 }

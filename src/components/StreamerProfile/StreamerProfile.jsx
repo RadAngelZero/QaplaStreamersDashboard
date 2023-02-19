@@ -342,12 +342,10 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                         await auth.signOut();
                         history.push('/');
                     }
-                } else if (user.broadcasterType) {
-                    /**
-                     * No afilliates or partners can't create the reward, so only redirect to onboarding if the
-                     * user has a broadcaster type
-                     */
-                    history.push('/onboarding');
+                } else {
+                    if (user.broadcasterType || !user.onboardingDone) {
+                        return history.push('/onboarding');
+                    }
                 }
             } catch (error) {
                 console.log(error);

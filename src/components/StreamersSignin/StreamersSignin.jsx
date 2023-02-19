@@ -105,7 +105,11 @@ const StreamersSignin = ({ user, title }) => {
                 if (user.broadcasterType) {
                     history.push('/onboarding');
                 } else {
-                    history.push('/profile');
+                    if (user.onboardingDone) {
+                        history.push('/profile');
+                    } else {
+                        history.push('/onboarding');
+                    }
                 }
             }
         }

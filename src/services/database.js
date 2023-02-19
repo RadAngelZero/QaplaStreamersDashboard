@@ -146,6 +146,14 @@ export async function updateStreamerProfile(uid, userData) {
 }
 
 /**
+ * Creates and set the onboardingDone flag as true, to decide when to show the onboarding to the user
+ * @param {string} uid User identifier
+ */
+export async function markOnboardingAsDone(uid) {
+    return await userStreamersRef.child(uid).update({ onboardingDone: true });
+}
+
+/**
  * Update the data on the User Streamer Public Data node
  * @param {string} uid User identifier
  * @param {object} streamerData Data to update
@@ -1221,6 +1229,8 @@ export async function setVisitsCounter(uid, count) {
 export async function getNumberOfVisits(uid) {
     return await dashboardStreamersVisitsCounterRef.child(uid).once('value');
 }
+
+////////////////////////
 // Uberduck requests
 ////////////////////////
 

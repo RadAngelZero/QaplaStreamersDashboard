@@ -7,7 +7,7 @@ import { ReactComponent as CopyIcon } from './../../assets/CopyPaste.svg';
 import { useHistory } from 'react-router-dom';
 import { getEmotes, getUserWebhooks, subscribeStreamerToTwitchWebhook } from '../../services/functions';
 import { createInteractionsReward } from '../../services/interactionsQapla';
-import { loadTwitchExtensionReactionsPrices, saveInteractionsRewardData, setReactionLevelPrice, writeTestCheer } from '../../services/database';
+import { loadTwitchExtensionReactionsPrices, markOnboardingAsDone, saveInteractionsRewardData, setReactionLevelPrice, writeTestCheer } from '../../services/database';
 import { CHEERS_URI, InteractionsRewardRedemption, ZAP, ZAP_REWARD_NAME } from '../../utilities/Constants';
 import { notifyBugToDevelopTeam } from '../../services/discord';
 import ReactionCard from '../ReactionCard/ReactionCard';
@@ -151,7 +151,7 @@ const OnBoarding = ({ user }) => {
         }
     }, [creatingReward, loadingDots]);
 
-    const handleMainButton = async () => {
+    const handleMainButton = () => {
         switch (step) {
             case -1:
                 if (errorCode === 403) {
@@ -182,6 +182,7 @@ const OnBoarding = ({ user }) => {
                 setStep(step + 1);
                 break;
             case 6:
+                markOnboardingAsDone(user.uid);
                 window.analytics.track('User Finished Onboarding', {
                     StreamerId: user.id,
                     StreamerUid: user.uid,

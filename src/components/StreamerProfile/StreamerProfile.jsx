@@ -10,6 +10,7 @@ import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
+import { ReactComponent as BitsIconBright } from './../../assets/Bits.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg';
 
 import { ReactComponent as GIFIcon } from './../../assets/reactionCardsIcons/GIF.svg';
@@ -32,6 +33,10 @@ import { ReactComponent as ClockOnTabIcon } from './../../assets/ClockTabOn.svg'
 import { ReactComponent as ClockOffTabIcon } from './../../assets/ClockTabOff.svg';
 import { ReactComponent as Heart } from './../../assets/Heart.svg';
 import { ReactComponent as SlidersSettings } from './../../assets/SlidersSettings.svg';
+import { ReactComponent as Refresh } from './../../assets/ActivityFeed/Refresh.svg';
+import { ReactComponent as Deny } from './../../assets/ActivityFeed/Deny.svg';
+import { ReactComponent as Clock } from './../../assets/ActivityFeed/Clock.svg';
+import { ReactComponent as DownArrow } from './../../assets/ActivityFeed/DownArrow.svg';
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
@@ -41,7 +46,10 @@ import {
     SCHEDULED_EVENT_TYPE,
     PENDING_APPROVAL_EVENT_TYPE,
     PAST_STREAMS_EVENT_TYPE,
-    PREMIUM
+    PREMIUM,
+    BITS_DONATION,
+    QOIN,
+    ZAP,
 } from '../../utilities/Constants';
 import CheersBitsRecordDialog from '../CheersBitsRecordDialog/CheersBitsRecordDialog';
 import BuySubscriptionDialog from '../BuySubscriptionDialog/BuySubscriptionDialog';
@@ -49,6 +57,66 @@ import ReactionCard from '../ReactionCard/ReactionCard';
 import { getEmotes, refreshUserAccessToken } from '../../services/functions';
 import { auth } from '../../services/firebase';
 import { getCustomReward, updateCustomReward } from '../../services/twitch';
+import { notationConvertion } from '../../utilities/functions';
+
+const ActivityData = [
+    {
+        user: {
+            imgURL: 'https://static-cdn.jtvnw.net/jtv_user_pictures/37454f0e-581b-42ba-b95b-416f3113fd37-profile_image-70x70.png',
+            displayName: 'IlloJuan',
+        },
+        cost: {
+            amount: 25,
+            type: BITS_DONATION,
+        },
+        data: {
+            message: 'Esta es una donacion de prueba',
+            media: '',
+        },
+    },
+    {
+        user: {
+            imgURL: 'https://static-cdn.jtvnw.net/jtv_user_pictures/37454f0e-581b-42ba-b95b-416f3113fd37-profile_image-70x70.png',
+            displayName: 'IlloJuan',
+        },
+        cost: {
+            amount: 1,
+            type: ZAP,
+        },
+        data: {
+            message: 'Esta es una donacion de prueba',
+            media: '',
+        },
+    },
+    {
+        user: {
+            imgURL: 'https://static-cdn.jtvnw.net/jtv_user_pictures/37454f0e-581b-42ba-b95b-416f3113fd37-profile_image-70x70.png',
+            displayName: 'IlloJuan',
+        },
+        cost: {
+            amount: 2000,
+            type: QOIN,
+        },
+        data: {
+            message: 'Esta es una donacion de prueba',
+            media: '',
+        },
+    },
+    {
+        user: {
+            imgURL: 'https://static-cdn.jtvnw.net/jtv_user_pictures/37454f0e-581b-42ba-b95b-416f3113fd37-profile_image-70x70.png',
+            displayName: 'Loremipsumdolorsitamet,consecteturadipiscingelit',
+        },
+        cost: {
+            amount: 2143322,
+            type: QOIN,
+        },
+        data: {
+            message: 'Esta es una donacion de prueba',
+            media: '',
+        },
+    },
+];
 
 const BalanceButtonContainer = withStyles(() => ({
     root: {
@@ -580,6 +648,70 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                     </div>
                                 </Grid>
                                 <Grid xs={12}>
+                                    <Grid container xs={12}>
+                                        <Grid item xs={12}>
+                                            <h1 className={styles.title}>
+                                                {`Activity`}
+                                            </h1>
+                                            <div className={styles.activityRowContainer} style={{ marginTop: '32px' }}>
+                                                <div className={styles.activityUserContainer}>
+                                                    <p className={styles.activityRowHeaderText}>{`User`}</p>
+                                                </div>
+                                                <div className={styles.activityAmountContainer}>
+                                                    <p className={styles.activityRowHeaderText}>{`Amount`}</p>
+                                                </div>
+                                                <div className={styles.activityFeedActionButtonsContainer}>
+                                                    <p className={styles.activityRowHeaderText} style={{ marginLeft: 'auto' }}>{`Actions`}</p>
+                                                </div>
+                                            </div>
+                                            <style>
+                                                {`
+                                                #activity-feed::-webkit-scrollbar {
+                                                    display: ${ActivityData.length <= 3 ? 'none' : ''};
+                                                }
+                                                `}
+                                            </style>
+                                            <div id='activity-feed' className={styles.activityFeedContainer} >
+                                                {ActivityData.map((element, index) => {
+                                                    return (
+                                                        <div className={styles.activityRowContainer} style={{ backgroundColor: index % 2 ? '#0000' : '#141735' }}>
+                                                            <div className={styles.activityUserContainer}>
+                                                                <img className={styles.activityUserImg} src={element.user.imgURL} alt={'User'} />
+                                                                <p className={styles.activityUserDispName}>{element.user.displayName}</p>
+                                                            </div>
+                                                            <div className={styles.activityAmountContainer}>
+                                                                <p className={styles.activityAmountText} >{notationConvertion(element.cost.amount)}</p>
+                                                                {element.cost.type === BITS_DONATION &&
+                                                                    <BitsIconBright style={{ width: '16px', height: '16px' }} />
+                                                                }
+                                                                {element.cost.type === ZAP &&
+                                                                    <Zap style={{ width: '16px', height: '16px' }} />
+                                                                }
+                                                                {element.cost.type === QOIN &&
+                                                                    <DonatedQoin style={{ width: '16px', height: '16px' }} />
+                                                                }
+                                                            </div>
+                                                            <div className={styles.activityFeedActionButtonsContainer}>
+                                                                <div className={styles.activityFeedActionButton}>
+                                                                    <Refresh />
+                                                                </div>
+                                                                <div className={styles.activityFeedActionButton}>
+                                                                    <Deny />
+                                                                </div>
+                                                                <div className={styles.activityFeedActionButton}>
+                                                                    <Clock />
+                                                                </div>
+                                                                <div className={styles.activityFeedActionButton}>
+                                                                    <DownArrow />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+
+                                            </div>
+                                        </Grid>
+                                    </Grid>
                                     <Grid container xs={12}>
                                         <Grid item xs={12}>
                                             <h1 className={styles.title}>

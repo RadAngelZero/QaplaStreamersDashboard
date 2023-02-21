@@ -320,6 +320,7 @@ const OnBoarding = ({ user }) => {
         );
 
         setStep(5);
+        setStepIndicator(2);
         setCreatingReward(false);
     }
 

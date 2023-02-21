@@ -15,7 +15,7 @@ import SignInImage from './../../assets/SignIn.png';
 import StreamerDashboardContainer from '../StreamerDashboardContainer/StreamerDashboardContainer';
 import { signInWithTwitch, signUpOrSignInTwitchUser } from '../../services/auth';
 import { getUserToken, subscribeStreamerToTwitchWebhook, subscribeStreamerToMailerLiteGroup } from '../../services/functions';
-import { createStreamerProfile, getInteractionsRewardData, getNumberOfVisits, getStreamerDeepLink, setVisitsCounter, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
+import { createStreamerProfile, getInteractionsRewardData, getIsOnboardingDoneFlag, getNumberOfVisits, getStreamerDeepLink, setVisitsCounter, updateStreamerProfile, userHasPublicProfile } from '../../services/database';
 import { webhookStreamOffline, webhookStreamOnline } from '../../utilities/Constants';
 import { getTwitchUserData } from '../../services/twitch';
 
@@ -66,7 +66,7 @@ const StreamersSignin = ({ user, title }) => {
                             broadcasterType: user.userData.broadcasterType
                         });
 
-                        redirectUser(user.firebaseAuthUser.user.uid);
+                        redirectUser(user.firebaseAuthUser.user.uid, user.userData.broadcasterType);
                     } catch (error) {
                         console.log(error);
                     }
@@ -75,7 +75,7 @@ const StreamersSignin = ({ user, title }) => {
                 }
             }
         }
-        async function redirectUser(uid) {
+        async function redirectUser(uid, broadcasterType, onboardingDone) {
             const interactionsRewardData = await getInteractionsRewardData(uid);
             if (interactionsRewardData.exists()) {
                 const userHasProfile = await userHasPublicProfile(uid);
@@ -102,10 +102,11 @@ const StreamersSignin = ({ user, title }) => {
                     }
                 }
             } else {
-                if (user.broadcasterType) {
+                if (broadcasterType) {
                     history.push('/onboarding');
                 } else {
-                    if (user.onboardingDone) {
+                    const onboardingDone = await getIsOnboardingDoneFlag(uid);
+                    if (onboardingDone.exists() && onboardingDone.val()) {
                         history.push('/profile');
                     } else {
                         history.push('/onboarding');

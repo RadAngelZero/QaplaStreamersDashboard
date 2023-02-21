@@ -154,6 +154,14 @@ export async function markOnboardingAsDone(uid) {
 }
 
 /**
+ * Returns the onboardingDone flag of the given user
+ * @param {string} uid User identifier
+ */
+export async function getIsOnboardingDoneFlag(uid) {
+    return await userStreamersRef.child(uid).child('onboardingDone').once('value');
+}
+
+/**
  * Update the data on the User Streamer Public Data node
  * @param {string} uid User identifier
  * @param {object} streamerData Data to update

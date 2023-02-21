@@ -182,12 +182,14 @@ const OnBoarding = ({ user }) => {
                 setStep(step + 1);
                 break;
             case 6:
-                markOnboardingAsDone(user.uid);
                 window.analytics.track('User Finished Onboarding', {
                     StreamerId: user.id,
                     StreamerUid: user.uid,
                     StreamerName: user.displayName
-                }, () => history.push('/profile'));
+                });
+
+                markOnboardingAsDone(user.uid);
+                history.push('/profile')
                 break;
             default:
                 break;

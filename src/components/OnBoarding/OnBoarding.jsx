@@ -499,7 +499,7 @@ const OnBoarding = ({ user }) => {
                             </ul>
                             <Button startIcon={<VideoIcon />}
                                 className={styles.watchConfigButton}
-                                onClick={() => window.open('https://youtu.be/w1Y2HQNGZyo', '_blank')}>
+                                onClick={() => window.open('https://youtu.be/DYo4eAgLX0U', '_blank')}>
                                 {t('Onboarding.watchConfigGuide')}
                             </Button>
                         </>

@@ -1,0 +1,175 @@
+.activityContainer {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.5s ease-out 0s;
+    overflow: hidden;
+}
+
+.activityRowContainer {
+    display: flex;
+
+}
+
+.activityUserContainer {
+    display: flex;
+    align-items: center;
+}
+
+.activityUserImg {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+}
+
+.activityUserDispName {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 19px;
+    margin-left: 8px;
+    word-break: break-all;
+    overflow: hidden;
+    height: 16px;
+}
+
+.activityAmountContainer {
+    display: flex;
+    margin-left: auto;
+    margin-right: 16px;
+    align-items: center;
+    min-width: 100px;
+    max-width: 100px;
+    justify-content: flex-end;
+}
+
+.activityAmountText {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19px;
+    text-align: right;
+    margin-right: 8px;
+    max-width: 6.5ch;
+    overflow-x: scroll;
+}
+
+.activityAmountText::-webkit-scrollbar {
+    display: none;
+}
+
+.activityFeedActionButtonsContainer {
+    display: flex;
+    min-width: 176px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.activityFeedActionButton {
+    display: flex;
+    width: 31px;
+    height: 31px;
+    border-radius: 5px;
+    margin: 1px;
+    background-color: #4040FF4D;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.mediaContainer {
+    display: flex;
+    position: relative;
+    width: 160px;
+    height: 130px;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-right: 24px;
+}
+
+.mediaAttributionContainer {
+    display: flex;
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    align-items: center;
+}
+
+.mediaAttributionImage {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+}
+
+.mediaAttributionText {
+    color: #fff;
+    margin: 0px;
+    margin-left: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 12px;
+    text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+.media {
+    width: 160px;
+    height: 130px;
+    object-fit: cover;
+}
+
+.dataContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 332px;
+}
+
+.dataText {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 15px;
+    margin: 0px;
+}
+
+.dataDisplayContainer {
+    display: flex;
+    gap: 8px;
+}
+
+.dataDisplayInRow {
+    display: flex;
+    gap: 24px;
+}
+
+.stickersContainer {
+    display: flex;
+    gap: 4px;
+}
+
+.sticker {
+    width: 16px;
+    height: 16px;
+}
+
+.banButton {
+    display: flex;
+    background-color: #3B4BF9;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    align-items: center;
+    margin-left: auto;
+    height: fit-content;
+    align-self: flex-end;
+}
+
+.banButtonText {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 15px;
+}

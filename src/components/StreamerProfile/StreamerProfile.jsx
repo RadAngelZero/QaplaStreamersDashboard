@@ -10,7 +10,6 @@ import { ReactComponent as TwitchIcon } from './../../assets/twitchIcon.svg';
 import { ReactComponent as AddIcon } from './../../assets/AddIcon.svg';
 import { ReactComponent as DonatedQoin } from './../../assets/DonatedQoin.svg';
 import { ReactComponent as BitsIcon } from './../../assets/BitsIcon.svg';
-import { ReactComponent as BitsIconBright } from './../../assets/Bits.svg';
 import { ReactComponent as MessageIcon } from './../../assets/MessageBubble.svg';
 
 import { ReactComponent as GIFIcon } from './../../assets/reactionCardsIcons/GIF.svg';
@@ -33,10 +32,6 @@ import { ReactComponent as ClockOnTabIcon } from './../../assets/ClockTabOn.svg'
 import { ReactComponent as ClockOffTabIcon } from './../../assets/ClockTabOff.svg';
 import { ReactComponent as Heart } from './../../assets/Heart.svg';
 import { ReactComponent as SlidersSettings } from './../../assets/SlidersSettings.svg';
-import { ReactComponent as Refresh } from './../../assets/ActivityFeed/Refresh.svg';
-import { ReactComponent as Deny } from './../../assets/ActivityFeed/Deny.svg';
-import { ReactComponent as Clock } from './../../assets/ActivityFeed/Clock.svg';
-import { ReactComponent as DownArrow } from './../../assets/ActivityFeed/DownArrow.svg';
 
 import BarProgressBit from '../BarProgressBit/BarProgressBit';
 
@@ -57,7 +52,7 @@ import ReactionCard from '../ReactionCard/ReactionCard';
 import { getEmotes, refreshUserAccessToken } from '../../services/functions';
 import { auth } from '../../services/firebase';
 import { getCustomReward, updateCustomReward } from '../../services/twitch';
-import { notationConvertion } from '../../utilities/functions';
+import Activity from '../ActivityFeed/Activity';
 
 const ActivityData = [
     {
@@ -70,8 +65,19 @@ const ActivityData = [
             type: BITS_DONATION,
         },
         data: {
-            message: 'Esta es una donacion de prueba',
-            media: '',
+            message: 'Primer mensaje de prueba, interesante, tambien tenemos un gif',
+            media: {
+                url: 'https://media.giphy.com/media/TztOD2c0znrtm/giphy-downsized-large.gif',
+                uploader: {
+                    username: 'juansguarnizo',
+                    avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png',
+                },
+            },
+            stickers: [
+            
+            ],
+            tier: 2,
+            timestamp: 1678155797,
         },
     },
     {
@@ -84,8 +90,19 @@ const ActivityData = [
             type: ZAP,
         },
         data: {
-            message: 'Esta es una donacion de prueba',
-            media: '',
+            message: 'Segundo mensaje, sin alguna imagen, gif o video',
+            media: {
+                url: '',
+                uploader: {
+                    username: '',
+                    avatarImg: '',
+                },
+            },
+            stickers: [
+            
+            ],
+            tier: 1,
+            timestamp: 1678155797,
         },
     },
     {
@@ -94,12 +111,24 @@ const ActivityData = [
             displayName: 'IlloJuan',
         },
         cost: {
-            amount: 2000,
+            amount: 2120,
             type: QOIN,
         },
         data: {
-            message: 'Esta es una donacion de prueba',
-            media: '',
+            message: 'Tercer mensaje, que el mundo arda, con stickers',
+            media: {
+                url: 'https://media.giphy.com/media/yr7n0u3qzO9nG/giphy.gif',
+                uploader: {
+                    username: 'juansguarnizo',
+                    avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png',
+                },
+            },
+            stickers: [
+                'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_234ecd3990a44f5fa63153005adb266b/default/light/1.0',
+                'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_dbe7b97359d64f009787ca9e668e05c5/default/light/1.0'
+            ],
+            tier: 3,
+            timestamp: 1678155797,
         },
     },
     {
@@ -108,12 +137,23 @@ const ActivityData = [
             displayName: 'Loremipsumdolorsitamet,consecteturadipiscingelit',
         },
         cost: {
-            amount: 2143322,
+            amount: 2243322,
             type: QOIN,
         },
         data: {
-            message: 'Esta es una donacion de prueba',
-            media: '',
+            message: 'Un mensaje con un nombre muy peculiar, deberia de poner mas ipsum a este, Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
+            media: {
+                url: '',
+                uploader: {
+                    username: '',
+                    avatarImg: '',
+                },
+            },
+            stickers: [
+            
+            ],
+            tier: 1,
+            timestamp: 1678155797,
         },
     },
 ];
@@ -294,7 +334,9 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
     const [nextMilestone, setNextMilestone] = useState(0);
     const [availableBits, setAvailableBits] = useState(0);
     const [estimatedBits, setEstimatedBits] = useState(0);
+    const [activityOpenedIndex, setActivityOpenedIndex] = useState(null);
     const inputRef = useRef(null);
+    const activityScrollRef = useRef();
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -565,6 +607,27 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
         setEditingSubsRewards(newValue);
     }
 
+    const handleActivityOpen = (index) => {
+        if (index === activityOpenedIndex)
+            return setActivityOpenedIndex(null);
+        setActivityOpenedIndex(index);
+        if (activityOpenedIndex === null) {
+            setTimeout(() => {
+                activityScrollRef.current.scrollTo({
+                    top: 65 * index,
+                    left: 0,
+                    behavior: 'smooth',
+                })
+            }, 450);
+            return;
+        }
+        activityScrollRef.current.scrollTo({
+            top: 65 * index,
+            left: 0,
+            behavior: 'smooth',
+        });
+    }
+
     const isPremium = user && (user.premium || user.freeTrial);
 
     let cheersQoins = 0;
@@ -667,48 +730,18 @@ const StreamerProfile = ({ user, games, qoinsDrops }) => {
                                             <style>
                                                 {`
                                                 #activity-feed::-webkit-scrollbar {
-                                                    display: ${ActivityData.length <= 3 ? 'none' : ''};
+                                                    // display: ${ActivityData.length <= 4 ? 'none' : ''};
                                                 }
                                                 `}
                                             </style>
-                                            <div id='activity-feed' className={styles.activityFeedContainer} >
-                                                {ActivityData.map((element, index) => {
-                                                    return (
-                                                        <div className={styles.activityRowContainer} style={{ backgroundColor: index % 2 ? '#0000' : '#141735' }}>
-                                                            <div className={styles.activityUserContainer}>
-                                                                <img className={styles.activityUserImg} src={element.user.imgURL} alt={'User'} />
-                                                                <p className={styles.activityUserDispName}>{element.user.displayName}</p>
-                                                            </div>
-                                                            <div className={styles.activityAmountContainer}>
-                                                                <p className={styles.activityAmountText} >{notationConvertion(element.cost.amount)}</p>
-                                                                {element.cost.type === BITS_DONATION &&
-                                                                    <BitsIconBright style={{ width: '16px', height: '16px' }} />
-                                                                }
-                                                                {element.cost.type === ZAP &&
-                                                                    <Zap style={{ width: '16px', height: '16px' }} />
-                                                                }
-                                                                {element.cost.type === QOIN &&
-                                                                    <DonatedQoin style={{ width: '16px', height: '16px' }} />
-                                                                }
-                                                            </div>
-                                                            <div className={styles.activityFeedActionButtonsContainer}>
-                                                                <div className={styles.activityFeedActionButton}>
-                                                                    <Refresh />
-                                                                </div>
-                                                                <div className={styles.activityFeedActionButton}>
-                                                                    <Deny />
-                                                                </div>
-                                                                <div className={styles.activityFeedActionButton}>
-                                                                    <Clock />
-                                                                </div>
-                                                                <div className={styles.activityFeedActionButton}>
-                                                                    <DownArrow />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-
+                                            <div id='activity-feed' className={styles.activityFeedContainer} ref={activityScrollRef} >
+                                                <div className={styles.activityFeedScroll}>
+                                                    {ActivityData.map((element, index) => {
+                                                        return (
+                                                            <Activity data={element} selectedIndex={activityOpenedIndex} onActivityOpen={handleActivityOpen} index={index} />
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
                                         </Grid>
                                     </Grid>
